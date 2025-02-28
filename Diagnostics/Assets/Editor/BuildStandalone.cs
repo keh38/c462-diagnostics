@@ -14,32 +14,6 @@ public class BuildStandalone : MonoBehaviour
         ClearConsole();
         Debug.Log("Beginning Windows standalone build...");
 
-        //Debug.Log("Updating revision...");
-        var proc = new System.Diagnostics.Process();
-        //proc.StartInfo.FileName = "SubWCRev.exe";
-        //proc.StartInfo.Arguments = " \"D:\\Development\\Jenks\" ";
-        //proc.StartInfo.Arguments += "\"Assets\\Scripts\\VersionInfo.cs.template\" ";
-        //proc.StartInfo.Arguments += "\"Assets\\Scripts\\VersionInfo.cs\"";
-        //proc.Start();
-        //proc.WaitForExit();
-        //Debug.Log("Done.");
-
-        //var text = File.ReadAllText("Assets/Scripts/VersionInfo.cs");
-        //string pattern = @"Revision = ([\d]+)";
-        //var m = Regex.Match(text, pattern);
-
-        //string revStr = "";
-        //if (m.Success)
-        //{
-        //    revStr = m.Groups[1].Value;
-        //    Debug.Log("Revision = " + revStr);
-        //}
-        //else
-        //{
-        //    Debug.Log("Build aborted: could not find revision.");
-        //    return;
-        //}
-
         var scenesInBuild = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
 
         var buildPlayerOptions = new BuildPlayerOptions();
@@ -64,6 +38,7 @@ public class BuildStandalone : MonoBehaviour
 
         /*
         Debug.Log("Creating installer...");
+        var proc = new System.Diagnostics.Process();
         proc.StartInfo.FileName = "\"C:\\Program Files (x86)\\Inno Setup 6\\iscc.exe\"";
         //proc.StartInfo.Arguments = " /DrevStr=\"" + VersionInfo.Version + "\"";
         proc.StartInfo.Arguments = " \"D:\\Development\\Jenks\\jenks-navi-vr\\Installers\\NAVI combined.iss\"";

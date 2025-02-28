@@ -9440,17 +9440,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 22403892, guid: 8da81206961a7f340a92d51b06f8a443, type: 3}
   m_PrefabInstance: {fileID: 1537544871}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1561527518 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 11415712, guid: 8da81206961a7f340a92d51b06f8a443, type: 3}
-  m_PrefabInstance: {fileID: 1537544871}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d061a7dbf4334944895f07a2673e175a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1590632748
 GameObject:
   m_ObjectHideFlags: 0
@@ -9837,17 +9826,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1630072289}
   m_CullTransparentMesh: 1
---- !u!114 &1632253360 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 11415712, guid: 8da81206961a7f340a92d51b06f8a443, type: 3}
-  m_PrefabInstance: {fileID: 1666402280}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d061a7dbf4334944895f07a2673e175a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1658222258
 GameObject:
   m_ObjectHideFlags: 0
@@ -11186,7 +11164,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Training App Sandbox
+  m_text: Hearing Diagnostics
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -11428,12 +11406,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21df10c9a1a40ab44abe16c0370fe0f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioDropDown: {fileID: 1561527518}
-  hapticDropDown: {fileID: 1632253360}
-  samplingRateInput: {fileID: 43494407}
-  nptsInput: {fileID: 1379704937}
-  nbufInput: {fileID: 893874422}
-  showToggle: {fileID: 1080771909}
   messageBox: {fileID: 1030061647}
   testButton: {fileID: 970051516}
 --- !u!114 &1939112957

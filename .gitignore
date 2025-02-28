@@ -2,3 +2,7 @@
 /Diagnostics/Build
 /Diagnostics/obj
 /Diagnostics/Temp
+/Launcher/.vs
+/Launcher/Launcher/obj
+/Launcher/Launcher/bin
+/Installer/Output
