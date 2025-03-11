@@ -21,17 +21,41 @@ public class OneDrivePanel : MonoBehaviour
 
     public bool IsConnected { get; private set; }
 
+    public static Color GetStatusColor(MSGraphClient.ConnectionStatus status)
+    {
+        if (status == MSGraphClient.ConnectionStatus.Ready)
+        {
+            return new Color(9f / 255f, 74f / 255f, 178f / 255f);
+        }
+        else if ((status & MSGraphClient.ConnectionStatus.HaveInterface) == 0)
+        {
+        }
+        else if ((status & MSGraphClient.ConnectionStatus.HaveAccessToken) == 0)
+        {
+        }
+        else if ((status == MSGraphClient.ConnectionStatus.Error || (status & MSGraphClient.ConnectionStatus.HaveFolderAccess) == 0))
+        {
+            return Color.red;
+        }
+
+        return new Color(0.47f, 0.47f, 0.47f);
+    }
+
     public IEnumerator ConnectToOneDrive()
-    { 
+    {
         MSGraphClient.RestartPath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
         yield return null;
 
-        cloud.color = new Color(0.47f, 0.47f, 0.47f);
+        if (!MSGraphClient.IsReady)
+        {
+            MSGraphClient.Initialize("Diagnostics");
+        }
+
+        var status = MSGraphClient.GetConnectionStatus(out string details);
+        cloud.color = GetStatusColor(status);
         messageBox.Show("Connecting...");
 
-        var success = MSGraphClient.Initialize("Training");
-
-        if (MSGraphClient.IsConnected)
+        if ((status & MSGraphClient.ConnectionStatus.HaveAccessToken) > 0)
         {
             string user = MSGraphClient.GetUser();
             if (string.IsNullOrEmpty(user)) user = "???";
@@ -46,36 +70,15 @@ public class OneDrivePanel : MonoBehaviour
         }
         signInOutButton.interactable = true;
 
-        if (success)
-        {
-            cloud.color = new Color(9f / 255f, 74f / 255f, 178f / 255f);
-        }
-        else
-        {
-            var errorMsg = MSGraphClient.GetInitializationStatus();
-            if (MSGraphClient.IsConnected)
-            {
-                cloud.color = Color.red;
-            }
-
-            Debug.Log("OneDrive: " + errorMsg);
-            if (errorMsg.StartsWith("No connection"))
+        if ((status & MSGraphClient.ConnectionStatus.Error) > 0)
+        { 
+            Debug.Log("OneDrive: " + details);
+            if (details.StartsWith("No connection"))
             {
                 signInOutButton.interactable = false;
-                //errorMsg += $"{Environment.NewLine}{Environment.NewLine}Rebooting is the easiest option";
-                errorMsg = $"-{errorMsg}{Environment.NewLine}-Rebooting is the easiest option";
+                details = $"-{details}{Environment.NewLine}-Rebooting is the easiest option";
             }
-            messageBox.ShowMarkdown(errorMsg, MessageBox.IconShape.Error);
-        }
-
-        IsConnected = success;
-    }
-
-    public void CheckConnectionStatus()
-    {
-        if (MSGraphClient.IsConnected)
-        {
-            cloud.color = new Color(9f / 255f, 74f / 255f, 178f / 255f);
+            messageBox.ShowMarkdown(details, MessageBox.IconShape.Error);
         }
     }
 
@@ -115,7 +118,7 @@ public class OneDrivePanel : MonoBehaviour
 
     private IEnumerator SignInAsync()
     {
-//        Debug.Log(AppDomain.CurrentDomain.BaseDirectory);
+        //        Debug.Log(AppDomain.CurrentDomain.BaseDirectory);
 
         if (!MSGraphClient.SignInUser())
         {
@@ -128,9 +131,9 @@ public class OneDrivePanel : MonoBehaviour
             messageBox.Show("This app will close and restart after you log into OneDrive.");
             yield return new WaitForSeconds(3);
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-        //        Application.Quit();
-        // https://answers.unity.com/questions/467030/unity-builds-crash-when-i-exit-1.html
-        if (!Application.isEditor) System.Diagnostics.Process.GetCurrentProcess().Kill();
+            //        Application.Quit();
+            // https://answers.unity.com/questions/467030/unity-builds-crash-when-i-exit-1.html
+            if (!Application.isEditor) System.Diagnostics.Process.GetCurrentProcess().Kill();
 #endif
         }
     }

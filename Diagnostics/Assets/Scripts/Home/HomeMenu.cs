@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 using KLib;
+using KLib.MSGraph;
 
 public class HomeMenu : MonoBehaviour
 {
@@ -19,6 +22,8 @@ public class HomeMenu : MonoBehaviour
     public Button configMenuButton;
     public Button quitMenuButton;
 
+    [SerializeField] private Image _oneDriveIcon;
+
     private GameObject _activePanel = null;
     private Button _activeButton = null;
 
@@ -32,17 +37,13 @@ public class HomeMenu : MonoBehaviour
     IEnumerator Start()
     {
         versionLabel.text = "V" + Application.version;
+        yield return null;
+
         if (!GameManager.Initialized)
         {
             EnableMenu(false);
             message.text = "Starting up...";
             yield return null;
-
-            var logFolder = Path.Combine(Application.persistentDataPath, "Logs");
-            if (!Directory.Exists(logFolder))
-            {
-                Directory.CreateDirectory(logFolder);
-            }
 
             KLogger.Create(
                 Path.Combine(Application.persistentDataPath, "Logs", Application.productName + ".log"),
@@ -52,17 +53,14 @@ public class HomeMenu : MonoBehaviour
             Debug.Log($"Started V{Application.version}");
 
             subjectPanel.SubjectChangedEvent.AddListener(OnSubjectChanged);
-            //yield return StartCoroutine(oneDrivePanel.ConnectToOneDrive());
 
             message.text = "";
             EnableMenu(true);
 
             GameManager.Initialized = true;
         }
-        else
-        {
-            //oneDrivePanel.CheckConnectionStatus();
-        }
+
+        ConnectToCloud();
 
         if (!string.IsNullOrEmpty(GameManager.Subject)) 
         {
@@ -70,7 +68,18 @@ public class HomeMenu : MonoBehaviour
         }
 
         subjectMenuButton.Select();
-        SubjectMenuButtonClick();
+        OnSubjectMenuButtonClick();
+    }
+
+    private async void ConnectToCloud()
+    {
+        MSGraphClient.RestartPath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+        if (!MSGraphClient.IsReady)
+        {
+            await Task.Run(() => MSGraphClient.Initialize("Diagnostics"));
+        }
+
+        _oneDriveIcon.color = OneDrivePanel.GetStatusColor(MSGraphClient.GetConnectionStatus());
     }
 
     void EnableMenu(bool enabled)
@@ -84,7 +93,7 @@ public class HomeMenu : MonoBehaviour
         //SelectItem(playMenuButton, playPanel.gameObject);
     }
 
-    public void SubjectMenuButtonClick()
+    public void OnSubjectMenuButtonClick()
     {
         SelectItem(subjectMenuButton, subjectPanel.gameObject);
         subjectPanel.ShowPanel();
@@ -95,17 +104,17 @@ public class HomeMenu : MonoBehaviour
         _subjectLabel.text = newSubject;
     }
 
-    public void OnConfigButtonClick()
+    public void OnAdminButtonClick()
     {
-        //SelectItem(configMenuButton, configPanel.gameObject);
+        SceneManager.LoadScene("Admin Tools");
     }
 
-    public void QuitMenuClick()
+    public void OnQuitMenuClick()
     {
         SelectItem(quitMenuButton, quitPanel);
     }
 
-    public void QuitConfirmClick()
+    public void OnQuitConfirmClick()
     {
         Debug.Log("Quitting");
         KLib.KLogger.Log.StopLogging();

@@ -9,10 +9,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{5AF0151F-D49E-6111-AB0A-E5988E5E32AB}</ProjectGuid>
+    <ProjectGuid>{ED2660E6-08D3-E4A0-2FA7-D084F677F2C4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>NaughtyAttributes.Core</AssemblyName>
+    <AssemblyName>KLib</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -53,53 +53,13 @@
     <UnityVersion>2020.3.22f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\MetaAttributes\IGroupAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes\AllowNestingAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes\ShowAssetPreviewAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\MetaAttributes\OnValueChangedAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes\MinMaxSliderAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\MetaAttributes\ShowIfAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes\LayerAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes\EnumFlagsAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes\AnimatorParamAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\MetaAttributes\DisableIfAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes\ResizableTextAreaAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes\CurveRangeAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\Utility\EConditionOperator.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\MetaAttributes\EnableIfAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes\Expandable.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes\InputAxisAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes_SpecialCase\SpecialCaseDrawerAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\MetaAttributes\ReadOnlyAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\ValidatorAttributes\RequiredAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\MetaAttributes\EnableIfAttributeBase.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes\DrawerAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\MetaAttributes\HideIfAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes\DropdownAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\Utility\EColor.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes_SpecialCase\ShowNativePropertyAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\MetaAttributes\FoldoutAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\ValidatorAttributes\MaxValueAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes\SortingLayerAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes\ProgressBarAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\MetaAttributes\LabelAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\INaughtyAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\MetaAttributes\BoxGroupAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\ValidatorAttributes\ValidateInputAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes_SpecialCase\ReorderableListAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes\HorizontalLineAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\ValidatorAttributes\MinValueAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes\InfoBoxAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes_SpecialCase\ButtonAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\MetaAttributes\MetaAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\MetaAttributes\ShowIfAttributeBase.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes\SceneAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\ValidatorAttributes\ValidatorAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes_SpecialCase\ShowNonSerializedFieldAttribute.cs" />
-    <Compile Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\DrawerAttributes\TagAttribute.cs" />
+    <Compile Include="Packages\com.epl.klib\Runtime\KLib\KLogger.cs" />
+    <Compile Include="Packages\com.epl.klib\Runtime\KLib\FileIO.cs" />
+    <Compile Include="Packages\com.epl.klib\Runtime\KLib\VolumeManager.cs" />
+    <Compile Include="Packages\com.epl.klib\Runtime\KLib\VersionInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\FancyTextRendering\NaughtyAttributes\Scripts\Core\NaughtyAttributes.Core.asmdef" />
+    <None Include="Packages\com.epl.klib\Runtime\KLib\KLib.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -358,7 +318,7 @@
       <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@2.0.0\Runtime\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="protobuf-net">
-      <HintPath>Library\PackageCache\com.epl.klib@36767bbb4c\Runtime\Plugins\protobuf-net.dll</HintPath>
+      <HintPath>Library\PackageCache\com.epl.klib@5a73cba5d0\Runtime\Plugins\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="unityplastic">
       <HintPath>Library\PackageCache\com.unity.collab-proxy@1.17.1\Lib\Editor\PlasticSCM\unityplastic.dll</HintPath>

@@ -10,7 +10,6 @@ public class SubjectPanel : MonoBehaviour
     [SerializeField] private DropDownListControl projectDropDown;
     [SerializeField] private DropDownListControl subjectDropDown;
     [SerializeField] private TMPro.TMP_InputField subjectInputField;
-    [SerializeField] private Button applyButton;
 
     public UnityEvent<string> SubjectChangedEvent { get; } = new UnityEvent<string>();
 
@@ -28,6 +27,8 @@ public class SubjectPanel : MonoBehaviour
         _selectedProject = GameManager.Project;
         _selectedSubject = GameManager.Subject;
 
+        subjectInputField.gameObject.SetActive(false);
+
         subjectDropDown.Clear();
         FillProjectDropDown();
     }
@@ -40,22 +41,31 @@ public class SubjectPanel : MonoBehaviour
 
     public void OnSubjectDropDownChange(GameObject go, int intSelected)
     {
-        var subject = subjectDropDown.Items[intSelected].name;
-        GameManager.SetSubject(_selectedProject, subject);
-        SubjectChangedEvent.Invoke(GameManager.Subject);
-    }
-    
-    public void SubjectInputFieldEndEdit(string value)
-    {
-        applyButton.interactable = true;
+        subjectInputField.gameObject.SetActive(intSelected == 0);
+
+        if (intSelected > 0)
+        {
+            var subject = subjectDropDown.Items[intSelected].name;
+            GameManager.SetSubject(_selectedProject, subject);
+            SubjectChangedEvent.Invoke(GameManager.Subject);
+        }
+        else
+        {
+            subjectInputField.Select();
+        }
     }
 
-    public void ApplyButtonClick()
+    public void OnSubjectInputFieldEndEdit(string value)
     {
-        applyButton.interactable = false;
-        GameManager.SetSubject("Scratch", subjectInputField.text);
+        CreateNewSubject(subjectInputField.text);
+    }
 
-        SubjectChangedEvent.Invoke(GameManager.Subject);
+    private void CreateNewSubject(string name)
+    {
+        _selectedSubject = name;
+        GameManager.SetSubject(_selectedProject, name);
+
+        FillSubjectDropDown();
     }
 
     private void FillProjectDropDown()
@@ -76,14 +86,19 @@ public class SubjectPanel : MonoBehaviour
         var subjects = FileLocations.EnumerateSubjects(_selectedProject);
 
         subjectDropDown.Clear();
+        subjectDropDown.AddItem(0, "Create new subject...");
         for (int k = 0; k < subjects.Count; k++)
         {
-            subjectDropDown.AddItem(k, subjects[k]);
+            subjectDropDown.AddItem(k+1, subjects[k]);
         }
-        subjectDropDown.AddItem(2, "Create new...");
-        var x = subjectDropDown.DdlListBox.Items[2];
-        x.ItemNormalColor = Color.red;
-        x.Text = "argh";
+
+        var item = subjectDropDown.DdlListBox.Items[0];
+        var text = item.transform.GetChild(1)?.GetComponent<Text>();
+        if (text != null)
+        {
+            text.fontStyle = FontStyle.Italic;
+        }
+
         subjectDropDown.SelectByText(_selectedSubject);
     }
 

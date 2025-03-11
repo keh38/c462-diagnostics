@@ -9,8 +9,6 @@ public class GameManager : MonoBehaviour
     private AppState _appState = new AppState();
     private bool _initialized = false;
 
-    //private VersionInfo _versionInfo = new VersionInfo("Training App Sandbox", 0, 2, 0);
-
     #region Singleton creation
     // Singleton
     private static GameManager _instance;

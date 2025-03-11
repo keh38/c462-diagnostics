@@ -23,7 +23,7 @@ public class UpdatePanel : MonoBehaviour
     public void CheckForUpdates()
     {
         messageBox.Hide();
-        if (MSGraphClient.IsConnected)
+        if (MSGraphClient.IsReady)
         {
             StartCoroutine(CheckForUpdatesAsync());
         }
