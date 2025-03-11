@@ -23,6 +23,7 @@ public class HomeMenu : MonoBehaviour
     public Button quitMenuButton;
 
     [SerializeField] private Image _oneDriveIcon;
+    [SerializeField] private Image _networkIcon;
 
     private GameObject _activePanel = null;
     private Button _activeButton = null;
@@ -36,6 +37,8 @@ public class HomeMenu : MonoBehaviour
 
     IEnumerator Start()
     {
+        Application.runInBackground = true;
+
         versionLabel.text = "V" + Application.version;
         yield return null;
 
@@ -57,6 +60,8 @@ public class HomeMenu : MonoBehaviour
             message.text = "";
             EnableMenu(true);
 
+            HTS_Server.StartServer();
+
             GameManager.Initialized = true;
         }
 
@@ -69,6 +74,8 @@ public class HomeMenu : MonoBehaviour
 
         subjectMenuButton.Select();
         OnSubjectMenuButtonClick();
+
+        _networkIcon.color = HTS_Server.RemoteConnected ? Color.green : Color.gray;
     }
 
     private async void ConnectToCloud()
