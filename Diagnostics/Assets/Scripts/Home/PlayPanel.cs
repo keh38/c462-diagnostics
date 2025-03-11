@@ -33,9 +33,9 @@ public class PlayPanel : MonoBehaviour
         }
         listBox.OnChange += OnListBoxChange;
 
-        var index = _demos.FindIndex(o => o.name.Equals(GameManager.LastDemo));
-        if (index < 0) index = 0;
-        listBox.SelectByIndex(index);
+        //var index = _demos.FindIndex(o => o.name.Equals(GameManager.LastDemo));
+        //if (index < 0) index = 0;
+        //listBox.SelectByIndex(index);
     }
 
     public void OnListBoxChange(GameObject go, int intSelected)
@@ -45,7 +45,7 @@ public class PlayPanel : MonoBehaviour
 
     public void PlayButtonClick()
     {
-        GameManager.LastDemo = _demos[listBox.SelectedIndex].name;
+        //GameManager.LastDemo = _demos[listBox.SelectedIndex].name;
         Debug.Log($"Loading '{_demos[listBox.SelectedIndex].name}' scene ({_demos[listBox.SelectedIndex].scene})");
         SceneManager.LoadScene(_demos[listBox.SelectedIndex].scene);
     }

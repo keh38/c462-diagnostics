@@ -15,10 +15,12 @@ public class StyleControlEditor : Editor
     private int _selectedStyleIndex;
     private bool _locked = false;
 
+    private string StylesFolder { get { return Path.Combine(Application.dataPath, "Scripts", "Menu Tools", "Styles"); } }
+
     private void OnEnable()
     {
         _savedStyleNames = new List<string>();
-        var files = Directory.EnumerateFiles(Path.Combine(Application.dataPath, "Styles"), "*.json");
+        var files = Directory.EnumerateFiles(StylesFolder, "*.json");
         foreach (var f in files)
         {
             _savedStyleNames.Add(Path.GetFileNameWithoutExtension(f));
@@ -44,7 +46,7 @@ public class StyleControlEditor : Editor
         _selectedStyleIndex = EditorGUILayout.Popup(_selectedStyleIndex, _savedStyleNames.ToArray());
         if (GUILayout.Button("Load", GUILayout.Width(80)))
         {
-            var fn = Path.Combine(Application.dataPath, "Styles", _savedStyleNames[_selectedStyleIndex] + ".json");
+            var fn = Path.Combine(StylesFolder, _savedStyleNames[_selectedStyleIndex] + ".json");
             var data = File.ReadAllText(fn);
             myTarget.style = JsonUtility.FromJson<StyleDefinition>(data);
         }

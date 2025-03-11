@@ -1,5 +1,7 @@
-using UnityEngine;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using UnityEngine;
 
 using KLib;
 
@@ -8,27 +10,20 @@ using KLib;
 /// </summary>
 public static class FileLocations
 {
-    private static string _currentID = "";
+    private static string _currentSubject = "";
     private static string _currentProject = "";
-    private static string _docFolder = Application.persistentDataPath;
-    private static readonly string _dataRoot = _docFolder;// + "/EPL/Training";
 
     public static string SubjectFolder { get; private set; } = "";
     public static string ProjectFolder { get; private set; } = "";
+    public static string DataRoot { get; } = Path.Combine(Application.persistentDataPath, "Projects");
 
-    public static void SetID(string project, string id)
+    public static void SetSubject(string project, string subject)
     {
-        _currentID = id;
         _currentProject = project;
+        _currentSubject = subject;
 
-        ProjectFolder = FileIO.CombinePaths(_dataRoot, "Projects", project);
-        if (!Directory.Exists(ProjectFolder))
-        {
-            Directory.CreateDirectory(ProjectFolder);
-            Debug.Log($"Created project folder {ProjectFolder}");
-        }
-
-        SubjectFolder = FileIO.CombinePaths(ProjectFolder, "Subjects", id);
+        ProjectFolder = Path.Combine(DataRoot, project);
+        SubjectFolder = Path.Combine(ProjectFolder, "Subjects", subject);
         if (!Directory.Exists(SubjectFolder))
         {
             Directory.CreateDirectory(SubjectFolder);
@@ -36,9 +31,19 @@ public static class FileLocations
         }
     }
 
+    public static List<string> EnumerateProjects()
+    {
+        return FileIO.EnumerateFolderNames(DataRoot);
+    }
+
+    public static List<string> EnumerateSubjects(string project)
+    {
+        return FileIO.EnumerateFolderNames(Path.Combine(DataRoot, project, "Subjects"));
+    }
+
     public static bool DoesSubjectExist(string project, string id)
     {
-        var folder = FileIO.CombinePaths(_dataRoot, project, "Subjects", id);
+        var folder = Path.Combine(DataRoot, project, "Subjects", id);
         return Directory.Exists(folder);
     }
 
@@ -54,11 +59,11 @@ public static class FileLocations
 
     public static string LocalResourceFolder(string resourceType)
     {
-        return FileIO.CombinePaths(ProjectFolder, "Resources", resourceType);
+        return Path.Combine(ProjectFolder, "Resources", resourceType);
     }
     public static string LocalResourceFolder(string project, string resourceType)
     {
-        return FileIO.CombinePaths(_dataRoot, project, "Resources", resourceType);
+        return Path.Combine(DataRoot, project, "Resources", resourceType);
     }
     public static string RemoteResourceFolder(string project, string resourceType)
     {
@@ -74,33 +79,33 @@ public static class FileLocations
 
     public static string ConfigFile(string name)
     {
-        return FileIO.CombinePaths(ProjectFolder, "Resources", "Config Files", name + ".xml");
+        return Path.Combine(ProjectFolder, "Resources", "Config Files", name + ".xml");
     }
 
     public static string ConfigFile(string type, string name)
     {
-        return FileIO.CombinePaths(ProjectFolder, "Resources", "Config Files", type + "." + name + ".xml");
+        return Path.Combine(ProjectFolder, "Resources", "Config Files", type + "." + name + ".xml");
     }
 
     public static string StateFile
     {
-        get { return Path.Combine(_dataRoot, "state.xml"); }
+        get { return Path.Combine(Application.persistentDataPath, "state.xml"); }
     }
 
     public static string UploadLog
     {
-        get { return Path.Combine(_dataRoot, "upload.log"); }
+        get { return Path.Combine(DataRoot, "upload.log"); }
     }
 
     public static string ProjectMetadata(string project)
     {
-        return FileIO.CombinePaths(_dataRoot, project, "pmd.bin");
+        return Path.Combine(DataRoot, project, "pmd.bin");
     }
 
-    public static string TinnitusMatchHistoryFile { get { return FileIO.CombinePaths(SubjectFolder, "meta", "tmh.json"); } }
+    public static string TinnitusMatchHistoryFile { get { return Path.Combine(SubjectFolder, "meta", "tmh.json"); } }
 
     // Paths to project manager file
-    public static string ProjectStatePath { get { return FileIO.CombinePaths(SubjectFolder, "meta", "ps.json"); } }
+    public static string ProjectStatePath { get { return Path.Combine(SubjectFolder, "meta", "ps.json"); } }
 
     // Paths to subject manager files
     public static string SubjectMetaFolder { get { return SubjectFolder + "/meta"; } }

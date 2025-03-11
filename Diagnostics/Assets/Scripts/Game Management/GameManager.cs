@@ -47,17 +47,7 @@ public class GameManager : MonoBehaviour
     public static string Subject { get { return instance._appState.subject; } }
     public static string Project { get { return instance._appState.project; } }
 
-    public static string LastDemo
-    {
-        get { return instance._appState.lastDemo; }
-        set
-        {
-            instance._appState.lastDemo = value;
-            instance._appState.Save();
-        }
-    }
-
-    public static void SetSubject(string project, string subject) { instance.m_setSubject(project, subject); }
+    public static void SetSubject(string project, string subject) { instance._setSubject(project, subject); }
     #endregion
 
     #region Private methods
@@ -65,19 +55,29 @@ public class GameManager : MonoBehaviour
     private void Init()
     {
         _appState = AppState.Restore();
-        Debug.Log($"Restored '{_appState.project}/{_appState.subject}'");
-        FileLocations.SetID(_appState.project, _appState.subject);
+        if (!string.IsNullOrEmpty(_appState.project) && !string.IsNullOrEmpty(_appState.subject))
+        {
+            Debug.Log($"[GameManager] Restored '{_appState.project}/{_appState.subject}'");
+            FileLocations.SetSubject(_appState.project, _appState.subject);
+        }
+        else
+        {
+            Debug.Log($"[GameManager] no subject restored");
+        }
     }
 
-    private void m_setSubject(string project, string subject)
+    private void _setSubject(string project, string subject)
     {
-        _appState.project = project;
-        _appState.subject = subject;
-        _appState.Save();
+        if (!project.Equals(_appState.project) || !subject.Equals(_appState.subject))
+        {
+            _appState.project = project;
+            _appState.subject = subject;
+            _appState.Save();
 
-        Debug.Log($"Subject changed to '{_appState.subject}'");
+            Debug.Log($"Subject changed to '{_appState.subject}'");
 
-        FileLocations.SetID(_appState.project, _appState.subject);
+            FileLocations.SetSubject(_appState.project, _appState.subject);
+        }
     }
 
     #endregion

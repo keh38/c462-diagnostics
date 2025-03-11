@@ -69,7 +69,8 @@ public class HomeMenu : MonoBehaviour
             _subjectLabel.text = GameManager.Subject;
         }
 
-        //SelectItem(playMenuButton, playPanel.gameObject);
+        subjectMenuButton.Select();
+        SubjectMenuButtonClick();
     }
 
     void EnableMenu(bool enabled)
