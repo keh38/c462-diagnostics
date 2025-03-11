@@ -58,6 +58,9 @@
     <Compile Include="Assets\Unity UI Controls\Scripts\ListBox Scripts\Editor\ListBoxControlEditor.cs" />
     <Compile Include="Assets\Unity UI Controls\Scripts\ListItem Scripts\Editor\ListBoxLineItemEditor.cs" />
     <Compile Include="Assets\Editor\BuildStandalone.cs" />
+    <Compile Include="Assets\Scripts\Menu Tools\Editor\TitleBarControlEditor.cs" />
+    <Compile Include="Assets\Scripts\Menu Tools\Editor\MenuButtonControlEditor.cs" />
+    <Compile Include="Assets\Scripts\Menu Tools\Editor\StyleControlEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

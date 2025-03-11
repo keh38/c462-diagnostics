@@ -8,13 +8,13 @@
 #define verStr_ StringChange(SemanticVersion(), '.', '-')
 
 [Setup]
-AppName=Hearing Diagnostics
-AppVerName=Hearing Diagnostics V{#semanticVersion}
-DefaultDirName={commonpf}\EPL\Hearing Diagnostics
+AppName=Hearing Test Suite
+AppVerName=Hearing Test Suite V{#semanticVersion}
+DefaultDirName={commonpf}\EPL\Hearing Test Suite
 OutputDir=Output
 DefaultGroupName=EPL
 AllowNoIcons=yes
-OutputBaseFilename=HearingDiagnostics_{#verStr_}
+OutputBaseFilename=Hearing_Test_Suite_{#verStr_}
 UsePreviousAppDir=no
 UsePreviousGroup=no
 UsePreviousSetupType=no
@@ -28,7 +28,7 @@ Source: "..\Launcher\Launcher\bin\Release\*.*"; DestDir: "{app}"; Flags: replace
 
 [Icons]
 ;Name: "{commondesktop}\Hearing Diagnostics"; Filename: "{app}\HearingDiagnostics.exe";
-Name: "{commondesktop}\Hearing Diagnostics"; Filename: "{app}\DiagnosticsLauncher.exe"; IconFilename: "{app}\Diagnostics.ico"; IconIndex: 0;
+Name: "{commondesktop}\Hearing Test Suite"; Filename: "{app}\HTSLauncher.exe"; IconFilename: "{app}\Diagnostics.ico"; IconIndex: 0;
 
 [Registry]
 ;Root: HKCU; Subkey: "SOFTWARE\MEEI\HearingDiagnostics"; ValueType: dword; ValueName: "Screenmanager Is Fullscreen mode_h3981298716"; ValueData: "1"; Flags: uninsdeletevalue;
