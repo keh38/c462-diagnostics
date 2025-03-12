@@ -176,4 +176,8 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
                 break;
         }
     }
+    void IRemoteControllable.ChangeScene(string newScene)
+    {
+        SceneManager.LoadScene(newScene);
+    }
 }

@@ -39,4 +39,10 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     {
 
     }
+
+    void IRemoteControllable.ChangeScene(string newScene)
+    {
+        SceneManager.LoadScene(newScene);
+    }
+
 }

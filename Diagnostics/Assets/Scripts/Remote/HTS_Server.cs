@@ -181,6 +181,9 @@ public class HTS_Server : MonoBehaviour
                 _currentScene.ProcessRPC("SubjectChanged");
                 break;
 
+            case "ChangeScene":
+                _currentScene.ChangeScene(data);
+                break;
 
             default:
                 _listener.SendAcknowledgement(false);

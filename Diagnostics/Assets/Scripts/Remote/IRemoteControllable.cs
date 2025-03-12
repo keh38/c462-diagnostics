@@ -5,4 +5,5 @@ using UnityEngine;
 public interface IRemoteControllable
 {
     void ProcessRPC(string command, string data="");
+    void ChangeScene(string newScene);
 }
