@@ -9,7 +9,7 @@ using UnityEngine.UI;
 using KLib;
 using KLib.MSGraph;
 
-public class HomeMenu : MonoBehaviour
+public class HomeMenu : MonoBehaviour, IRemoteControllable
 {
     public TMPro.TMP_Text versionLabel;
     public TMPro.TMP_Text message;
@@ -24,6 +24,7 @@ public class HomeMenu : MonoBehaviour
 
     [SerializeField] private Image _oneDriveIcon;
     [SerializeField] private Image _networkIcon;
+    private Color _networkActiveColor = new Color(0f, 0.7f, 0f);
 
     private GameObject _activePanel = null;
     private Button _activeButton = null;
@@ -61,6 +62,7 @@ public class HomeMenu : MonoBehaviour
             EnableMenu(true);
 
             HTS_Server.StartServer();
+            HTS_Server.SetCurrentScene(SceneManager.GetActiveScene().name, this);
 
             GameManager.Initialized = true;
         }
@@ -75,7 +77,7 @@ public class HomeMenu : MonoBehaviour
         subjectMenuButton.Select();
         OnSubjectMenuButtonClick();
 
-        _networkIcon.color = HTS_Server.RemoteConnected ? Color.green : Color.gray;
+        _networkIcon.color = HTS_Server.RemoteConnected ? _networkActiveColor : Color.gray;
     }
 
     private async void ConnectToCloud()
@@ -143,5 +145,17 @@ public class HomeMenu : MonoBehaviour
         _activeButton = button;
 
         _activePanel.SetActive(true);
+    }
+
+    void IRemoteControllable.ProcessRPC(string command, string data="")
+    {
+        if (command.Equals("Connect"))
+        {
+            _networkIcon.color = _networkActiveColor;
+        }
+        else if (command.Equals("Disconnect"))
+        {
+            _networkIcon.color = Color.gray;
+        }
     }
 }

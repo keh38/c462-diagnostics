@@ -18,6 +18,8 @@ public class HTS_Server : MonoBehaviour
     private string _address;
     private int _port = 4950;
 
+    private IRemoteControllable _currentScene = null;
+    private string _currentSceneName = "";
     private bool _remoteConnected = false;
 
     // Make singleton
@@ -45,6 +47,11 @@ public class HTS_Server : MonoBehaviour
 
     public static void StartServer() => instance._StartServer();
     public static bool RemoteConnected { get { return instance._remoteConnected; } }
+    public static void SetCurrentScene(string name, IRemoteControllable controllableScene)
+    {
+        instance._currentSceneName = name;
+        instance._currentScene = controllableScene;
+    }
 
     private void _Init()
     {
@@ -157,11 +164,26 @@ public class HTS_Server : MonoBehaviour
             //    _listener.WriteByteArray(Message.ToProtoBuf(subjInfo));
             //    break;
 
+            case "Connect":
+                _listener.SendAcknowledgement();
+                _remoteConnected = true;
+                _currentScene.ProcessRPC("Connect");
+                break;
+
+            case "Disconnect":
+                _listener.SendAcknowledgement();
+                _remoteConnected = false;
+                _currentScene.ProcessRPC("Disconnect");
+                break;
+
+            case "GetCurrentSceneName":
+                _listener.WriteStringAsByteArray(_currentSceneName);
+                break;
+
             case "Ping":
                 _listener.SendAcknowledgement();
 //                _scene.RemoteIPAddress = data;
                 Debug.Log("remote address = " + data);
-                _remoteConnected = true;
 //                _scene.Ping();
                 break;
 
