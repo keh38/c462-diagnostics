@@ -46,6 +46,11 @@ public class GameManager : MonoBehaviour
     public static string Project { get { return instance._appState.project; } }
 
     public static void SetSubject(string project, string subject) { instance._setSubject(project, subject); }
+    public static void SetSubject(string projectAndSubject)
+    {
+        var parts = projectAndSubject.Split('/');
+        SetSubject(parts[0], parts[1]);
+    }
     #endregion
 
     #region Private methods

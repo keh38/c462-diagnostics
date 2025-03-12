@@ -73,6 +73,7 @@
     <Compile Include="Assets\Unity UI Controls\Scripts\_Demo Scripts\DemoListBox.cs" />
     <Compile Include="Assets\Unity UI Controls\Scripts\_Demo Scripts\DemoProgressBar.cs" />
     <Compile Include="Assets\Prefabs\WaitSpinner.cs" />
+    <Compile Include="Assets\Scripts\Remote\IRemoteControllable.cs" />
     <Compile Include="Assets\Unity UI Controls\Scripts\Utility Scripts\Util.cs" />
     <Compile Include="Assets\Unity UI Controls\Scripts\DropDownList Scripts\DropDownListControl.cs" />
     <Compile Include="Assets\Scripts\Admin Tools\SyncPanel.cs" />
@@ -89,7 +90,6 @@
     <Compile Include="Assets\Prefabs\MessageBox.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\MenuBarControl.cs" />
     <Compile Include="Assets\Scripts\Home\SubjectPanel.cs" />
-    <Compile Include="Assets\Scripts\Remote\IRemoteControllable.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

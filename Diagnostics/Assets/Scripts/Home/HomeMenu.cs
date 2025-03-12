@@ -149,13 +149,22 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 
     void IRemoteControllable.ProcessRPC(string command, string data="")
     {
-        if (command.Equals("Connect"))
+        switch (command)
         {
-            _networkIcon.color = _networkActiveColor;
-        }
-        else if (command.Equals("Disconnect"))
-        {
-            _networkIcon.color = Color.gray;
+            case "Connect":
+                _networkIcon.color = _networkActiveColor;
+                break;
+
+            case "Disconnect":
+                _networkIcon.color = Color.gray;
+                break;
+
+            case "SubjectChanged":
+                if (_activePanel == subjectPanel.gameObject)
+                {
+                    subjectPanel.ShowPanel();
+                }
+                break;
         }
     }
 }
