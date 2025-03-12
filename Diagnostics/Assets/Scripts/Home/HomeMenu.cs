@@ -11,19 +11,22 @@ using KLib.MSGraph;
 
 public class HomeMenu : MonoBehaviour, IRemoteControllable
 {
-    public TMPro.TMP_Text versionLabel;
-    public TMPro.TMP_Text message;
+    [SerializeField] private TMPro.TMP_Text _versionLabel;
+    [SerializeField] private TMPro.TMP_Text _message;
 
-    public PlayPanel playPanel;
-    public SubjectPanel subjectPanel;
-    public GameObject quitPanel;
+    [SerializeField] private Button _subjectMenuButton;
+    [SerializeField] private Button _turandotMenuButton;
+    [SerializeField] private Button _configMenuButton;
+    [SerializeField] private Button _quitMenuButton;
 
-    public Button subjectMenuButton;
-    public Button configMenuButton;
-    public Button quitMenuButton;
+    [SerializeField] private PlayPanel _playPanel;
+    [SerializeField] private SubjectPanel _subjectPanel;
+    [SerializeField] private TurandotPanel _turandotPanel;
+    [SerializeField] private GameObject _quitPanel;
 
     [SerializeField] private Image _oneDriveIcon;
     [SerializeField] private Image _networkIcon;
+
     private Color _networkActiveColor = new Color(0f, 0.7f, 0f);
 
     private GameObject _activePanel = null;
@@ -33,20 +36,20 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 
     private void Awake()
     {
-        _subjectLabel = subjectMenuButton.GetComponentInChildren<TMPro.TMP_Text>();
+        _subjectLabel = _subjectMenuButton.GetComponentInChildren<TMPro.TMP_Text>();
     }
 
     IEnumerator Start()
     {
         Application.runInBackground = true;
 
-        versionLabel.text = "V" + Application.version;
+        _versionLabel.text = "V" + Application.version;
         yield return null;
 
         if (!GameManager.Initialized)
         {
             EnableMenu(false);
-            message.text = "Starting up...";
+            _message.text = "Starting up...";
             yield return null;
 
             KLogger.Create(
@@ -56,16 +59,16 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 
             Debug.Log($"Started V{Application.version}");
 
-            subjectPanel.SubjectChangedEvent.AddListener(OnSubjectChanged);
+            _subjectPanel.SubjectChangedEvent.AddListener(OnSubjectChanged);
 
-            message.text = "";
+            _message.text = "";
             EnableMenu(true);
 
             HTS_Server.StartServer();
-            HTS_Server.SetCurrentScene(SceneManager.GetActiveScene().name, this);
-
             GameManager.Initialized = true;
         }
+
+        HTS_Server.SetCurrentScene("Home", this);
 
         ConnectToCloud();
 
@@ -74,7 +77,7 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
             _subjectLabel.text = GameManager.Subject;
         }
 
-        subjectMenuButton.Select();
+        _subjectMenuButton.Select();
         OnSubjectMenuButtonClick();
 
         _networkIcon.color = HTS_Server.RemoteConnected ? _networkActiveColor : Color.gray;
@@ -93,8 +96,8 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 
     void EnableMenu(bool enabled)
     {
-        subjectMenuButton.interactable = enabled;
-        configMenuButton.interactable = enabled;
+        _subjectMenuButton.interactable = enabled;
+        _configMenuButton.interactable = enabled;
     }
 
     public void PlayMenuButtonClick()
@@ -104,8 +107,14 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 
     public void OnSubjectMenuButtonClick()
     {
-        SelectItem(subjectMenuButton, subjectPanel.gameObject);
-        subjectPanel.ShowPanel();
+        SelectItem(_subjectMenuButton, _subjectPanel.gameObject);
+        _subjectPanel.ShowPanel();
+    }
+
+    public void OnTurandotButtonClick()
+    {
+        SelectItem(_turandotMenuButton, _turandotPanel.gameObject);
+        //_subjectPanel.ShowPanel();
     }
 
     private void OnSubjectChanged(string newSubject)
@@ -120,7 +129,7 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 
     public void OnQuitMenuClick()
     {
-        SelectItem(quitMenuButton, quitPanel);
+        SelectItem(_quitMenuButton, _quitPanel);
     }
 
     public void OnQuitConfirmClick()
@@ -160,9 +169,9 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
                 break;
 
             case "SubjectChanged":
-                if (_activePanel == subjectPanel.gameObject)
+                if (_activePanel == _subjectPanel.gameObject)
                 {
-                    subjectPanel.ShowPanel();
+                    _subjectPanel.ShowPanel();
                 }
                 break;
         }

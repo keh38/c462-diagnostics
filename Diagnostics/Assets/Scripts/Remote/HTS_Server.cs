@@ -2,16 +2,14 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Linq;
-using System.Net.Sockets;
+using System.Net;
 
 using KLib.Network;
 
 public class HTS_Server : MonoBehaviour
 {
-    //a true/false variable for connection status
     private bool _listenerReady = false;
 
-    KTcpClient _client;
     private KTcpListener _listener = null;
     private bool _stopServer;
     private NetworkDiscoveryServer _discoveryServer;
@@ -21,6 +19,7 @@ public class HTS_Server : MonoBehaviour
     private IRemoteControllable _currentScene = null;
     private string _currentSceneName = "";
     private bool _remoteConnected = false;
+    private IPEndPoint _remoteEndPoint = null;
 
     // Make singleton
     private static HTS_Server _instance;
@@ -51,6 +50,10 @@ public class HTS_Server : MonoBehaviour
     {
         instance._currentSceneName = name;
         instance._currentScene = controllableScene;
+        if (instance._remoteEndPoint != null)
+        {
+            var result = KTcpClient.SendMessage(instance._remoteEndPoint, $"ChangedScene:{name}");
+        }
     }
 
     private void _Init()
@@ -74,7 +77,6 @@ public class HTS_Server : MonoBehaviour
         Use = true;
 
         _address = NetworkUtils.FindServerAddress();
-
 
         _listener = new KTcpListener();
         _listener.StartListener(_address, _port, bigEndian: false);
@@ -144,6 +146,7 @@ public class HTS_Server : MonoBehaviour
             case "Connect":
                 _listener.SendAcknowledgement();
                 _remoteConnected = true;
+                _remoteEndPoint = ParseEndPoint(data);
                 _currentScene.ProcessRPC("Connect");
                 break;
 
@@ -185,6 +188,14 @@ public class HTS_Server : MonoBehaviour
         }
 
         _listener.CloseTcpClient();
+    }
+
+    private IPEndPoint ParseEndPoint(string address)
+    {
+        var parts = address.Split('/');
+        var port = Int32.Parse(parts[1]);
+
+        return new IPEndPoint(IPAddress.Parse(parts[0]), port);
     }
 
     #endregion
