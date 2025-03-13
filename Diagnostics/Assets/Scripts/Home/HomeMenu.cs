@@ -91,7 +91,10 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
             await Task.Run(() => MSGraphClient.Initialize("Diagnostics"));
         }
 
-        _oneDriveIcon.color = OneDrivePanel.GetStatusColor(MSGraphClient.GetConnectionStatus());
+        if (_oneDriveIcon != null)
+        {
+            _oneDriveIcon.color = OneDrivePanel.GetStatusColor(MSGraphClient.GetConnectionStatus());
+        }
     }
 
     void EnableMenu(bool enabled)

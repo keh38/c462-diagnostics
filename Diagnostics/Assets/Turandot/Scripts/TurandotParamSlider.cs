@@ -1,0 +1,235 @@
+﻿using UnityEngine;
+using System;
+using System.Collections.Generic;
+
+using KLib.Signals;
+using KLib.Signals.Enumerations;
+using KLib.Signals.Waveforms;
+using Turandot.Inputs;
+using Turandot.Screen;
+using Input = Turandot.Inputs.Input;
+
+namespace Turandot.Scripts
+{
+    public class TurandotParamSlider : TurandotInput
+    {
+        // TURANDOT FIX
+/*
+        public KUISlider slider;
+        public UILabel leftLabel;
+        public UILabel rightLabel;
+
+        private ParamSliderLayout _layout = new ParamSliderLayout();
+        private ParamSliderAction _action = null;
+
+        private SignalManager _sigMan;
+        private Action<float> _paramSetter = null;
+        private float _range;
+
+        private InputLog _log = new InputLog("paramslider");
+
+        private int _ncalls = 0;
+        private float _value;
+        private List<float> _values = new List<float>();
+        private float _minVal;
+        private float _maxVal;
+        private bool _started = false;
+
+        private float _xmin;
+        private float _xmax;
+
+        private Noise _noise;
+        private bool _setFilters;
+
+        private bool _ignoreEvents = false;
+
+        public void Start()
+        {
+            slider.ThumbOnly = true;
+            slider.OnSelectNotifier = OnSliderPress;
+        }
+
+        public void Initialize(ParamSliderLayout layout)
+        {
+            _layout = layout;
+            slider.backgroundWidget.width = _layout.width;
+            slider.foregroundWidget.width = _layout.width;
+        }
+
+        public void ClearLog()
+        {
+            _log.Clear();
+        }
+
+        public void Activate(Input input, TurandotAudio audio)
+        {
+            var action = input as ParamSliderAction;
+            leftLabel.text = action.leftLabel;
+            rightLabel.text = action.rightLabel;
+
+            _log.Add(Time.timeSinceLevelLoad, float.NaN);
+            button.IsVisible = false;
+            _started = false;
+
+            if (action.reset)
+            {
+                _action = null;
+                _ncalls = 0;
+                _values.Clear();
+            }
+            else if (action.startVisible)
+            {
+                _ignoreEvents = true;
+
+                _action = action;
+                _sigMan = audio.SigMan;
+
+                _noise = _sigMan[_action.channel].waveform as Noise;
+
+                _setFilters = _noise != null && _action.parameter == "Frequency";
+                _paramSetter = _sigMan[_action.channel].ParamSetter(_setFilters ? "CF" : _action.parameter);
+
+                if (_action.parameter == "Level")
+                {
+                    _sigMan[_action.channel].ClampLevelToMax(true);
+                }
+
+                if (_ncalls == 0)
+                {
+                    _value = _action.startVal;
+                    _minVal = _action.minVal;
+                    _maxVal = _action.maxVal;
+                }
+
+                if (_action.isLog)
+                {
+                    if (_ncalls > 0)
+                    {
+                        if (_action.shrinkFactor > 0)
+                        {
+                            float newRange = (1 - _action.shrinkFactor / 100) * Mathf.Log(_maxVal / _minVal); // number of log units
+                            float dv = UnityEngine.Random.Range(0.5f * (1 - _action.startRange / 100), 0.5f * (1 + _action.startRange / 100));
+                            _minVal = Mathf.Max(_minVal, _value * Mathf.Exp(-dv * newRange));
+                            _maxVal = Mathf.Min(_maxVal, _minVal * Mathf.Exp(newRange));
+                            _minVal = _maxVal * Mathf.Exp(-newRange);
+
+                            _value = Mathf.Exp(UnityEngine.Random.Range(0f, 1f) * newRange) * _minVal;
+                        }
+                        else
+                        {
+                            _value = Mathf.Pow(2, UnityEngine.Random.Range(-0.5f, 0.5f)) * _action.startVal;
+                        }
+                        Debug.Log("random value = " + _value);
+
+                        Debug.Log("Min=" + _minVal + "; Max=" + _maxVal);
+                    }
+
+                    _range = Mathf.Log(_maxVal / _minVal);
+                    slider.value = Mathf.Log(_value / _minVal) / _range;
+                }
+                else
+                {
+                    _range = _maxVal - _minVal;
+                    slider.value = (_value - _action.minVal) / _range;
+                }
+
+                _action.thumbTogglesSound = false;
+                if (_action.thumbTogglesSound) _sigMan.StartPaused();
+                ApplyValue();
+
+                ++_ncalls;
+
+                _values.Add(_value);
+
+                _ignoreEvents = false;
+            }
+
+            button.IsVisible = false;
+            _xmin = input.X - (float)(slider.foregroundWidget.width - button.Width) / 2;
+            _xmax = input.X + (float)(slider.foregroundWidget.width - button.Width) / 2;
+
+            base.Activate(input);
+        }
+
+        override public void Deactivate()
+        {
+            base.Deactivate();
+        }
+
+        public override void ApplySkin(Skin skin)
+        {
+            base.ApplySkin(skin);
+
+            //slider.foregroundWidget.GetComponent<UISprite>().color = skin.sliderForegroundColor;
+            slider.backgroundWidget.GetComponent<UISprite>().color = skin.sliderBackgroundColor;
+        }
+
+        public string Value
+        {
+            get
+            {
+                string s = "[";
+                foreach (float v in _values) s += v.ToString() + " ";
+                s += "]";
+                return s;
+            }
+        }
+
+        void OnSliderPress(bool state)
+        {
+            _started = true;
+
+            if (_action != null && _action.thumbTogglesSound)
+            {
+                if (state)
+                    _sigMan.Unpause();
+                else
+                    _sigMan.Pause();
+            }
+
+            button.IsVisible = !state && _action!=null && _action.showButton;
+            if (!state)
+            {
+                float x = Mathf.Max(_xmin, slider.thumb.localPosition.x);
+                button.SetX(Mathf.Min(_xmax, x));
+            }
+        }
+
+        public void SliderMoved()
+        {
+            if (_ignoreEvents) return;
+
+            //button.IsVisible = _started && _action.showButton;
+
+            if ((_paramSetter != null || _setFilters) && _action != null)
+            {
+                if (_action.isLog)
+                {
+                    _value = Mathf.Exp(slider.value * _range) * _minVal;
+                }
+                else
+                {
+                    _value = slider.value * _range + _minVal;
+
+                }
+                //Debug.Log("SLIDER: " + _value);
+                ApplyValue();
+                _values[_ncalls - 1] = _value;
+            }
+        }
+
+        private void ApplyValue()
+        {
+            _paramSetter.Invoke(_value);
+        }
+
+        public string LogJSONString
+        {
+            get
+            {
+                _log.Trim();
+                return KLib.FileIO.JSONSerializeToString(_log);
+            }
+        }*/
+    }
+}

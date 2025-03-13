@@ -1,0 +1,572 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
+
+using Turandot;
+using Turandot.Schedules;
+using Turandot.Screen;
+using Turandot.Scripts;
+
+public class TurandotEngine : MonoBehaviour
+{
+    public TurandotInputMonitor inputMonitor;
+    public TurandotCueController cueController;
+
+    Parameters _params;
+
+    FlowElement _currentFlowElement = null;
+    History _log = null;
+    TrialType _trialType = TrialType.NoResult;
+    TermType _termType = TermType.Any;
+    string _logPath = null;
+    string _result = "";
+    float _reactionTime = float.NaN;
+    string _stateEndReason = "";
+    float _stateStartTime = 0;
+    string _deferredLinkTo = "";
+    EndAction _endAction = EndAction.None;
+
+    bool _actionInProgress;
+
+    GameObject _dummyAudioPlayer;
+    GameObject _dummyAudioPlayerNoSource;
+
+    List<TurandotAudio> _audio = new List<TurandotAudio>();
+    // TURANDOT FIX 
+    //KEventDelegate _onFinished = null;
+    //VolumeManager _volumeManager;
+
+    void Awake()
+    {
+        _dummyAudioPlayer = GameObject.Find("DummyAudioPlayer");
+        _dummyAudioPlayerNoSource = GameObject.Find("NoSourceAudioPlayer");
+        //_volumeManager = new VolumeManager();
+    }
+
+    //public KEventDelegate OnFinished
+    //{
+    //    set { _onFinished = value; }
+    //}
+
+    public string Result
+    {
+        get { return _result; }
+    }
+
+    public float ReactionTime
+    {
+        get { return _reactionTime; }
+    }
+
+    public EndAction FlowchartEndAction
+    {
+        get { return _endAction; }
+    }
+
+    public void ClearScreen()
+    {
+        inputMonitor.ClearScreen();
+        cueController.ClearScreen();
+    }
+
+    public void ApplySkin(Skin skin)
+    {
+        inputMonitor.ApplySkin(skin);
+        cueController.ApplySkin(skin);
+    }
+
+    public void ShowInputs(bool show)
+    {
+        inputMonitor.ShowDefaultInputs(show);
+    }
+
+    public void Initialize(Parameters par, string transducer, float maxLevelMargin)
+    {
+        _log = new History();
+        _params = par;
+        _currentFlowElement = null;
+        _actionInProgress = false;
+
+        CreateAudioPlayers(transducer, maxLevelMargin);
+        //inputMonitor.OnEventChanged = OnInputEventChanged;
+        inputMonitor.Initialize(_params.screen, _params.buttons, _params.inputEvents, _params.InputsUsed);
+        cueController.Initialize(_params.screen, _params.CuesUsed);
+    }
+
+    void CreateAudioPlayers(string transducer, float maxLevelMargin)
+    {
+        foreach (TurandotAudio a in _audio)
+        {
+            Destroy(a);
+        }
+        _audio.Clear();
+
+        foreach (FlowElement fe in _params.flowChart)
+        {
+            GameObject o = GameObject.Instantiate(fe.sigMan != null ? _dummyAudioPlayer : _dummyAudioPlayerNoSource);
+            o.name = fe.name;
+            o.transform.parent = _dummyAudioPlayer.transform.parent;
+
+            TurandotAudio a = o.GetComponent<TurandotAudio>();
+            a.name = fe.name;
+            // TURANDOT FIX 
+            //a.OnTimeOut = OnStateTimeout;
+            //a.Initialize(fe.sigMan, transducer, maxLevelMargin);
+            //if (fe.isAction)
+            //{
+            //    a.OnTimeOut = EndActionAudio;
+            //}
+
+            _audio.Add(a);
+        }
+    }
+
+    public IEnumerator ExecuteFlowchart(TrialType trialType, List<Flag> flags, string logPath)
+    {
+#if !CONFIG_HACK
+        // TURANDOT FIX 
+        //_volumeManager.SetMasterVolume(1f, VolumeManager.VolumeUnit.Scalar);
+#endif
+
+        _trialType = trialType;
+        if (_trialType == TrialType.CSplus) _termType = TermType.CSplus;
+        else if (_trialType == TrialType.CSminus) _termType = TermType.CSminus;
+        else _termType = TermType.Any;
+
+        _logPath = logPath;
+
+        _result = "";
+        _reactionTime = float.NaN;
+        _stateEndReason = "";
+        _actionInProgress = false;
+
+        foreach (TurandotAudio a in _audio)
+        {
+            a.Reset();
+            a.ClearLog();
+        }
+
+        inputMonitor.StartMonitor(flags);
+        cueController.ClearLog();
+        cueController.SetFlags(flags);
+
+        yield return null; // the shit above takes time, first state time stamp will not be accurate without this
+
+        _log.Clear();
+        _log.Add(Time.timeSinceLevelLoad, HistoryEvent.StartTrial);
+
+        NextState(_params.firstState);
+
+        yield break;
+    }
+
+    public void ShowState(Parameters par, string state)
+    {
+        ClearScreen();
+
+        cueController.Initialize(par.screen, par.CuesUsed);
+        //inputMonitor.Initialize(par.screen, par.buttons, par.inputEvents, par.InputsUsed);
+
+        //inputMonitor.Activate(par[state].inputs, null, 0);
+        cueController.Activate(par[state].cues);
+    }
+
+#if KDEBUG
+    public IEnumerator SimulateFlowchart(TrialType trialType, List<Flag> flags, string logPath, string simResult)
+    {
+        _trialType = trialType;
+        if (_trialType == TrialType.CSplus) _termType = TermType.CSplus;
+        else if (_trialType == TrialType.CSminus) _termType = TermType.CSminus;
+        else _termType = TermType.Any;
+
+        _logPath = logPath;
+
+        _result = "";
+        _reactionTime = float.NaN;
+        _stateEndReason = "";
+
+        _log.Clear();
+        _log.Add(Time.timeSinceLevelLoad, HistoryEvent.StartTrial);
+
+        foreach (TurandotAudio a in _audio)
+        {
+            a.Reset();
+        }
+ 
+        inputMonitor.StartMonitor(flags);
+        cueController.ClearLog();
+
+        yield return new WaitForSeconds(0.2f);
+
+        _reactionTime = 0.5f;
+        _result = simResult;
+
+        NextState("");
+    }
+#endif
+
+    void NextState(string nextState)
+    {
+        if (string.IsNullOrEmpty(nextState))
+        {
+            _log.Add(Time.timeSinceLevelLoad, HistoryEvent.EndTrial);
+
+            inputMonitor.StopMonitor();
+            if (_params.trialLogOption != TrialLogOption.None) WriteLogFile();
+
+#if KDEBUG
+            _endAction = EndAction.None;
+#else
+            _endAction = _currentFlowElement.endAction;
+#endif
+
+            //TURANDOT FIX _onFinished();
+        }
+        else
+        {
+            _currentFlowElement = _params.flowChart.Find(fe => fe.name == nextState);
+            _stateEndReason = "";
+            _deferredLinkTo = "";
+            _stateStartTime = Time.timeSinceLevelLoad;
+
+            Debug.Log("State: " + _currentFlowElement.name);
+
+            var timeOut = _currentFlowElement.GetTimeout(_trialType).Value;
+            var a = _audio.Find(o => o.name == _currentFlowElement.name);
+            a.Activate(timeOut, _params.flags);
+
+            // TURANDOT FIX 
+            //if (IPC.Instance.Use && !_params.bypassIPC && !DoIPC(_currentFlowElement))
+            //    throw new System.Exception("IPC error: " + IPC.Instance.LastError);
+
+            _log.Add(Time.timeSinceLevelLoad, HistoryEvent.StartState, _currentFlowElement.name);
+
+            cueController.Activate(_currentFlowElement.cues);
+            inputMonitor.Activate(_currentFlowElement.inputs, a, timeOut);
+            inputMonitor.PollEvents();
+        }
+    }
+    // TURANDOT FIX 
+    private bool DoIPC(FlowElement state)
+    {
+        return false;
+        ////if (!IPC.Instance.SendCommand("State", state.name + " [" + AudioSettings.dspTime + "]")) return false;
+        //if (!IPC.Instance.SendCommand("State", state.name)) return false;
+
+        //if (string.IsNullOrEmpty(state.ipcCommand)) return true;
+
+        //if (state.ipcCommand == "{result}")
+        //{
+        //    return IPC.Instance.SendCommandAndBytes("Result:", _result);
+        //}
+
+        //if (!state.ipcCommand.StartsWith("Result:"))
+        //    return IPC.Instance.SendCommand(state.ipcCommand);
+
+        //string cmd = ExpandResult("", state.ipcCommand);
+        //return IPC.Instance.SendCommandAndBytes("Result:", cmd.Substring(7));
+    }
+
+    private void DoAction(string name)
+    {
+        // TURANDOT FIX 
+//        if (IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Action", name);
+
+        FlowElement actionState = _params.flowChart.Find(fe => fe.name == name);
+        cueController.Activate(actionState.cues);
+
+        var a = _audio.Find(o => o.name == actionState.name);
+        inputMonitor.Activate(actionState.inputs, a, 0);
+
+        _audio.Find(x => x.name == _currentFlowElement.name).PauseAudio(true);
+        a.Activate(a.SigMan.GetMaxInterval(1) / 1000f, null);
+        _log.Add(Time.timeSinceLevelLoad, HistoryEvent.StartAction, name);
+        //_log.Add(Time.realtimeSinceStartup, HistoryEvent.StartAction, name);
+    }
+
+    private void EndActionAudio(string name)
+    {
+        _audio.Find(x => x.name == _currentFlowElement.name).PauseAudio(false);
+        _log.Add(Time.timeSinceLevelLoad, HistoryEvent.EndAction, name);
+
+        _actionInProgress = false;
+
+        var actionState = _params.flowChart.Find(fe => fe.name == name);
+        if (actionState.HasSequence)
+        {
+            if (actionState.AdvanceSequence())
+            {
+                var a = _audio.Find(o => o.name == actionState.name);
+                a.Reset();
+            }
+            else
+            {
+                OnStateTimeout(_currentFlowElement.name);
+            }
+        }
+        else
+        {
+            var a = _audio.Find(o => o.name == actionState.name);
+            a.Reset();
+        }
+    }
+
+    public void Abort()
+    {
+        if (_currentFlowElement != null) _audio.Find(a => a.name == _currentFlowElement.name).KillAudio();
+        WriteLogFile();
+        inputMonitor.StopMonitor();
+        inputMonitor.Deactivate();
+        cueController.Deactivate();
+    }
+
+    void OnStateTimeout(string source)
+    {
+        string linkTo = "";
+
+        if (source == _currentFlowElement.name) // to eliminate race conditions
+        {
+            //Debug.Log(_currentFlowElement.name + ": " +_stateEndReason);
+            if (_stateEndReason == "") // not deferred ending from prior input event
+            {
+                _stateEndReason = "Timeout";
+                string r = _currentFlowElement.GetTimeout(_trialType).result;
+                if (!string.IsNullOrEmpty(r))
+                {
+                    _result = ExpandResult(_result, r);
+                }
+                linkTo = _currentFlowElement.GetTimeout(_trialType).linkTo;
+            }
+            else
+            {
+                linkTo = _deferredLinkTo;
+            }
+
+            _log.Add(Time.timeSinceLevelLoad, HistoryEvent.EndState, _stateEndReason);
+
+            cueController.Deactivate();
+            inputMonitor.Deactivate();
+            NextState(linkTo);
+        }
+    }
+
+    void OnInputEventChanged(string whichEvent)
+    {
+//#if KDEBUG
+        if (_currentFlowElement == null) return;
+//#endif
+        Termination term = _currentFlowElement.term.Find(t => t.source == whichEvent && (t.type == TermType.Any || t.type == _termType));
+        if (term != null && _stateEndReason=="" && Time.timeSinceLevelLoad - _stateStartTime >= 0.001f*term.latency_ms)
+        {
+            bool nextIsAction = false;
+            if (!string.IsNullOrEmpty(term.linkTo)) nextIsAction = _params.flowChart.Find(fe => fe.name == term.linkTo).isAction;
+
+            if (!nextIsAction) _stateEndReason = whichEvent;
+
+            _log.Add(Time.timeSinceLevelLoad, HistoryEvent.TermCond, whichEvent);
+            Debug.Log(whichEvent + ": " + term.action);
+
+            if (!string.IsNullOrEmpty(term.result))
+            {
+                Debug.Log(term.source + ": " + term.result);
+                _result = ExpandResult(_result, term.result);
+            }
+
+            if (!string.IsNullOrEmpty(term.flagExpr) && (!nextIsAction || !_actionInProgress))
+            {
+                EvaluateFlagExpression(term.flagExpr);
+            }
+
+            if (_currentFlowElement.name == _params.schedule.decisionState)
+            {
+                _reactionTime = Time.timeSinceLevelLoad - _stateStartTime;
+            }
+
+            if (term.action == TerminationAction.EndImmediately && !nextIsAction)
+            {
+                cueController.Deactivate();
+                inputMonitor.Deactivate();
+                _audio.Find(a => a.name == _currentFlowElement.name).KillAudio();
+                _log.Add(Time.timeSinceLevelLoad, HistoryEvent.EndState, _stateEndReason);
+                NextState(term.linkTo);
+            }
+            else
+            {
+                if (nextIsAction)
+                {
+                    if (!_actionInProgress)
+                    {
+                        _actionInProgress = true;
+                        DoAction(term.linkTo);
+                    }
+                }
+                else
+                {
+                    _deferredLinkTo = term.linkTo;
+                }
+            }
+        }
+    }
+
+    string ExpandResult(string previous, string result)
+    {
+        string expanded = result;
+        if (!expanded.Contains("=") && !expanded.Contains("{")) expanded = "outcome=\"" + result + "\";";
+
+        if (result.ToLower().Contains("{category}"))
+        {
+            expanded = expanded.Replace("{category}", inputMonitor.Category);
+        }
+        if (result.ToLower().Contains("{scale}"))
+        {
+            expanded = expanded.Replace("{scale}", inputMonitor.SliderResult);
+        }
+        if (result.ToLower().Contains("{sam}"))
+        {
+            expanded = expanded.Replace("{sam}", inputMonitor.SAMResult);
+        }
+        if (result.ToLower().Contains("{keypad}"))
+        {
+            expanded = expanded.Replace("{keypad}", inputMonitor.KeypadResult);
+        }
+        if (result.ToLower().Contains("{param}"))
+        {
+            expanded = expanded.Replace("{param}", inputMonitor.ParamResult);
+        }
+        if (result.ToLower().Contains("{score}"))
+        {
+            expanded = expanded.Replace("{score}", "score=" + cueController.counter.Count + ";");
+        }
+        if (result.ToLower().Contains("{-score}"))
+        {
+            expanded = expanded.Replace("{-score}", "score=" + (-cueController.counter.Count).ToString() + ";");
+        }
+        if (result.ToLower().Contains("{trace}"))
+        {
+            expanded = expanded.Replace("{trace}", inputMonitor.TraceResult);
+        }
+        if (result.Contains("{sigMan"))
+        {
+            expanded = ExpandSignalExpression(expanded);
+        }
+
+        return previous + expanded;
+    }
+
+    string SubstituteResult(string result)
+    {
+        string expanded = result;
+
+        if (result.ToLower().Contains("{scale}"))
+        {
+            expanded = expanded.Replace("{scale}", inputMonitor.SliderSubstitution);
+        }
+        if (result.ToLower().Contains("{param}"))
+        {
+            expanded = expanded.Replace("{param}", inputMonitor.ParamSubstitution);
+        }
+        expanded = ExpandSignalExpression(expanded);
+
+        return expanded;
+    }
+
+    string ExpandSignalExpression(string expression)
+    {
+        string pattern = @"{([a-zA-Z0-9]+)\.([a-zA-Z0-9]+)\.([a-zA-Z0-9\.]+)}";
+        Match m = Regex.Match(expression, pattern);
+
+        if (m.Success)
+        {
+            var state = (m.Groups[1].Value == "sigMan") ? _currentFlowElement : _params[m.Groups[1].Value];
+            if (state != null)
+                expression = expression.Replace(m.Groups[0].Value, state.sigMan.GetParameter(m.Groups[2].Value, m.Groups[3].Value).ToString());
+        }
+
+        return expression;
+    }
+
+    void EvaluateFlagExpression(string expr)
+    {
+        string[] subExpr = expr.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries);
+        foreach (var e in subExpr)
+        {
+            var orExpr = e.Split(new string[] { "|=" }, System.StringSplitOptions.RemoveEmptyEntries);
+
+            if (orExpr.Length == 2)
+            {
+                _params.OrFlag(orExpr[0].Trim(), KLib.Expressions.EvaluateToIntScalar(orExpr[1]));
+            }
+            else
+            {
+                string[] exprParts = e.Split('=');
+                if (exprParts.Length == 2)
+                {
+                    string lh = exprParts[0].Trim();
+                    string rh = SubstituteResult(exprParts[1]);
+
+                    string pattern = @"(M\([a-zA-Z0-9\._,]+\))";
+                    Match m = Regex.Match(lh, pattern);
+
+                    if (m.Success)
+                    {
+                        lh = m.Groups[0].Value;
+                        lh = lh.Substring(2, lh.Length - 3);
+                        // TURANDOT FIX 
+                        //SubjectManager.Instance.AddMetric(lh, KLib.Expressions.EvaluateToFloatScalar(rh));
+                    }
+                    else
+                        _params.SetFlag(exprParts[0].Trim(), KLib.Expressions.EvaluateToIntScalar(rh));
+                }
+                else if (e.Substring(e.Length - 2, 2) == "++")
+                {
+                    _params.IncrementFlag(e.Substring(0, e.Length - 2));
+                }
+            }
+        }
+    }
+
+    void WriteLogFile()
+    {
+        _log.Trim();
+
+        string json = KLib.FileIO.JSONStringAdd("", "history", KLib.FileIO.JSONSerializeToString(_log));
+        json = KLib.FileIO.JSONStringAdd(json, "events", inputMonitor.EventLogJSONString);
+
+        string cueJson = cueController.LogJSONString;
+        if (!string.IsNullOrEmpty(cueJson))
+            json = KLib.FileIO.JSONStringAdd(json, "cues", cueJson);
+
+        string inputJson = inputMonitor.InputLogJSONString;
+        if (!string.IsNullOrEmpty(inputJson))
+            json = KLib.FileIO.JSONStringAdd(json, "inputs", inputJson);
+
+        foreach (var fe in _params.flowChart.FindAll(x => x.HasSequence))
+        {
+            json = KLib.FileIO.JSONStringAdd(json, fe.name, fe.ActionSequenceJSONString);
+        }
+
+        foreach (var fe in _params.flowChart)
+        {
+            json = KLib.FileIO.JSONStringAdd(json, fe.name + "Audio", KLib.FileIO.JSONSerializeToString(_audio.Find(x => x.name.Equals(fe.name)).Log.Trim()));
+        }
+
+        File.WriteAllText(_logPath, json);
+        // TURANDOT FIX
+//        if (SubjectManager.Instance.UploadData && _params.trialLogOption == TrialLogOption.Upload) DataFileManager.UploadDataFile(_logPath);
+    }
+
+//    public void WriteAudioLogFile(string path)
+//    {
+//        string json = "";
+//        foreach (var fe in _params.flowChart)
+//        {
+//            json = KLib.FileIO.JSONStringAdd(json, fe.name + "Audio", KLib.FileIO.JSONSerializeToString(_audio.Find(x => x.name.Equals(fe.name)).Log.Trim()));
+//        }
+
+//        KLib.FileIO.WriteTextFile(path, json);
+////        if (SubjectManager.Instance.UploadData && _params.trialLogOption == TrialLogOption.Upload) DataFileManager.UploadDataFile(path);
+//        if (SubjectManager.Instance.UploadData) DataFileManager.UploadDataFile(path);
+//    }
+}

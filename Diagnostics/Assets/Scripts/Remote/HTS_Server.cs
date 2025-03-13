@@ -1,9 +1,9 @@
-using UnityEngine;
 using System;
 using System.Collections;
 using System.Linq;
 using System.Net;
-
+using UnityEngine;
+using UnityEngine.SceneManagement;
 using KLib.Network;
 
 public class HTS_Server : MonoBehaviour
@@ -46,6 +46,7 @@ public class HTS_Server : MonoBehaviour
 
     public static void StartServer() => instance._StartServer();
     public static bool RemoteConnected { get { return instance._remoteConnected; } }
+    public static string MyAddress { get { return instance._address.Equals("localhost") ? "127.0.0.1" : instance._address; } }
     public static void SetCurrentScene(string name, IRemoteControllable controllableScene)
     {
         instance._currentSceneName = name;
@@ -154,6 +155,7 @@ public class HTS_Server : MonoBehaviour
                 _listener.SendAcknowledgement();
                 _remoteConnected = false;
                 _currentScene.ProcessRPC("Disconnect");
+                SceneManager.LoadScene("Home");
                 break;
 
             case "Ping":
@@ -187,6 +189,7 @@ public class HTS_Server : MonoBehaviour
 
             default:
                 _listener.SendAcknowledgement(false);
+                _currentScene.ProcessRPC(command, data);
                 break;
         }
 
