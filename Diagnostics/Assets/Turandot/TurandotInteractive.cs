@@ -135,22 +135,32 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
     private void SetParams(string data)
     {
-        Debug.Log(data);
-        //_sigMan = FileIO.JSONDeserializeFromString<SignalManager>(data);
+        _audioInitialized = false;
+
         _sigMan = FileIO.XmlDeserializeFromString<SignalManager>(data);
-        Debug.Log(_sigMan.channels[0].gate.Duration_ms);
 
         AudioSettings.GetDSPBufferSize(out int bufferLength, out int numBuffers);
 
         _sigMan.AdapterMap = CreateAdapterMap();
-        var tone = _sigMan.channels[0].waveform as Sinusoid;
-        Debug.Log(_sigMan.channels[0].waveform.Shape);
         _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
         _sigMan.StartPaused();
 
         _udpData = new byte[sizeof(float) * _sigMan.CurrentAmplitudes.Length];
 
         _audioInitialized = true;
+    }
+
+    private void SetParameter(string data)
+    {
+        var parts = data.Split('=');
+        if (parts.Length == 2)
+        {
+            var lhs = parts[0].Split(new char[] { '.' }, 2);
+            string name = lhs[0];
+            string param = lhs[1];
+            float value = float.Parse(parts[1]);
+            _sigMan.SetParameter(name, param, value);
+        }
     }
 
     private void StartStreaming()
@@ -184,6 +194,9 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
                 break;
             case "SetParams":
                 SetParams(data);
+                break;
+            case "SetParameter":
+                SetParameter(data);
                 break;
         }
     }

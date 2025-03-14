@@ -334,7 +334,7 @@ namespace KLib.Signals
             if (AdapterMap == null)
             {
                 LastErrorMessage = "No adapter map specified.";
-                throw new System.Exception("No adapter map specified");
+                throw new Exception("No adapter map specified");
             }
 
             try
