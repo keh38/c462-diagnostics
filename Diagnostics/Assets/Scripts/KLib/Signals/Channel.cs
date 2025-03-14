@@ -72,7 +72,6 @@ namespace KLib.Signals
         public string Transducer { set; get; }
 
         [ProtoMember(9, IsRequired = true)]
-        [XmlIgnore]
         public string Adapter { set; get; }
 
         [ProtoMember(9, IsRequired = true)]

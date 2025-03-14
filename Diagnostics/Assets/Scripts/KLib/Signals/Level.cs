@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
 using Newtonsoft.Json;
 using ProtoBuf;
@@ -47,6 +48,7 @@ namespace KLib.Signals
 
         [ProtoIgnore]
         [JsonIgnore]
+        [XmlIgnore]
         public float Atten { get; private set; }
 
         [ProtoIgnore]

@@ -97,7 +97,10 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
             Name = "Audio",
             Adapter = "Audio",
             Laterality = Laterality.Diotic,
-            waveform = new Noise(),
+            waveform = new Sinusoid()
+            {
+                Frequency_Hz = 300
+            },
             modulation = new KLib.Signals.Modulations.SinusoidalAM()
             {
                 Frequency_Hz = 40,
@@ -118,8 +121,30 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
         AudioSettings.GetDSPBufferSize(out int bufferLength, out int numBuffers);
 
-        _sigMan = new SignalManager(CreateAdapterMap());
+        //_sigMan = new SignalManager(CreateAdapterMap());
+        _sigMan = new SignalManager();
+        _sigMan.AdapterMap = CreateAdapterMap();
         _sigMan.AddChannel(ch);
+        _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
+        //_sigMan.StartPaused();
+
+        //_udpData = new byte[sizeof(float) * _sigMan.CurrentAmplitudes.Length];
+
+        //_audioInitialized = true;
+    }
+
+    private void SetParams(string data)
+    {
+        Debug.Log(data);
+        //_sigMan = FileIO.JSONDeserializeFromString<SignalManager>(data);
+        _sigMan = FileIO.XmlDeserializeFromString<SignalManager>(data);
+        Debug.Log(_sigMan.channels[0].gate.Duration_ms);
+
+        AudioSettings.GetDSPBufferSize(out int bufferLength, out int numBuffers);
+
+        _sigMan.AdapterMap = CreateAdapterMap();
+        var tone = _sigMan.channels[0].waveform as Sinusoid;
+        Debug.Log(_sigMan.channels[0].waveform.Shape);
         _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
         _sigMan.StartPaused();
 
@@ -152,11 +177,13 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         switch (command)
         {
             case "Start":
-                Debug.Log("start " + _audioInitialized);
                 StartStreaming();
                 break;
             case "Stop":
                 StopStreaming();
+                break;
+            case "SetParams":
+                SetParams(data);
                 break;
         }
     }
