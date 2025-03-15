@@ -136,7 +136,7 @@ namespace KLib.Signals.Waveforms
         /// </summary>
         public ToneCloud()
         {
-			shape = Waveshape.Tone_Cloud;
+			shape = Waveshape.ToneCloud;
             _shortName = "cloud";
 
             PipDuration_ms = 30;

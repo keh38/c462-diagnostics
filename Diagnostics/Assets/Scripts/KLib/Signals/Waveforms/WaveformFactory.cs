@@ -87,10 +87,10 @@ namespace KLib.Signals.Waveforms
                 case Waveshape.Noise:
                     wf = new Noise();
                     break;
-                case Waveshape.Tone_Cloud:
+                case Waveshape.ToneCloud:
                     wf = new ToneCloud();
                     break;
-                case Waveshape.Moving_Ripple_Noise:
+                case Waveshape.MovingRippleNoise:
                     wf = new MovingRippleNoise();
                     break;
                 case Waveshape.FM:
@@ -99,7 +99,7 @@ namespace KLib.Signals.Waveforms
                 case Waveshape.File:
                     wf = new UserFile();
                     break;
-                case Waveshape.Ripple_Noise:
+                case Waveshape.RippleNoise:
                     wf = new RippleNoise();
                     break;
             }

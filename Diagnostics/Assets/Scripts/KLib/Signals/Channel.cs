@@ -72,9 +72,12 @@ namespace KLib.Signals
         public string Transducer { set; get; }
 
         [ProtoMember(9, IsRequired = true)]
-        public string Adapter { set; get; }
+        public Modality Modality { set; get; } = Modality.Audio;
 
-        [ProtoMember(9, IsRequired = true)]
+        [ProtoMember(10, IsRequired = true)]
+        public string Location { set; get; }
+
+        [ProtoMember(11, IsRequired = true)]
         [JsonProperty]
         public BinauralProperties binaural = new BinauralProperties();
 
@@ -118,10 +121,6 @@ namespace KLib.Signals
         [ProtoIgnore]
         [XmlIgnore]
         public string MyEndpoint { get; private set; }
-
-        [ProtoIgnore]
-        [XmlIgnore]
-        public string MyAdapter { get; private set; }
 
         [ProtoIgnore]
         [XmlIgnore]
@@ -202,25 +201,59 @@ namespace KLib.Signals
 			this.modulation = modul;
 		}
 
-        public void SetSignalPath(int copyNum)
+        public void SetEndpoint(int copyNum)
         {
             string tag = "";
-            if (Laterality == Laterality.None)
+
+            if (Modality == Modality.Audio)
             {
-                tag = $".{(copyNum + 1).ToString()}";
+                if (Laterality == Laterality.None)
+                {
+                    tag = "";
+                }
+                else if (Laterality == Laterality.Left)
+                    tag = ".Left";
+                else if (Laterality == Laterality.Right)
+                    tag = ".Right";
+                else
+                {
+                    tag += (copyNum == 0) ? ".Left" : ".Right";
+                }
             }
-            else if (Laterality == Laterality.Left)
-                tag = ".Left";
-            else if (Laterality == Laterality.Right)
-                tag = ".Right";
-            else
+            else if (Modality == Modality.Haptic || Modality == Modality.Electric)
             {
-                tag += (copyNum == 0) ? ".Left" : ".Right";
+                tag = $".{Location}";
             }
 
             MyEndpoint = Transducer + tag;
-            MyAdapter = Adapter + tag;
         }
+
+        public string GetLocation(int copyNum)
+        {
+            string location = "";
+
+            if (Modality == Modality.Audio)
+            {
+                if (Laterality == Laterality.None)
+                {
+                    location = "";
+                }
+                else if (Laterality == Laterality.Left)
+                    location = "Left";
+                else if (Laterality == Laterality.Right)
+                    location = "Right";
+                else
+                {
+                    location += (copyNum == 0) ? "Left" : "Right";
+                }
+            }
+            else if (Modality == Modality.Haptic || Modality == Modality.Electric)
+            {
+                location = Location;
+            }
+            return location;
+        }
+
 
         public void SetActive(bool active)
         {
@@ -503,7 +536,7 @@ namespace KLib.Signals
 
                 for (int k=0; k<NumCopies; k++)
                 {
-                    SetSignalPath(k);
+                    SetEndpoint(k);
                     level.Initialize(MyEndpoint, Vmax);
                     float mx = waveform.GetMaxLevel(level, SamplingRateHz);
                     mx += modulation.LevelCorrection;

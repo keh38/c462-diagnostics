@@ -28,7 +28,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     {
         HTS_Server.SetCurrentScene("Turandot Interactive", this);
         _udpClient = new UdpClient();
-        _udpEndPoint = new IPEndPoint(IPAddress.Parse(HTS_Server.MyAddress), _udpPort);
+        //_udpEndPoint = new IPEndPoint(IPAddress.Parse(HTS_Server.MyAddress), _udpPort);
 
         CreateDefaultSignalManager();
     }
@@ -39,7 +39,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         {
             var amplitudes = _sigMan.CurrentAmplitudes;
             Buffer.BlockCopy(amplitudes, 0, _udpData, 0, _udpData.Length);
-            _udpClient.Send(_udpData, _udpData.Length, _udpEndPoint);
+            //_udpClient.Send(_udpData, _udpData.Length, _udpEndPoint);
         }
     }
 
@@ -74,32 +74,17 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         StopStreaming();
     }
 
-    private AdapterMap CreateAdapterMap()
-    {
-        var map = new AdapterMap();
-
-        map.Add("Audio", "Left", "Front-Left");
-        map.Add("Audio", "Right", "Front-Right");
-        //map.Add("Electric", "1", "Center");
-        //map.Add("Electric", "2", "Subwoofer");
-        //map.Add("None", "0", "Side-Left");
-        //map.Add("None", "1", "Side-Right");
-        //map.Add("Haptic", "1", "Rear-Left");
-        //map.Add("Haptic", "2", "Rear-Right");
-
-        return map;
-    }
-
     private void CreateDefaultSignalManager()
     {
         var ch = new Channel()
         {
             Name = "Audio",
-            Adapter = "Audio",
+            Modality = KLib.Signals.Enumerations.Modality.Audio,
             Laterality = Laterality.Diotic,
+            Location = "Site 2",
             waveform = new Sinusoid()
             {
-                Frequency_Hz = 300
+                Frequency_Hz = 500
             },
             modulation = new KLib.Signals.Modulations.SinusoidalAM()
             {
@@ -109,7 +94,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
             gate = new Gate()
             {
                 Active = true,
-                Duration_ms = 500,
+                Duration_ms = 250,
                 Period_ms = 1000
             },
             level = new Level()
@@ -121,9 +106,8 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
         AudioSettings.GetDSPBufferSize(out int bufferLength, out int numBuffers);
 
-        //_sigMan = new SignalManager(CreateAdapterMap());
         _sigMan = new SignalManager();
-        _sigMan.AdapterMap = CreateAdapterMap();
+        _sigMan.AdapterMap = AdapterMap.DefaultStereoMap();
         _sigMan.AddChannel(ch);
         _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
         //_sigMan.StartPaused();
@@ -141,7 +125,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
         AudioSettings.GetDSPBufferSize(out int bufferLength, out int numBuffers);
 
-        _sigMan.AdapterMap = CreateAdapterMap();
+        _sigMan.AdapterMap = AdapterMap.DefaultStereoMap();
         _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
         _sigMan.StartPaused();
 

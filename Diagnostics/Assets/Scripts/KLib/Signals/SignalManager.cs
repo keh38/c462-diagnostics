@@ -358,9 +358,9 @@ namespace KLib.Signals
                             ch.waveform.ChannelName = ch.Name;
                         }
 
-                        ch.SetSignalPath(k);
+                        ch.SetEndpoint(k);
 
-                        c.outputNum = AdapterMap.GetAdapterNumber(c.MyAdapter);
+                        c.outputNum = AdapterMap.GetAdapterIndex(c.Modality.ToString(), c.GetLocation(k));
                         c.Vmax = Vmax;
 
                         _shadows.Add(c);

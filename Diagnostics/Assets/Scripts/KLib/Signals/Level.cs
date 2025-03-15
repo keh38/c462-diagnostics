@@ -26,7 +26,8 @@ namespace KLib.Signals
         dB_HL,
         dB_SL,
         PercentDR,
-        dB_SPL_noLDL
+        dB_SPL_noLDL,
+        mA
     };
     #endregion
 
