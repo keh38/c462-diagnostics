@@ -82,6 +82,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
             Modality = KLib.Signals.Enumerations.Modality.Audio,
             Laterality = Laterality.Diotic,
             Location = "Site 2",
+            Transducer = "HD280", 
             waveform = new Sinusoid()
             {
                 Frequency_Hz = 500
@@ -99,8 +100,8 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
             },
             level = new Level()
             {
-                Units = LevelUnits.dB_attenuation,
-                Value = -20
+                Units = LevelUnits.dB_SPL,
+                Value = 50
             }
         };
 

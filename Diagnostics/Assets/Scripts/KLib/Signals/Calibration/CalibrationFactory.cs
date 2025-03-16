@@ -9,7 +9,7 @@ namespace KLib.Signals.Calibration
 {
     public class CalibrationFactory
     {
-        public static string DefaultFolder = "";
+        public static string DefaultFolder = @"C:\Users\Public\Music\{4CF46EAB-0304-4429-9666-035ADFDB847F}\{18AE38D6-5684-4966-9047-C49547486142}\Calibration";
         public static string AudiogramFolder = "";
 
         public static CalibrationData Load(LevelUnits refMode, string transducer, string destination, float maxLevelMargin = 0)
@@ -26,11 +26,7 @@ namespace KLib.Signals.Calibration
                 result = CalibrationData.Create_dBVrms(acal);
             }
 
-            if (string.IsNullOrEmpty(DefaultFolder))
-                acal = AcousticCalibration.Load(transducer, destination);
-            else
-                acal = AcousticCalibration.LoadPC(transducer, destination, DefaultFolder);
-
+            acal = AcousticCalibration.Load(DefaultFolder, transducer, destination);
 
             if (refMode == LevelUnits.dB_SPL && acal != null)
             {

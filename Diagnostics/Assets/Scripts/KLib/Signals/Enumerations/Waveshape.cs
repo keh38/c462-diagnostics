@@ -10,10 +10,10 @@ namespace KLib.Signals.Enumerations
         None, 
         Sinusoid, 
         Noise, 
-        MovingRippleNoise, 
-        ToneCloud, 
+        Moving_Ripple_Noise, 
+        Tone_Cloud, 
         FM,
         File,
-        RippleNoise
+        Ripple_Noise
     }
 }

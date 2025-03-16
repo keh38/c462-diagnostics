@@ -70,7 +70,7 @@ namespace KLib.Signals.Waveforms
 
         public MovingRippleNoise()
         {
-			shape = Waveshape.MovingRippleNoise;
+			shape = Waveshape.Moving_Ripple_Noise;
             _shortName = "Ripple";
 
 			Fmin = 250;

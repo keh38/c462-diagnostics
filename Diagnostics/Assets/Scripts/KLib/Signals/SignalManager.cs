@@ -108,11 +108,6 @@ namespace KLib.Signals
         [ProtoIgnore]
         [JsonIgnore]
         [XmlIgnore]
-        public string CalibrationFolder { set; get; }
-
-        [ProtoIgnore]
-        [JsonIgnore]
-        [XmlIgnore]
         public string WavFolder { set; get; }
 
         [ProtoIgnore]
@@ -328,7 +323,6 @@ namespace KLib.Signals
             _unpausePending = false;
             _dt = (float)Npts / SamplingRate_Hz;
 
-            CalibrationFactory.DefaultFolder = CalibrationFolder;
             UserFile.WavFolder = WavFolder;
 
             if (AdapterMap == null)

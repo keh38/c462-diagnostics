@@ -73,6 +73,7 @@
     <Compile Include="Assets\Scripts\Remote\HTS_Server.cs" />
     <Compile Include="Assets\Turandot\Scripts\Turandot.AnalysisFunctions.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.Script.cs" />
+    <Compile Include="Assets\Scripts\KLib\Signals\Enumerations\Modality.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.InputLog.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\Sinusoid.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.InputSource.cs" />
@@ -268,7 +269,6 @@
     <Compile Include="Assets\Scripts\Menu Tools\MenuBarControl.cs" />
     <Compile Include="Assets\Turandot\Schedules\Optimizations\Turandot.Optimizations.Optimization.cs" />
     <Compile Include="Assets\Scripts\Home\SubjectPanel.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Enumerations\Modality.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

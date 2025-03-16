@@ -43,7 +43,7 @@ namespace KLib.Signals.Waveforms
 
         public RippleNoise()
         {
-			shape = Waveshape.RippleNoise;
+			shape = Waveshape.Ripple_Noise;
             _shortName = "RippleNoise";
 
             Fmin = 350;
