@@ -108,8 +108,8 @@ public static class FileLocations
     public static string ProjectStatePath { get { return Path.Combine(SubjectFolder, "meta", "ps.json"); } }
 
     // Paths to subject manager files
-    public static string SubjectMetaFolder { get { return SubjectFolder + "/meta"; } }
-    public static string SubjectMetadataPath { get { return SubjectFolder + "/meta/gm.json"; } }
+    public static string SubjectMetaFolder { get { return Path.Combine(SubjectFolder, "meta"); } }
+    public static string SubjectMetadataPath { get { return Path.Combine(SubjectMetaFolder, "smd.xml"); } }
     public static string SubjectCustomSpeechPath { get { return SubjectFolder + "/meta/speech.xml"; } }
 
     // Paths to audiogram files

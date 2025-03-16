@@ -269,6 +269,8 @@
     <Compile Include="Assets\Scripts\Menu Tools\MenuBarControl.cs" />
     <Compile Include="Assets\Turandot\Schedules\Optimizations\Turandot.Optimizations.Optimization.cs" />
     <Compile Include="Assets\Scripts\Home\SubjectPanel.cs" />
+    <Compile Include="Assets\Scripts\Game Management\SubjectMetadata.cs" />
+    <Compile Include="Assets\Scripts\Game Management\Project.Settings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

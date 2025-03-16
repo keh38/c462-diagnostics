@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 using KLib;
@@ -8,6 +9,8 @@ public class GameManager : MonoBehaviour
 {
     private AppState _appState = new AppState();
     private bool _initialized = false;
+    private SubjectMetadata _subjectMetadata;
+    private Project.Settings _projectSettings;
 
     #region Singleton creation
     // Singleton
@@ -45,12 +48,49 @@ public class GameManager : MonoBehaviour
     public static string Subject { get { return instance._appState.subject; } }
     public static string Project { get { return instance._appState.project; } }
 
-    public static void SetSubject(string project, string subject) { instance._setSubject(project, subject); }
+    public static void SetSubject(string project, string subject) { instance._SetSubject(project, subject); }
     public static void SetSubject(string projectAndSubject)
     {
         var parts = projectAndSubject.Split('/');
         SetSubject(parts[0], parts[1]);
     }
+
+    public static Project.Settings ProjectSettings { get { return instance._projectSettings; } }
+    public static string Transducer
+    {
+        get { return instance._subjectMetadata?.Transducer; }
+        set { instance._SetTransducer(value); }
+    }
+
+    public static string SerializeSubjectMetadata()
+    {
+        return FileIO.XmlSerializeToString(instance._subjectMetadata);
+    }
+
+    public static void DeserializeSubjectMetadata(string data)
+    {
+        instance._subjectMetadata = FileIO.XmlDeserializeFromString<SubjectMetadata>(data);
+        instance._SaveSubjectMetadata();
+    }
+
+    public static List<string> EnumerateTransducers()
+    {
+        var transducers = new List<string>();
+        var localCalFolder = Path.Combine(FileLocations.BasicResourcesFolder, "Calibration");
+        foreach (string path in Directory.GetFiles(localCalFolder))
+        {
+            var fn = Path.GetFileNameWithoutExtension(path);
+            if (!fn.Contains("_") && (GameManager.ProjectSettings.ValidTransducers == null || GameManager.ProjectSettings.ValidTransducers.Contains(fn)))
+            {
+                transducers.Add(fn);
+            }
+        }
+        transducers.Sort();
+
+        return transducers;
+    }
+
+
     #endregion
 
     #region Private methods
@@ -61,7 +101,7 @@ public class GameManager : MonoBehaviour
         if (!string.IsNullOrEmpty(_appState.project) && !string.IsNullOrEmpty(_appState.subject))
         {
             Debug.Log($"[GameManager] Restored '{_appState.project}/{_appState.subject}'");
-            FileLocations.SetSubject(_appState.project, _appState.subject);
+            _SetSubject(_appState.project, _appState.subject);
         }
         else
         {
@@ -69,7 +109,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void _setSubject(string project, string subject)
+    private void _SetSubject(string project, string subject)
     {
         if (!project.Equals(_appState.project) || !subject.Equals(_appState.subject))
         {
@@ -79,8 +119,48 @@ public class GameManager : MonoBehaviour
 
             Debug.Log($"Subject changed to '{_appState.subject}'");
 
-            FileLocations.SetSubject(_appState.project, _appState.subject);
         }
+        FileLocations.SetSubject(_appState.project, _appState.subject);
+
+        if (File.Exists(FileLocations.ConfigFile("Project.Settings")))
+        {
+            _projectSettings = FileIO.XmlDeserialize<Project.Settings>(FileLocations.ConfigFile("Project.Settings"));
+        }
+        else
+        {
+            _projectSettings = new Project.Settings();
+        }
+
+        if (File.Exists(FileLocations.SubjectMetadataPath))
+        {
+            _subjectMetadata = FileIO.XmlDeserialize<SubjectMetadata>(FileLocations.SubjectMetadataPath);
+        }
+        else
+        {
+            _subjectMetadata = new SubjectMetadata()
+            {
+                ID = subject,
+                Project = project,
+                Transducer = _projectSettings.DefaultTransducer,
+                Laterality = KLib.Signals.Laterality.Binaural
+            };
+            _SaveSubjectMetadata();
+        }
+    }
+
+    private void _SetTransducer(string transducer)
+    {
+        _subjectMetadata.Transducer = transducer;
+        _SaveSubjectMetadata();
+    }
+
+    private void _SaveSubjectMetadata()
+    {
+        if (!Directory.Exists(FileLocations.SubjectMetaFolder))
+        {
+            Directory.CreateDirectory(FileLocations.SubjectMetaFolder);
+        }
+        FileIO.XmlSerialize(_subjectMetadata, FileLocations.SubjectMetadataPath);
     }
 
     #endregion

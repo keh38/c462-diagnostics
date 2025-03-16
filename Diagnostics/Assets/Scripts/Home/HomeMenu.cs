@@ -177,6 +177,13 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
                     _subjectPanel.ShowPanel();
                 }
                 break;
+
+            case "SubjectMetadataChanged":
+                if (_activePanel == _subjectPanel.gameObject)
+                {
+                    _subjectPanel.ShowPanel();
+                }
+                break;
         }
     }
     void IRemoteControllable.ChangeScene(string newScene)

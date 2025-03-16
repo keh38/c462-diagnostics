@@ -9,6 +9,7 @@ public class SubjectPanel : MonoBehaviour
 {
     [SerializeField] private DropDownListControl projectDropDown;
     [SerializeField] private DropDownListControl subjectDropDown;
+    [SerializeField] private DropDownListControl transducerDropDown;
     [SerializeField] private TMPro.TMP_InputField subjectInputField;
 
     public UnityEvent<string> SubjectChangedEvent { get; } = new UnityEvent<string>();
@@ -16,10 +17,13 @@ public class SubjectPanel : MonoBehaviour
     private string _selectedProject = "";
     private string _selectedSubject = "";
 
+    private bool _ignoreEvents = false;
+
     private void Start()
     {
         projectDropDown.OnSelectionChange += OnProjectDropDownChange;
         subjectDropDown.OnSelectionChange += OnSubjectDropDownChange;
+        transducerDropDown.OnSelectionChange += OnTransducerDropDownChange;
     }
 
     public void ShowPanel()
@@ -36,6 +40,7 @@ public class SubjectPanel : MonoBehaviour
     public void OnProjectDropDownChange(GameObject go, int intSelected)
     {
         _selectedProject = projectDropDown.Items[intSelected].name;
+        FillTransducerDropDown();
         FillSubjectDropDown();
    }
 
@@ -48,6 +53,10 @@ public class SubjectPanel : MonoBehaviour
             var subject = subjectDropDown.Items[intSelected].name;
             GameManager.SetSubject(_selectedProject, subject);
             SubjectChangedEvent.Invoke(GameManager.Subject);
+
+            _ignoreEvents = true;
+            transducerDropDown.SelectByText(GameManager.Transducer);
+            _ignoreEvents = false;
         }
         else
         {
@@ -58,6 +67,14 @@ public class SubjectPanel : MonoBehaviour
     public void OnSubjectInputFieldEndEdit(string value)
     {
         CreateNewSubject(subjectInputField.text);
+    }
+
+    public void OnTransducerDropDownChange(GameObject go, int intSelected)
+    {
+        if (!_ignoreEvents)
+        {
+            GameManager.Transducer = transducerDropDown.Items[intSelected].name;
+        }
     }
 
     private void CreateNewSubject(string name)
@@ -102,4 +119,14 @@ public class SubjectPanel : MonoBehaviour
         subjectDropDown.SelectByText(_selectedSubject);
     }
 
+    private void FillTransducerDropDown()
+    {
+        var transducers = GameManager.EnumerateTransducers();
+
+        transducerDropDown.Clear();
+        for (int k=0; k<transducers.Count; k++)
+        {
+            transducerDropDown.AddItem(k, transducers[k]);
+        }
+    }
 }

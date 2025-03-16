@@ -183,6 +183,19 @@ public class HTS_Server : MonoBehaviour
                 _currentScene.ProcessRPC("SubjectChanged");
                 break;
 
+            case "GetSubjectMetadata":
+                _listener.WriteStringAsByteArray(GameManager.SerializeSubjectMetadata());
+                break;
+
+            case "SetSubjectMetadata":
+                GameManager.DeserializeSubjectMetadata(data);
+                _currentScene.ProcessRPC("SubjectMetadataChanged");
+                break;
+
+            case "GetTransducers":
+                _listener.WriteStringAsByteArray(KLib.FileIO.XmlSerializeToString(GameManager.EnumerateTransducers()));
+                break;
+
             case "ChangeScene":
                 _currentScene.ChangeScene(data);
                 break;
