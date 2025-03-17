@@ -118,6 +118,7 @@
     <Compile Include="Assets\Turandot\Parameters\Turandot.Parameters.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotScripter.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Calibration\CalibrationData.cs" />
+    <Compile Include="Assets\Scripts\Game Management\SubjectMetadata.cs" />
     <Compile Include="Assets\Turandot\Screen\Turandot.Screen.ScreenElements.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.VariableOrder.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\TitleBarStyle.cs" />
@@ -225,6 +226,7 @@
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\MovingRippleNoise.cs" />
     <Compile Include="Assets\Turandot\Screen\Turandot.Screen.ThumbSliderLayout.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.Order.cs" />
+    <Compile Include="Assets\Scripts\Game Management\Project.Settings.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.InputOperator.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptiveTrack.cs" />
     <Compile Include="Assets\Turandot\Screen\Turandot.Screen.MessageLayout.cs" />
@@ -269,8 +271,6 @@
     <Compile Include="Assets\Scripts\Menu Tools\MenuBarControl.cs" />
     <Compile Include="Assets\Turandot\Schedules\Optimizations\Turandot.Optimizations.Optimization.cs" />
     <Compile Include="Assets\Scripts\Home\SubjectPanel.cs" />
-    <Compile Include="Assets\Scripts\Game Management\SubjectMetadata.cs" />
-    <Compile Include="Assets\Scripts\Game Management\Project.Settings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

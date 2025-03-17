@@ -24,6 +24,19 @@ namespace KLib
             }
         }
 
+        public class Endpoint
+        {
+            public int index;
+            public string transducer;
+            public string location;
+            public string extra;
+            public Endpoint() { }
+            public override string ToString()
+            {
+                return $"{transducer}.{location}";
+            }
+        }
+
         private List<AdapterSpec> _items = new List<AdapterSpec>();
 
         public AdapterMap() { }
@@ -47,10 +60,10 @@ namespace KLib
 
             map.Add("Front-Left", "Audio", "Headphones", "Left");
             map.Add("Front-Right", "Audio", "Headphones", "Right");
-            map.Add("Center", "Electric", "DSR.372", "Site 1", "50");
-            map.Add("Subwoofer", "Electric", "DSR.000", "Site 2", "50");
-            map.Add("Side-Left", "Haptic", "Haptic.1", "Site 1");
-            map.Add("Side-Right", "Haptic", "Haptic.2", "Site 2");
+            map.Add("Center", "Electric", "DSR372", "Site 1", "50");
+            map.Add("Subwoofer", "Electric", "DSR000", "Site 2", "50");
+            map.Add("Side-Left", "Haptic", "Haptic1", "Site 1");
+            map.Add("Side-Right", "Haptic", "Haptic2", "Site 2");
             map.Add("Rear-Left", "", "", "");
             map.Add("Rear-Right", "", "", "");
 
@@ -65,16 +78,25 @@ namespace KLib
 
         public int GetAdapterIndex(string modality, string location)
         {
-            int number = _items.FindIndex(o => o.modality == modality && o.location == location);
-            if (number < 0)
+            int index = _items.FindIndex(o => o.modality == modality && o.location == location);
+            if (index < 0)
                 throw new Exception($"Adapter '{modality}.{location}' does not exist.");
 
-            return number;
+            return index;
         }
 
-        public List<string>GetLocations(string modality)
+        public Endpoint GetEndpoint(string modality, string location)
         {
-            return _items.FindAll(x => x.modality.Equals(modality)).Select(y => y.location).ToList();
+            var index = GetAdapterIndex(modality, location);
+
+            var ep = new Endpoint()
+            {
+                index = index,
+                transducer = _items[index].transducer,
+                location = location,
+                extra = _items[index].extra
+            };
+            return ep;
         }
     }
 }

@@ -67,10 +67,6 @@ namespace KLib.Signals
         [JsonProperty]
         public Laterality Laterality { set; get; } = Laterality.None;
 
-        [ProtoMember(8, IsRequired = true)]
-        [XmlIgnore]
-        public string Transducer { set; get; }
-
         [ProtoMember(9, IsRequired = true)]
         public Modality Modality { set; get; } = Modality.Audio;
 
@@ -120,11 +116,11 @@ namespace KLib.Signals
 
         [ProtoIgnore]
         [XmlIgnore]
-        public string MyEndpoint { get; private set; }
+        public AdapterMap.Endpoint MyEndpoint { get; set; }
 
         [ProtoIgnore]
         [XmlIgnore]
-        public int outputNum = 0;
+        public int OutputNum { get { return MyEndpoint.index; } }
 
         [JsonIgnore]
         [XmlIgnore]
@@ -136,7 +132,7 @@ namespace KLib.Signals
 
         [ProtoIgnore]
         [XmlIgnore]
-        public string LongName { get { return Name + (!string.IsNullOrEmpty(MyEndpoint) ? " (" + MyEndpoint + ")" : ""); } }
+        public string LongName { get { return Name + (MyEndpoint != null ? " (" + MyEndpoint + ")" : ""); } }
 
         [ProtoIgnore]
         [XmlIgnore]
@@ -201,31 +197,10 @@ namespace KLib.Signals
 			this.modulation = modul;
 		}
 
-        public void SetEndpoint(int copyNum)
+        public void SetEndpoint(AdapterMap.Endpoint endpoint, int copyNum)
         {
-            string tag = "";
-
-            if (Modality == Modality.Audio)
-            {
-                if (Laterality == Laterality.None)
-                {
-                    tag = "";
-                }
-                else if (Laterality == Laterality.Left)
-                    tag = ".Left";
-                else if (Laterality == Laterality.Right)
-                    tag = ".Right";
-                else
-                {
-                    tag += (copyNum == 0) ? ".Left" : ".Right";
-                }
-            }
-            else if (Modality == Modality.Haptic || Modality == Modality.Electric)
-            {
-                tag = $".{Location}";
-            }
-
-            MyEndpoint = Transducer + tag;
+            MyEndpoint = endpoint;
+            MyEndpoint.location = GetLocation(copyNum);
         }
 
         public string GetLocation(int copyNum)
@@ -536,7 +511,7 @@ namespace KLib.Signals
 
                 for (int k=0; k<NumCopies; k++)
                 {
-                    SetEndpoint(k);
+                    //SetEndpoint(k);
                     level.Initialize(MyEndpoint, Vmax);
                     float mx = waveform.GetMaxLevel(level, SamplingRateHz);
                     mx += modulation.LevelCorrection;

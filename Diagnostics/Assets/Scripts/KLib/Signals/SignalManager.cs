@@ -352,9 +352,7 @@ namespace KLib.Signals
                             ch.waveform.ChannelName = ch.Name;
                         }
 
-                        ch.SetEndpoint(k);
-
-                        c.outputNum = AdapterMap.GetAdapterIndex(c.Modality.ToString(), c.GetLocation(k));
+                        c.MyEndpoint = AdapterMap.GetEndpoint(c.Modality.ToString(), c.GetLocation(k));
                         c.Vmax = Vmax;
 
                         _shadows.Add(c);
@@ -440,7 +438,7 @@ namespace KLib.Signals
                 {
                     for (int j = 0; j < _shadows.Count; j++)
                     {
-                        data[idx + _shadows[j].outputNum] = 0;
+                        data[idx + _shadows[j].OutputNum] = 0;
                     }
                     idx += Noutputs;
                 }
@@ -471,15 +469,15 @@ namespace KLib.Signals
                         idx = 0;
                         for (int k = 0; k < Npts; k++)
                         {
-                            data[idx + ch.outputNum] += ch.Data[k] * ch.ALeft;
-                            data[idx + ch.outputNum + 1] += ch.Data[k] * ch.ARight;
+                            data[idx + ch.OutputNum] += ch.Data[k] * ch.ALeft;
+                            data[idx + ch.OutputNum + 1] += ch.Data[k] * ch.ARight;
                             idx += Noutputs;
                             maxVal = (maxVal > ch.Data[k]) ? maxVal : ch.Data[k];
                         }
                     }
                     else
                     {
-                        idx = ch.outputNum;
+                        idx = ch.OutputNum;
                         for (int k = 0; k < Npts; k++)
                         {
                             data[idx] += ch.Data[k];
@@ -547,15 +545,15 @@ namespace KLib.Signals
                     {
                         for (int k = 0; k < Npts; k++)
                         {
-                            data[ch.outputNum, k] += ch.Data[k] * ch.ALeft;
-                            data[ch.outputNum + 1, k] += ch.Data[k] * ch.ARight;
+                            data[ch.OutputNum, k] += ch.Data[k] * ch.ALeft;
+                            data[ch.OutputNum + 1, k] += ch.Data[k] * ch.ARight;
                         }
                     }
                     else
                     {
                         for (int k = 0; k < Npts; k++)
                         {
-                            data[ch.outputNum, k] += ch.Data[k];
+                            data[ch.OutputNum, k] += ch.Data[k];
                         }
                     }
                 }

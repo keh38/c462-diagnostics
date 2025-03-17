@@ -172,11 +172,11 @@ namespace KLib.Signals
             return new List<string>(new string[] { "Level", "Level.Rove" });
         }
 
-        public void Initialize(string endpoint, float vmax)
+        public void Initialize(AdapterMap.Endpoint endpoint, float vmax)
         {
-            var parts = endpoint.Split('.');
-            _transducer = parts[0];
-            _channel = parts[1];
+            //var parts = endpoint.Split('.');
+            //_transducer = parts[0];
+            //_channel = parts[1];
             _vmax = vmax;
 
             _calib = CalibrationFactory.Load(Units, _transducer, _channel);
