@@ -12,6 +12,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Admin Tools.unity
     guid: 773a4abd8bbca034792f2edba7be5c64
   - enabled: 1
-    path: Assets/Turandot/Turandot Interactive.unity
+    path: Assets/Turandot/Interactive/Turandot Interactive.unity
     guid: bc2d5bc90bdba7848a002df2422f0743
   m_configObjects: {}

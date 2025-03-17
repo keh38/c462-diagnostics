@@ -40,7 +40,6 @@ public class SubjectPanel : MonoBehaviour
     public void OnProjectDropDownChange(GameObject go, int intSelected)
     {
         _selectedProject = projectDropDown.Items[intSelected].name;
-        FillTransducerDropDown();
         FillSubjectDropDown();
    }
 
@@ -55,7 +54,11 @@ public class SubjectPanel : MonoBehaviour
             SubjectChangedEvent.Invoke(GameManager.Subject);
 
             _ignoreEvents = true;
+
+            FillTransducerDropDown();
             transducerDropDown.SelectByText(GameManager.Transducer);
+            HardwareInterface.AdapterMap.AudioTransducer = GameManager.Transducer;
+
             _ignoreEvents = false;
         }
         else
@@ -74,6 +77,7 @@ public class SubjectPanel : MonoBehaviour
         if (!_ignoreEvents)
         {
             GameManager.Transducer = transducerDropDown.Items[intSelected].name;
+            HardwareInterface.AdapterMap.AudioTransducer = GameManager.Transducer;
         }
     }
 

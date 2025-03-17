@@ -28,7 +28,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     {
         HTS_Server.SetCurrentScene("Turandot Interactive", this);
         _udpClient = new UdpClient();
-        //_udpEndPoint = new IPEndPoint(IPAddress.Parse(HTS_Server.MyAddress), _udpPort);
+        _udpEndPoint = new IPEndPoint(IPAddress.Parse(HTS_Server.MyAddress), _udpPort);
 
         CreateDefaultSignalManager();
     }
@@ -39,7 +39,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         {
             var amplitudes = _sigMan.CurrentAmplitudes;
             Buffer.BlockCopy(amplitudes, 0, _udpData, 0, _udpData.Length);
-            //_udpClient.Send(_udpData, _udpData.Length, _udpEndPoint);
+            _udpClient.Send(_udpData, _udpData.Length, _udpEndPoint);
         }
     }
 
@@ -107,7 +107,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         AudioSettings.GetDSPBufferSize(out int bufferLength, out int numBuffers);
 
         _sigMan = new SignalManager();
-        _sigMan.AdapterMap = AdapterMap.DefaultStereoMap();
+        _sigMan.AdapterMap = HardwareInterface.AdapterMap;
         _sigMan.AddChannel(ch);
         _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
         //_sigMan.StartPaused();
@@ -121,11 +121,12 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     {
         _audioInitialized = false;
 
-        _sigMan = FileIO.XmlDeserializeFromString<SignalManager>(data);
+        var settings = FileIO.XmlDeserializeFromString<Turandot.Interactive.InteractiveSettings>(data);
+        _sigMan = settings.SigMan;
 
         AudioSettings.GetDSPBufferSize(out int bufferLength, out int numBuffers);
 
-        _sigMan.AdapterMap = AdapterMap.DefaultStereoMap();
+        _sigMan.AdapterMap = HardwareInterface.AdapterMap;
         _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
         _sigMan.StartPaused();
 

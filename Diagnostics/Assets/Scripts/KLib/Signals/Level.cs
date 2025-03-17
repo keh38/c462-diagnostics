@@ -174,9 +174,8 @@ namespace KLib.Signals
 
         public void Initialize(AdapterMap.Endpoint endpoint, float vmax)
         {
-            //var parts = endpoint.Split('.');
-            //_transducer = parts[0];
-            //_channel = parts[1];
+            _transducer = endpoint.transducer;
+            _channel = endpoint.location;
             _vmax = vmax;
 
             _calib = CalibrationFactory.Load(Units, _transducer, _channel);

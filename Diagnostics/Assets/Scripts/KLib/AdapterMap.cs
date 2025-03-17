@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
+
+using Newtonsoft.Json;
 
 namespace KLib
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class AdapterMap
     {
+        [JsonObject(MemberSerialization.Fields)]
         internal class AdapterSpec
         {
             public string jackName;
@@ -14,7 +19,7 @@ namespace KLib
             public string transducer;
             public string location;
             public string extra;
-            public AdapterSpec(string jackName, string modality, string transducer, string location, string extra="")
+            public AdapterSpec(string jackName, string modality, string transducer, string location, string extra = "")
             {
                 this.jackName = jackName;
                 this.modality = modality;
@@ -37,12 +42,29 @@ namespace KLib
             }
         }
 
+        [JsonProperty]
         private List<AdapterSpec> _items = new List<AdapterSpec>();
+        private string _audioTransducer = "";
 
         public AdapterMap() { }
 
         public int NumChannels { get { return _items.Count; } }
-        //public List<string> Devices { get { return _items.Select(x => x.device).ToList(); } }
+        public string AudioTransducer
+        {
+            get
+            {
+                return _audioTransducer;
+            }
+            set
+            {
+                _audioTransducer = value;
+                foreach (var i in _items.FindAll(x => x.modality == "Audio"))
+                {
+                    i.transducer = _audioTransducer;
+                }
+            }
+        }
+
 
         public static AdapterMap DefaultStereoMap()
         {
@@ -76,7 +98,12 @@ namespace KLib
             _items.Add(new AdapterSpec(jackName, modality, location, channel, extra));
         }
 
-        public int GetAdapterIndex(string modality, string location)
+        public List<string> GetLocations(string modality)
+        {
+            return _items.FindAll(x => x.modality.Equals(modality)).Select(y => y.location).ToList();
+        }
+
+        private int GetAdapterIndex(string modality, string location)
         {
             int index = _items.FindIndex(o => o.modality == modality && o.location == location);
             if (index < 0)

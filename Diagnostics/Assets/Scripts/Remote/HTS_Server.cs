@@ -162,6 +162,11 @@ public class HTS_Server : MonoBehaviour
                 _listener.SendAcknowledgement();
                 break;
 
+
+            case "ChangeScene":
+                _currentScene.ChangeScene(data);
+                break;
+
             case "GetCurrentSceneName":
                 _listener.WriteStringAsByteArray(_currentSceneName);
                 break;
@@ -196,8 +201,8 @@ public class HTS_Server : MonoBehaviour
                 _listener.WriteStringAsByteArray(KLib.FileIO.XmlSerializeToString(GameManager.EnumerateTransducers()));
                 break;
 
-            case "ChangeScene":
-                _currentScene.ChangeScene(data);
+            case "GetAdapterMap":
+                _listener.WriteStringAsByteArray(KLib.FileIO.JSONSerializeToString(HardwareInterface.AdapterMap));
                 break;
 
             default:
