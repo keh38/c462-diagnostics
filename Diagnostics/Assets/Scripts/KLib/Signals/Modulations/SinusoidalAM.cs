@@ -114,6 +114,27 @@ namespace KLib.Signals.Modulations
             return "";
         }
 
+        override public float GetParameter(string paramName)
+        {
+            switch (paramName)
+            {
+                case "Freq_Hz":
+                    return Frequency_Hz;
+
+                case "Depth":
+                    return Depth;
+
+                case "Depth_dB":
+                    return 20*Mathf.Log10(Depth);
+
+                case "Phase":
+                    return Phase_cycles;
+            }
+
+            return float.NaN;
+        }
+
+
         public override bool Initialize(float Fs, int N)
         {
             base.Initialize(Fs, N);

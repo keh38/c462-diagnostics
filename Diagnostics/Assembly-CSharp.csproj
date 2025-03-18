@@ -62,6 +62,7 @@
     <Compile Include="Assets\Scripts\KLib\Signals\Level.cs" />
     <Compile Include="Assets\Turandot\TurandotEngine.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.GrapherLog.cs" />
+    <Compile Include="Assets\Scripts\KLib\ChannelProperties.cs" />
     <Compile Include="Assets\Prefabs\ParameterSlider.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\SignalManager.cs" />
     <Compile Include="Assets\Scripts\Admin Tools\UpdatePanel.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="Assets\Scripts\KLib\Signals\Gate.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Filters\IIRFilter.cs" />
     <Compile Include="Assets\Turandot\Screen\Turandot.Screen.Skin.cs" />
+    <Compile Include="Assets\Turandot\Interactive\InteractiveControl.cs" />
     <Compile Include="Assets\Turandot\Schedules\Optimizations\Turandot.Optimizations.Parameter.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.Input.cs" />
     <Compile Include="Assets\Turandot\Parameters\Turandot.Parameters.cs" />
@@ -273,8 +275,6 @@
     <Compile Include="Assets\Scripts\Menu Tools\MenuBarControl.cs" />
     <Compile Include="Assets\Turandot\Schedules\Optimizations\Turandot.Optimizations.Optimization.cs" />
     <Compile Include="Assets\Scripts\Home\SubjectPanel.cs" />
-    <Compile Include="Assets\Turandot\Interactive\InteractiveControl.cs" />
-    <Compile Include="Assets\Scripts\KLib\ChannelProperties.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

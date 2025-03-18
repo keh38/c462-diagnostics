@@ -382,7 +382,7 @@ namespace KLib.Signals
                         ch.ApplyBinauralProperties();
                     }
                 }
-                _currentAmplitudes = new float[_shadows.Count];
+                _currentAmplitudes = new float[channels.Count];
             }
             catch (Exception ex)
             {
@@ -456,6 +456,7 @@ namespace KLib.Signals
                 if (!_unpausePending && _paused) return;
 
                 Synth = true;
+                int iamp = 0;
                 for (int kch=0; kch<_shadows.Count; kch++)
                 {
                     var ch = _shadows[kch];
@@ -495,7 +496,10 @@ namespace KLib.Signals
                             maxVal = (maxVal > ch.Data[k]) ? maxVal : ch.Data[k];
                         }
                     }
-                    _currentAmplitudes[kch] = maxVal;
+                    if (channels.Contains(ch))
+                    {
+                        _currentAmplitudes[iamp++] = maxVal;
+                    }
                 }
                 Synth = false;
 

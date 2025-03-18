@@ -85,6 +85,7 @@ namespace KLib.Signals
         public float Vmax = 1;
 
         private bool _gateClosed;
+        private bool _deactivated;
 
         internal class IntramuralVariable
         {
@@ -394,16 +395,42 @@ namespace KLib.Signals
 
         public float GetParameter(string paramName)
         {
-            float val = float.NaN;
-
-            switch (paramName)
+            string[] s = paramName.Split('.');
+            if (s.Length != 2 && s[0] != "Level" && s[0] != "Ear")
             {
-                case "Level":
-                    val = level.Value;
-                    break;
+                return float.NaN;
             }
 
-            return val;
+            switch (s[0])
+            {
+                case "Ear":
+                    //Destination = (Laterality)(value + 2);
+                    break;
+
+                case "Gate":
+                    return gate.GetParameter(s[1]);
+
+                case "Mod":
+                case "SAM":
+                    return modulation.GetParameter(s[1]);
+
+                case "Level":
+                    return level.Value;
+
+                case "MBL":
+                    return binaural.MBL;
+
+                case "ILD":
+                    return binaural.ILD;
+
+                case "IPD":
+                    return binaural.IPD;
+
+                default:
+                    return waveform.GetParameter(s[1]);
+            }
+
+            return float.NaN;
         }
         
         public List<string> GetValidParameters()
@@ -487,6 +514,7 @@ namespace KLib.Signals
                     location = "balance";
                     SetBalance();
                 }
+                _deactivated = false;
 
                 _intramuralVariables.Clear();
             }
@@ -664,8 +692,6 @@ namespace KLib.Signals
             References references;
             float modRefCorr = 0;
 
-            float currentMax = 0;
-
             for (int k = 0; k < Data.Length; k++)
             {
                 Data[k] = 0;
@@ -676,7 +702,7 @@ namespace KLib.Signals
                 return;
             }
 
-            if ((!active || _gateClosed) && _rampState == RampState.Off)
+            if (_gateClosed && _rampState == RampState.Off)
             {
                 return;
             }
@@ -687,17 +713,17 @@ namespace KLib.Signals
             }
 
             references = waveform.Create(Data);
-
             modRefCorr = modulation.Apply(Data);
+
             if (gate.Active)
             {
-                gate.Apply(Data, !active && _rampState == RampState.On);
+                gate.Apply(Data);
 
-                if (active & !gate.Running) // so a one-shot will turn the channel off automatically
+                if (!gate.Running) // so a one-shot will turn the channel off automatically
                 {
-                    _gateClosed = true;
+                    //_gateClosed = true;
                 }
-                _rampState = (active || gate.Running) ? RampState.On : RampState.Off;
+                _rampState = (gate.Running) ? RampState.On : RampState.Off;
 
 
                 if (_intramuralVariables.Count > 0 && gate.Looped)
@@ -715,7 +741,28 @@ namespace KLib.Signals
                 _rampState = active ? RampState.On : RampState.Off;
             }
 
-            level.Apply(Data, references.Offset(modRefCorr));
+            _rampState = active ? _rampState : RampState.Off;
+
+            if (active && !_deactivated)
+            {
+                level.Apply(Data, references.Offset(modRefCorr));
+            }
+            else if (!active && !_deactivated)
+            {
+                level.Apply(Data, references.Offset(modRefCorr));
+                Gate.RampDown(Data);
+                _deactivated = true;
+            }
+            else if (active && _deactivated)
+            {
+                level.Apply(Data, references.Offset(modRefCorr));
+                Gate.RampUp(Data);
+                _deactivated = false;
+            }
+            else if (!active && _deactivated)
+            {
+                for (int k = 0; k < Data.Length; k++) Data[k] = 0;
+            }
         }
 
         public void ClearExpertOptions()

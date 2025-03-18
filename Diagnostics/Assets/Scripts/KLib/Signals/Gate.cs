@@ -79,9 +79,9 @@ namespace KLib.Signals
 
         private int _lastPulseTotalPoints;
         private int _currentPulse;
+        private float _fs = 0;
 
         private bool _isOneShot;
-        private bool _forceOffInProgress;
 
         private int _nmax;
 
@@ -116,6 +116,8 @@ namespace KLib.Signals
         {
             get { return _nmax; }
         }
+
+        private float _nextGateTime;
 
         /// <summary>
         /// Construct default Gate object.
@@ -174,10 +176,12 @@ namespace KLib.Signals
             {
                 case "Delay_ms":
                     Delay_ms = value;
+                    UpdateProperties();
                     break;
 
                 case "Duration_ms":
                     Duration_ms = value;
+                    UpdateProperties();
                     break;
 
                 case "Period_ms":
@@ -187,6 +191,22 @@ namespace KLib.Signals
 
             return "";
         }
+
+        public float GetParameter(string paramName)
+        {
+            switch (paramName)
+            {
+                case "Delay_ms":
+                    return Delay_ms;
+                case "Duration_ms":
+                    return Duration_ms;
+                case "Period_ms":
+                    return Period_ms;
+            }
+
+            return float.NaN;
+        }
+
 
         /// <summary>
         /// Static function to create just the ramp portion of a gate.
@@ -329,6 +349,8 @@ namespace KLib.Signals
 
         public void Initialize(float Fs, int N)
         {
+            _fs = Fs;
+
             _nmax = -1;
             if (!Active) return;
 
@@ -361,7 +383,6 @@ namespace KLib.Signals
             _currentPulse = 0;
 
             _state = GateState.Idle;
-            _forceOffInProgress = false;
 
             if (!Bursted && !float.IsInfinity(Duration_ms) && Period_ms > 0)
             {
@@ -370,34 +391,19 @@ namespace KLib.Signals
             }
         }
 
-        public void Apply(float[] data, bool forceOff=false)
+        private void UpdateProperties()
+        {
+            int nRampPts = Mathf.RoundToInt(_fs * Ramp_ms / 1000);
+            _startPointOfRampUp = Mathf.RoundToInt(_fs * Delay_ms / 1000);
+            _startPointOfRampDown = _startPointOfRampUp + Mathf.RoundToInt(_fs * Duration_ms / 1000) - nRampPts;
+        }
+
+        public void Apply(float[] data)
         {
             bool finished = false;
             float value = 0;
 
             _wasLooped = false;
-
-            if (forceOff)
-            {
-                _gateIndex = _startPointOfRampDown;
-                if (!_forceOffInProgress)
-                {
-                    switch (_state)
-                    {
-                        case GateState.RampDown:
-                        case GateState.RampUp:
-                            break;
-                        case GateState.On:
-                            _rampIndex = myRamp.Length;
-                            break;
-                        default:
-                            _state = GateState.Finished;
-                            _rampIndex = 0;
-                            break;
-                    }
-                    _forceOffInProgress = true;
-                }
-            }
 
             for (int k=0; k<data.Length; k++)
             {
@@ -429,11 +435,11 @@ namespace KLib.Signals
 
                 data[k] *= value;
 
-                if ((forceOff || _isOneShot) && _state == GateState.Off)
+                if (_isOneShot && _state == GateState.Off)
                 {
                     finished = true;
                 }
-                else if (!forceOff)
+                else
                 {
                     _gateIndex++;
                     if (Bursted)
@@ -460,7 +466,6 @@ namespace KLib.Signals
 
             if (finished)
             {
-                _forceOffInProgress = false;
                 _state = GateState.Finished;
             }
         }
@@ -469,7 +474,6 @@ namespace KLib.Signals
         {
             _gateIndex = 0;
             _rampIndex = 0;
-            _forceOffInProgress = false;
             _state = GateState.Idle;
         }
     }

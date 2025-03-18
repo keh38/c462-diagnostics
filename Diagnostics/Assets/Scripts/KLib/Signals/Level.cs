@@ -218,7 +218,7 @@ namespace KLib.Signals
 
                     if (Units == LevelUnits.PercentDR) Value = tmpValue;
 
-                    throw new System.Exception("Level over range.");
+                    throw new Exception("Level over range.");
                 }
             }
 

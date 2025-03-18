@@ -78,6 +78,19 @@ namespace KLib.Signals.Waveforms
             return "";
         }
 
+        override public float GetParameter(string paramName)
+        {
+            switch (paramName)
+            {
+                case "Frequency_Hz":
+                    return Frequency_Hz;
+                case "Phase_cycles":
+                    return Phase_cycles;
+            }
+
+            return float.NaN;
+        }
+
         override public List<string> GetValidParameters()
         {
             List<string> plist = new List<string>();

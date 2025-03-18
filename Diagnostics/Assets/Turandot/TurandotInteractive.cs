@@ -109,12 +109,14 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         _sigMan = new SignalManager();
         _sigMan.AdapterMap = HardwareInterface.AdapterMap;
         _sigMan.AddChannel(ch);
-        _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
+        //_sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
         //_sigMan.StartPaused();
 
         //_udpData = new byte[sizeof(float) * _sigMan.CurrentAmplitudes.Length];
 
         //_audioInitialized = true;
+
+        Debug.Log(_sigMan.GetParameter("Audio", "Tone.Frequency_Hz"));
     }
 
     private void SetParams(string data)
@@ -135,7 +137,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         _audioInitialized = true;
     }
 
-    private void SetParameter(string data)
+    private void SetProperty(string data)
     {
         var parts = data.Split('=');
         if (parts.Length == 2)
@@ -145,6 +147,17 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
             string param = lhs[1];
             float value = float.Parse(parts[1]);
             _sigMan.SetParameter(name, param, value);
+        }
+    }
+
+    private void SetActive(string data)
+    {
+        var parts = data.Split('=');
+        if (parts.Length == 2)
+        {
+            string name = parts[0];
+            bool value = float.Parse(parts[1]) > 0;
+            _sigMan[name].active = value;
         }
     }
 
@@ -180,8 +193,11 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
             case "SetParams":
                 SetParams(data);
                 break;
-            case "SetParameter":
-                SetParameter(data);
+            case "SetProperty":
+                SetProperty(data);
+                break;
+            case "SetActive":
+                SetActive(data);
                 break;
         }
     }

@@ -69,6 +69,11 @@ namespace KLib.Signals.Modulations
             return "";
         }
 
+        virtual public float GetParameter(string paramName)
+        {
+            return float.NaN;
+        }
+
         public virtual void ResetSweepables()
         {
         }

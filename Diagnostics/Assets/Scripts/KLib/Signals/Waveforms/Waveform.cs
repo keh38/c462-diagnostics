@@ -118,6 +118,11 @@ namespace KLib.Signals.Waveforms
             return "";
         }
 
+        virtual public float GetParameter(string paramName)
+        {
+            return float.NaN;
+        }
+
         virtual public List<string> GetValidParameters()
         {
             return new List<string>();
