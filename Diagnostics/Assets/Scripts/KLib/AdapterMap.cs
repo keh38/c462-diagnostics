@@ -4,21 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 
-using Newtonsoft.Json;
-
 namespace KLib
 {
-    [JsonObject(MemberSerialization.OptIn)]
     public class AdapterMap
     {
-        [JsonObject(MemberSerialization.Fields)]
-        internal class AdapterSpec
+        public class AdapterSpec
         {
             public string jackName;
             public string modality;
             public string transducer;
             public string location;
             public string extra;
+            public AdapterSpec() { }
             public AdapterSpec(string jackName, string modality, string transducer, string location, string extra = "")
             {
                 this.jackName = jackName;
@@ -41,14 +38,13 @@ namespace KLib
                 return $"{transducer}.{location}";
             }
         }
-
-        [JsonProperty]
-        private List<AdapterSpec> _items = new List<AdapterSpec>();
+        public string Name { set; get; }
+        public List<AdapterSpec> Items = new List<AdapterSpec>();
         private string _audioTransducer = "";
 
         public AdapterMap() { }
 
-        public int NumChannels { get { return _items.Count; } }
+        public int NumChannels { get { return Items.Count; } }
         public string AudioTransducer
         {
             get
@@ -58,7 +54,7 @@ namespace KLib
             set
             {
                 _audioTransducer = value;
-                foreach (var i in _items.FindAll(x => x.modality == "Audio"))
+                foreach (var i in Items.FindAll(x => x.modality == "Audio"))
                 {
                     i.transducer = _audioTransducer;
                 }
@@ -69,6 +65,7 @@ namespace KLib
         public static AdapterMap DefaultStereoMap()
         {
             var map = new AdapterMap();
+            map.Name = "Stereo";
 
             map.Add("Left", "Audio", "Headphones", "Left");
             map.Add("Right", "Audio", "Headphones", "Right");
@@ -79,6 +76,7 @@ namespace KLib
         public static AdapterMap Default7point1Map()
         {
             var map = new AdapterMap();
+            map.Name = "7.1";
 
             map.Add("Front-Left", "Audio", "Headphones", "Left");
             map.Add("Front-Right", "Audio", "Headphones", "Right");
@@ -95,17 +93,17 @@ namespace KLib
 
         public void Add(string jackName, string modality, string location, string channel, string extra = "")
         {
-            _items.Add(new AdapterSpec(jackName, modality, location, channel, extra));
+            Items.Add(new AdapterSpec(jackName, modality, location, channel, extra));
         }
 
         public List<string> GetLocations(string modality)
         {
-            return _items.FindAll(x => x.modality.Equals(modality)).Select(y => y.location).ToList();
+            return Items.FindAll(x => x.modality.Equals(modality)).Select(y => y.location).ToList();
         }
 
         private int GetAdapterIndex(string modality, string location)
         {
-            int index = _items.FindIndex(o => o.modality == modality && o.location == location);
+            int index = Items.FindIndex(o => o.modality == modality && o.location == location);
             if (index < 0)
                 throw new Exception($"Adapter '{modality}.{location}' does not exist.");
 
@@ -119,9 +117,9 @@ namespace KLib
             var ep = new Endpoint()
             {
                 index = index,
-                transducer = _items[index].transducer,
+                transducer = Items[index].transducer,
                 location = location,
-                extra = _items[index].extra
+                extra = Items[index].extra
             };
             return ep;
         }

@@ -16,13 +16,15 @@ using Serilog;
 using CoreAudio;
 using CoreAudio.Interfaces;
 
+using KLib;
+
 namespace Launcher
 {
     public partial class MainForm : Form
     {
         bool _configButtonPressed = false;
         Timer _timer;
-        int _delayTime = 1000;
+        int _delayTime = 5000;
 
         public MainForm()
         {
@@ -53,7 +55,20 @@ namespace Launcher
                 _timer.Enabled = false;
                 _configButtonPressed = true;
                 Log.Information("Config button pressed");
+                ShowConfigDialog();
+                _configButtonPressed = false;
+                LaunchUnityApp();
             }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                Close();
+            }
+        }
+
+        private void ShowConfigDialog()
+        {
+            var dlg = new ConfigForm();
+            dlg.ShowDialog();
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -102,7 +117,7 @@ namespace Launcher
             if (!string.IsNullOrEmpty(errorMsg))
             {
                 statusTextBox.AppendText(errorMsg + Environment.NewLine);
-                statusTextBox.BackColor = Color.PaleVioletRed;
+                statusTextBox.BackColor = Color.FromArgb(228, 192, 192);
             }
             else
             {
@@ -112,17 +127,37 @@ namespace Launcher
 
         private string ValidateHardwareSetup()
         {
-            statusTextBox.AppendText("Checking hardware..." + Environment.NewLine);
-            Log.Information("Validating hardware setup");
+            statusTextBox.AppendText("Reading configuration..." + Environment.NewLine);
+            Log.Information("Reading configuration");
+            var config = ReadConfiguration();
+            var map = config.GetSelectedMap();
 
-            var errMsg = ValidateSoundCardConfiguration();
+            statusTextBox.AppendText("Checking hardware..." + Environment.NewLine);
+            Log.Information($"Validating hardware setup '{map.Name}'");
+
+            var errMsg = ValidateSoundCardConfiguration(map.NumChannels);
 
             return errMsg;
         }
 
-        private string ValidateSoundCardConfiguration()
+        private HardwareConfiguration ReadConfiguration()
+        {
+            HardwareConfiguration config = null;
+            if (File.Exists(FileLocations.HardwareConfigFile))
+            {
+                config = KFile.XmlDeserialize<HardwareConfiguration>(FileLocations.HardwareConfigFile);
+            }
+            if (config == null)
+            {
+                config = HardwareConfiguration.GetDefaultConfiguration();
+            }
+            return config;
+        }
+
+        private string ValidateSoundCardConfiguration(int numChannels)
         {
             Log.Information("Validating sound card");
+            if (numChannels == 2) return "";
 
             var desiredFormat = new NAudio.Wave.WaveFormatExtensible(48000, 16, 8, (int)ChannelMapping.Surround7point1);
 

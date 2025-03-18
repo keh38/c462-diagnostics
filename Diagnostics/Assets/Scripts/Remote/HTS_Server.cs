@@ -202,7 +202,7 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "GetAdapterMap":
-                _listener.WriteStringAsByteArray(KLib.FileIO.JSONSerializeToString(HardwareInterface.AdapterMap));
+                _listener.WriteStringAsByteArray(KLib.FileIO.XmlSerializeToString(HardwareInterface.AdapterMap));
                 break;
 
             default:
