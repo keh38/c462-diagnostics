@@ -405,8 +405,7 @@ namespace KLib.Signals
 
             return val;
         }
-
-
+        
         public List<string> GetValidParameters()
         {
             List<string> plist = new List<string>();

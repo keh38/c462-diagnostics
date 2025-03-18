@@ -11,11 +11,13 @@ namespace Turandot.Interactive
     {
         public string Name { set; get; }
         public SignalManager SigMan { get; set; }
+        public List<InteractiveControl> Controls { get; set; }
 
         public InteractiveSettings()
         {
             Name = "Defaults";
             SigMan = CreateDefaultSignalManager();
+            Controls = new List<InteractiveControl>();
         }
 
         private SignalManager CreateDefaultSignalManager()
@@ -25,7 +27,7 @@ namespace Turandot.Interactive
                 Name = "Audio",
                 Modality = KLib.Signals.Enumerations.Modality.Audio,
                 Laterality = Laterality.Diotic,
-                Location = "Site 2",
+                Location = "Site 1",
                 waveform = new Sinusoid()
                 {
                     Frequency_Hz = 500

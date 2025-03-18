@@ -297,6 +297,16 @@ namespace KLib.Signals
                 ch.ResetSweepables();
         }
 
+        public List<ChannelProperties> GetValidProperties()
+        {
+            var properties = new List<ChannelProperties>();
+            foreach (var ch in channels)
+            {
+                properties.Add(new ChannelProperties() { channelName = ch.Name, properties = ch.GetValidParameters() });
+            }
+            return properties;
+        }
+
         /// <summary>
         /// 
         /// </summary>
