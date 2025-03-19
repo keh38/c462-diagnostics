@@ -19,20 +19,49 @@ namespace KLib.Signals.Waveforms
         [JsonProperty]
         public float PulseRate_Hz;
 
+        [ProtoMember(2, IsRequired = true)]
+        [JsonProperty]
+        public float PulseMode;
+
+        [ProtoMember(3, IsRequired = true)]
+        [JsonProperty]
+        public float PulsePolarity;
+
+        [ProtoMember(4, IsRequired = true)]
+        [JsonProperty]
+        public float Width;
+
+        [ProtoMember(5, IsRequired = true)]
+        [JsonProperty]
+        public float Recovery;
+
+        [ProtoMember(6, IsRequired = true)]
+        [JsonProperty]
+        public float Dwell;
+
         private float _pulseCarrierFreq = 1000;
         private float[] _pulse;
         private int _nptsPeriod;
         private int _pulseIndex;
         private int _nextPulseIndex;
 
+        private float[] _amBuffer;
+        private float _currentModulationValue;
+
         private int _runningTimeIndex;
 
         public Digitimer()
         {
             PulseRate_Hz = 20;
+            PulseMode = 1;
+            PulsePolarity = 2;
+            Width = 200;
+            Recovery = 100;
+            Dwell = 1;
 
             shape = Waveshape.Digitimer;
             _shortName = "Digitimer";
+            HandlesModulation = true;
         }
 
         public override List<SweepableParam> GetSweepableParams()
@@ -95,9 +124,9 @@ namespace KLib.Signals.Waveforms
             //phase_radians = 2 * Mathf.PI * Phase_cycles;
         }
 
-        override public void Initialize(float Fs, int N, Gate gate, Level level)
+        override public void Initialize(float Fs, int N, Channel channel)
         {
-            base.Initialize(Fs, N, gate, level);
+            base.Initialize(Fs, N, channel);
 
             int npts = Mathf.RoundToInt(Fs / _pulseCarrierFreq);
             _pulse = new float[npts];
@@ -107,9 +136,12 @@ namespace KLib.Signals.Waveforms
             }
 
             _nptsPeriod = Mathf.RoundToInt(Fs / PulseRate_Hz);
-            _nextPulseIndex = (_gate.DelaySamples > 0) ? _gate.DelaySamples : 0;
+            _nextPulseIndex = (_channel.gate.DelaySamples > 0) ? _channel.gate.DelaySamples : 0;
             _pulseIndex = 0;
             _runningTimeIndex = 0;
+
+            _amBuffer = new float[N];
+            _currentModulationValue = 0;
         }
 
         public override float GetMaxLevel(Level level, float Fs)
@@ -119,11 +151,20 @@ namespace KLib.Signals.Waveforms
 
         override public References Create(float[] data)
         {
+
+            for (int k = 0; k < _amBuffer.Length; k++) _amBuffer[k] = 1;
+            _channel.modulation.Apply(_amBuffer);
+
             for (int k = 0; k < data.Length; k++)
             {
+                if (_runningTimeIndex == _nextPulseIndex)
+                {
+                    _currentModulationValue = _amBuffer[k];
+                }
+
                 if (_runningTimeIndex >= _nextPulseIndex)
                 {
-                    data[k] = _pulse[_pulseIndex];
+                    data[k] = _pulse[_pulseIndex] * _currentModulationValue;
                     _pulseIndex++;
                     if (_pulseIndex == _pulse.Length)
                     {
@@ -132,17 +173,14 @@ namespace KLib.Signals.Waveforms
                     }
                 }
                 _runningTimeIndex++;
-                if (_gate.TotalSamples > 0 && _runningTimeIndex == _gate.TotalSamples)
+                if (_channel.gate.TotalSamples > 0 && _runningTimeIndex == _channel.gate.TotalSamples)
                 {
                     _runningTimeIndex = 0;
-                    _nextPulseIndex = _gate.DelaySamples;
+                    _nextPulseIndex = _channel.gate.DelaySamples;
                 }
             }
 
-            var r = new References();
-            r.maxVal = 1;
-            r.refVal = 1;
-            return r;// _calib.GetAllReferences(Frequency_Hz);
+            return new References();
         }
 
     }

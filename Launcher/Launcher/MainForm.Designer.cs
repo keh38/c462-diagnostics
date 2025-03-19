@@ -51,11 +51,12 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(308, 26);
+            this.label1.Location = new System.Drawing.Point(320, 26);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(164, 19);
+            this.label1.Size = new System.Drawing.Size(148, 19);
             this.label1.TabIndex = 2;
-            this.label1.Text = "Hearing Diagnostics";
+            this.label1.Text = "Hearing Test Suite";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // versionLabel
             // 

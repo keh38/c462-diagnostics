@@ -87,7 +87,7 @@ namespace KLib.Signals.Calibration
             c.V_of_ref = new float[npts];
             c.dBMax_per_1Vpeak = new float[npts];
 
-            for (int k=0; k<npts; k++)
+            for (int k = 0; k < npts; k++)
             {
                 c.dBref_per_1Vpeak[k] = -20 * Mathf.Log10(Mathf.Sqrt(2));
 
@@ -96,6 +96,20 @@ namespace KLib.Signals.Calibration
 
                 c.dBMax_per_1Vpeak[k] = c.dBref_per_1Vpeak[0]; // implicitly, this corresponds to the max SPL
             }
+
+            return c;
+        }
+
+        public static CalibrationData Create_mA(float currentLimit)
+        {
+            var c = new CalibrationData();
+            c.type = LevelUnits.mA;
+            c.reference = currentLimit / 10f;
+            c.df_Hz = 0;
+
+            c.dBref_per_1Vpeak = new float[] { 20 * Mathf.Log10(c.reference) };
+            c.V_of_ref = new float[] { 1 };
+            c.dBMax_per_1Vpeak = new float[] { 20 * Mathf.Log10(c.reference) };
 
             return c;
         }

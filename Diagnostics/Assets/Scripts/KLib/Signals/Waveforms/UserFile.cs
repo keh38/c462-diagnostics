@@ -165,16 +165,20 @@ namespace KLib.Signals.Waveforms
             return setter;
         }
 
-        override public void Initialize(float Fs, int N, Gate gate, Level level)
+        override public void Initialize(float Fs, int N, Channel channel)
         {
-            base.Initialize(Fs, N, gate, level);
+            base.Initialize(Fs, N, channel);
 
-            ReadData(level.Destination);
-            ComputeReferences(_level, samplingRate_Hz);
+            ReadData(channel.level.Destination);
+            ComputeReferences(channel.level, samplingRate_Hz);
             _curIndex = 0;
             _offset = 0;
 
             _playedOnce = false;
+            if (oneShot)
+            {
+                OffsetBy(channel.gate.Delay_ms);
+            }
         }
 
         public void OffsetBy(float delay_ms)

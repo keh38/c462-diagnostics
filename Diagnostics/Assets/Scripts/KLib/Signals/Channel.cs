@@ -506,13 +506,7 @@ namespace KLib.Signals
                 _rampState = RampState.Off;
 
                 location = "waveform";
-                waveform.Initialize(Fs, N, gate, level);
-
-                UserFile uf = waveform as UserFile;
-                if (uf != null && uf.oneShot)
-                {
-                    uf.OffsetBy(gate.Delay_ms);
-                }
+                waveform.Initialize(Fs, N, this);
 
                 if (Laterality == Laterality.Diotic)
                 {
@@ -537,6 +531,11 @@ namespace KLib.Signals
                 if (level.Units == LevelUnits.dB_attenuation)
                 {
                     return 0;
+                }
+                else if (level.Units == LevelUnits.mA)
+                {
+                    level.Initialize(MyEndpoint, Vmax);
+                    return level.GetMaxLevel(level.Units);
                 }
 
                 float maxValue = float.PositiveInfinity;
@@ -719,28 +718,31 @@ namespace KLib.Signals
             }
 
             references = waveform.Create(Data);
-            modRefCorr = modulation.Apply(Data);
+            if (!waveform.HandlesModulation)
+            {
+                modRefCorr = modulation.Apply(Data);
+            }                    
 
             if (gate.Active)
             {
                 gate.Apply(Data);
 
-                if (!gate.Running) // so a one-shot will turn the channel off automatically
-                {
-                    //_gateClosed = true;
-                }
+                //if (!gate.Running) // so a one-shot will turn the channel off automatically
+                //{
+                //    //_gateClosed = true;
+                //}
                 _rampState = (gate.Running) ? RampState.On : RampState.Off;
 
 
-                if (_intramuralVariables.Count > 0 && gate.Looped)
-                {
-                    UpdateIntramurals();
-                }
+                //if (_intramuralVariables.Count > 0 && gate.Looped)
+                //{
+                //    UpdateIntramurals();
+                //}
 
-                if (!active && _rampState == RampState.Off)
-                {
-                 //   gate.Reset();
-                }
+                //if (!active && _rampState == RampState.Off)
+                //{
+                // //   gate.Reset();
+                //}
             }
             else
             {

@@ -14,6 +14,7 @@ public class MenuButtonControl : MonoBehaviour
     public TMPro.TMP_Text label;
     public Image icon;
 
+#if UNITY_EDITOR
     [MenuItem("Tools/Add MenuButtonControl")]
     static void AddComponent()
     {
@@ -25,6 +26,7 @@ public class MenuButtonControl : MonoBehaviour
             mbc.icon = go.transform.Find("Image")?.GetComponentInChildren<Image>();
         }
     }
+#endif
 
     public void SetStyle(MenuBarStyle menuBarStyle, Color mainColor)
     {

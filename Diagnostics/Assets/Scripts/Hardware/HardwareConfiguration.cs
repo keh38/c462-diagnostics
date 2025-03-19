@@ -25,5 +25,10 @@ namespace KLib
             config.SyncComPort = "";
             return config;
         }
+
+        public bool UsesDigitimer()
+        {
+            return GetSelectedMap().Items.Find(x => x.transducer.StartsWith("DSR")) != null;
+        }
     }
 }

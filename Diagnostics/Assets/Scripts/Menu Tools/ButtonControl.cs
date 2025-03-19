@@ -10,6 +10,7 @@ public class ButtonControl : MonoBehaviour
     public TMPro.TMP_Text label;
     public Image icon;
 
+#if UNITY_EDITOR
     [MenuItem("Tools/Add ButtonControl")]
     static void AddComponent()
     {
@@ -21,6 +22,7 @@ public class ButtonControl : MonoBehaviour
             bc.icon = go.transform.Find("Image")?.GetComponentInChildren<Image>();
         }
     }
+#endif
 
     public void SetStyle(ButtonStyle style)
     {

@@ -10,13 +10,15 @@ using KLib.MSGraph;
 
 public class AdminToolsMenu : MonoBehaviour
 {
-    public SyncPanel syncPanel;
-    public UpdatePanel updatePanel;
-    public OneDrivePanel oneDrivePanel;
+    [SerializeField] private SyncPanel _syncPanel;
+    [SerializeField] private UpdatePanel _updatePanel;
+    [SerializeField] private OneDrivePanel _oneDrivePanel;
+    [SerializeField] private GameObject _hardwarePanel;
 
-    public Button syncMenuButton;
-    public Button updateMenuButton;
-    public Button oneDriveMenuButton;
+    [SerializeField] private Button _syncMenuButton;
+    [SerializeField] private Button _updateMenuButton;
+    [SerializeField] private Button _oneDriveMenuButton;
+    [SerializeField] private Button _hardwareMenuButton;
 
     [SerializeField] private Image _cloudIcon;
 
@@ -28,6 +30,12 @@ public class AdminToolsMenu : MonoBehaviour
     void Start()
     {
         _cloudIcon.color = OneDrivePanel.GetStatusColor(MSGraphClient.GetConnectionStatus(out string details));
+        if (!HardwareInterface.IsReady && !HardwareInterface.ErrorAcknowledged)
+        {
+            HardwareInterface.AcknowledgeError();
+            _hardwareMenuButton.Select();
+            OnHardwareMenuButtonClick();
+        }
     }
 
     //void EnableMenu(bool enabled)
@@ -43,26 +51,32 @@ public class AdminToolsMenu : MonoBehaviour
 
     public void OnSyncMenuButtonClick()
     {
-        SelectItem(syncMenuButton, syncPanel.gameObject);
+        SelectItem(_syncMenuButton, _syncPanel.gameObject);
     }
 
     public void OnUpdateMenuButtonClick()
     {
-        SelectItem(updateMenuButton, updatePanel.gameObject);
-        updatePanel.CheckForUpdates();
+        SelectItem(_updateMenuButton, _updatePanel.gameObject);
+        _updatePanel.CheckForUpdates();
     }
 
     public void OnOneDriveClick()
     {
-        if (_activePanel != oneDrivePanel.gameObject)
+        if (_activePanel != _oneDrivePanel.gameObject)
         {
-            SelectItem(oneDriveMenuButton, oneDrivePanel.gameObject);
+            SelectItem(_oneDriveMenuButton, _oneDrivePanel.gameObject);
         }
 //        else
         {
-            StartCoroutine(oneDrivePanel.ConnectToOneDrive());
+            StartCoroutine(_oneDrivePanel.ConnectToOneDrive());
         }
     }
+
+    public void OnHardwareMenuButtonClick()
+    {
+        SelectItem(_hardwareMenuButton, _hardwarePanel.gameObject);
+    }
+
 
     public void OnBackButtonClick()
     {

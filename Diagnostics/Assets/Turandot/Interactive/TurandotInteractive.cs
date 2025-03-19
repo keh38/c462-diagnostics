@@ -79,7 +79,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         var ch = new Channel()
         {
             Name = "Audio",
-            Modality = KLib.Signals.Enumerations.Modality.Audio,
+            Modality = KLib.Signals.Enumerations.Modality.Electric,
             Laterality = Laterality.Diotic,
             Location = "Site 2",
             waveform = new Noise(),
@@ -92,7 +92,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
             },
             level = new Level()
             {
-                Units = LevelUnits.Volts,
+                Units = LevelUnits.mA,
                 Value = 1
             }
         };
@@ -100,7 +100,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         AudioSettings.GetDSPBufferSize(out int bufferLength, out int numBuffers);
 
         _sigMan = new SignalManager();
-        _sigMan.AdapterMap = HardwareInterface.AdapterMap;
+        _sigMan.AdapterMap = AdapterMap.Default7point1Map();
         _sigMan.AdapterMap.AudioTransducer = "HD280";
         _sigMan.AddChannel(ch);
         _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
@@ -108,9 +108,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
         //_udpData = new byte[sizeof(float) * _sigMan.CurrentAmplitudes.Length];
 
-        _audioInitialized = true;
-
-        Debug.Log(_sigMan.GetParameter("Audio", "Digitimer.PulseRate_Hz"));
+        //_audioInitialized = true;
     }
 
     private void SetParams(string data)
@@ -127,6 +125,15 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         _sigMan.StartPaused();
 
         _udpData = new byte[sizeof(float) * _sigMan.CurrentAmplitudes.Length];
+
+        var digitimerChannels = _sigMan.channels.FindAll(x => x.waveform.Shape == KLib.Signals.Enumerations.Waveshape.Digitimer && x.Modality == KLib.Signals.Enumerations.Modality.Electric);
+        foreach (var d in digitimerChannels)
+        {
+            if (int.TryParse(d.MyEndpoint.transducer.Substring(3), out int id))
+            {
+                HardwareInterface.Digitimer.EnableDevice(id, d.waveform as Digitimer);
+            }
+        }
 
         _audioInitialized = true;
     }
@@ -163,6 +170,15 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     private void StopStreaming()
     {
         _sigMan.Pause();
+        var digitimerChannels = _sigMan.channels.FindAll(x => x.waveform.Shape == KLib.Signals.Enumerations.Waveshape.Digitimer && x.Modality == KLib.Signals.Enumerations.Modality.Electric);
+        foreach (var d in digitimerChannels)
+        {
+            if (int.TryParse(d.MyEndpoint.transducer.Substring(3), out int id))
+            {
+                HardwareInterface.Digitimer.DisableDevice(id);
+            }
+        }
+
     }
 
     private void OnAudioFilterRead(float[] data, int channels)

@@ -16,6 +16,7 @@ using Serilog;
 using CoreAudio;
 using CoreAudio.Interfaces;
 
+using D128NET;
 using KLib;
 
 namespace Launcher
@@ -25,6 +26,8 @@ namespace Launcher
         bool _configButtonPressed = false;
         Timer _timer;
         int _delayTime = 5000;
+
+        HardwareConfiguration _config;
 
         public MainForm()
         {
@@ -40,6 +43,11 @@ namespace Launcher
             _timer.Interval = _delayTime;
             _timer.Tick += Timer_Tick;
             _timer.Enabled = true;
+
+            if (!Directory.Exists(FileLocations.RootFolder))
+            {
+                Directory.CreateDirectory(FileLocations.RootFolder);
+            }
         }
 
         private async void MainForm_Shown(object sender, EventArgs e)
@@ -92,7 +100,7 @@ namespace Launcher
                 .MinimumLevel.ControlledBy(logLevel)
                 .WriteTo.Console()
                 .WriteTo.File(
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "EPL", "Logs", "SandboxLauncher-.txt"),
+                    Path.Combine(FileLocations.RootFolder, "Logs", "HTSLauncher-.txt"),
                     rollingInterval: RollingInterval.Day,
                     retainedFileCountLimit: 30,
                     flushToDiskInterval: TimeSpan.FromSeconds(30),
@@ -112,32 +120,162 @@ namespace Launcher
 
         private void LaunchUnityApp()
         {
-            var errorMsg = ValidateHardwareSetup();
+            string errorMsg = "";
+            try
+            {
+                errorMsg = ValidateHardwareSetup();
+            }
+            catch (Exception ex)
+            {
+                errorMsg = "Failed to initialize hardware";
+                Log.Error(ex.Message);
+            }
+
+            if (string.IsNullOrEmpty(errorMsg))
+            {
+                statusTextBox.AppendText("Starting Hearing Test Suite..." + Environment.NewLine);
+                Log.Information("Starting HTS");
+                System.Threading.Thread.Sleep(1000);
+
+                var folder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+#if DEBUG
+                var index = folder.IndexOf("Launcher");
+                folder = Path.Combine(folder.Substring(0, index - 1), "Diagnostics", "Build");
+                return;
+#else
+                // up one more level
+                folder = Path.GetDirectoryName(folder);
+#endif
+                var htsPath = Path.Combine(folder, "Hearing Test Suite.exe");
+
+                try
+                {
+                    Log.Information($"App path = {htsPath}");
+                    Process.Start(htsPath);
+                }
+                catch (Exception ex)
+                {
+                    errorMsg = $"Error starting app:{Environment.NewLine}{ex.Message}";
+                    Log.Error(errorMsg);
+                }
+            }
 
             if (!string.IsNullOrEmpty(errorMsg))
             {
-                statusTextBox.AppendText(errorMsg + Environment.NewLine);
-                statusTextBox.BackColor = Color.FromArgb(228, 192, 192);
+                ShowErrorMessage(errorMsg);
             }
             else
             {
+                Log.Information("Success!");
                 Close();
             }
+        }
+
+        private void ShowErrorMessage(string message)
+        {
+            statusTextBox.AppendText(message + Environment.NewLine);
+            statusTextBox.BackColor = Color.FromArgb(228, 192, 192);
         }
 
         private string ValidateHardwareSetup()
         {
             statusTextBox.AppendText("Reading configuration..." + Environment.NewLine);
             Log.Information("Reading configuration");
-            var config = ReadConfiguration();
-            var map = config.GetSelectedMap();
+            _config = ReadConfiguration();
+            var map = _config.GetSelectedMap();
 
             statusTextBox.AppendText("Checking hardware..." + Environment.NewLine);
             Log.Information($"Validating hardware setup '{map.Name}'");
 
-            var errMsg = ValidateSoundCardConfiguration(map.NumChannels);
+            var sb = new StringBuilder(100);
 
-            return errMsg;
+            var errMsg = ValidateSoundCardConfiguration(map.NumChannels);
+            if (!string.IsNullOrEmpty(errMsg)) sb.AppendLine(errMsg);
+
+            errMsg = ValidateSyncDevice();
+            if (!string.IsNullOrEmpty(errMsg)) sb.AppendLine(errMsg);
+
+            errMsg = ValidateDigitimerDevices();
+            if (!string.IsNullOrEmpty(errMsg)) sb.AppendLine(errMsg);
+
+            return sb.ToString();
+        }
+
+        private string ValidateSyncDevice()
+        {
+            if (string.IsNullOrEmpty(_config.SyncComPort))
+            {
+                statusTextBox.AppendText("No sync device COM port: attempt to sync will cause error" + Environment.NewLine);
+                Log.Information("No sync COM port specified");
+                return "";
+            }
+
+            statusTextBox.AppendText("Checking sync device..." + Environment.NewLine);
+            Log.Information("Pinging sync device");
+
+            var success = ConfigForm.TestComPort(_config.SyncComPort);
+            if (!success)
+            {
+                string msg = $"Sync device not responding at: {_config.SyncComPort}";
+                Log.Information(msg);
+                return msg;
+            }
+            return "";
+        }
+
+        private string ValidateDigitimerDevices()
+        {
+            var map = _config.GetSelectedMap();
+            var devices = map.Items.FindAll(x => x.modality.Equals("Electric") && x.transducer.StartsWith("DSR"));
+            if (devices.Count == 0)
+            {
+                return "";
+            }
+
+            statusTextBox.AppendText("Initializing Digitimer devices..." + Environment.NewLine);
+            string result = "";
+
+            var d128 = new D128ExAPI();
+            try
+            {
+                d128.Initialize();
+                d128.GetState();
+                foreach (var d in devices)
+                {
+                    int id = int.Parse(d.transducer.Substring(3));
+                    float max = float.Parse(d.extra);
+
+                    if (d128.Devices.Contains(id))
+                    {
+                        d128[id].Limit = (int)(max * 10);
+                        d128[id].Source = DemandSource.External;
+                    }
+                    else
+                    {
+                        var e = $"DSR #{id} not found";
+                        result += e + Environment.NewLine;
+                        Log.Error(e);
+                    }
+                }
+
+                var errorCode = d128.SetState();
+                if (errorCode != ErrorCode.Success)
+                {
+                    result += "Failed to initialize Digitimer devices" + Environment.NewLine;
+                    Log.Error($"Failed to set current limits ({errorCode})");
+                }
+            }
+            catch (Exception ex)
+            {
+                result += "Failed to initialize Digitimer devices" + Environment.NewLine;
+                Log.Error($"Failed to initialize Digitimer devices: {ex.Message}");
+            }
+            finally
+            {
+                d128.Close();
+            }
+
+            return result;
         }
 
         private HardwareConfiguration ReadConfiguration()
@@ -156,6 +294,7 @@ namespace Launcher
 
         private string ValidateSoundCardConfiguration(int numChannels)
         {
+            statusTextBox.AppendText("Checking sound card..." + Environment.NewLine);
             Log.Information("Validating sound card");
             if (numChannels == 2) return "";
 

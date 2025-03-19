@@ -18,7 +18,7 @@ public class BuildStandalone : MonoBehaviour
 
         var buildPlayerOptions = new BuildPlayerOptions();
         buildPlayerOptions.scenes = scenesInBuild.Select(x => x.path).ToArray();
-        buildPlayerOptions.locationPathName = "Build/HearingDiagnostics.exe";
+        buildPlayerOptions.locationPathName = Path.Combine("Build", Application.productName + ".exe");
         buildPlayerOptions.target = BuildTarget.StandaloneWindows64;
         buildPlayerOptions.options = BuildOptions.None;
 

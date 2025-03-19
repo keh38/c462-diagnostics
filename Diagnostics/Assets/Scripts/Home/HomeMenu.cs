@@ -49,7 +49,7 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
         if (!GameManager.Initialized)
         {
             EnableMenu(false);
-            _message.text = "Starting up...";
+            //_message.text = "Starting up...";
             yield return null;
 
             KLogger.Create(
@@ -64,6 +64,8 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
             _message.text = "";
             EnableMenu(true);
 
+            HardwareInterface.Initialize();
+
             HTS_Server.StartServer();
             GameManager.Initialized = true;
         }
@@ -72,7 +74,7 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 
         ConnectToCloud();
 
-        if (!string.IsNullOrEmpty(GameManager.Subject)) 
+        if (!string.IsNullOrEmpty(GameManager.Subject))
         {
             _subjectLabel.text = GameManager.Subject;
         }
@@ -81,6 +83,18 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
         OnSubjectMenuButtonClick();
 
         _networkIcon.color = HTS_Server.RemoteConnected ? _networkActiveColor : Color.gray;
+
+        StartCoroutine(InitializeHardware());
+    }
+
+    private IEnumerator InitializeHardware()
+    {
+        yield return new WaitForSeconds(1);
+
+        if (!HardwareInterface.IsReady && !HardwareInterface.ErrorAcknowledged)
+        {
+            SceneManager.LoadScene("Admin Tools");
+        }
     }
 
     private async void ConnectToCloud()

@@ -224,9 +224,9 @@ namespace KLib.Signals.Waveforms
         /// <remarks>
         /// 
         /// </remarks>
-        override public void Initialize(float Fs, int N, Gate g, Level level)
+        override public void Initialize(float Fs, int N, Channel channel)
         {
-            base.Initialize(Fs, N, level);
+            base.Initialize(Fs, N, channel);
 
 
             float Toffset = 1000.0f / PipRate_Hz;

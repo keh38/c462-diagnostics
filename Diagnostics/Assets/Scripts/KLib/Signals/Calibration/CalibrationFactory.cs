@@ -25,6 +25,10 @@ namespace KLib.Signals.Calibration
             {
                 result = CalibrationData.Create_dBVrms(acal);
             }
+            else if (refMode == LevelUnits.mA)
+            {
+                return CalibrationData.Create_mA(maxLevelMargin);
+            }
 
             acal = AcousticCalibration.Load(DefaultFolder, transducer, destination);
 

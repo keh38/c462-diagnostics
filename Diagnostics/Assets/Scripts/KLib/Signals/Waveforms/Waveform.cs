@@ -55,6 +55,8 @@ namespace KLib.Signals.Waveforms
             get { return shape.ToString().Replace('_', ' '); }
         }
 
+        public bool HandlesModulation { get; set; } = false;
+
         /// <summary>
         /// Local record of the sampling rate.
         /// </summary>
@@ -79,8 +81,7 @@ namespace KLib.Signals.Waveforms
         /// <seealso cref="Initialize"/>
         protected float T;
 
-        protected Level _level;
-        protected Gate _gate;
+        protected Channel _channel;
         protected CalibrationData _calib;
 
         protected string _name;
@@ -131,11 +132,6 @@ namespace KLib.Signals.Waveforms
             return new List<string>();
         }
 
-        virtual public void Initialize(float Fs, int N, Gate gate, Level level)
-        {
-            _gate = gate;
-            Initialize(Fs, N, level);
-        }
         /// <summary>
         /// Waveform base class initialization.
         /// </summary>
@@ -146,19 +142,20 @@ namespace KLib.Signals.Waveforms
         /// Saves local copy of sampling rate and buffer lengths. For convenience, pre-computes corresponding values of sampling interval and buffer duration.
         /// Derived classes should override this function to provide class-specific initialization, i.e.: <code>base.Initialize(Fs, N);</code>
         /// </remarks>
-        public void Initialize(float Fs, int N, Level level)
+        virtual public void Initialize(float Fs, int N, Channel channel)
         {
             dt = 1.0f / Fs;
             samplingRate_Hz = Fs;
             Npts = N;
             T = N * dt;
 
-            if (level.Cal == null)
+            _channel = channel;
+            if (_channel.level.Cal == null)
             {
             //    throw new ApplicationException("Null calibration data");
             }
-            _level = level;
-            _calib = level.Cal;
+
+            _calib = _channel.level.Cal;
         }
 
         virtual public float GetMaxLevel(Level level, float Fs)

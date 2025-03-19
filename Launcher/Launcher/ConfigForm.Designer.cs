@@ -41,6 +41,9 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.continueButton = new System.Windows.Forms.Button();
+            this.detectButton = new System.Windows.Forms.Button();
+            this.messageLabel = new System.Windows.Forms.Label();
+            this.dsrDropDown = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -64,6 +67,10 @@
             this.dataGridView.RowTemplate.Height = 24;
             this.dataGridView.Size = new System.Drawing.Size(503, 291);
             this.dataGridView.TabIndex = 0;
+            this.dataGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellClick);
+            this.dataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellValueChanged);
+            this.dataGridView.CurrentCellDirtyStateChanged += new System.EventHandler(this.dataGridView_CurrentCellDirtyStateChanged);
+            this.dataGridView.Leave += new System.EventHandler(this.dataGridView_Leave);
             // 
             // Jack
             // 
@@ -125,7 +132,7 @@
             // 
             this.comPortDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comPortDropDown.FormattingEnabled = true;
-            this.comPortDropDown.Location = new System.Drawing.Point(444, 381);
+            this.comPortDropDown.Location = new System.Drawing.Point(383, 383);
             this.comPortDropDown.Name = "comPortDropDown";
             this.comPortDropDown.Size = new System.Drawing.Size(70, 21);
             this.comPortDropDown.TabIndex = 3;
@@ -134,7 +141,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(383, 385);
+            this.label1.Location = new System.Drawing.Point(322, 387);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(59, 13);
             this.label1.TabIndex = 4;
@@ -159,11 +166,47 @@
             this.continueButton.UseVisualStyleBackColor = true;
             this.continueButton.Click += new System.EventHandler(this.continueButton_Click);
             // 
+            // detectButton
+            // 
+            this.detectButton.Location = new System.Drawing.Point(459, 382);
+            this.detectButton.Name = "detectButton";
+            this.detectButton.Size = new System.Drawing.Size(55, 23);
+            this.detectButton.TabIndex = 7;
+            this.detectButton.Text = "Detect";
+            this.detectButton.UseVisualStyleBackColor = true;
+            this.detectButton.Click += new System.EventHandler(this.detectButton_Click);
+            // 
+            // messageLabel
+            // 
+            this.messageLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.messageLabel.Location = new System.Drawing.Point(11, 382);
+            this.messageLabel.Name = "messageLabel";
+            this.messageLabel.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            this.messageLabel.Size = new System.Drawing.Size(290, 33);
+            this.messageLabel.TabIndex = 8;
+            this.messageLabel.Text = "label3";
+            this.messageLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.messageLabel.Visible = false;
+            // 
+            // dsrDropDown
+            // 
+            this.dsrDropDown.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.dsrDropDown.FormattingEnabled = true;
+            this.dsrDropDown.Location = new System.Drawing.Point(207, 27);
+            this.dsrDropDown.Name = "dsrDropDown";
+            this.dsrDropDown.Size = new System.Drawing.Size(104, 21);
+            this.dsrDropDown.TabIndex = 9;
+            this.dsrDropDown.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.dsrDropDown_DrawItem);
+            this.dsrDropDown.SelectedIndexChanged += new System.EventHandler(this.dsrDropDown_SelectedIndexChanged);
+            // 
             // ConfigForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(529, 437);
+            this.ClientSize = new System.Drawing.Size(529, 428);
+            this.Controls.Add(this.dsrDropDown);
+            this.Controls.Add(this.messageLabel);
+            this.Controls.Add(this.detectButton);
             this.Controls.Add(this.continueButton);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -196,5 +239,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button continueButton;
+        private System.Windows.Forms.Button detectButton;
+        private System.Windows.Forms.Label messageLabel;
+        private System.Windows.Forms.ComboBox dsrDropDown;
     }
 }

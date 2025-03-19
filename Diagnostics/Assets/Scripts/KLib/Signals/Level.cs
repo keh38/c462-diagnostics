@@ -146,7 +146,14 @@ namespace KLib.Signals
         public void ResetSweepables()
         {
             _lastAtten = float.NaN;
-            _lastAmplitude = Value;
+            if (Units == LevelUnits.mA)
+            {
+                _lastAmplitude = Value / _calib.Reference;
+            }
+            else
+            {
+                _lastAmplitude = Value;
+            }
         }
 
         public Level()
@@ -178,9 +185,25 @@ namespace KLib.Signals
             _channel = endpoint.location;
             _vmax = vmax;
 
-            _calib = CalibrationFactory.Load(Units, _transducer, _channel);
+            if (float.TryParse(endpoint.extra, out float max))
+            {
+                _calib = CalibrationFactory.Load(Units, _transducer, _channel, max);
+            }
+            else
+            {
+                _calib = CalibrationFactory.Load(Units, _transducer, _channel);
+            }
 
             ResetSweepables();
+        }
+
+        public float GetMaxLevel(LevelUnits units)
+        {
+            if (units == LevelUnits.mA && _calib.Type == LevelUnits.mA)
+            {
+                return _calib.Reference;
+            }
+            return float.NaN;
         }
 
         public void Apply(float[] data, References r)
@@ -192,6 +215,10 @@ namespace KLib.Signals
             if (Units == LevelUnits.Volts)
             {
                 r.refVal = r.maxVal = _vmax;
+            }
+            else if (Units == LevelUnits.mA)
+            {
+                r.refVal = r.maxVal = _calib.Reference;
             }
             else if (Units == LevelUnits.dB_attenuation)
             {
@@ -208,7 +235,6 @@ namespace KLib.Signals
             {
                 if (_clampToMax)
                 {
-                    //Debug.Log(Name + " CLAMPED");
                     Value = r.maxVal;
                 }
                 else
@@ -230,7 +256,9 @@ namespace KLib.Signals
             if (Units == LevelUnits.PercentDR) Value = tmpValue;
 
             if (float.IsNaN(_lastAtten))
+            {
                 _lastAtten = curAtten;
+            }
 
             if (Units == LevelUnits.Volts)
             {
@@ -241,6 +269,16 @@ namespace KLib.Signals
                     data[k] *= _lastAmplitude;
                 }
                 _lastAmplitude = Value;
+            }
+            else if (Units == LevelUnits.mA)
+            {
+                float dy = (Value/r.maxVal - _lastAmplitude) / N;
+                for (int k = 0; k < N; k++)
+                {
+                    _lastAmplitude += dy;
+                    data[k] *= _lastAmplitude;
+                }
+                _lastAmplitude = Value / r.maxVal;
             }
             else
             {

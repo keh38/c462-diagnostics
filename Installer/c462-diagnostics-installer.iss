@@ -2,7 +2,7 @@
 
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING .ISS SCRIPT FILES!
 #define SemanticVersion() \
-   GetVersionComponents("..\Launcher\Launcher\bin\Release\DiagnosticsLauncher.exe", Local[0], Local[1], Local[2], Local[3]), \
+   GetVersionComponents("..\Launcher\Launcher\bin\Release\HTSLauncher.exe", Local[0], Local[1], Local[2], Local[3]), \
    Str(Local[0]) + "." + Str(Local[1]) + ((Local[2]>0) ? "." + Str(Local[2]) : "")
     
 #define verStr_ StringChange(SemanticVersion(), '.', '-')
@@ -23,12 +23,12 @@ PrivilegesRequired=admin
 
 [Files]
 Source: "..\Diagnostics\Build\*.*"; DestDir: "{app}"; Flags: replacesameversion recursesubdirs;
-Source: "..\Launcher\Launcher\bin\Release\*.*"; DestDir: "{app}"; Flags: replacesameversion recursesubdirs;
+Source: "..\Launcher\Launcher\bin\Release\*.*"; DestDir: "{app}\Launcher"; Flags: replacesameversion recursesubdirs;
 ;Source: "D:\Development\C462\c462-odi\Installer\Output\ODI_Installer_1-0.exe"; DestDir: "{tmp}";
 
 [Icons]
 ;Name: "{commondesktop}\Hearing Diagnostics"; Filename: "{app}\HearingDiagnostics.exe";
-Name: "{commondesktop}\Hearing Test Suite"; Filename: "{app}\HTSLauncher.exe"; IconFilename: "{app}\Diagnostics.ico"; IconIndex: 0;
+Name: "{commondesktop}\Hearing Test Suite"; Filename: "{app}\Launcher\HTSLauncher.exe"; IconFilename: "{app}\Launcher\Diagnostics.ico"; IconIndex: 0;
 
 [Registry]
 ;Root: HKCU; Subkey: "SOFTWARE\MEEI\HearingDiagnostics"; ValueType: dword; ValueName: "Screenmanager Is Fullscreen mode_h3981298716"; ValueData: "1"; Flags: uninsdeletevalue;

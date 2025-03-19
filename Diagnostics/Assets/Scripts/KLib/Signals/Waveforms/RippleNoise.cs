@@ -76,9 +76,9 @@ namespace KLib.Signals.Waveforms
 			return setter;
 		}
 
-        override public void Initialize(float Fs, int N, Gate gate, Level level)
+        override public void Initialize(float Fs, int N, Channel channel)
         {
-			base.Initialize(Fs, N, gate, level);
+			base.Initialize(Fs, N, channel);
 
 			CreateToken();
 			curIndex = 0;
@@ -98,7 +98,7 @@ namespace KLib.Signals.Waveforms
 
             ApplyFilter();
 
-            ComputeReferences(_level, samplingRate_Hz);
+            ComputeReferences(_channel.level, samplingRate_Hz);
 		}
 
         private void ComputeReferences(Level level, float Fs)
@@ -145,11 +145,11 @@ namespace KLib.Signals.Waveforms
             float df = samplingRate_Hz / n;
             float[] w = ComputeRippleWeights(df, n / 2);
 
-            if (precompensate && _level.SPLBasedUnits)
+            if (precompensate && _channel.level.SPLBasedUnits)
             {
                 float[] freq = new float[n / 2];
                 for (int k = 0; k < freq.Length; k++) freq[k] = k * df;
-                _level.Cal.GetAmplitudesInterp(freq, w);
+                _channel.level.Cal.GetAmplitudesInterp(freq, w);
             }
 
             alglib.complex[] z = new alglib.complex[n];

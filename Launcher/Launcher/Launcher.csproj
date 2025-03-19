@@ -7,7 +7,7 @@
     <ProjectGuid>{02C4B69D-4200-4E97-B41E-E6479CAC1E8D}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>Launcher</RootNamespace>
-    <AssemblyName>DiagnosticsLauncher</AssemblyName>
+    <AssemblyName>HTSLauncher</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -38,6 +38,9 @@
     </Reference>
     <Reference Include="CoreAudio">
       <HintPath>..\..\..\..\klib\Framework\CoreAudio.dll</HintPath>
+    </Reference>
+    <Reference Include="D128NET">
+      <HintPath>..\..\..\c462-digitimer\D128NET\bin\x64\Debug\D128NET.dll</HintPath>
     </Reference>
     <Reference Include="KLib, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
