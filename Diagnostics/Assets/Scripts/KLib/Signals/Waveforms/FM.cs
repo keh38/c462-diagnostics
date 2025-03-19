@@ -112,9 +112,9 @@ namespace KLib.Signals.Waveforms
             return plist;
         }
 
-        override public void Initialize(float Fs, int N, int Nmax, Level level)
+        override public void Initialize(float Fs, int N, Gate gate, Level level)
         {
-            base.Initialize(Fs, N, level);
+            base.Initialize(Fs, N, gate, level);
 
             intFs = (int)Fs;
             LUT = new float[intFs];

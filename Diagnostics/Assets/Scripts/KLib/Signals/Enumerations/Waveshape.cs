@@ -14,6 +14,7 @@ namespace KLib.Signals.Enumerations
         Tone_Cloud, 
         FM,
         File,
-        Ripple_Noise
+        Ripple_Noise,
+        Digitimer
     }
 }

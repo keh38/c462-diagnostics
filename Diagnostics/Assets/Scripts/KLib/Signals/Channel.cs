@@ -86,6 +86,8 @@ namespace KLib.Signals
 
         private bool _gateClosed;
         private bool _deactivated;
+        private int _nptsPerInterval;
+        private int _nptsDelay;
 
         internal class IntramuralVariable
         {
@@ -495,13 +497,16 @@ namespace KLib.Signals
                 gate.Initialize(Fs, N);
                 _gateClosed = false;
 
+                _nptsDelay = Mathf.RoundToInt(Fs * gate.Delay_ms / 1000);
+                _nptsPerInterval = gate.Active ? Mathf.RoundToInt(Fs * gate.Period_ms / 1000) : -1;
+
                 location = "level";
                 level.Initialize(MyEndpoint, Vmax);
 
                 _rampState = RampState.Off;
 
                 location = "waveform";
-                waveform.Initialize(Fs, N, gate.NMax, level);
+                waveform.Initialize(Fs, N, gate, level);
 
                 UserFile uf = waveform as UserFile;
                 if (uf != null && uf.oneShot)
@@ -691,6 +696,7 @@ namespace KLib.Signals
         {
             References references;
             float modRefCorr = 0;
+
 
             for (int k = 0; k < Data.Length; k++)
             {

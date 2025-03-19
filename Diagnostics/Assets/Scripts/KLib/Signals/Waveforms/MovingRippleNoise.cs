@@ -122,9 +122,9 @@ namespace KLib.Signals.Waveforms
             lastDepth = Depth;
         }
 
-        override public void Initialize(float Fs, int N, int Nmax, Level level)
+        override public void Initialize(float Fs, int N, Gate gate, Level level)
         {
-            base.Initialize(Fs, N, level);
+            base.Initialize(Fs, N, gate, level);
 
             numComponents = (int)(Mathf.Round(Mathf.Log(Fmax / Fmin) / Mathf.Log(2) * CompPerOctave)) + 1;
 

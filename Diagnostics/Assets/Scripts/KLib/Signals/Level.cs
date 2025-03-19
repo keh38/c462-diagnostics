@@ -146,7 +146,7 @@ namespace KLib.Signals
         public void ResetSweepables()
         {
             _lastAtten = float.NaN;
-            _lastAmplitude = float.NaN;
+            _lastAmplitude = Value;
         }
 
         public Level()
@@ -213,8 +213,8 @@ namespace KLib.Signals
                 }
                 else
                 {
-                    Debug.Log("Ref = " + r.refVal.ToString("F1") + ", Max = " + r.maxVal.ToString("F1") +
-                              " => Value = " + Value.ToString("F1") + " " + Units);
+                    //Debug.Log("Ref = " + r.refVal.ToString("F1") + ", Max = " + r.maxVal.ToString("F1") +
+                    //          " => Value = " + Value.ToString("F1") + " " + Units);
 
                     if (Units == LevelUnits.PercentDR) Value = tmpValue;
 

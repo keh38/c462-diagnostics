@@ -136,9 +136,9 @@ namespace KLib.Signals.Waveforms
             _sharedSeed = value;
         }
 
-        override public void Initialize(float Fs, int N, int Nmax, Level level)
+        override public void Initialize(float Fs, int N, Gate gate, Level level)
         {
-			base.Initialize(Fs, N, level);
+			base.Initialize(Fs, N, gate, level);
 
             _sweepableFilter = filter.shape != FilterShape.None && filter.sweepable;
             _uniform = filter.shape != FilterShape.None && !filter.brickwall && !filter.unityFilter;
@@ -149,7 +149,7 @@ namespace KLib.Signals.Waveforms
             }
 
             _curIndex = 0;
-            CreateToken(Nmax);
+            CreateToken(gate.NMax);
 
             if (_sweepableFilter)
             {

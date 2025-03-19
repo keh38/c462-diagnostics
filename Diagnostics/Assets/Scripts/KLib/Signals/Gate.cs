@@ -76,14 +76,13 @@ namespace KLib.Signals
         private int _startPointOfRampUp;
         private int _startPointOfRampDown;
         private int _totalPoints;
+        private int _nmax;
 
         private int _lastPulseTotalPoints;
         private int _currentPulse;
         private float _fs = 0;
 
         private bool _isOneShot;
-
-        private int _nmax;
 
         private GateState _state;
         private bool _wasLooped = false;
@@ -112,12 +111,15 @@ namespace KLib.Signals
 
         [JsonIgnore]
         [ProtoIgnore]
-        public int NMax
-        {
-            get { return _nmax; }
-        }
+        public int NMax { get { return _nmax; } }
 
-        private float _nextGateTime;
+        [JsonIgnore]
+        [ProtoIgnore]
+        public int DelaySamples { get { return _startPointOfRampUp; } }
+
+        [JsonIgnore]
+        [ProtoIgnore]
+        public int TotalSamples { get { return _totalPoints; } }
 
         /// <summary>
         /// Construct default Gate object.
@@ -352,6 +354,9 @@ namespace KLib.Signals
             _fs = Fs;
 
             _nmax = -1;
+            _startPointOfRampUp = -1;
+            _totalPoints = -1;
+
             if (!Active) return;
 
             int nRampPts = Mathf.RoundToInt(Fs * Ramp_ms / 1000);

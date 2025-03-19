@@ -105,9 +105,9 @@ namespace KLib.Signals.Waveforms
             phase_radians = 2 * Mathf.PI * Phase_cycles;
         }
 
-        override public void Initialize(float Fs, int N, int Nmax, Level level)
+        override public void Initialize(float Fs, int N, Gate gate, Level level)
         {
-            base.Initialize(Fs, N, level);
+            base.Initialize(Fs, N, gate, level);
 
             lastFreq = Frequency_Hz;
             phase_radians = 2 * Mathf.PI * Phase_cycles;

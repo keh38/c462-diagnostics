@@ -276,6 +276,7 @@
     <Compile Include="Assets\Turandot\Schedules\Optimizations\Turandot.Optimizations.Optimization.cs" />
     <Compile Include="Assets\Scripts\Home\SubjectPanel.cs" />
     <Compile Include="Assets\Scripts\Hardware\HardwareConfiguration.cs" />
+    <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\Digitimer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

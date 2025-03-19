@@ -69,9 +69,13 @@ namespace KLib.Signals.Waveforms
             {
                 wf = new RippleNoise();
             }
+            else if (t == typeof(Digitimer))
+            {
+                wf = new Digitimer();
+            }
             else
             {
-                throw new System.Exception("Invalid waveform type");
+                throw new Exception("Invalid waveform type");
             }
             return wf;
         }
@@ -101,6 +105,9 @@ namespace KLib.Signals.Waveforms
                     break;
                 case Waveshape.Ripple_Noise:
                     wf = new RippleNoise();
+                    break;
+                case Waveshape.Digitimer:
+                    wf = new Digitimer();
                     break;
             }
             return wf;

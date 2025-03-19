@@ -28,7 +28,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     {
         HTS_Server.SetCurrentScene("Turandot Interactive", this);
         _udpClient = new UdpClient();
-        _udpEndPoint = new IPEndPoint(IPAddress.Parse(HTS_Server.MyAddress), _udpPort);
+        //_udpEndPoint = new IPEndPoint(IPAddress.Parse(HTS_Server.MyAddress), _udpPort);
 
         CreateDefaultSignalManager();
     }
@@ -37,9 +37,9 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     {
         if (_audioInitialized)
         {
-            var amplitudes = _sigMan.CurrentAmplitudes;
-            Buffer.BlockCopy(amplitudes, 0, _udpData, 0, _udpData.Length);
-            _udpClient.Send(_udpData, _udpData.Length, _udpEndPoint);
+            //var amplitudes = _sigMan.CurrentAmplitudes;
+            //Buffer.BlockCopy(amplitudes, 0, _udpData, 0, _udpData.Length);
+            //_udpClient.Send(_udpData, _udpData.Length, _udpEndPoint);
         }
     }
 
@@ -82,25 +82,18 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
             Modality = KLib.Signals.Enumerations.Modality.Audio,
             Laterality = Laterality.Diotic,
             Location = "Site 2",
-            waveform = new Sinusoid()
-            {
-                Frequency_Hz = 500
-            },
-            modulation = new KLib.Signals.Modulations.SinusoidalAM()
-            {
-                Frequency_Hz = 40,
-                Depth = 1
-            },
+            waveform = new Noise(),
             gate = new Gate()
             {
                 Active = true,
-                Duration_ms = 250,
+                Delay_ms = 100,
+                Duration_ms = 500,
                 Period_ms = 1000
             },
             level = new Level()
             {
-                Units = LevelUnits.dB_SPL,
-                Value = 50
+                Units = LevelUnits.Volts,
+                Value = 1
             }
         };
 
@@ -108,15 +101,16 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
         _sigMan = new SignalManager();
         _sigMan.AdapterMap = HardwareInterface.AdapterMap;
+        _sigMan.AdapterMap.AudioTransducer = "HD280";
         _sigMan.AddChannel(ch);
-        //_sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
-        //_sigMan.StartPaused();
+        _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
+        _sigMan.StartPaused();
 
         //_udpData = new byte[sizeof(float) * _sigMan.CurrentAmplitudes.Length];
 
-        //_audioInitialized = true;
+        _audioInitialized = true;
 
-        Debug.Log(_sigMan.GetParameter("Audio", "Tone.Frequency_Hz"));
+        Debug.Log(_sigMan.GetParameter("Audio", "Digitimer.PulseRate_Hz"));
     }
 
     private void SetParams(string data)

@@ -76,9 +76,9 @@ namespace KLib.Signals.Waveforms
 			return setter;
 		}
 
-        override public void Initialize(float Fs, int N, int Nmax, Level level)
+        override public void Initialize(float Fs, int N, Gate gate, Level level)
         {
-			base.Initialize(Fs, N, level);
+			base.Initialize(Fs, N, gate, level);
 
 			CreateToken();
 			curIndex = 0;

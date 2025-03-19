@@ -29,6 +29,8 @@ namespace KLib.Signals.Waveforms
     [ProtoInclude(507, typeof(UserFile))]
     [XmlInclude(typeof(RippleNoise))]
     [ProtoInclude(508, typeof(RippleNoise))]
+    [XmlInclude(typeof(Digitimer))]
+    [ProtoInclude(509, typeof(Digitimer))]
     [JsonObject(MemberSerialization.OptIn)]
     public class Waveform
     {
@@ -78,6 +80,7 @@ namespace KLib.Signals.Waveforms
         protected float T;
 
         protected Level _level;
+        protected Gate _gate;
         protected CalibrationData _calib;
 
         protected string _name;
@@ -128,8 +131,9 @@ namespace KLib.Signals.Waveforms
             return new List<string>();
         }
 
-        virtual public void Initialize(float Fs, int N, int Nmax, Level level)
+        virtual public void Initialize(float Fs, int N, Gate gate, Level level)
         {
+            _gate = gate;
             Initialize(Fs, N, level);
         }
         /// <summary>

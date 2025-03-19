@@ -224,7 +224,7 @@ namespace KLib.Signals.Waveforms
         /// <remarks>
         /// 
         /// </remarks>
-        override public void Initialize(float Fs, int N, int Nmax, Level level)
+        override public void Initialize(float Fs, int N, Gate g, Level level)
         {
             base.Initialize(Fs, N, level);
 
