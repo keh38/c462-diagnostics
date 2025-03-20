@@ -122,6 +122,7 @@ public class GameManager : MonoBehaviour
         }
         FileLocations.SetSubject(_appState.project, _appState.subject);
 
+        //Debug.Log($"[GameManager] project settings");
         if (File.Exists(FileLocations.ConfigFile("Project.Settings")))
         {
             _projectSettings = FileIO.XmlDeserialize<Project.Settings>(FileLocations.ConfigFile("Project.Settings"));
@@ -131,6 +132,7 @@ public class GameManager : MonoBehaviour
             _projectSettings = new Project.Settings();
         }
 
+        //Debug.Log($"[GameManager] subject metadata");
         if (File.Exists(FileLocations.SubjectMetadataPath))
         {
             _subjectMetadata = FileIO.XmlDeserialize<SubjectMetadata>(FileLocations.SubjectMetadataPath);

@@ -141,7 +141,6 @@ namespace Launcher
 #if DEBUG
                 var index = folder.IndexOf("Launcher");
                 folder = Path.Combine(folder.Substring(0, index - 1), "Diagnostics", "Build");
-                return;
 #else
                 // up one more level
                 folder = Path.GetDirectoryName(folder);
@@ -200,7 +199,7 @@ namespace Launcher
 
             return sb.ToString();
         }
-
+  
         private string ValidateSyncDevice()
         {
             if (string.IsNullOrEmpty(_config.SyncComPort))
@@ -235,45 +234,46 @@ namespace Launcher
             statusTextBox.AppendText("Initializing Digitimer devices..." + Environment.NewLine);
             string result = "";
 
-            var d128 = new D128ExAPI();
-            try
-            {
-                d128.Initialize();
-                d128.GetState();
-                foreach (var d in devices)
-                {
-                    int id = int.Parse(d.transducer.Substring(3));
-                    float max = float.Parse(d.extra);
+            //D128ExAPI d128 = null;
+            //try
+            //{
+            //    d128 = new D128ExAPI();
+            //    d128.Initialize();
+            //    d128.GetState();
+            //    foreach (var d in devices)
+            //    {
+            //        int id = int.Parse(d.transducer.Substring(3));
+            //        float max = float.Parse(d.extra);
 
-                    if (d128.Devices.Contains(id))
-                    {
-                        d128[id].Limit = (int)(max * 10);
-                        d128[id].Source = DemandSource.External;
-                    }
-                    else
-                    {
-                        var e = $"DSR #{id} not found";
-                        result += e + Environment.NewLine;
-                        Log.Error(e);
-                    }
-                }
+            //        if (d128.Devices.Contains(id))
+            //        {
+            //            d128[id].Limit = (int)(max * 10);
+            //            d128[id].Source = DemandSource.External;
+            //        }
+            //        else
+            //        {
+            //            var e = $"DSR #{id} not found";
+            //            result += e + Environment.NewLine;
+            //            Log.Error(e);
+            //        }
+            //    }
 
-                var errorCode = d128.SetState();
-                if (errorCode != ErrorCode.Success)
-                {
-                    result += "Failed to initialize Digitimer devices" + Environment.NewLine;
-                    Log.Error($"Failed to set current limits ({errorCode})");
-                }
-            }
-            catch (Exception ex)
-            {
-                result += "Failed to initialize Digitimer devices" + Environment.NewLine;
-                Log.Error($"Failed to initialize Digitimer devices: {ex.Message}");
-            }
-            finally
-            {
-                d128.Close();
-            }
+            //    var errorCode = d128.SetState();
+            //    if (errorCode != ErrorCode.Success)
+            //    {
+            //        result += "Failed to initialize Digitimer devices" + Environment.NewLine;
+            //        Log.Error($"Failed to set current limits ({errorCode})");
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    result += "Failed to initialize Digitimer devices" + Environment.NewLine;
+            //    Log.Error($"Failed to initialize Digitimer devices: {ex.Message}");
+            //}
+            //finally
+            //{
+            //    if (d128 != null) d128.Close();
+            //}
 
             return result;
         }

@@ -33,6 +33,12 @@ public class ClockSynchronizer : MonoBehaviour
     public void Initialize(string comPort)
     {
         _comPort = comPort;
+        if (string.IsNullOrEmpty(_comPort))
+        {
+            Debug.Log("[Clock Synchronizer] no COM port specified, running with out");
+            return;
+        }
+
         _syncPulseDetector.InitializeSerialPort(_comPort);
     }
 

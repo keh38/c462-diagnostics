@@ -127,7 +127,7 @@ namespace Launcher
         {
             if (!_ignoreEvents)
             {
-                _config.SyncComPort = comPortDropDown.Text;
+                _config.SyncComPort = comPortDropDown.Text.Equals("none") ? "" : comPortDropDown.Text;
              }
         }
 
@@ -206,9 +206,10 @@ namespace Launcher
             devices.Add("DSR372");
             return devices;
 
-            var d128 = new D128ExAPI();
+            D128ExAPI d128 = null;
             try
             {
+                d128 = new D128ExAPI();
                 d128.Initialize();
                 d128.GetState();
                 foreach (var d in d128.Devices)
@@ -224,7 +225,7 @@ namespace Launcher
             }
             finally
             {
-                d128.Close();
+                if (d128 != null) d128.Close();
             }
 
             return devices;
@@ -288,7 +289,7 @@ namespace Launcher
         {
             if (_map.Items[e.RowIndex].modality != "Electric" || e.ColumnIndex != 2)
             {
-                dsrDropDown.Visible = false;
+                //dsrDropDown.Visible = false;
                 return;
             }
 
@@ -314,7 +315,6 @@ namespace Launcher
 
             dsrDropDown.Top = r.Top + dataGridView.Location.Y;
             dsrDropDown.Left = dataGridView.Location.X + r.Right - dsrDropDown.Width;
-            dsrDropDown.Height = r.Height;
             dsrDropDown.Visible = true;
         }
 
@@ -339,7 +339,7 @@ namespace Launcher
 
         private void dataGridView_Leave(object sender, EventArgs e)
         {
-            dsrDropDown.Visible = false;
+            //dsrDropDown.Visible = false;
         }
     }
 }

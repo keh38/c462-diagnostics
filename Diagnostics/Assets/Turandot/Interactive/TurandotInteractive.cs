@@ -28,7 +28,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     {
         HTS_Server.SetCurrentScene("Turandot Interactive", this);
         _udpClient = new UdpClient();
-        //_udpEndPoint = new IPEndPoint(IPAddress.Parse(HTS_Server.MyAddress), _udpPort);
+        _udpEndPoint = new IPEndPoint(IPAddress.Parse(HTS_Server.MyAddress), _udpPort);
 
         CreateDefaultSignalManager();
     }
@@ -37,9 +37,9 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     {
         if (_audioInitialized)
         {
-            //var amplitudes = _sigMan.CurrentAmplitudes;
-            //Buffer.BlockCopy(amplitudes, 0, _udpData, 0, _udpData.Length);
-            //_udpClient.Send(_udpData, _udpData.Length, _udpEndPoint);
+            var amplitudes = _sigMan.CurrentAmplitudes;
+            Buffer.BlockCopy(amplitudes, 0, _udpData, 0, _udpData.Length);
+            _udpClient.Send(_udpData, _udpData.Length, _udpEndPoint);
         }
     }
 
@@ -78,11 +78,14 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     {
         var ch = new Channel()
         {
-            Name = "Audio",
+            Name = "Electric",
             Modality = KLib.Signals.Enumerations.Modality.Electric,
             Laterality = Laterality.Diotic,
             Location = "Site 2",
-            waveform = new Noise(),
+            waveform = new Digitimer()
+            {
+                PulseRate_Hz = 100
+            },
             gate = new Gate()
             {
                 Active = true,
@@ -93,9 +96,48 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
             level = new Level()
             {
                 Units = LevelUnits.mA,
-                Value = 1
+                Value = 0.2f
             }
         };
+        var ch2 = new Channel()
+        {
+            Name = "Audio",
+            Modality = KLib.Signals.Enumerations.Modality.Audio,
+            Laterality = Laterality.Left,
+            waveform = new Noise(),
+            gate = new Gate()
+            {
+                Active = true,
+                Delay_ms = 100,
+                Duration_ms = 500,
+                Period_ms = 1000
+            },
+            level = new Level()
+            {
+                Units = LevelUnits.dB_attenuation,
+                Value = -6
+            }
+        };
+        var ch3 = new Channel()
+        {
+            Name = "Audio",
+            Modality = KLib.Signals.Enumerations.Modality.Audio,
+            Laterality = Laterality.Right,
+            waveform = new Sinusoid(),
+            gate = new Gate()
+            {
+                Active = true,
+                Delay_ms = 100,
+                Duration_ms = 500,
+                Period_ms = 1000
+            },
+            level = new Level()
+            {
+                Units = LevelUnits.dB_attenuation,
+                Value = -100
+            }
+        };
+
 
         AudioSettings.GetDSPBufferSize(out int bufferLength, out int numBuffers);
 
@@ -103,12 +145,14 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         _sigMan.AdapterMap = AdapterMap.Default7point1Map();
         _sigMan.AdapterMap.AudioTransducer = "HD280";
         _sigMan.AddChannel(ch);
+        _sigMan.AddChannel(ch2);
+        _sigMan.AddChannel(ch3);
         _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
         _sigMan.StartPaused();
 
         //_udpData = new byte[sizeof(float) * _sigMan.CurrentAmplitudes.Length];
 
-        //_audioInitialized = true;
+        _audioInitialized = true;
     }
 
     private void SetParams(string data)
@@ -178,7 +222,6 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
                 HardwareInterface.Digitimer.DisableDevice(id);
             }
         }
-
     }
 
     private void OnAudioFilterRead(float[] data, int channels)

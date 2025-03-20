@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dataGridView = new System.Windows.Forms.DataGridView();
             this.Jack = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Modality = new System.Windows.Forms.DataGridViewComboBoxColumn();
@@ -74,8 +74,8 @@
             // 
             // Jack
             // 
-            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.Jack.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.Jack.DefaultCellStyle = dataGridViewCellStyle1;
             this.Jack.HeaderText = "Jack";
             this.Jack.Name = "Jack";
             this.Jack.ReadOnly = true;
@@ -196,6 +196,7 @@
             this.dsrDropDown.Name = "dsrDropDown";
             this.dsrDropDown.Size = new System.Drawing.Size(104, 21);
             this.dsrDropDown.TabIndex = 9;
+            this.dsrDropDown.Visible = false;
             this.dsrDropDown.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.dsrDropDown_DrawItem);
             this.dsrDropDown.SelectedIndexChanged += new System.EventHandler(this.dsrDropDown_SelectedIndexChanged);
             // 

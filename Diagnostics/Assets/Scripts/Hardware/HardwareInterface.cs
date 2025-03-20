@@ -76,9 +76,11 @@ public class HardwareInterface : MonoBehaviour
             _hardwareConfig = HardwareConfiguration.GetDefaultConfiguration();
         }
         _adapterMap = _hardwareConfig.GetSelectedMap();
+        Debug.Log($"Adapter map contains {_adapterMap.NumChannels} channels");
 
         _audioReady = true;
         var config = AudioSettings.GetConfiguration();
+        Debug.Log(AudioSettings.driverCapabilities);
         if (_adapterMap.NumChannels == 8)
         {
             if (AudioSettings.driverCapabilities == AudioSpeakerMode.Mode7point1)

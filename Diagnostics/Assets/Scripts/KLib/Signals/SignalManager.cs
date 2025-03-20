@@ -341,6 +341,8 @@ namespace KLib.Signals
                 throw new Exception("No adapter map specified");
             }
 
+            Noutputs = AdapterMap.NumChannels;
+
             try
             {
                 _shadows.Clear();

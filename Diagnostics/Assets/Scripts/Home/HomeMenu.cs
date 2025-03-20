@@ -152,7 +152,7 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
     public void OnQuitConfirmClick()
     {
         Debug.Log("Quitting");
-        KLib.KLogger.Log.StopLogging();
+        KLogger.Log.StopLogging();
 #if UNITY_STANDALONE_WIN
         //        Application.Quit();
         // https://answers.unity.com/questions/467030/unity-builds-crash-when-i-exit-1.html
