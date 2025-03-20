@@ -152,7 +152,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
         //_udpData = new byte[sizeof(float) * _sigMan.CurrentAmplitudes.Length];
 
-        _audioInitialized = true;
+        //_audioInitialized = true;
     }
 
     private void SetParams(string data)
@@ -171,10 +171,13 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         _udpData = new byte[sizeof(float) * _sigMan.CurrentAmplitudes.Length];
 
         var digitimerChannels = _sigMan.channels.FindAll(x => x.waveform.Shape == KLib.Signals.Enumerations.Waveshape.Digitimer && x.Modality == KLib.Signals.Enumerations.Modality.Electric);
+        Debug.Log(digitimerChannels.Count);
         foreach (var d in digitimerChannels)
         {
+            Debug.Log(d.MyEndpoint.transducer);
             if (int.TryParse(d.MyEndpoint.transducer.Substring(3), out int id))
             {
+                Debug.Log(id);
                 HardwareInterface.Digitimer.EnableDevice(id, d.waveform as Digitimer);
             }
         }

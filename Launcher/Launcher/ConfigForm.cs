@@ -203,8 +203,7 @@ namespace Launcher
         {
             var devices = new List<string>();
 
-            devices.Add("DSR372");
-            return devices;
+            //devices.Add("DSR372");
 
             D128ExAPI d128 = null;
             try
@@ -289,7 +288,7 @@ namespace Launcher
         {
             if (_map.Items[e.RowIndex].modality != "Electric" || e.ColumnIndex != 2)
             {
-                //dsrDropDown.Visible = false;
+                dsrDropDown.Visible = false;
                 return;
             }
 
@@ -299,6 +298,7 @@ namespace Launcher
             dsrDropDown.Items.AddRange(_digitimerDevices.ToArray());
             dsrDropDown.Items.Add("---");
             dsrDropDown.Tag = false;
+            dsrDropDown.ForeColor = Color.Black;
 
             int index = _digitimerDevices.IndexOf(dataGridView.CurrentCell.Value as string);
             if (index < 0)
@@ -308,6 +308,7 @@ namespace Launcher
                 dsrDropDown.ForeColor = Color.Red;
                 index = 0;
             }
+            
 
             _ignoreEvents = true;
             dsrDropDown.SelectedIndex = index;
@@ -339,7 +340,8 @@ namespace Launcher
 
         private void dataGridView_Leave(object sender, EventArgs e)
         {
-            //dsrDropDown.Visible = false;
+            //if (!dsrDropDown.Focused) dsrDropDown.Visible = false;
         }
+
     }
 }

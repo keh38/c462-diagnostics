@@ -24,6 +24,7 @@ namespace Launcher
     public partial class MainForm : Form
     {
         bool _configButtonPressed = false;
+        bool _launchStarted = false;
         Timer _timer;
         int _delayTime = 5000;
 
@@ -58,7 +59,11 @@ namespace Launcher
 
         private void MainForm_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.F2 && !_configButtonPressed)
+            if (e.KeyCode == Keys.Enter && !_launchStarted)
+            {
+                LaunchUnityApp();
+            }
+            else if (e.KeyCode == Keys.F2 && !_configButtonPressed)
             {
                 _timer.Enabled = false;
                 _configButtonPressed = true;
@@ -112,7 +117,7 @@ namespace Launcher
         private void Timer_Tick(object sender, EventArgs e)
         {
             _timer.Enabled = false;
-            if (!_configButtonPressed)
+            if (!_configButtonPressed && !_launchStarted)
             {
                 LaunchUnityApp();
             }
@@ -120,6 +125,8 @@ namespace Launcher
 
         private void LaunchUnityApp()
         {
+            _launchStarted = true;
+
             string errorMsg = "";
             try
             {
@@ -128,7 +135,7 @@ namespace Launcher
             catch (Exception ex)
             {
                 errorMsg = "Failed to initialize hardware";
-                Log.Error(ex.Message);
+                Log.Error(ex.Message + Environment.NewLine + ex.StackTrace);
             }
 
             if (string.IsNullOrEmpty(errorMsg))
@@ -154,8 +161,8 @@ namespace Launcher
                 }
                 catch (Exception ex)
                 {
-                    errorMsg = $"Error starting app:{Environment.NewLine}{ex.Message}";
-                    Log.Error(errorMsg);
+                    errorMsg = "Error starting app";
+                    Log.Error($"Error starting app:{Environment.NewLine}{ex.Message}");
                 }
             }
 
@@ -204,7 +211,7 @@ namespace Launcher
         {
             if (string.IsNullOrEmpty(_config.SyncComPort))
             {
-                statusTextBox.AppendText("No sync device COM port: attempt to sync will cause error" + Environment.NewLine);
+                statusTextBox.AppendText("-- No sync device --" + Environment.NewLine);
                 Log.Information("No sync COM port specified");
                 return "";
             }
@@ -234,46 +241,46 @@ namespace Launcher
             statusTextBox.AppendText("Initializing Digitimer devices..." + Environment.NewLine);
             string result = "";
 
-            //D128ExAPI d128 = null;
-            //try
-            //{
-            //    d128 = new D128ExAPI();
-            //    d128.Initialize();
-            //    d128.GetState();
-            //    foreach (var d in devices)
-            //    {
-            //        int id = int.Parse(d.transducer.Substring(3));
-            //        float max = float.Parse(d.extra);
+            D128ExAPI d128 = null;
+            try
+            {
+                d128 = new D128ExAPI();
+                d128.Initialize();
+                d128.GetState();
+                foreach (var d in devices)
+                {
+                    int id = int.Parse(d.transducer.Substring(3));
+                    float max = float.Parse(d.extra);
 
-            //        if (d128.Devices.Contains(id))
-            //        {
-            //            d128[id].Limit = (int)(max * 10);
-            //            d128[id].Source = DemandSource.External;
-            //        }
-            //        else
-            //        {
-            //            var e = $"DSR #{id} not found";
-            //            result += e + Environment.NewLine;
-            //            Log.Error(e);
-            //        }
-            //    }
+                    if (d128.Devices.Contains(id))
+                    {
+                        d128[id].Limit = (int)(max * 10);
+                        d128[id].Source = DemandSource.External;
+                    }
+                    else
+                    {
+                        var e = $"DSR #{id} not found";
+                        result += e + Environment.NewLine;
+                        Log.Error(e);
+                    }
+                }
 
-            //    var errorCode = d128.SetState();
-            //    if (errorCode != ErrorCode.Success)
-            //    {
-            //        result += "Failed to initialize Digitimer devices" + Environment.NewLine;
-            //        Log.Error($"Failed to set current limits ({errorCode})");
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    result += "Failed to initialize Digitimer devices" + Environment.NewLine;
-            //    Log.Error($"Failed to initialize Digitimer devices: {ex.Message}");
-            //}
-            //finally
-            //{
-            //    if (d128 != null) d128.Close();
-            //}
+                var errorCode = d128.SetState();
+                if (errorCode != ErrorCode.Success)
+                {
+                    result += "Failed to initialize Digitimer devices" + Environment.NewLine;
+                    Log.Error($"Failed to set current limits ({errorCode})");
+                }
+            }
+            catch (Exception ex)
+            {
+                result += "Failed to initialize Digitimer devices" + Environment.NewLine;
+                Log.Error($"Failed to initialize Digitimer devices: {ex.Message}");
+            }
+            finally
+            {
+                if (d128 != null) d128.Close();
+            }
 
             return result;
         }
@@ -323,7 +330,7 @@ namespace Launcher
             // if audio enhancements are enabled, the device driver may respond capable of 7.1 on the basis that
             // it has an APO enabling it to convert 7.1 to stereo. To which we say, oh yeah, how many jacks ya got?
             // one jack? that's cute sweetheart. Fuck all the way off.
-            uint numJacks = device.DeviceTopology.GetConnector(0).GetConnectedTo.GetPart.JackDescription.Count;
+            uint numJacks = GetJackCount(device);
             supports71 &= numJacks > 1;
 
             if (supports71)
@@ -342,6 +349,8 @@ namespace Launcher
                 var supports = audioClient.IsFormatSupported(AudioClientShareMode.Shared, desiredFormat);
                 audioClient.Dispose();
 
+                supports &= GetJackCount(d)>1;
+
                 if (supports)
                 {
                     Log.Information($"Changing default device to {d.FriendlyName}");
@@ -358,24 +367,45 @@ namespace Launcher
             return "No 7.1 audio card was found";
         }
 
+        private uint GetJackCount(MMDevice device)
+        {
+            var jd = device.DeviceTopology.GetConnector(0).GetConnectedTo.GetPart.JackDescription;
+            uint numJacks = (jd == null) ? 0 : jd.Count;
+            return numJacks;
+        }
+
         private string RestartService()
         {
             string errMsg = "";
             try
             {
-                var processStartInfo = new ProcessStartInfo("net.exe", "stop audiosrv");
+                var processStartInfo = new ProcessStartInfo("net.exe", "stop audiosrv /y");
                 processStartInfo.UseShellExecute = true;
                 processStartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 processStartInfo.WorkingDirectory = Environment.SystemDirectory;
 
                 Log.Information("stopping audiosrv");
-                var start = Process.Start(processStartInfo);
-                start.WaitForExit();
+                var process = Process.Start(processStartInfo);
+                process.WaitForExit(5000);
+
+                if (!process.HasExited)
+                {
+                    process.Kill();
+                    Log.Error("Timed out stopping audio service");
+                    return "Error restarting audio service";
+                }
 
                 Log.Information("starting audiosrv");
                 processStartInfo.Arguments = "start audiosrv";
-                start = Process.Start(processStartInfo);
-                start.WaitForExit();
+                process = Process.Start(processStartInfo);
+                process.WaitForExit(5000);
+                if (!process.HasExited)
+                {
+                    process.Kill();
+                    Log.Error("Timed out starting audio service");
+                    return "Error restarting audio service";
+                }
+
             }
             catch (Exception ex)
             {

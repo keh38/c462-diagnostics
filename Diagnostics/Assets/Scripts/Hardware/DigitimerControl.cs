@@ -26,9 +26,9 @@ public class DigitimerControl : MonoBehaviour
     {
         try
         {
-            var d128 = new D128ExAPI();
-            d128.Initialize();
-            d128.GetState();
+            _d128 = new D128ExAPI();
+            _d128.Initialize();
+            _d128.GetState();
         }
         catch (Exception ex)
         {
