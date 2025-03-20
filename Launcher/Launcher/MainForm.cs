@@ -381,24 +381,24 @@ namespace Launcher
             {
                 var processStartInfo = new ProcessStartInfo("net.exe", "stop audiosrv /y");
                 processStartInfo.UseShellExecute = true;
-                processStartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                //processStartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 processStartInfo.WorkingDirectory = Environment.SystemDirectory;
 
                 Log.Information("stopping audiosrv");
                 var process = Process.Start(processStartInfo);
-                process.WaitForExit(5000);
+                process.WaitForExit(10000);
 
                 if (!process.HasExited)
                 {
                     process.Kill();
                     Log.Error("Timed out stopping audio service");
-                    return "Error restarting audio service";
+                    errMsg = "Error restarting audio service";
                 }
 
                 Log.Information("starting audiosrv");
                 processStartInfo.Arguments = "start audiosrv";
                 process = Process.Start(processStartInfo);
-                process.WaitForExit(5000);
+                process.WaitForExit(10000);
                 if (!process.HasExited)
                 {
                     process.Kill();
