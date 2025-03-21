@@ -117,12 +117,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 737a52c1220c9e74788db5790ebf3f5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slider: {fileID: 9005762246368731623}
-  inputField: {fileID: 9005762246598044375}
-  scale: 0
-  minVal: 0
-  maxVal: 1
-  value: 0
+  _slider: {fileID: 9005762246368731623}
+  _inputField: {fileID: 9005762246598044375}
 --- !u!1 &9005762244825527619
 GameObject:
   m_ObjectHideFlags: 0
@@ -676,7 +672,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.32156864, g: 0.42745098, b: 0.50980395, a: 1}
+  m_Color: {r: 0.22745098, g: 0.3529412, b: 0.3137255, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -826,7 +822,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.32156864, g: 0.42745098, b: 0.50980395, a: 0.5882353}
+  m_Color: {r: 0.22745098, g: 0.3529412, b: 0.3137255, a: 0.65882355}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -980,12 +976,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 737a52c1220c9e74788db5790ebf3f5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slider: {fileID: 0}
-  inputField: {fileID: 0}
-  scale: 0
-  minVal: 0
-  maxVal: 1
-  value: 0
+  _slider: {fileID: 0}
+  _inputField: {fileID: 0}
 --- !u!1 &9005762246403426808
 GameObject:
   m_ObjectHideFlags: 0

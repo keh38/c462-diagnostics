@@ -5,6 +5,8 @@ using UnityEngine;
 using KLib.Signals;
 using KLib.Signals.Waveforms;
 
+using Turandot.Inputs;
+
 namespace Turandot.Interactive
 {
     public class InteractiveSettings
@@ -12,12 +14,24 @@ namespace Turandot.Interactive
         public string Name { set; get; }
         public SignalManager SigMan { get; set; }
         public List<InteractiveControl> Controls { get; set; }
+        public List<ParameterSliderProperties> Sliders { get; set; }
+
+        public List<string> SliderNames
+        {
+            get
+            {
+                var names = new List<string>();
+                foreach (var s in Sliders) names.Add($"{s.Channel}.{s.Property}");
+                return names;
+            }
+        }
 
         public InteractiveSettings()
         {
             Name = "Defaults";
             SigMan = CreateDefaultSignalManager();
             Controls = new List<InteractiveControl>();
+            Sliders = new List<ParameterSliderProperties>();
         }
 
         private SignalManager CreateDefaultSignalManager()
