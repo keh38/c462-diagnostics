@@ -119,6 +119,10 @@ namespace KLib.Signals
 
         [ProtoIgnore]
         [XmlIgnore]
+        public Digitimer Digitimer { get { return waveform as Digitimer; } }
+
+        [ProtoIgnore]
+        [XmlIgnore]
         public AdapterMap.Endpoint MyEndpoint { get; set; }
 
         [ProtoIgnore]
@@ -300,22 +304,46 @@ namespace KLib.Signals
             return sp;
         }
 
-		public Action<float> ParamSetter(string paramName)
+		public Action<float> GetParamSetter(string paramName)
 		{
-			Action<float> setter = waveform.ParamSetter(paramName);
-			
-            if (setter == null) setter = level.ParamSetter(paramName);
-            if (setter == null) setter = modulation.ParamSetter(paramName);
+            Action<float> setter = null;
+
+            string[] s = paramName.Split('.');
+            if (s.Length != 2 && s[0] != "Level" && s[0] != "Ear")
+            {
+                return null;
+            }
+
+            switch (s[0])
+            {
+                case "Ear":
+                    //Destination = (Laterality)(value + 2);
+                    break;
+
+                //case "Gate":
+                //    return gate.G(s[1]);
+
+                case "Mod":
+                case "SAM":
+                    return modulation.GetParamSetter(s[1]);
+
+                //case "Level":
+                //    return GetParamSetter.Value;
+
+                default:
+                    return waveform.GetParamSetter(s[1]);
+            }
+
 
             if (setter != null && Laterality == Laterality.Binaural && ContraSide != null)
             {
-                setter += ContraSide.ParamSetter(paramName);
+                setter += ContraSide.GetParamSetter(paramName);
                 return setter;
             }
 
             if (setter == null)
             {
-                switch (paramName)
+                switch (s[0])
                 {
                     case "MBL":
                         setter = x => this.ChangeMBL(x);

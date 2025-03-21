@@ -130,7 +130,7 @@ namespace KLib.Signals
             return par;
         }
 
-        public Action<float> ParamSetter(string paramName)
+        public Action<float> GetParamSetter(string paramName)
         {
             Action<float> setter = null;
             switch (paramName)

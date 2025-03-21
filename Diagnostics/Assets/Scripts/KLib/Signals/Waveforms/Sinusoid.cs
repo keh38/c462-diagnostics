@@ -47,12 +47,12 @@ namespace KLib.Signals.Waveforms
             return par;
 		}
 
-        override public Action<float> ParamSetter(string paramName)
+        override public Action<float> GetParamSetter(string paramName)
         {
             Action<float> setter = null;
             switch (paramName)
             {
-                case "Frequency":
+                case "Frequency_Hz":
                     setter = x => this.Frequency_Hz = x;
                     break;
                 case "Phase":

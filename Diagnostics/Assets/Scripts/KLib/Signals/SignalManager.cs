@@ -156,6 +156,11 @@ namespace KLib.Signals
             return val > 0 ? val : defaultValue;
         }
 
+        public List<Channel> GetDigitimerChannels()
+        {
+            return channels.FindAll(x => x.waveform.Shape == Waveshape.Digitimer && x.Modality == Modality.Electric);
+        }
+
         //public void Activate(List<Turandot.Flag> flags)
         //{
         //    foreach (var ch in _shadows)
@@ -228,11 +233,11 @@ namespace KLib.Signals
             return amin;
         }
 
-        public Action<float> ParamSetter(string paramSpec)
+        public Action<float> GetParamSetter(string paramSpec)
 		{
 			Action<float> setter = null;
-			
-			string[] s = paramSpec.Split('.');
+
+            string[] s = paramSpec.Split(new char[] { '.' }, 2);
 			if (s.Length != 2)
 			{
 				throw new ApplicationException("Parameter specification is not in form '<channelName>.<paramName>'.");
@@ -243,7 +248,7 @@ namespace KLib.Signals
 			
 			// NullReferenceException is thrown if there is no channel with the specified name
             setter = MyParamSetter(par);
-            if (setter == null) setter = channels.Find(ch => ch.Name==dest).ParamSetter(par);
+            if (setter == null) setter = channels.Find(ch => ch.Name==dest).GetParamSetter(par);
 
             if (setter == null)
             {

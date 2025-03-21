@@ -80,8 +80,8 @@ namespace KLib
 
             map.Add("Front-Left", "Audio", "Headphones", "Left");
             map.Add("Front-Right", "Audio", "Headphones", "Right");
-            map.Add("Center", "Electric", "DSR372", "Site 1", "50");
-            map.Add("Subwoofer", "Electric", "DSR000", "Site 2", "50");
+            map.Add("Center", "Electric", "DS8R372", "Site 1", "50");
+            map.Add("Subwoofer", "Electric", "DS8R000", "Site 2", "50");
             map.Add("Side-Left", "Haptic", "Haptic1", "Site 1");
             map.Add("Side-Right", "Haptic", "Haptic2", "Site 2");
             map.Add("Rear-Left", "", "", "");

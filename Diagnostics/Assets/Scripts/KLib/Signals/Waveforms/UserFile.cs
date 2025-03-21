@@ -159,7 +159,7 @@ namespace KLib.Signals.Waveforms
             return "";
         }
 
-        override public Action<float> ParamSetter(string paramName)
+        override public Action<float> GetParamSetter(string paramName)
         {
             Action<float> setter = null;
             return setter;

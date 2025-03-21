@@ -107,7 +107,7 @@ namespace KLib.Signals.Waveforms
 			return new List<SweepableParam>();
 		}
 
-		virtual public Action<float> ParamSetter(string paramName)
+		virtual public Action<float> GetParamSetter(string paramName)
 		{
 			Action<float> setter = null;
 			return setter;

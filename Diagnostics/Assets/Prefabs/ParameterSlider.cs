@@ -4,56 +4,54 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+using Turandot.Inputs;
+
 public class ParameterSlider : MonoBehaviour
 {
-    public enum Scale { Linear, Log}
+    private ParameterSliderProperties _properties = new ParameterSliderProperties();
 
-    public Slider slider;
-    public TMPro.TMP_InputField inputField;
-
-    public Scale scale = Scale.Linear;
-    public float minVal = 0;
-    public float maxVal = 1;
-
-    public string format = "F";
+    [SerializeField] private Slider _slider;
+    [SerializeField] private TMPro.TMP_InputField _inputField;
 
     public Action<float> Setter = null;
 
     public float Value { get; private set; } = 0;
     public bool Interactable
     {
-        get { return slider.interactable; }
-        set { slider.interactable = value; }
+        get { return _slider.interactable; }
+        set { _slider.interactable = value; }
     }
 
-    public delegate void OnValueChangeDelegate(float value);
-    public event OnValueChangeDelegate OnValueChange;
-
-    public void Initialize(Scale scale, float minVal, float maxVal, float value)
+    public delegate void ValueChangeDelegate(float value);
+    public event ValueChangeDelegate ValueChange;
+    private void OnValueChange(float value)
     {
-        this.scale = scale;
-        this.minVal = minVal;
-        this.maxVal = maxVal;
-        Value = value;
+        ValueChange?.Invoke(value);
+    }
 
-        slider.SetValueWithoutNotify(ParameterValueToSliderValue(value));
-        inputField.text = value.ToString(format);
+    public void Initialize(ParameterSliderProperties properties)
+    {
+        _properties = properties;
+        Value = _properties.StartValue;
+
+        _slider.SetValueWithoutNotify(ParameterValueToSliderValue(Value));
+        _inputField.text = Value.ToString(_properties.DisplayFormat);
     }
 
     public void SetValue(float value)
     {
         Value = value;
-        slider.value = ParameterValueToSliderValue(value);
-        inputField.text = value.ToString(format);
+        _slider.value = ParameterValueToSliderValue(value);
+        _inputField.text = value.ToString(_properties.DisplayFormat);
     }
 
     public void OnSliderValueChanged(float sliderValue)
     {
         Value = SliderValueToParameterValue(sliderValue);
-        inputField.text = Value.ToString(format);
+        _inputField.text = Value.ToString(_properties.DisplayFormat);
 
         Setter?.Invoke(Value);
-        OnValueChange?.Invoke(Value);
+        OnValueChange(Value);
     }
 
     public void OnInputFieldEndEdit(string expr)
@@ -61,27 +59,27 @@ public class ParameterSlider : MonoBehaviour
         float newValue;
         if (float.TryParse(expr, out newValue))
         {
-            newValue = Mathf.Min(newValue, maxVal);
-            Value = Math.Max(newValue, minVal);
+            newValue = Mathf.Min(newValue, _properties.MaxValue);
+            Value = Math.Max(newValue, _properties.MinValue);
 
-            slider.SetValueWithoutNotify(ParameterValueToSliderValue(Value));
-            inputField.text = Value.ToString(format);
+            _slider.SetValueWithoutNotify(ParameterValueToSliderValue(Value));
+            _inputField.text = Value.ToString(_properties.DisplayFormat);
 
             Setter?.Invoke(Value);
-            OnValueChange?.Invoke(Value);
+            OnValueChange(Value);
         }
     }
 
     private float SliderValueToParameterValue(float sliderVal)
     {
         float paramVal = float.NaN;
-        if (scale == Scale.Linear)
+        if (_properties.Scale == ParameterSliderProperties.SliderScale.Linear)
         {
-            paramVal = minVal + sliderVal * (maxVal - minVal);
+            paramVal = _properties.MinValue + sliderVal * (_properties.MaxValue - _properties.MinValue);
         }
-        else if (scale == Scale.Log)
+        else if (_properties.Scale == ParameterSliderProperties.SliderScale.Log)
         {
-            paramVal = minVal * Mathf.Exp(sliderVal * Mathf.Log(maxVal / minVal));
+            paramVal = _properties.MinValue * Mathf.Exp(sliderVal * Mathf.Log(_properties.MaxValue / _properties.MinValue));
         }
 
         return paramVal;
@@ -90,13 +88,13 @@ public class ParameterSlider : MonoBehaviour
     private float ParameterValueToSliderValue(float paramVal)
     {
         float sliderVal = float.NaN;
-        if (scale == Scale.Linear)
+        if (_properties.Scale == ParameterSliderProperties.SliderScale.Linear)
         {
-            sliderVal = (paramVal - minVal) / (maxVal - minVal);
+            sliderVal = (paramVal - _properties.MinValue) / (_properties.MaxValue - _properties.MinValue);
         }
-        else if (scale == Scale.Log)
+        else if (_properties.Scale == ParameterSliderProperties.SliderScale.Log)
         {
-            sliderVal = Mathf.Log(paramVal / minVal) / Mathf.Log(maxVal / minVal);
+            sliderVal = Mathf.Log(paramVal / _properties.MinValue) / Mathf.Log(_properties.MaxValue / _properties.MinValue);
         }
 
         return sliderVal;

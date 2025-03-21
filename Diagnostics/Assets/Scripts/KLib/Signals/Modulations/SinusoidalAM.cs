@@ -51,7 +51,7 @@ namespace KLib.Signals.Modulations
             return par;
         }
 
-        public override Action<float> ParamSetter(string paramName)
+        public override Action<float> GetParamSetter(string paramName)
 		{
 			Action<float> setter = null;
 			switch (paramName)

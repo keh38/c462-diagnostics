@@ -53,7 +53,7 @@ namespace KLib.Signals.Modulations
             return par;
         }
 
-        public virtual Action<float> ParamSetter(string paramName)
+        public virtual Action<float> GetParamSetter(string paramName)
         {
             return null;
         }

@@ -213,7 +213,7 @@ namespace Launcher
                 d128.GetState();
                 foreach (var d in d128.Devices)
                 {
-                    devices.Add("DSR" + d);
+                    devices.Add("DS8R" + d);
                 }
             }
             catch (Exception ex)

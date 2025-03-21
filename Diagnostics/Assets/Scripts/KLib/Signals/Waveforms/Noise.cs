@@ -80,7 +80,7 @@ namespace KLib.Signals.Waveforms
             get { return _max_vs_cf; }
         }
 
-        override public Action<float> ParamSetter(string paramName)
+        override public Action<float> GetParamSetter(string paramName)
         {
             Action<float> setter = null;
             switch (paramName)

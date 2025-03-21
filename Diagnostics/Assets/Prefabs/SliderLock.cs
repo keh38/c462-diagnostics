@@ -15,8 +15,8 @@ public class SliderLock : MonoBehaviour
 
     private void Start()
     {
-        _leftSlider.OnValueChange += OnLeftValueChanged;
-        _rightSlider.OnValueChange += OnRightValueChanged;
+        //_leftSlider.OnValueChange += OnLeftValueChanged;
+        //_rightSlider.OnValueChange += OnRightValueChanged;
     }
 
     public void OnStateToggle(bool pressed)

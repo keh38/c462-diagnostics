@@ -36,6 +36,32 @@ public class DigitimerControl : MonoBehaviour
         }
     }
 
+    public bool EnableDevices(List<KLib.Signals.Channel> channels)
+    {
+        bool success = true;
+        foreach (var c in channels)
+        {
+            if (int.TryParse(c.MyEndpoint.transducer.Substring(("DS8R").Length), out int id))
+            {
+                success &= HardwareInterface.Digitimer.EnableDevice(id, c.Digitimer);
+            }
+        }
+        return success;
+    }
+
+    public bool DisableDevices(List<KLib.Signals.Channel> channels)
+    {
+        bool success = true;
+        foreach (var c in channels)
+        {
+            if (int.TryParse(c.MyEndpoint.transducer.Substring(("DS8R").Length), out int id))
+            {
+                success &= HardwareInterface.Digitimer.DisableDevice(id);
+            }
+        }
+        return success;
+    }
+
     public bool EnableDevice(int deviceNum, KLib.Signals.Waveforms.Digitimer digitimer)
     {
         if (_d128 == null) return false;

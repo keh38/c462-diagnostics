@@ -249,7 +249,7 @@ namespace Launcher
                 d128.GetState();
                 foreach (var d in devices)
                 {
-                    int id = int.Parse(d.transducer.Substring(3));
+                    int id = int.Parse(d.transducer.Substring(("DS8R").Length);
                     float max = float.Parse(d.extra);
 
                     if (d128.Devices.Contains(id))
