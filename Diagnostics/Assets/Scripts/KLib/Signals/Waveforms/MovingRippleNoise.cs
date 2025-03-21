@@ -86,14 +86,14 @@ namespace KLib.Signals.Waveforms
             FrequencyRes = 1;
         }
 
-		new public static List<SweepableParam> GetSweepableParams()
+		new public static List<string> GetSweepableParams()
 		{
-			List<SweepableParam> par = new List<SweepableParam>();
-			par.Add(new SweepableParam("Ripple Velocity", "cycles/s", 2));
-			par.Add(new SweepableParam("Ripple Density", "cycles/octave", 0.4f));
-			par.Add(new SweepableParam("Ripple Depth", "(0-1)", 0.9f));
-
-			return par;
+            return new List<string>()
+            {
+                "Velocity",
+                "Density",
+                "Depth"
+            };
 		}
 
 		override public Action<float> GetParamSetter(string paramName)
@@ -101,13 +101,13 @@ namespace KLib.Signals.Waveforms
 			Action<float> setter = null;
 			switch (paramName)
 			{
-			case "Ripple Velocity":
+			case "Velocity":
 				setter = x => this.RippleVelocity = x;
 				break;
-			case "Ripple Density":
+			case "Density":
 				setter = x => this.RippleDensity = x;
 				break;
-			case "Ripple Depth":
+			case "Depth":
 				setter = x => this.Depth = x;
 				break;
 			}

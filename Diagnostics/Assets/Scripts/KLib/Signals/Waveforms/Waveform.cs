@@ -102,9 +102,9 @@ namespace KLib.Signals.Waveforms
 			shape = Waveshape.None;
         }
 
-		virtual public List<SweepableParam> GetSweepableParams()
+		virtual public List<string> GetSweepableParams()
 		{
-			return new List<SweepableParam>();
+			return new List<string>();
 		}
 
 		virtual public Action<float> GetParamSetter(string paramName)

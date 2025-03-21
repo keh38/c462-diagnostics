@@ -161,14 +161,6 @@ namespace KLib.Signals
             return channels.FindAll(x => x.waveform.Shape == Waveshape.Digitimer && x.Modality == Modality.Electric);
         }
 
-        //public void Activate(List<Turandot.Flag> flags)
-        //{
-        //    foreach (var ch in _shadows)
-        //    {
-        //        ch.InitializeIntramural(flags);
-        //    }
-        //}
-
         public float GetMaxTime(float defaultValue)
         {
             float tmax = -1;
@@ -245,14 +237,14 @@ namespace KLib.Signals
 			
 			string dest = s[0];
 			string par = s[1];
-			
+
 			// NullReferenceException is thrown if there is no channel with the specified name
             setter = MyParamSetter(par);
             if (setter == null) setter = channels.Find(ch => ch.Name==dest).GetParamSetter(par);
 
             if (setter == null)
             {
-                throw new System.ApplicationException("Parameter '" + par + "' does not exist for channel '" + dest + "'.");
+                throw new ApplicationException("Parameter '" + par + "' does not exist for channel '" + dest + "'.");
             }
 			
 			return setter;
@@ -308,6 +300,16 @@ namespace KLib.Signals
             foreach (var ch in channels)
             {
                 properties.Add(new ChannelProperties() { channelName = ch.Name, properties = ch.GetValidParameters() });
+            }
+            return properties;
+        }
+
+        public List<ChannelProperties> GetValidSweepables()
+        {
+            var properties = new List<ChannelProperties>();
+            foreach (var ch in channels)
+            {
+                properties.Add(new ChannelProperties() { channelName = ch.Name, properties = ch.GetSweepableParams() });
             }
             return properties;
         }

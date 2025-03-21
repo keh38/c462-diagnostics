@@ -122,12 +122,12 @@ namespace KLib.Signals
             get { return _transducer; }
         }
 
-        public static List<SweepableParam> GetSweepableParams()
+        public static List<string> GetSweepableParams()
         {
-            List<SweepableParam> par = new List<SweepableParam>();
-            par.Add(new SweepableParam("Level", "dB", -6));
-
-            return par;
+            return new List<string>()
+            {
+                "Level"
+            };
         }
 
         public Action<float> GetParamSetter(string paramName)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
@@ -11,11 +12,13 @@ using KLib.Signals;
 using KLib.Signals.Waveforms;
 
 using Turandot.Inputs;
+using Turandot.Interactive;
 
 public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 {
     [SerializeField] private GameObject _quitPanel;
-    [SerializeField] private ParameterSlider _paramSlider;
+    [SerializeField] private GameObject _sliderPanelPrefab;
+    [SerializeField] private GameObject _sliderPrefab;
 
     private SignalManager _sigMan;
 
@@ -31,20 +34,34 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     {
         HTS_Server.SetCurrentScene("Turandot Interactive", this);
         _udpClient = new UdpClient();
-        //_udpEndPoint = new IPEndPoint(IPAddress.Parse(HTS_Server.MyAddress), _udpPort);
+#if !NO_NETWORK
+        _udpEndPoint = new IPEndPoint(IPAddress.Parse(HTS_Server.MyAddress), _udpPort);
+#endif
 
-        CreateDefaultSignalManager();
-        InitializeSlider();
+#if CONFIG_HACK
+        GameManager.SetSubject("Scratch/_Ken");
+        HardwareInterface.Initialize();
+        HardwareInterface.AdapterMap.AudioTransducer = GameManager.Transducer;
+        var param = FileIO.XmlDeserialize<InteractiveSettings>(FileLocations.ConfigFile("Interactive.Audio-Only"));
+        ApplyParameters(param);
+
+        InitializeSliders(param.Sliders);
+#endif 
+
+        //CreateDefaultSignalManager();
+        //InitializeSlider();
     }
 
     private void Update()
     {
+#if !NO_NETWORK
         if (_audioInitialized)
         {
-            //var amplitudes = _sigMan.CurrentAmplitudes;
-            //Buffer.BlockCopy(amplitudes, 0, _udpData, 0, _udpData.Length);
-            //_udpClient.Send(_udpData, _udpData.Length, _udpEndPoint);
+            var amplitudes = _sigMan.CurrentAmplitudes;
+            Buffer.BlockCopy(amplitudes, 0, _udpData, 0, _udpData.Length);
+            _udpClient.Send(_udpData, _udpData.Length, _udpEndPoint);
         }
+#endif
     }
 
     void OnGUI()
@@ -117,28 +134,38 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         _audioInitialized = true;
     }
 
-    private void InitializeSlider()
+    private void InitializeSliders(List<ParameterSliderProperties> properties)
     {
-        var sliderProperties = new ParameterSliderProperties()
-        {
-            MinValue = 100,
-            MaxValue = 2000,
-            Scale = ParameterSliderProperties.SliderScale.Log,
-            StartValue = 500,
-            Channel = "Audio",
-            Property = "Tone.Frequency_Hz"
-        };
+        if (properties.Count == 0) return;
 
-        _paramSlider.Initialize(sliderProperties);
-        _paramSlider.Setter = _sigMan.GetParamSetter($"{sliderProperties.Channel}.{sliderProperties.Property}");
-        Debug.Log(_paramSlider.Setter);
+        var groups = _sigMan.channels.Select(x => x.Name).ToList();
+
+        InitializeSliderPanel(groups[0], properties.FindAll(x => x.Channel.Equals(groups[0])));
     }
 
-    private void SetParams(string data)
+    private void InitializeSliderPanel(string name, List<ParameterSliderProperties> properties)
+    {
+        var canvas = GameObject.Find("Slider Area");
+        var panelObj = GameObject.Instantiate(_sliderPanelPrefab, canvas.transform);
+
+        var sliderPanel = panelObj.GetComponent<SliderPanel>();
+        sliderPanel.SetTitle(name);
+        sliderPanel.Setter = _sigMan[name].GetActiveSetter();
+
+        foreach (var prop in properties)
+        {
+            var gobj = GameObject.Instantiate(_sliderPrefab, panelObj.transform);
+            var slider = gobj.GetComponent<ParameterSlider>();
+            slider.Initialize(prop);
+            slider.Setter = _sigMan.GetParamSetter(prop.FullParameterName);
+            slider.Setter?.Invoke(prop.StartValue);
+        }
+    }
+
+    private void ApplyParameters(InteractiveSettings settings)
     {
         _audioInitialized = false;
 
-        var settings = FileIO.XmlDeserializeFromString<Turandot.Interactive.InteractiveSettings>(data);
         _sigMan = settings.SigMan;
 
         AudioSettings.GetDSPBufferSize(out int bufferLength, out int numBuffers);
@@ -152,6 +179,12 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         HardwareInterface.Digitimer.EnableDevices(_sigMan.GetDigitimerChannels());
 
         _audioInitialized = true;
+    }
+
+    private void SetParams(string data)
+    {
+        var settings = FileIO.XmlDeserializeFromString<InteractiveSettings>(data);
+        ApplyParameters(settings);
     }
 
     private void SetProperty(string data)

@@ -64,11 +64,9 @@ namespace KLib.Signals.Waveforms
             HandlesModulation = true;
         }
 
-        public override List<SweepableParam> GetSweepableParams()
+        public override List<string> GetSweepableParams()
         {
-            List<SweepableParam> par = new List<SweepableParam>();
-
-            return par;
+            return new List<string>();
         }
 
         override public Action<float> GetParamSetter(string paramName)

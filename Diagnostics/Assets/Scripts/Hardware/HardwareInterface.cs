@@ -32,7 +32,6 @@ public class HardwareInterface : MonoBehaviour
                 GameObject gobj = GameObject.Find("HardwareInterface");
                 _instance = gobj.GetComponent<HardwareInterface>();
                 DontDestroyOnLoad(gobj);
-//                _instance._Init();
             }
             return _instance;
         }

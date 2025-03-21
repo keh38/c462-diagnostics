@@ -58,12 +58,12 @@ namespace KLib.Signals.Waveforms
             return _maxLevel;
         }
 
-        public override List<SweepableParam> GetSweepableParams()
+        public override List<string> GetSweepableParams()
         {
-            List<SweepableParam> par = new List<SweepableParam>();
-            par.Add(new SweepableParam("CF", "Hz", 500));
-
-            return par;
+            return new List<string>()
+            {
+                "CF"
+            };
         }
 
         [ProtoIgnore]

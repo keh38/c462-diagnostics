@@ -38,13 +38,13 @@ namespace KLib.Signals.Waveforms
             _shortName = "Tone";
         }
 
-		public override List<SweepableParam> GetSweepableParams()
+		public override List<string> GetSweepableParams()
 		{
-			List<SweepableParam> par = new List<SweepableParam>();
-            par.Add(new SweepableParam("Frequency", "Hz", 500));
-            par.Add(new SweepableParam("Phase", "cycles", 0));
-
-            return par;
+            return new List<string>()
+            {
+                "Frequency_Hz",
+                "Phase_cycles"
+            };
 		}
 
         override public Action<float> GetParamSetter(string paramName)
@@ -55,7 +55,7 @@ namespace KLib.Signals.Waveforms
                 case "Frequency_Hz":
                     setter = x => this.Frequency_Hz = x;
                     break;
-                case "Phase":
+                case "Phase_cycles":
                     setter = x => this.Phase_cycles = x;
                     break;
             }

@@ -40,15 +40,14 @@ namespace KLib.Signals.Modulations
 
         public float CurrentPhase { get { return _phase; } }
 
-        public override List<SweepableParam> GetSweepableParams()
+        public override List<string> GetSweepableParams()
         {
-            List<SweepableParam> par = new List<SweepableParam>();
-            par.Add(new SweepableParam("ModFreq", "Hz", 40));
-            par.Add(new SweepableParam("ModDepth", "0-1", 1));
-            par.Add(new SweepableParam("ModDepth_dB", "dB", 1));
-            par.Add(new SweepableParam("ModPhase", "cycles", 1));
-
-            return par;
+            return new List<string>()
+            {
+                "SAM.Freq_Hz",
+                "SAM.Depth",
+                "SAM.Phase"
+            };
         }
 
         public override Action<float> GetParamSetter(string paramName)
@@ -56,16 +55,16 @@ namespace KLib.Signals.Modulations
 			Action<float> setter = null;
 			switch (paramName)
 			{
-			    case "ModFreq":
+			    case "Freq_Hz":
 				    setter = x => this.Frequency_Hz = x;
 				    break;
-                case "ModDepth":
+                case "Depth":
                     setter = x => this.Depth = x;
                     break;
-                case "ModDepth_dB":
+                case "Depth_dB":
                     setter = x => this.Depth = Mathf.Pow(10, x / 20);
                     break;
-                case "ModPhase":
+                case "Phase":
                     setter = x => this.Phase_cycles = x;
                     break;
             }

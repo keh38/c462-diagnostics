@@ -117,6 +117,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 737a52c1220c9e74788db5790ebf3f5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _label: {fileID: 9005762244992882358}
   _slider: {fileID: 9005762246368731623}
   _inputField: {fileID: 9005762246598044375}
 --- !u!1 &9005762244825527619
@@ -976,6 +977,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 737a52c1220c9e74788db5790ebf3f5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _label: {fileID: 0}
   _slider: {fileID: 0}
   _inputField: {fileID: 0}
 --- !u!1 &9005762246403426808

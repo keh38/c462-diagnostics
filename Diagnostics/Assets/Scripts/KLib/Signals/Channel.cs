@@ -282,26 +282,35 @@ namespace KLib.Signals
             return ch;
         }
 
-        public List<SweepableParam> GetSweepableParams()
+        public List<string> GetSweepableParams()
         {
-            List<SweepableParam> sp = new List<SweepableParam>();
+            var sp = new List<string>();
 
             if (waveform.Shape != Waveshape.None)
             {
+                foreach (string p in waveform.GetSweepableParams())
+                {
+                    sp.Add(waveform.ShortName + "." + p);
+                }
                 sp.AddRange(waveform.GetSweepableParams());
                 sp.AddRange(modulation.GetSweepableParams());
-                sp.Add(new SweepableParam("Level", "dB", 0));
+                sp.AddRange(Level.GetSweepableParams());
                 if (Laterality == Laterality.Binaural)
                 {
-                    sp.Add(new SweepableParam("MBL", "dB", 0));
-                    sp.Add(new SweepableParam("ILD", "dB", 0));
+                    sp.Add("MBL");
+                    sp.Add("ILD");
                     if (waveform.Shape == Waveshape.Sinusoid)
                     {
-                        sp.Add(new SweepableParam("IPD", "cycles", 0));
+                        sp.Add("IPD");
                     }
                 }
             }
             return sp;
+        }
+
+        public Action<bool> GetActiveSetter()
+        {
+            return x => SetActive(x);
         }
 
 		public Action<float> GetParamSetter(string paramName)
@@ -309,29 +318,28 @@ namespace KLib.Signals
             Action<float> setter = null;
 
             string[] s = paramName.Split('.');
-            if (s.Length != 2 && s[0] != "Level" && s[0] != "Ear")
+            if (s.Length != 2 && s[0] != "Level")
             {
                 return null;
             }
 
             switch (s[0])
             {
-                case "Ear":
-                    //Destination = (Laterality)(value + 2);
-                    break;
-
                 //case "Gate":
                 //    return gate.G(s[1]);
 
                 case "Mod":
                 case "SAM":
-                    return modulation.GetParamSetter(s[1]);
+                    setter = modulation.GetParamSetter(s[1]);
+                    break;
 
-                //case "Level":
-                //    return GetParamSetter.Value;
+                case "Level":
+                    setter = level.GetParamSetter("Level");
+                    break;
 
                 default:
-                    return waveform.GetParamSetter(s[1]);
+                    setter =  waveform.GetParamSetter(s[1]);
+                    break;
             }
 
 

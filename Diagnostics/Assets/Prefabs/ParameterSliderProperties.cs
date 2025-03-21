@@ -11,14 +11,13 @@ namespace Turandot.Inputs
     {
         public enum SliderScale { Linear, Log};
 
-//        [Browsable(false)]
         [Category("Signal parameter")]
         [ReadOnly(true)]
         public string Channel { set; get; }
-        [Browsable(false)]
-        public string Property { set; get; }
 
-        //public string Group { set; get; }
+        [Category("Signal parameter")]
+        [ReadOnly(true)]
+        public string Property { set; get; }
 
         [Category("Scale")]
         public SliderScale Scale { set; get; }
@@ -52,12 +51,5 @@ namespace Turandot.Inputs
         public string FullParameterName { get { return $"{Channel}.{Property}"; } }
 
         public ParameterSliderProperties() { }
-
-        private bool ShouldSerializeParameterSliderProperties()
-        {
-            //RETURN:
-            //      = true if the property value should be displayed in bold, or "treated as different from a default one"
-            return false;
-        }
     }
 }

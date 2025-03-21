@@ -154,14 +154,14 @@ namespace KLib.Signals.Waveforms
             //randt = new TruncatedNormalRandom();
         }
 		
-		new public static List<SweepableParam> GetSweepableParams()
+		new public static List<string> GetSweepableParams()
 		{
-			List<SweepableParam> par = new List<SweepableParam>();
-			par.Add(new SweepableParam("Cloud Mean", "Hz", 500));
-            par.Add(new SweepableParam("Cloud BW", "ERB", 0.5f));
-            par.Add(new SweepableParam("Cloud Sigma", "ERB", 0.5f));
-
-			return par;
+            return new List<string>()
+            {
+                "Mean_Hz",
+                "BW_ERB",
+                "Sigma_ERB"
+            };
 		}
 
 		override public Action<float> GetParamSetter(string paramName)
@@ -169,13 +169,13 @@ namespace KLib.Signals.Waveforms
 			Action<float> setter = null;
 			switch (paramName)
 			{
-        		case "Cloud Mean":
+        		case "Mean_Hz":
         			setter = x => this.Fmean_Hz = x;
         			break;
-                case "Cloud BW":
+                case "BW_ERB":
                     setter = x => this.Bandwidth = x;
                     break;
-                case "Cloud Sigma":
+                case "Sigma_ERB":
                     setter = x => this.Fsigma = x;
                     break;
             }

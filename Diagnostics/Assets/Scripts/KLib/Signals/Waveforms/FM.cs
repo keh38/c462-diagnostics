@@ -50,13 +50,13 @@ namespace KLib.Signals.Waveforms
             _shortName = "FM";
         }
 
-        new public static List<SweepableParam> GetSweepableParams()
+        new public static List<string> GetSweepableParams()
 		{
-			List<SweepableParam> par = new List<SweepableParam>();
-			par.Add(new SweepableParam("FM ModFreq", "Hz", 2));
-			par.Add(new SweepableParam("FM Depth", "Hz", 50));
-
-			return par;
+            return new List<string>()
+            {
+                "ModFreqHz",
+                "DepthHz"
+            };
 		}
 
 		override public Action<float> GetParamSetter(string paramName)
@@ -64,10 +64,10 @@ namespace KLib.Signals.Waveforms
 			Action<float> setter = null;
 			switch (paramName)
 			{
-			case "FM ModFreq":
+			case "ModFreqHz":
 				setter = x => this.ModFreq_Hz = x;
 				break;
-			case "FM Depth":
+			case "DepthHz":
 				setter = x => this.Depth_Hz = x;
 				break;
 			}

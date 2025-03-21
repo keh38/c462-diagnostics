@@ -10,6 +10,7 @@ public class ParameterSlider : MonoBehaviour
 {
     private ParameterSliderProperties _properties = new ParameterSliderProperties();
 
+    [SerializeField] private TMPro.TMP_Text _label;
     [SerializeField] private Slider _slider;
     [SerializeField] private TMPro.TMP_InputField _inputField;
 
@@ -34,6 +35,7 @@ public class ParameterSlider : MonoBehaviour
         _properties = properties;
         Value = _properties.StartValue;
 
+        _label.text = properties.Label;
         _slider.SetValueWithoutNotify(ParameterValueToSliderValue(Value));
         _inputField.text = Value.ToString(_properties.DisplayFormat);
     }

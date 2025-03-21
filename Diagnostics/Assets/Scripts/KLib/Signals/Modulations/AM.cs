@@ -47,10 +47,9 @@ namespace KLib.Signals.Modulations
         {
         }
 
-        public virtual List<SweepableParam> GetSweepableParams()
+        public virtual List<string> GetSweepableParams()
         {
-            List<SweepableParam> par = new List<SweepableParam>();
-            return par;
+            return new List<string>();
         }
 
         public virtual Action<float> GetParamSetter(string paramName)

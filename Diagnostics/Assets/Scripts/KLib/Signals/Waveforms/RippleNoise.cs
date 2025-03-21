@@ -64,10 +64,9 @@ namespace KLib.Signals.Waveforms
             return maxLevel;
         }
 
-		new public static List<SweepableParam> GetSweepableParams()
+		new public static List<string> GetSweepableParams()
 		{
-			List<SweepableParam> par = new List<SweepableParam>();
-			return par;
+            return new List<string>();
 		}
 		
 		override public Action<float> GetParamSetter(string paramName)
