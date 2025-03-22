@@ -15,6 +15,7 @@ namespace Turandot.Interactive
         public SignalManager SigMan { get; set; }
         public List<InteractiveControl> Controls { get; set; }
         public List<ParameterSliderProperties> Sliders { get; set; }
+        public bool ShowSliders { set; get; }
 
         public List<string> SliderNames
         {

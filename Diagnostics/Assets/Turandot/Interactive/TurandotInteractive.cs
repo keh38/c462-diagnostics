@@ -28,7 +28,8 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     private UdpClient _udpClient;
     private int _udpPort = 63557;
     private IPEndPoint _udpEndPoint;
-    private byte[] _udpData;
+
+    private UDPPacket _udpPacket = new UDPPacket();
 
     void Start()
     {
@@ -47,9 +48,6 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
         InitializeSliders(param.Sliders);
 #endif 
-
-        //CreateDefaultSignalManager();
-        //InitializeSlider();
     }
 
     private void Update()
@@ -57,9 +55,10 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 #if !NO_NETWORK
         if (_audioInitialized)
         {
-            var amplitudes = _sigMan.CurrentAmplitudes;
-            Buffer.BlockCopy(amplitudes, 0, _udpData, 0, _udpData.Length);
-            _udpClient.Send(_udpData, _udpData.Length, _udpEndPoint);
+            _udpPacket.Status = 1;
+            _udpPacket.SetAmplitudes(_sigMan.CurrentAmplitudes);
+            _udpPacket.UpdateByteArray();
+            _udpClient.Send(_udpPacket.ByteArray, _udpPacket.ByteArray.Length, _udpEndPoint);
         }
 #endif
     }
@@ -136,17 +135,24 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
     private void InitializeSliders(List<ParameterSliderProperties> properties)
     {
+        var sliderArea = GameObject.Find("Slider Area");
+        int nchild = sliderArea.transform.childCount;
+        for (int k = nchild - 1; k >= 0; k--) GameObject.Destroy(sliderArea.transform.GetChild(k).gameObject);
+ 
         if (properties.Count == 0) return;
 
         var groups = _sigMan.channels.Select(x => x.Name).ToList();
 
-        InitializeSliderPanel(groups[0], properties.FindAll(x => x.Channel.Equals(groups[0])));
+        foreach (var g in groups)
+        {
+            InitializeSliderPanel(g, properties.FindAll(x => x.Channel.Equals(g)));
+        }
     }
 
     private void InitializeSliderPanel(string name, List<ParameterSliderProperties> properties)
     {
-        var canvas = GameObject.Find("Slider Area");
-        var panelObj = GameObject.Instantiate(_sliderPanelPrefab, canvas.transform);
+        var sliderArea = GameObject.Find("Slider Area");
+        var panelObj = GameObject.Instantiate(_sliderPanelPrefab, sliderArea.transform);
 
         var sliderPanel = panelObj.GetComponent<SliderPanel>();
         sliderPanel.SetTitle(name);
@@ -174,8 +180,6 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
         _sigMan.StartPaused();
 
-        _udpData = new byte[sizeof(float) * _sigMan.CurrentAmplitudes.Length];
-
         HardwareInterface.Digitimer.EnableDevices(_sigMan.GetDigitimerChannels());
 
         _audioInitialized = true;
@@ -185,6 +189,10 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     {
         var settings = FileIO.XmlDeserializeFromString<InteractiveSettings>(data);
         ApplyParameters(settings);
+        if (settings.ShowSliders)
+        {
+            InitializeSliders(settings.Sliders);
+        }
     }
 
     private void SetProperty(string data)
