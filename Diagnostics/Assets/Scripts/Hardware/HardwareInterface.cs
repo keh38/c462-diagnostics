@@ -40,16 +40,21 @@ public class HardwareInterface : MonoBehaviour
 
     #region PUBLIC STATIC ACCESSORS
     public static void Initialize() { instance._Init(); }
+#if HACKING
+    public static AdapterMap AdapterMap { get { return AdapterMap.DefaultStereoMap("HD280"); } }
+    public static DigitimerControl Digitimer { get { return null; } }
+#else
     public static AdapterMap AdapterMap { get { return instance._adapterMap; } }
-    public static ClockSynchronizer ClockSync { get { return instance._clockSynchronizer; } }
     public static DigitimerControl Digitimer { get { return instance._digitimer; } }
+#endif
+    public static ClockSynchronizer ClockSync { get { return instance._clockSynchronizer; } }
     public static VolumeManager VolumeManager { get { return instance._volumeManager; } }
     public static bool IsReady { get { return instance._audioReady; } }
     public static bool ErrorAcknowledged { get { return instance._errorAcknowledged; } }
     public static void AcknowledgeError() { instance._errorAcknowledged = true; }
-    #endregion
+#endregion
 
-    #region PRIVATE METHODS
+#region PRIVATE METHODS
     private void OnDestroy()
     {
         if (_volumeManager != null)
@@ -104,5 +109,5 @@ public class HardwareInterface : MonoBehaviour
 
         return true;
     }
-    #endregion
+#endregion
 }

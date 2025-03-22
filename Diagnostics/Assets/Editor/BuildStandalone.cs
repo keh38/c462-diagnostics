@@ -12,6 +12,12 @@ public class BuildStandalone : MonoBehaviour
     public static void MyBuild()
     {
         ClearConsole();
+
+#if HACKING
+        Debug.LogError("Cannot build with HACKING defined");
+        return;
+#endif
+
         Debug.Log("Beginning Windows standalone build...");
 
         var scenesInBuild = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);

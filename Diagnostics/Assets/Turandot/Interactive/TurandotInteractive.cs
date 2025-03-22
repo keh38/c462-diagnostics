@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 using KLib;
@@ -16,9 +17,11 @@ using Turandot.Interactive;
 
 public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 {
+    [SerializeField] private GameObject _menuPanel;
     [SerializeField] private GameObject _quitPanel;
     [SerializeField] private GameObject _sliderPanelPrefab;
     [SerializeField] private GameObject _sliderPrefab;
+    [SerializeField] private GameObject _sliderArea;
 
     private SignalManager _sigMan;
 
@@ -30,19 +33,20 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     private IPEndPoint _udpEndPoint;
 
     private UDPPacket _udpPacket = new UDPPacket();
+    private bool _isRemoteConnected;
 
     void Start()
     {
         HTS_Server.SetCurrentScene("Turandot Interactive", this);
         _udpClient = new UdpClient();
-#if !NO_NETWORK
-        _udpEndPoint = new IPEndPoint(IPAddress.Parse(HTS_Server.MyAddress), _udpPort);
-#endif
+        _isRemoteConnected = HTS_Server.RemoteConnected;
+        if (_isRemoteConnected)
+        {
+            _udpEndPoint = new IPEndPoint(IPAddress.Parse(HTS_Server.MyAddress), _udpPort);
+        }
 
-#if CONFIG_HACK
+#if HACKING
         GameManager.SetSubject("Scratch/_Ken");
-        HardwareInterface.Initialize();
-        HardwareInterface.AdapterMap.AudioTransducer = GameManager.Transducer;
         var param = FileIO.XmlDeserialize<InteractiveSettings>(FileLocations.ConfigFile("Interactive.Audio-Only"));
         ApplyParameters(param);
 
@@ -52,15 +56,13 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
     private void Update()
     {
-#if !NO_NETWORK
-        if (_audioInitialized)
+        if (_audioInitialized && _isRemoteConnected)
         {
             _udpPacket.Status = 1;
             _udpPacket.SetAmplitudes(_sigMan.CurrentAmplitudes);
             _udpPacket.UpdateByteArray();
             _udpClient.Send(_udpPacket.ByteArray, _udpPacket.ByteArray.Length, _udpEndPoint);
         }
-#endif
     }
 
     void OnGUI()
@@ -68,6 +70,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         Event e = Event.current;
         if (e.control && e.keyCode == KeyCode.A && !_quitPanelShowing)
         {
+            _sliderArea.SetActive(false);
             _quitPanelShowing = true;
             _quitPanel.SetActive(true);
         }
@@ -80,18 +83,28 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
     public void OnQuitCancelButtonClick()
     {
+        _sliderArea.SetActive(true);
         _quitPanel.SetActive(false);
         _quitPanelShowing = false;
     }
 
-    public void OnStartButtonClick()
+    public void OnStartButtonToggle(bool ispressed)
     {
-        StartStreaming();
+        if (ispressed)
+        {
+            StartStreaming();
+        }
+        else
+        {
+            StopStreaming();
+        }
     }
 
-    public void OnStopButtonClick()
+    public void OnBackButtonClick()
     {
-        StopStreaming();
+        _sliderArea.SetActive(false);
+        _quitPanelShowing = true;
+        _quitPanel.SetActive(true);
     }
 
     private void CreateDefaultSignalManager()
@@ -165,7 +178,12 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
             slider.Initialize(prop);
             slider.Setter = _sigMan.GetParamSetter(prop.FullParameterName);
             slider.Setter?.Invoke(prop.StartValue);
+
+            sliderPanel.AddSlider(slider.gameObject);
         }
+
+        var flowLayout = sliderArea.GetComponent<FlowLayout>();
+        flowLayout.Add(panelObj);
     }
 
     private void ApplyParameters(InteractiveSettings settings)
@@ -180,7 +198,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
         _sigMan.StartPaused();
 
-        HardwareInterface.Digitimer.EnableDevices(_sigMan.GetDigitimerChannels());
+        HardwareInterface.Digitimer?.EnableDevices(_sigMan.GetDigitimerChannels());
 
         _audioInitialized = true;
     }
@@ -227,7 +245,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     private void StopStreaming()
     {
         _sigMan.Pause();
-        HardwareInterface.Digitimer.DisableDevices(_sigMan.GetDigitimerChannels());
+        HardwareInterface.Digitimer?.DisableDevices(_sigMan.GetDigitimerChannels());
     }
 
     private void OnAudioFilterRead(float[] data, int channels)

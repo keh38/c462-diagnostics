@@ -62,7 +62,7 @@ namespace KLib
         }
 
 
-        public static AdapterMap DefaultStereoMap()
+        public static AdapterMap DefaultStereoMap(string audioTransducer = "")
         {
             var map = new AdapterMap();
             map.Name = "Stereo";
@@ -70,10 +70,14 @@ namespace KLib
             map.Add("Left", "Audio", "Headphones", "Left");
             map.Add("Right", "Audio", "Headphones", "Right");
 
+            if (!string.IsNullOrEmpty(audioTransducer))
+            {
+                map.AudioTransducer = audioTransducer;
+            }
             return map;
         }
 
-        public static AdapterMap Default7point1Map()
+        public static AdapterMap Default7point1Map(string audioTransducer="")
         {
             var map = new AdapterMap();
             map.Name = "7.1";
@@ -87,6 +91,10 @@ namespace KLib
             map.Add("Rear-Left", "", "", "");
             map.Add("Rear-Right", "", "", "");
 
+            if (!string.IsNullOrEmpty(audioTransducer))
+            {
+                map.AudioTransducer = audioTransducer;
+            }
             return map;
         }
 
