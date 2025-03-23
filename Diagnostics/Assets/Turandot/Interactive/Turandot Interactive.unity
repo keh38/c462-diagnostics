@@ -1044,6 +1044,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e449b6c8a49e14c47bcd904628643f05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _titleBar: {fileID: 1969611750}
   _menuPanel: {fileID: 1783720956}
   _quitPanel: {fileID: 1699298678}
   _sliderPanelPrefab: {fileID: 3972967476943432603, guid: 9ff5b0aca64aa464f8102861f35199d5, type: 3}

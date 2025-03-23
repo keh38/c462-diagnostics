@@ -12,6 +12,14 @@ public class FlowLayout : MonoBehaviour
     private float _relWidth = 0.49f;
     private int _column = 0;
 
+    public void Clear()
+    {
+        int nchild = gameObject.transform.childCount;
+        for (int k = nchild - 1; k >= 0; k--) GameObject.Destroy(gameObject.transform.GetChild(k).gameObject);
+        _xoffset = 0;
+        _yoffset = 0;
+    }
+
     public void Add(GameObject gobj)
     {
         var myRT = GetComponent<RectTransform>();

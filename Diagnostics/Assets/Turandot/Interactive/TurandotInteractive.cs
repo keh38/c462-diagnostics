@@ -17,6 +17,7 @@ using Turandot.Interactive;
 
 public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 {
+    [SerializeField] private GameObject _titleBar;
     [SerializeField] private GameObject _menuPanel;
     [SerializeField] private GameObject _quitPanel;
     [SerializeField] private GameObject _sliderPanelPrefab;
@@ -35,6 +36,8 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     private UDPPacket _udpPacket = new UDPPacket();
     private bool _isRemoteConnected;
 
+    private List<ParameterSlider> _sliders;
+
     void Start()
     {
         HTS_Server.SetCurrentScene("Turandot Interactive", this);
@@ -51,7 +54,11 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         ApplyParameters(param);
 
         InitializeSliders(param.Sliders);
-#endif 
+#else
+        _menuPanel.SetActive(false);
+        var rt = _titleBar.GetComponent<RectTransform>();
+        rt.anchorMin = new Vector2(0, rt.anchorMin.y);
+#endif
     }
 
     private void Update()
@@ -60,6 +67,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         {
             _udpPacket.Status = 1;
             _udpPacket.SetAmplitudes(_sigMan.CurrentAmplitudes);
+            for (int k = 0; k < _sliders.Count; k++) _udpPacket.Values[k] = _sliders[k].Value;
             _udpPacket.UpdateByteArray();
             _udpClient.Send(_udpPacket.ByteArray, _udpPacket.ByteArray.Length, _udpEndPoint);
         }
@@ -141,31 +149,30 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
         _sigMan.StartPaused();
 
-        //_udpData = new byte[sizeof(float) * _sigMan.CurrentAmplitudes.Length];
-
         _audioInitialized = true;
     }
 
     private void InitializeSliders(List<ParameterSliderProperties> properties)
     {
-        var sliderArea = GameObject.Find("Slider Area");
-        int nchild = sliderArea.transform.childCount;
-        for (int k = nchild - 1; k >= 0; k--) GameObject.Destroy(sliderArea.transform.GetChild(k).gameObject);
- 
+        _sliderArea.GetComponent<FlowLayout>().Clear();
+
         if (properties.Count == 0) return;
 
         var groups = _sigMan.channels.Select(x => x.Name).ToList();
 
+        _sliders = new List<ParameterSlider>();
         foreach (var g in groups)
         {
-            InitializeSliderPanel(g, properties.FindAll(x => x.Channel.Equals(g)));
+            var addedSliders = InitializeSliderPanel(g, properties.FindAll(x => x.Channel.Equals(g)));
+            _sliders.AddRange(addedSliders);
         }
     }
 
-    private void InitializeSliderPanel(string name, List<ParameterSliderProperties> properties)
+    private List<ParameterSlider> InitializeSliderPanel(string name, List<ParameterSliderProperties> properties)
     {
-        var sliderArea = GameObject.Find("Slider Area");
-        var panelObj = GameObject.Instantiate(_sliderPanelPrefab, sliderArea.transform);
+        var addedSliders = new List<ParameterSlider>();
+
+        var panelObj = GameObject.Instantiate(_sliderPanelPrefab, _sliderArea.transform);
 
         var sliderPanel = panelObj.GetComponent<SliderPanel>();
         sliderPanel.SetTitle(name);
@@ -180,10 +187,13 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
             slider.Setter?.Invoke(prop.StartValue);
 
             sliderPanel.AddSlider(slider.gameObject);
+            addedSliders.Add(slider);
         }
 
-        var flowLayout = sliderArea.GetComponent<FlowLayout>();
+        var flowLayout = _sliderArea.GetComponent<FlowLayout>();
         flowLayout.Add(panelObj);
+
+        return addedSliders;
     }
 
     private void ApplyParameters(InteractiveSettings settings)
@@ -207,10 +217,8 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     {
         var settings = FileIO.XmlDeserializeFromString<InteractiveSettings>(data);
         ApplyParameters(settings);
-        if (settings.ShowSliders)
-        {
-            InitializeSliders(settings.Sliders);
-        }
+        InitializeSliders(settings.Sliders);
+        _sliderArea.SetActive(settings.ShowSliders);
     }
 
     private void SetProperty(string data)
@@ -223,6 +231,8 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
             string param = lhs[1];
             float value = float.Parse(parts[1]);
             _sigMan.SetParameter(name, param, value);
+
+            _sliders.Find(x => x.FullParameterName.Equals(parts[0]))?.SetValue(value);
         }
     }
 
@@ -275,6 +285,10 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
                 break;
             case "SetActive":
                 SetActive(data);
+                break;
+            case "ShowSliders":
+                Debug.Log("setsliders = " + data);
+                _sliderArea.SetActive(data.Equals("True"));
                 break;
         }
     }

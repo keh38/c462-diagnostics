@@ -16,7 +16,9 @@ public class ParameterSlider : MonoBehaviour
 
     public Action<float> Setter = null;
 
+    public string FullParameterName { get; private set; }
     public float Value { get; private set; } = 0;
+
     public bool Interactable
     {
         get { return _slider.interactable; }
@@ -34,6 +36,7 @@ public class ParameterSlider : MonoBehaviour
     {
         _properties = properties;
         Value = _properties.StartValue;
+        FullParameterName = _properties.FullParameterName;
 
         _label.text = properties.Label;
         _slider.SetValueWithoutNotify(ParameterValueToSliderValue(Value));

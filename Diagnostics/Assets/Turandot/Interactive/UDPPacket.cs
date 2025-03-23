@@ -34,14 +34,14 @@ namespace Turandot.Interactive
         {
             Buffer.BlockCopy(BitConverter.GetBytes(Status), 0, ByteArray, 0, sizeof(Int32));
             Buffer.BlockCopy(Amplitudes, 0, ByteArray, sizeof(int), _sizeOfAmplitudes);
-            Buffer.BlockCopy(Amplitudes, 0, ByteArray, sizeof(int) + _sizeOfAmplitudes, _sizeOfValues);
+            Buffer.BlockCopy(Values, 0, ByteArray, sizeof(int) + _sizeOfAmplitudes, _sizeOfValues);
         }
 
         public void FromByteArray(byte[] byteArray)
         {
             Status = BitConverter.ToInt32(byteArray, 0);
             Buffer.BlockCopy(byteArray, sizeof(int), Amplitudes, 0, _sizeOfAmplitudes);
-            Buffer.BlockCopy(byteArray, sizeof(int) + _sizeOfAmplitudes, Amplitudes, 0, _sizeOfValues);
+            Buffer.BlockCopy(byteArray, sizeof(int) + _sizeOfAmplitudes, Values, 0, _sizeOfValues);
         }
 
     }
