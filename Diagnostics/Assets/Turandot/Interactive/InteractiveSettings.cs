@@ -13,7 +13,6 @@ namespace Turandot.Interactive
     {
         public string Name { set; get; }
         public SignalManager SigMan { get; set; }
-        public List<InteractiveControl> Controls { get; set; }
         public List<ParameterSliderProperties> Sliders { get; set; }
         public bool ShowSliders { set; get; }
 
@@ -31,7 +30,6 @@ namespace Turandot.Interactive
         {
             Name = "Defaults";
             SigMan = CreateDefaultSignalManager();
-            Controls = new List<InteractiveControl>();
             Sliders = new List<ParameterSliderProperties>();
         }
 

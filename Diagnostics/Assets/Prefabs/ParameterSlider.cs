@@ -18,6 +18,7 @@ public class ParameterSlider : MonoBehaviour
 
     public string FullParameterName { get; private set; }
     public float Value { get; private set; } = 0;
+    public bool SelfChange { get; private set; }
 
     public bool Interactable
     {
@@ -45,6 +46,7 @@ public class ParameterSlider : MonoBehaviour
 
     public void SetValue(float value)
     {
+        SelfChange = false;
         Value = value;
         _slider.value = ParameterValueToSliderValue(value);
         _inputField.text = value.ToString(_properties.DisplayFormat);
@@ -55,6 +57,7 @@ public class ParameterSlider : MonoBehaviour
         Value = SliderValueToParameterValue(sliderValue);
         _inputField.text = Value.ToString(_properties.DisplayFormat);
 
+        SelfChange = true;
         Setter?.Invoke(Value);
         OnValueChange(Value);
     }

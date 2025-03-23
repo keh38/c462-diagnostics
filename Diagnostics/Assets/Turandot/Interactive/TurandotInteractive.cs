@@ -37,6 +37,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     private bool _isRemoteConnected;
 
     private List<ParameterSlider> _sliders;
+    private List<SliderPanel> _sliderPanels;
 
     void Start()
     {
@@ -67,7 +68,14 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         {
             _udpPacket.Status = 1;
             _udpPacket.SetAmplitudes(_sigMan.CurrentAmplitudes);
-            for (int k = 0; k < _sliders.Count; k++) _udpPacket.Values[k] = _sliders[k].Value;
+            for (int k = 0; k < _sliders.Count; k++)
+            {
+                _udpPacket.Values[k] = _sliders[k].SelfChange ? _sliders[k].Value : float.NaN;
+            }
+            for (int k = 0; k < _sliderPanels.Count; k++)
+            {
+                _udpPacket.Active[k] = _sliderPanels[k].SelfChange ? _sliderPanels[k].IsActive : -1;
+            }
             _udpPacket.UpdateByteArray();
             _udpClient.Send(_udpPacket.ByteArray, _udpPacket.ByteArray.Length, _udpEndPoint);
         }
@@ -160,18 +168,18 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
         var groups = _sigMan.channels.Select(x => x.Name).ToList();
 
+        _sliderPanels = new List<SliderPanel>();
         _sliders = new List<ParameterSlider>();
         foreach (var g in groups)
         {
-            var addedSliders = InitializeSliderPanel(g, properties.FindAll(x => x.Channel.Equals(g)));
-            _sliders.AddRange(addedSliders);
+            var sliderPanel = InitializeSliderPanel(g, properties.FindAll(x => x.Channel.Equals(g)));
+            _sliderPanels.Add(sliderPanel);
+            _sliders.AddRange(sliderPanel.Sliders);
         }
     }
 
-    private List<ParameterSlider> InitializeSliderPanel(string name, List<ParameterSliderProperties> properties)
+    private SliderPanel InitializeSliderPanel(string name, List<ParameterSliderProperties> properties)
     {
-        var addedSliders = new List<ParameterSlider>();
-
         var panelObj = GameObject.Instantiate(_sliderPanelPrefab, _sliderArea.transform);
 
         var sliderPanel = panelObj.GetComponent<SliderPanel>();
@@ -186,14 +194,13 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
             slider.Setter = _sigMan.GetParamSetter(prop.FullParameterName);
             slider.Setter?.Invoke(prop.StartValue);
 
-            sliderPanel.AddSlider(slider.gameObject);
-            addedSliders.Add(slider);
+            sliderPanel.AddSlider(slider);
         }
 
         var flowLayout = _sliderArea.GetComponent<FlowLayout>();
         flowLayout.Add(panelObj);
 
-        return addedSliders;
+        return sliderPanel;
     }
 
     private void ApplyParameters(InteractiveSettings settings)
@@ -244,6 +251,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
             string name = parts[0];
             bool value = float.Parse(parts[1]) > 0;
             _sigMan[name].active = value;
+            _sliderPanels.Find(x => x.ChannelName == name).SetChannelActive(value);
         }
     }
 

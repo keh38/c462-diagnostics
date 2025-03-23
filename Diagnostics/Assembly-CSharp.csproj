@@ -117,7 +117,6 @@
     <Compile Include="Assets\Scripts\KLib\Signals\Gate.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Filters\IIRFilter.cs" />
     <Compile Include="Assets\Turandot\Screen\Turandot.Screen.Skin.cs" />
-    <Compile Include="Assets\Turandot\Interactive\InteractiveControl.cs" />
     <Compile Include="Assets\Turandot\Schedules\Optimizations\Turandot.Optimizations.Parameter.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.Input.cs" />
     <Compile Include="Assets\Turandot\Parameters\Turandot.Parameters.cs" />
