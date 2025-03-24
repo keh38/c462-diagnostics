@@ -88,7 +88,9 @@ namespace Turandot.Scripts
                 _sigMan.Name = name;
                 // TURANDOT FIX 
                 //_sigMan.MaxLevelMargin = maxLevelMargin;
-                //_sigMan.Initialize(transducer, AudioSettings.outputSampleRate, npts);
+                _sigMan.AdapterMap = KLib.AdapterMap.DefaultStereoMap("HD280");
+                _sigMan.Initialize(AudioSettings.outputSampleRate, npts);
+                _sigMan.StartPaused();
                 _isi = _sigMan.channels[0].gate.Period_ms / 1000f;
             }
 
@@ -132,6 +134,7 @@ namespace Turandot.Scripts
 
             if (_sigMan != null)
             {
+                _sigMan.Unpause();
                 //_sigMan.Activate(flags);
 
                 if (timeOut == 0)

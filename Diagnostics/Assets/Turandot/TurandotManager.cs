@@ -645,39 +645,39 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         //if (IPC.Instance.Use && !_params.bypassIPC && !IPC.Instance.SendCommand("Trial End", ""))
         //    throw new System.Exception("IPC error: " + IPC.Instance.LastError);
 
-        //if (_engine.FlowchartEndAction != EndAction.None)
-        //{
-        //    EndRun(_engine.FlowchartEndAction == EndAction.AbortAll);
-        //    return;
-        //}
+        if (_engine.FlowchartEndAction != EndAction.None)
+        {
+            EndRun(_engine.FlowchartEndAction == EndAction.AbortAll);
+            return;
+        }
 
-        //_SCL.RemoveAt(0);
+        _SCL.RemoveAt(0);
 
         //progressBar.value += _progressBarStep;
         //if (_usingServer && !_waitForServer && IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Progress", progressBar.value.ToString());
 
-        //if (_SCL.Count > 0)
-        //{
-        //    AdvanceSequence();
-        //}
-        //else
-        //{
-        //    _isRunning = false;
-        //    _state.SetLastBlock(_blockNum);
-        //    ++_blockNum;
+        if (_SCL.Count > 0)
+        {
+            AdvanceSequence();
+        }
+        else
+        {
+            _isRunning = false;
+            _state.SetLastBlock(_blockNum);
+            ++_blockNum;
 
-        //    if (_params.schedule.offerBreakAfter > 0 && ++_numSinceLastBreak == _params.schedule.offerBreakAfter && _blockNum < _params.schedule.numBlocks)
-        //    {
-        //        _numSinceLastBreak = 0;
-        //        _state.CanResume = true;
-        //        _state.Save();
-        //        ShowBreakInstructions(_params.schedule.breakInstructions);
-        //    }
-        //    else if (!_usingServer)
-        //    {
-        //        StartCoroutine(NextBlock());
-        //    }
-        //}
+            if (_params.schedule.offerBreakAfter > 0 && ++_numSinceLastBreak == _params.schedule.offerBreakAfter && _blockNum < _params.schedule.numBlocks)
+            {
+                _numSinceLastBreak = 0;
+                _state.CanResume = true;
+                _state.Save();
+                //ShowBreakInstructions(_params.schedule.breakInstructions);
+            }
+            else if (!_usingServer)
+            {
+                StartCoroutine(NextBlock());
+            }
+        }
     }
     /*
     void StopIPCRecording()
