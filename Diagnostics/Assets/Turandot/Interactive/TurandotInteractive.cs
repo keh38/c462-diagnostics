@@ -55,11 +55,22 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         ApplyParameters(param);
 
         InitializeSliders(param.Sliders);
-#else
-        _menuPanel.SetActive(false);
-        var rt = _titleBar.GetComponent<RectTransform>();
-        rt.anchorMin = new Vector2(0, rt.anchorMin.y);
 #endif
+        if (!string.IsNullOrEmpty(GameManager.DataForNextScene))
+        {
+            var param = FileIO.XmlDeserialize<InteractiveSettings>(FileLocations.ConfigFile(GameManager.DataForNextScene));
+            param.ShowSliders = true;
+            ApplyParameters(param);
+
+            InitializeSliders(param.Sliders);
+        }
+        else
+        {
+            _menuPanel.SetActive(false);
+            var rt = _titleBar.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0, rt.anchorMin.y);
+        }
+
     }
 
     private void Update()

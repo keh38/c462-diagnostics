@@ -47,6 +47,7 @@ public class GameManager : MonoBehaviour
     }
     public static string Subject { get { return instance._appState.subject; } }
     public static string Project { get { return instance._appState.project; } }
+    public static string DataForNextScene { get; set; }
 
     public static void SetSubject(string project, string subject) { instance._SetSubject(project, subject); }
     public static void SetSubject(string projectAndSubject)

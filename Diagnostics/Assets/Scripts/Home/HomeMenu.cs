@@ -162,15 +162,25 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 
     private void SelectItem(Button button, GameObject panel)
     {
+        ColorBlock cb;
+
         if (_activePanel != null)
         {
             _activePanel.SetActive(false);
+            cb = _activeButton.colors;
+            cb.normalColor = new Color(cb.normalColor.r, cb.normalColor.g, cb.normalColor.b, 0);
+            cb.selectedColor = cb.normalColor;
+            _activeButton.colors = cb;
         }
 
         _activePanel = panel;
         _activeButton = button;
 
         _activePanel.SetActive(true);
+        cb = _activeButton.colors;
+        cb.normalColor = new Color(cb.normalColor.r, cb.normalColor.g, cb.normalColor.b, 1);
+        cb.selectedColor = cb.normalColor;
+        _activeButton.colors = cb;
     }
 
     void IRemoteControllable.ProcessRPC(string command, string data="")

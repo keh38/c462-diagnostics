@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Linq;
+using System.IO;
 using System.Net;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -162,8 +163,8 @@ public class HTS_Server : MonoBehaviour
                 _listener.SendAcknowledgement();
                 break;
 
-
             case "ChangeScene":
+                GameManager.DataForNextScene = "";
                 _currentScene.ChangeScene(data);
                 break;
 
@@ -205,6 +206,11 @@ public class HTS_Server : MonoBehaviour
                 _listener.WriteStringAsByteArray(KLib.FileIO.XmlSerializeToString(HardwareInterface.AdapterMap));
                 break;
 
+            case "TransferFile":
+                _listener.SendAcknowledgement();
+                ReceiveFile(data);
+                break;
+
             default:
                 _listener.SendAcknowledgement(false);
                 _currentScene.ProcessRPC(command, data);
@@ -212,6 +218,17 @@ public class HTS_Server : MonoBehaviour
         }
 
         _listener.CloseTcpClient();
+    }
+
+    private void ReceiveFile(string data)
+    {
+        Debug.Log(data);
+        var parts = data.Split(new char[] { ':' }, 3);
+        for (int k = 0; k < parts.Length; k++) Debug.Log(parts[k]);
+        if (parts.Length != 3) return;
+        var folder = FileLocations.LocalResourceFolder(parts[0]);
+        var filePath = Path.Combine(folder, parts[1]);
+        File.WriteAllText(filePath, parts[2]);
     }
 
     private IPEndPoint ParseEndPoint(string address)
