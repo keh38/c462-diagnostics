@@ -159,6 +159,17 @@ namespace KLib.Signals
             Bursted = false;
         }
 
+        public List<string> GetSweepableParams()
+        {
+            if (!Active) return new List<string>();
+
+            return new List<string>()
+            {
+                "Gate.Delay_ms",
+                "Gate.Duration_ms"
+            };
+        }
+
         public List<string> GetValidParameters()
         {
             List<string> p = new List<string>();
@@ -170,6 +181,23 @@ namespace KLib.Signals
                 p.Add("Gate.Period_ms");
             }
             return p;
+        }
+
+        public Action<float> GetParamSetter(string paramName)
+        {
+            Action<float> setter = null;
+
+            switch (paramName)
+            {
+                case "Delay_ms":
+                    setter = x => { this.Delay_ms = x; UpdateProperties(); };
+                    break;
+
+                case "Duration_ms":
+                    setter = x => { this.Duration_ms = x; UpdateProperties(); };
+                    break;
+            }
+            return setter;
         }
 
         public string SetParameter(string paramName, float value)

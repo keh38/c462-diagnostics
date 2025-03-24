@@ -71,6 +71,8 @@ public class DigitimerControl : MonoBehaviour
         _d128[deviceNum].Width = (int)digitimer.Width;
         _d128[deviceNum].Recovery = (int)digitimer.Recovery;
         _d128[deviceNum].Dwell = (int)digitimer.Dwell;
+        _d128[deviceNum].Source = IntToDemandSource((int)digitimer.Source);
+        _d128[deviceNum].Demand = (int)(digitimer.Demand * 10);
         _d128[deviceNum].Enable = EnableState.Enabled;
 
         var result = _d128.SetState();
@@ -98,6 +100,15 @@ public class DigitimerControl : MonoBehaviour
             return PulsePolarity.Positive;
         }
         return PulsePolarity.Alternating;
+    }
+
+    private DemandSource IntToDemandSource(int value)
+    {
+        if (value == 1)
+        {
+            return DemandSource.External;
+        }
+        return DemandSource.Internal;
     }
 
     public bool DisableDevice(int deviceNum)

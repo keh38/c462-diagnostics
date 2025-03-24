@@ -292,9 +292,14 @@ namespace KLib.Signals
                 {
                     sp.Add(waveform.ShortName + "." + p);
                 }
-                sp.AddRange(waveform.GetSweepableParams());
                 sp.AddRange(modulation.GetSweepableParams());
-                sp.AddRange(Level.GetSweepableParams());
+                sp.AddRange(gate.GetSweepableParams());
+
+                var digitimer = waveform as Digitimer;
+                if (digitimer == null || digitimer.Source == Digitimer.DemandSource.External)
+                {
+                    sp.AddRange(Level.GetSweepableParams());
+                }
                 if (Laterality == Laterality.Binaural)
                 {
                     sp.Add("MBL");
@@ -325,8 +330,9 @@ namespace KLib.Signals
 
             switch (s[0])
             {
-                //case "Gate":
-                //    return gate.G(s[1]);
+                case "Gate":
+                    setter = gate.GetParamSetter(s[1]);
+                    break;
 
                 case "Mod":
                 case "SAM":
@@ -537,6 +543,13 @@ namespace KLib.Signals
                 _nptsPerInterval = gate.Active ? Mathf.RoundToInt(Fs * gate.Period_ms / 1000) : -1;
 
                 location = "level";
+                var digitimer = waveform as Digitimer;
+                if (digitimer != null && digitimer.Source == Digitimer.DemandSource.Internal)
+                {
+                    level.Units = LevelUnits.Volts;
+                    level.Value = 1;
+                }
+
                 level.Initialize(MyEndpoint, Vmax);
 
                 _rampState = RampState.Off;

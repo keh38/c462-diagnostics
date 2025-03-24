@@ -17,9 +17,13 @@ namespace KLib.Signals.Calibration
             CalibrationData result = null;
             AcousticCalibration acal = null;
 
-            if (refMode == LevelUnits.dB_attenuation || refMode == LevelUnits.Volts)
+            if (refMode == LevelUnits.dB_attenuation)
             {
                 return CalibrationData.Create_dBAtten();
+            }
+            else if (refMode == LevelUnits.Volts)
+            {
+                return CalibrationData.Create_Volts();
             }
             else if (refMode == LevelUnits.dB_Vrms)
             {

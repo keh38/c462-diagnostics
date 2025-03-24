@@ -35,7 +35,6 @@ public class SliderPanel : MonoBehaviour
     {
         if (_ignoreEvents) return;
 
-        Debug.Log("get fucked");
         Setter?.Invoke(!isPressed);
         IsActive = isPressed ? 0 : 1;
         SelfChange = true;

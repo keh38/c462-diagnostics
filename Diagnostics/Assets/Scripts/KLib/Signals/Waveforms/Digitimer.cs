@@ -15,6 +15,8 @@ namespace KLib.Signals.Waveforms
     [JsonObject(MemberSerialization.OptIn)]
     public class Digitimer : Waveform
     {
+        public enum DemandSource { Internal, External};
+
         [ProtoMember(1, IsRequired = true)]
         [JsonProperty]
         public float PulseRate_Hz;
@@ -39,6 +41,14 @@ namespace KLib.Signals.Waveforms
         [JsonProperty]
         public float Dwell;
 
+        [ProtoMember(7, IsRequired = true)]
+        [JsonProperty]
+        public DemandSource Source;
+
+        [ProtoMember(7, IsRequired = true)]
+        [JsonProperty]
+        public float Demand;
+
         private float _pulseCarrierFreq = 1000;
         private float[] _pulse;
         private int _nptsPeriod;
@@ -58,6 +68,8 @@ namespace KLib.Signals.Waveforms
             Width = 200;
             Recovery = 100;
             Dwell = 1;
+            Demand = 0;
+            Source = DemandSource.Internal;
 
             shape = Waveshape.Digitimer;
             _shortName = "Digitimer";
@@ -66,21 +78,31 @@ namespace KLib.Signals.Waveforms
 
         public override List<string> GetSweepableParams()
         {
-            return new List<string>();
+            var items = new List<string>()
+            {
+                "PulseRate_Hz"
+            };
+
+            if (Source == DemandSource.Internal)
+            {
+                items.Add("Demand_mA");
+            }
+            return items;
         }
 
         override public Action<float> GetParamSetter(string paramName)
         {
             Action<float> setter = null;
-            //switch (paramName)
-            //{
-            //    case "Frequency":
-            //        setter = x => this.Frequency_Hz = x;
-            //        break;
-            //    case "Phase":
-            //        setter = x => this.Phase_cycles = x;
-            //        break;
-            //}
+            switch (paramName)
+            {
+                case "PulseRate_Hz":
+                    setter = x => { this.PulseRate_Hz = x; _nptsPeriod = Mathf.RoundToInt(1 / (dt * PulseRate_Hz)); };
+
+                    break;
+                case "Demand_mA":
+                    setter = x => this.Demand = x;
+                    break;
+            }
 
             return setter;
         }

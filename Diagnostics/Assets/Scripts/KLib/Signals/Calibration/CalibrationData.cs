@@ -100,6 +100,20 @@ namespace KLib.Signals.Calibration
             return c;
         }
 
+        public static CalibrationData Create_Volts()
+        {
+            var c = new CalibrationData();
+            c.type = LevelUnits.Volts;
+            c.reference = 1;
+            c.df_Hz = 0;
+
+            c.dBref_per_1Vpeak = new float[] { 20 * Mathf.Log10(c.reference) };
+            c.V_of_ref = new float[] { 1 };
+            c.dBMax_per_1Vpeak = new float[] { 20 * Mathf.Log10(c.reference) };
+
+            return c;
+        }
+
         public static CalibrationData Create_mA(float currentLimit)
         {
             var c = new CalibrationData();
