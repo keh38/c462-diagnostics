@@ -1,7 +1,12 @@
-﻿namespace Turandot.Screen
+﻿using System.Collections.Generic;
+
+using Turandot.Cues;
+
+namespace Turandot.Screen
 {
     public class ScreenElements
     {
+        public List<CueLayout> Cues { get; set; }
         public FixationPoint fixationPoint = new FixationPoint();
         public Counter counter = new Counter();
         public Scoreboard scoreboard = new Scoreboard();
@@ -15,6 +20,9 @@
 
         public AvailableCues cues = new AvailableCues();
         public AvailableInputs inputs = new AvailableInputs();
-        public ScreenElements() { }
+        public ScreenElements()
+        {
+            Cues = new List<CueLayout>();
+        }
     }
 }

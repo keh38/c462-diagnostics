@@ -95,7 +95,6 @@
     <Compile Include="Assets\Turandot\Parameters\Turandot.Flag.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.Variable.cs" />
     <Compile Include="Assets\Turandot\Screen\Turandot.Screen.ProgressBarLayout.cs" />
-    <Compile Include="Assets\Turandot\Scripts\TurandotUI.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\MenuButtonStyle.cs" />
     <Compile Include="Assets\Turandot\Parameters\Turandot.Timeout.cs" />
     <Compile Include="Assets\Scripts\Game Management\FileLocations.cs" />
@@ -166,7 +165,6 @@
     <Compile Include="Assets\Scripts\Admin Tools\OneDrivePanel.cs" />
     <Compile Include="Assets\Turandot\Interactive\InteractiveSettings.cs" />
     <Compile Include="Assets\Turandot\Cues\Turandot.Cues.Help.cs" />
-    <Compile Include="Assets\Turandot\Scripts\TurandotServer.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Audiograms\Audiograms.Ear.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotInputMonitor.cs" />
     <Compile Include="Assets\Unity UI Controls\Scripts\_Demo Scripts\DemoListBox.cs" />
@@ -283,6 +281,8 @@
     <Compile Include="Assets\Scripts\Menu Tools\MenuBarControl.cs" />
     <Compile Include="Assets\Turandot\Schedules\Optimizations\Turandot.Optimizations.Optimization.cs" />
     <Compile Include="Assets\Scripts\Home\SubjectPanel.cs" />
+    <Compile Include="Assets\Turandot\Scripts\InstructionPanel.cs" />
+    <Compile Include="Assets\Turandot\Cues\Turandot.Cues.CueLayout.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

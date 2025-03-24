@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Xml.Serialization;
 
 using Newtonsoft.Json;
@@ -20,8 +21,19 @@ namespace Turandot.Cues
     public class Cue
     {
         public int color = 0xFFFFFF;
-        public bool startVisible = true;
-        public bool endVisible = false;
+
+        [Category("Action")]
+        public bool StartVisible { get; set; }
+        private bool ShouldSerializeStartVisible() { return false; }
+
+        [Category("Action")]
+        public bool EndVisible { get; set; }
+        private bool ShouldSerializeEndVisible() { return false; }
+
+        [ReadOnly(true)]
+        public string Target { get; set; }
+        //private bool ShouldSerializeTarget() { return false; }
+
         public float delay_ms = 0f;
         public float duration_ms = 200f;
         public float interval_ms = 500f;

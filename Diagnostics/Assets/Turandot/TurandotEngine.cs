@@ -12,7 +12,9 @@ using Turandot.Scripts;
 public class TurandotEngine : MonoBehaviour
 {
     public TurandotInputMonitor inputMonitor;
-    public TurandotCueController cueController;
+    [SerializeField] private TurandotCueController _cueController;
+    [SerializeField] private GameObject _audioPrefab;
+    [SerializeField] private GameObject _audioDummyPrefab;
 
     Parameters _params;
 
@@ -30,19 +32,14 @@ public class TurandotEngine : MonoBehaviour
 
     bool _actionInProgress;
 
-    GameObject _dummyAudioPlayer;
-    GameObject _dummyAudioPlayerNoSource;
-
     List<TurandotAudio> _audio = new List<TurandotAudio>();
-    // TURANDOT FIX 
-    //KEventDelegate _onFinished = null;
-    //VolumeManager _volumeManager;
+
+    public delegate void FlowchartFinishedDelegate();
+    public FlowchartFinishedDelegate FlowchartFinished;
+    private void OnFlowchartFinished() { FlowchartFinished?.Invoke(); }
 
     void Awake()
     {
-        _dummyAudioPlayer = GameObject.Find("DummyAudioPlayer");
-        _dummyAudioPlayerNoSource = GameObject.Find("NoSourceAudioPlayer");
-        //_volumeManager = new VolumeManager();
     }
 
     //public KEventDelegate OnFinished
@@ -67,14 +64,8 @@ public class TurandotEngine : MonoBehaviour
 
     public void ClearScreen()
     {
-        inputMonitor.ClearScreen();
-        cueController.ClearScreen();
-    }
-
-    public void ApplySkin(Skin skin)
-    {
-        inputMonitor.ApplySkin(skin);
-        cueController.ApplySkin(skin);
+        //inputMonitor.ClearScreen();
+        _cueController.ClearScreen();
     }
 
     public void ShowInputs(bool show)
@@ -82,20 +73,20 @@ public class TurandotEngine : MonoBehaviour
         inputMonitor.ShowDefaultInputs(show);
     }
 
-    public void Initialize(Parameters par, string transducer, float maxLevelMargin)
+    public void Initialize(Parameters par)//, string transducer, float maxLevelMargin)
     {
         _log = new History();
         _params = par;
         _currentFlowElement = null;
         _actionInProgress = false;
 
-        CreateAudioPlayers(transducer, maxLevelMargin);
+        CreateAudioPlayers();
         //inputMonitor.OnEventChanged = OnInputEventChanged;
-        inputMonitor.Initialize(_params.screen, _params.buttons, _params.inputEvents, _params.InputsUsed);
-        cueController.Initialize(_params.screen, _params.CuesUsed);
+        //inputMonitor.Initialize(_params.screen, _params.buttons, _params.inputEvents, _params.InputsUsed);
+        _cueController.Initialize(_params.screen, _params.CuesUsed);
     }
 
-    void CreateAudioPlayers(string transducer, float maxLevelMargin)
+    void CreateAudioPlayers()
     {
         foreach (TurandotAudio a in _audio)
         {
@@ -105,15 +96,14 @@ public class TurandotEngine : MonoBehaviour
 
         foreach (FlowElement fe in _params.flowChart)
         {
-            GameObject o = GameObject.Instantiate(fe.sigMan != null ? _dummyAudioPlayer : _dummyAudioPlayerNoSource);
+            GameObject o = GameObject.Instantiate(fe.sigMan != null ? _audioPrefab : _audioDummyPrefab);
             o.name = fe.name;
-            o.transform.parent = _dummyAudioPlayer.transform.parent;
+            o.transform.parent = _audioPrefab.transform.parent;
 
             TurandotAudio a = o.GetComponent<TurandotAudio>();
             a.name = fe.name;
-            // TURANDOT FIX 
-            //a.OnTimeOut = OnStateTimeout;
-            //a.Initialize(fe.sigMan, transducer, maxLevelMargin);
+            a.TimeOut = OnStateTimeout;
+            a.Initialize(fe.sigMan);
             //if (fe.isAction)
             //{
             //    a.OnTimeOut = EndActionAudio;
@@ -148,9 +138,9 @@ public class TurandotEngine : MonoBehaviour
             a.ClearLog();
         }
 
-        inputMonitor.StartMonitor(flags);
-        cueController.ClearLog();
-        cueController.SetFlags(flags);
+        //inputMonitor.StartMonitor(flags);
+        _cueController.ClearLog();
+        _cueController.SetFlags(flags);
 
         yield return null; // the shit above takes time, first state time stamp will not be accurate without this
 
@@ -166,11 +156,11 @@ public class TurandotEngine : MonoBehaviour
     {
         ClearScreen();
 
-        cueController.Initialize(par.screen, par.CuesUsed);
+        _cueController.Initialize(par.screen, par.CuesUsed);
         //inputMonitor.Initialize(par.screen, par.buttons, par.inputEvents, par.InputsUsed);
 
         //inputMonitor.Activate(par[state].inputs, null, 0);
-        cueController.Activate(par[state].cues);
+        _cueController.Activate(par[state].cues);
     }
 
 #if KDEBUG
@@ -213,17 +203,16 @@ public class TurandotEngine : MonoBehaviour
         {
             _log.Add(Time.timeSinceLevelLoad, HistoryEvent.EndTrial);
 
-            inputMonitor.StopMonitor();
-            if (_params.trialLogOption != TrialLogOption.None) WriteLogFile();
+            //inputMonitor.StopMonitor();
+            //if (_params.trialLogOption != TrialLogOption.None) WriteLogFile();
 
 #if KDEBUG
             _endAction = EndAction.None;
 #else
             _endAction = _currentFlowElement.endAction;
 #endif
-
-            //TURANDOT FIX _onFinished();
-        }
+            OnFlowchartFinished();
+       }
         else
         {
             _currentFlowElement = _params.flowChart.Find(fe => fe.name == nextState);
@@ -243,9 +232,9 @@ public class TurandotEngine : MonoBehaviour
 
             _log.Add(Time.timeSinceLevelLoad, HistoryEvent.StartState, _currentFlowElement.name);
 
-            cueController.Activate(_currentFlowElement.cues);
-            inputMonitor.Activate(_currentFlowElement.inputs, a, timeOut);
-            inputMonitor.PollEvents();
+            _cueController.Activate(_currentFlowElement.cues);
+            //inputMonitor.Activate(_currentFlowElement.inputs, a, timeOut);
+            //inputMonitor.PollEvents();
         }
     }
     // TURANDOT FIX 
@@ -275,7 +264,7 @@ public class TurandotEngine : MonoBehaviour
 //        if (IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Action", name);
 
         FlowElement actionState = _params.flowChart.Find(fe => fe.name == name);
-        cueController.Activate(actionState.cues);
+        _cueController.Activate(actionState.cues);
 
         var a = _audio.Find(o => o.name == actionState.name);
         inputMonitor.Activate(actionState.inputs, a, 0);
@@ -319,7 +308,7 @@ public class TurandotEngine : MonoBehaviour
         WriteLogFile();
         inputMonitor.StopMonitor();
         inputMonitor.Deactivate();
-        cueController.Deactivate();
+        _cueController.Deactivate();
     }
 
     void OnStateTimeout(string source)
@@ -346,8 +335,8 @@ public class TurandotEngine : MonoBehaviour
 
             _log.Add(Time.timeSinceLevelLoad, HistoryEvent.EndState, _stateEndReason);
 
-            cueController.Deactivate();
-            inputMonitor.Deactivate();
+            _cueController.Deactivate();
+            //inputMonitor.Deactivate();
             NextState(linkTo);
         }
     }
@@ -386,7 +375,7 @@ public class TurandotEngine : MonoBehaviour
 
             if (term.action == TerminationAction.EndImmediately && !nextIsAction)
             {
-                cueController.Deactivate();
+                _cueController.Deactivate();
                 inputMonitor.Deactivate();
                 _audio.Find(a => a.name == _currentFlowElement.name).KillAudio();
                 _log.Add(Time.timeSinceLevelLoad, HistoryEvent.EndState, _stateEndReason);
@@ -437,11 +426,11 @@ public class TurandotEngine : MonoBehaviour
         }
         if (result.ToLower().Contains("{score}"))
         {
-            expanded = expanded.Replace("{score}", "score=" + cueController.counter.Count + ";");
+            expanded = expanded.Replace("{score}", "score=" + _cueController.counter.Count + ";");
         }
         if (result.ToLower().Contains("{-score}"))
         {
-            expanded = expanded.Replace("{-score}", "score=" + (-cueController.counter.Count).ToString() + ";");
+            expanded = expanded.Replace("{-score}", "score=" + (-_cueController.counter.Count).ToString() + ";");
         }
         if (result.ToLower().Contains("{trace}"))
         {
@@ -534,7 +523,7 @@ public class TurandotEngine : MonoBehaviour
         string json = KLib.FileIO.JSONStringAdd("", "history", KLib.FileIO.JSONSerializeToString(_log));
         json = KLib.FileIO.JSONStringAdd(json, "events", inputMonitor.EventLogJSONString);
 
-        string cueJson = cueController.LogJSONString;
+        string cueJson = _cueController.LogJSONString;
         if (!string.IsNullOrEmpty(cueJson))
             json = KLib.FileIO.JSONStringAdd(json, "cues", cueJson);
 

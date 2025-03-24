@@ -10,14 +10,16 @@ namespace Turandot.Scripts
 {
     public class TurandotCueMessage : TurandotCue
     {
-        public Text label;
-        //public UISprite sprite;
+        [SerializeField] private Text _label;
 
         private MessageLayout _layout = new MessageLayout();
+
+        public override string Name { get { return _layout.Name; } }
 
         public void Initialize(MessageLayout layout)
         {
             _layout = layout;
+            LayoutControl();
 
             base.Initialize();
         }
@@ -25,7 +27,7 @@ namespace Turandot.Scripts
         public void ActivateMessage(Cue cue, List<Flag> flags)
         {
             Message m = cue as Message;
-            label.text = SubstituteFlags(m.text, flags);
+            _label.text = SubstituteFlags(m.Text, flags);
             ChangeAppearance(m);
 
             base.Activate(cue);
@@ -33,12 +35,20 @@ namespace Turandot.Scripts
 
         override public void Activate(Cue cue)
         {
+            Debug.Log("here i am");
             Message m = cue as Message;
 
-            label.text = m.text;
-            ChangeAppearance(m);
+            _label.text = m.Text;
+            //ChangeAppearance(m);
 
             base.Activate(cue);
+        }
+
+        private void LayoutControl()
+        {
+            _label.fontSize = _layout.FontSize;
+            var rt = GetComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(_layout.X, _layout.Y);
         }
 
         private void ChangeAppearance(Message m)
@@ -88,12 +98,7 @@ namespace Turandot.Scripts
 
         public void Append(string text)
         {
-            label.text += text;
-        }
-
-        public void ApplySkin(Skin skin)
-        {
-            label.color = skin.messageColor;
+            _label.text += text;
         }
 
     }

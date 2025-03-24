@@ -3,11 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-#if UNITY_METRO && !UNITY_EDITOR
-using LegacySystem.IO;
-#else
 using System.IO;
-#endif
 using System.Text.RegularExpressions;
 
 using KLib.Signals.Waveforms;
@@ -16,20 +12,14 @@ using Turandot.Schedules;
 using Turandot.Scripts;
 using Turandot.Screen;
 
-public class TurandotManager : MonoBehaviour
+public class TurandotManager : MonoBehaviour, IRemoteControllable
 {
-    // TURANDOT FIX
-    /*
-    public Camera sceneCamera;
-    public TurandotCueMessage prompt;
+    [SerializeField] private TurandotEngine _engine;
+    [SerializeField] private InstructionPanel _instructionPanel;
+
     //public UIProgressBar progressBar;
-    //public DiagnosticsUI diagnosticsUI;
-    public TurandotServer server;
 
     Parameters _params = new Parameters();
-
-    Turandot.Cues.Message _message;
-    TurandotEngine _engine;
 
     TurandotState _state = null;
     List<SCLElement> _SCL = new List<SCLElement>();
@@ -64,20 +54,17 @@ public class TurandotManager : MonoBehaviour
 
     List<string> _synonymsForCorrect = new List<string>(new string[] { "hit", "withhold", "go", "right", "correct" });
 
-    Skin _skin = Skin.DefaultSkin;
-    VolumeManager _volumeManager;
-
     void Awake()
     {
-        Application.RegisterLogCallback(HandleException);
+        //Application.RegisterLogCallback(HandleException);
     }
 
     void OnDestroy()
     {
-        Application.RegisterLogCallback(null);
+        //Application.logMessageReceived
     }
-
-    public string MainDataFile { get { return _mainDataFile; } }
+    
+    //public string MainDataFile { get { return _mainDataFile; } }
 
     void Start()
     {
@@ -86,131 +73,89 @@ public class TurandotManager : MonoBehaviour
         //string configName = "RI-VAS";
         string configName = "TServer";
         //DiagnosticsManager.Instance.MakeExtracurricular("Turandot", "Turandot." + configName);
-        //IPC.Instance.Use = false;
 #else
-        string configName = DiagnosticsManager.Instance.SettingsFile;
+        //string configName = DiagnosticsManager.Instance.SettingsFile;
+        GameManager.SetSubject("Scratch", "_Ken");
+        string configName = "Test";
 #endif
-
-        _volumeManager = new VolumeManager();
-
-        if (PupillometerSettings.Restore().Use)
-        {
-            _skin = Skin.PupilSkin;
-            float intensity = SubjectManager.Instance.ScreenIntensity;
-            _skin.screenColor = new Color(intensity, intensity, intensity);
-        }
-
-        diagnosticsUI.EnableHomeButton(false);
-        diagnosticsUI.SetHelpBoxBackground(_skin.helpBackgroundColor);
 
         _engine = GetComponent<TurandotEngine>();
         _engine.ClearScreen();
-        _engine.ApplySkin(_skin);
-
-        _message = new Turandot.Cues.Message();
-        _message.duration_ms = 200;
-        _message.interval_ms = 500;
-        _message.numFlash = 4;
-        _message.startVisible = true;
-        prompt.Initialize();
-
-        AudioSettings.outputSampleRate = KLib.Unity.AudioSampleRate();
-        AudioSettings.SetDSPBufferSize(1024, 4);
-#if !CONFIG_HACK
-        //_volumeManager.SetMasterVolume(1f, VolumeManager.VolumeUnit.Scalar);
-#endif
 
         _isScripted = (GameObject.Find("TurandotScripter") != null);
 
-        sceneCamera.backgroundColor = _skin.screenColor;
-        prompt.ApplySkin(_skin);
-
-        KLib.Expressions.Metrics = SubjectManager.Instance.Metrics;
+        //KLib.Expressions.Metrics = SubjectManager.Instance.Metrics;
         KLib.Expressions.Audiogram = Audiograms.AudiogramData.Load();
-        var ldl = Audiograms.AudiogramData.Load(DataFileLocations.LDLPath);
-        if (ldl != null) ldl.ReplaceNaNWithMax(SubjectManager.Instance.Transducer);
+        var ldl = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
+        if (ldl != null) ldl.ReplaceNaNWithMax(GameManager.Transducer);
         KLib.Expressions.LDL = ldl;
 
-        if (configName.Contains("TServer"))
-        {
-            _usingServer = true;
-            server.StartServer();
-            return;
-//            yield break;
-        }
-
-        if (IPC.Instance.Use && !_params.bypassIPC)
-        {
-  //          yield return null;
-            if (!IPC.Instance.Ping())
-            {
-                HandleError("Error connecting to IPC interface.");
-                return;
-//                yield break;
-            }
-        }
-
         string localName = "";
-        if (!_isScripted && configName.Contains("TScript."))
-        {
-            TurandotScripter.Instance.Initialize(DataFileLocations.ConfigFile(configName));
-            _isScripted = true;
-        }
+        //if (!_isScripted && configName.Contains("TScript."))
+        //{
+        //    TurandotScripter.Instance.Initialize(DataFileLocations.ConfigFile(configName));
+        //    _isScripted = true;
+        //}
 
-        if (_isScripted)
+        //if (_isScripted)
+        //{
+        //    _params = TurandotScripter.Instance.Next();
+        //    localName = TurandotScripter.Instance.ParamFile;
+        //}
+        //else
         {
-            _params = TurandotScripter.Instance.Next();
-            localName = TurandotScripter.Instance.ParamFile;
-        }
-        else
-        {
-            localName = DataFileLocations.ConfigFile("Turandot", configName);
+            localName = FileLocations.ConfigFile("Turandot", configName);
             _params = KLib.FileIO.XmlDeserialize<Parameters>(localName);
         }
 
-        _paramFile = System.IO.Path.GetFileName(localName);
+        _paramFile = Path.GetFileName(localName);
         _params.CheckParameters();
-        _params.ApplyDefaultWavFolder(SubjectManager.Instance.Project);
+        _params.ApplyDefaultWavFolder(GameManager.Project);
 
-        try
+        //try
         {
-            _engine.Initialize(_params, SubjectManager.Instance.Transducer, SubjectManager.Instance.MaxLevelMargin);
+            _engine.Initialize(_params);//, SubjectManager.Instance.Transducer, SubjectManager.Instance.MaxLevelMargin);
         }
-        catch (Exception ex)
-        {
-            HandleException(ex.Message, ex.StackTrace, LogType.Exception);
-            return;
-        }
+        //catch (Exception ex)
+        //{
+        //    //HandleException(ex.Message, ex.StackTrace, LogType.Exception);
+        //    return;
+        //}
 
-        _state = new TurandotState(SubjectManager.Instance.Project, SubjectManager.CurrentSubject, configName);
+        _state = new TurandotState(GameManager.Project, GameManager.Subject, configName);
 
-        if (_state.IsRunInProgress())
+        //if (_state.IsRunInProgress())
+        //{
+        ////    StartCoroutine(AskToResume());
+        //}
+        if (!string.IsNullOrEmpty(_params.instructions.Text))
         {
-            StartCoroutine(AskToResume());
-        }
-        else if (_params.instructions.pages.Count > 0)
-        {
-            StartCoroutine(ShowInstructions());
+            //StartCoroutine(ShowInstructions());
         }
         else
         {
-            StartRun();
+            //StartRun();
         }
+        StartRun();
     }
-
+    
     IEnumerator ShowInstructions()
     {
-        if (IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Instructions", "started");
+        //if (IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Instructions", "started");
 
         yield return new WaitForSeconds(1);
 
-        diagnosticsUI.transform.position = new Vector2(0, 0);
-        diagnosticsUI.SetHelpBalloonSize(1750, 800);
-        diagnosticsUI.SetHelpBalloonPosition(new Vector3(0, 100, 0));
-        diagnosticsUI.SetHelpBalloonAlpha(0.85f);
-        diagnosticsUI.ShowInstructions(_params.instructions.pages, StartRun);
+        _instructionPanel.gameObject.SetActive(true);
+        _instructionPanel.InstructionsFinished = OnInstructionsFinished;
+        _instructionPanel.ShowInstructions(_params.instructions);
+    }
+    private void OnInstructionsFinished()
+    {
+        _instructionPanel.gameObject.SetActive(false);
+        StartRun();
     }
 
+    /*
     void ShowMorePracticeInstructions()
     {
         diagnosticsUI.transform.position = new Vector2(0, 0);
@@ -318,23 +263,22 @@ public class TurandotManager : MonoBehaviour
         }
         NextBlock();
     }
-
+    */
     void StartRun()
     {
-        if (IPC.Instance.Use && !_params.bypassIPC && _params.instructions.pages.Count > 0) IPC.Instance.SendCommand("Instructions", "finished");
+        //if (IPC.Instance.Use && !_params.bypassIPC && _params.instructions.pages.Count > 0) IPC.Instance.SendCommand("Instructions", "finished");
 
-        if (_params.flowChart.Count == 0) 
-            Return();
-        else
-            StartCoroutine(StartRunAsync());
+        //if (_params.flowChart.Count == 0) 
+        //    Return();
+        //else
+        StartCoroutine(StartRunAsync());
     }
 
     IEnumerator StartRunAsync()
     {
         _params.Initialize();
-        diagnosticsUI.transform.position = new Vector2(-2200, 0);
 
-        InitDataFile();
+        //InitDataFile();
         _blockNum = 0;
         _nominalNumBlocks = _params.schedule.numBlocks;
         _numSinceLastBreak = 0;
@@ -346,81 +290,52 @@ public class TurandotManager : MonoBehaviour
         //if (!_usingServer || _waitForServer)
         {
             _state.SetMasterSCL(_params.schedule.CreateStimConList());
-            string localName = KLib.FileIO.CombinePaths(Application.persistentDataPath, "scldump.json");
-            KLib.FileIO.WriteTextFile(localName, KLib.FileIO.JSONSerializeToString(_state.MasterSCL));
-        }
-
-        if (IPC.Instance.Use && !_usingServer && !_params.bypassIPC)
-        {
-            _message.text = "Starting...";
-            _message.numFlash = 0;
-            prompt.Activate(_message);
-            yield return null;
-            yield return new WaitForSeconds(1);
-            _message.numFlash = 4;
-
-            StartIPCRecording();
-
-            prompt.Deactivate();
-            yield return null;
+            string localName = Path.Combine(Application.persistentDataPath, "scldump.json");
+            File.WriteAllText(localName, KLib.FileIO.JSONSerializeToString(_state.MasterSCL));
         }
 
         if (_params.schedule.mode == Mode.Sequence || _params.schedule.mode == Mode.CS)
         {
             _results.Clear();
-            _engine.OnFinished = OnFlowchartFinished;
+            _engine.FlowchartFinished = OnFlowchartFinished;
 
-            if (!(_usingServer && _waitForServer))
-            {
-                StartCoroutine(NextBlock());
-            }
-            else
-            {
-                Debug.Log("sending ready");
-                if (IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Ready");
-            }
+            StartCoroutine(NextBlock());
         }
-        else if (_params.schedule.mode == Mode.Adapt) // Adaptation
-        {
-            _engine.OnFinished = OnAdaptFlowchartFinished;
-            _params.adapt.Initialize();
-            InitializeProgressBar(_params.adapt.MaxNumberOfBlocks);
-            NextBlockOfTracks();
-        }
-        else if (_params.schedule.mode == Mode.Optimize) // Adaptation
-        {
-            _engine.OnFinished = OnOptimizationFlowchartFinished;
-            _params.optimization.Initialize();
-            InitializeProgressBar(_params.optimization.MaxNumberOfTrials);
-            StartOptimization();
-        }
+        //else if (_params.schedule.mode == Mode.Adapt) // Adaptation
+        //{
+        //    _engine.OnFinished = OnAdaptFlowchartFinished;
+        //    _params.adapt.Initialize();
+        //    InitializeProgressBar(_params.adapt.MaxNumberOfBlocks);
+        //    NextBlockOfTracks();
+        //}
+        yield break;
     }
-
+    /*
     public void InitializeProgressBar(int numSteps)
     {
         progressBar.numberOfSteps = numSteps + 1;
         _progressBarStep = 1f / progressBar.numberOfSteps;
         progressBar.value = 0;
     }
-
+    */
     IEnumerator NextBlock()
     {
 #if !KDEBUG
-        if (_params.schedule.training && _blockNum == _params.schedule.numBlocks && (_blockNum < _params.schedule.maxPracticeBlocks || _params.schedule.maxPracticeBlocks < 0))
-        {
-            yield return StartCoroutine(CheckIsTrainingPerformanceOK());
-            if (!_performanceOK)
-            {
-                progressBar.value = 0;
+        //if (_params.schedule.training && _blockNum == _params.schedule.numBlocks && (_blockNum < _params.schedule.maxPracticeBlocks || _params.schedule.maxPracticeBlocks < 0))
+        //{
+        //    yield return StartCoroutine(CheckIsTrainingPerformanceOK());
+        //    if (!_performanceOK)
+        //    {
+        //        progressBar.value = 0;
 
-                _params.schedule.numBlocks += _nominalNumBlocks;
-                _params.schedule.AppendNewStimConList(_state.MasterSCL, _nominalNumBlocks);
-                _state.Save();
+        //        _params.schedule.numBlocks += _nominalNumBlocks;
+        //        _params.schedule.AppendNewStimConList(_state.MasterSCL, _nominalNumBlocks);
+        //        _state.Save();
 
-                ShowMorePracticeInstructions();
-                yield break;
-            }
-    }
+        //        ShowMorePracticeInstructions();
+        //        yield break;
+        //    }
+        // }
 #else
         yield return null;
 #endif
@@ -428,106 +343,108 @@ public class TurandotManager : MonoBehaviour
         if (_blockNum < _params.schedule.numBlocks)
         {
             _SCL = _state.MasterSCL.FindAll(o => o.block == _blockNum + 1);
-            string localName = KLib.FileIO.CombinePaths(Application.persistentDataPath, "scldump.json");
-            KLib.FileIO.WriteTextFile(localName, KLib.FileIO.JSONSerializeToString(_SCL));
+            string localName = Path.Combine(Application.persistentDataPath, "scldump.json");
+            File.WriteAllText(localName, KLib.FileIO.JSONSerializeToString(_SCL));
 
             if (_blockNum == 0)
             {
-                InitializeProgressBar(_params.schedule.numBlocks * _SCL.Count);
+                //InitializeProgressBar(_params.schedule.numBlocks * _SCL.Count);
             }
 
             _isRunning = true;
             AdvanceSequence();
         }
         else EndRun(false);
+        yield break;
     }
 
     private void EndRun(bool abort)
     {
-        if (_params.schedule.mode != Mode.Adapt) StoreResults();
+        //if (_params.schedule.mode != Mode.Adapt) StoreResults();
 
         //_audioTimer.StopThread();
 
         if (_usingServer)
         {
             _engine.ClearScreen();
-            if (!_waitForServer && IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Run", "finished");
+            //if (!_waitForServer && IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Run", "finished");
         }
         else
         {
             _engine.ClearScreen();
 
-            StopIPCRecording();
+            //StopIPCRecording();
 
             //_engine.WriteAudioLogFile(_mainDataFile.Replace(".json", ".audio.json"));
-            if (SubjectManager.Instance.UploadData) DataFileManager.UploadDataFile(_mainDataFile);
-            SubjectManager.Instance.DataFiles.Add(_mainDataFile);
+            //if (SubjectManager.Instance.UploadData) DataFileManager.UploadDataFile(_mainDataFile);
+            //SubjectManager.Instance.DataFiles.Add(_mainDataFile);
 
             _state.Finish();
 
             bool finished = true;
-            if (_isScripted)
-            {
-                TurandotScripter.Instance.Advance();
-                finished = TurandotScripter.Instance.IsFinished;
+            //if (_isScripted)
+            //{
+            //    TurandotScripter.Instance.Advance();
+            //    finished = TurandotScripter.Instance.IsFinished;
 
-                if (finished)
-                {
-                    string linkTo = TurandotScripter.Instance.LinkTo;
+            //    if (finished)
+            //    {
+            //        string linkTo = TurandotScripter.Instance.LinkTo;
 
-                    GameObject.Destroy(GameObject.Find("TurandotScripter"));
-                    if (!string.IsNullOrEmpty(linkTo))
-                    {
-                        finished = false;
-                        if (DiagnosticsManager.Instance.IsExtraCurricular)
-                            DiagnosticsManager.Instance.MakeExtracurricular("Turandot", System.IO.Path.GetFileNameWithoutExtension(linkTo).Replace("Turandot.", ""));
-                        else
-                            DiagnosticsManager.Instance.SettingsFile = System.IO.Path.GetFileNameWithoutExtension(linkTo).Replace("Turandot.", "");
+            //        GameObject.Destroy(GameObject.Find("TurandotScripter"));
+            //        if (!string.IsNullOrEmpty(linkTo))
+            //        {
+            //            finished = false;
+            //            if (DiagnosticsManager.Instance.IsExtraCurricular)
+            //                DiagnosticsManager.Instance.MakeExtracurricular("Turandot", System.IO.Path.GetFileNameWithoutExtension(linkTo).Replace("Turandot.", ""));
+            //            else
+            //                DiagnosticsManager.Instance.SettingsFile = System.IO.Path.GetFileNameWithoutExtension(linkTo).Replace("Turandot.", "");
 
-                        Application.LoadLevel("Turandot");
-                    }
-                }
-                else
-                {
-                    Application.LoadLevel("Turandot");
-                }
-            }
-            else if (!string.IsNullOrEmpty(_params.linkTo) && !abort)
-            {
-                finished = false;
-                if (_params.linkTo.Equals("return"))
-                {
-                    DiagnosticsManager.Instance.AdvanceProtocol();
-                    Return();
-                }
-                else
-                {
-                    if (DiagnosticsManager.Instance.IsExtraCurricular)
-                        DiagnosticsManager.Instance.MakeExtracurricular("Turandot", System.IO.Path.GetFileNameWithoutExtension(_params.linkTo).Replace("Turandot.", ""), DiagnosticsManager.Instance.ReturnToScene);
-                    else
-                        DiagnosticsManager.Instance.SettingsFile = System.IO.Path.GetFileNameWithoutExtension(_params.linkTo).Replace("Turandot.", "");
-                    Application.LoadLevel("Turandot");
-                }
-            }
+            //            Application.LoadLevel("Turandot");
+            //        }
+            //    }
+            //    else
+            //    {
+            //        Application.LoadLevel("Turandot");
+            //    }
+            //}
+            //else if (!string.IsNullOrEmpty(_params.linkTo) && !abort)
+            //{
+            //    finished = false;
+            //    if (_params.linkTo.Equals("return"))
+            //    {
+            //        DiagnosticsManager.Instance.AdvanceProtocol();
+            //        Return();
+            //    }
+            //    else
+            //    {
+            //        if (DiagnosticsManager.Instance.IsExtraCurricular)
+            //            DiagnosticsManager.Instance.MakeExtracurricular("Turandot", System.IO.Path.GetFileNameWithoutExtension(_params.linkTo).Replace("Turandot.", ""), DiagnosticsManager.Instance.ReturnToScene);
+            //        else
+            //            DiagnosticsManager.Instance.SettingsFile = System.IO.Path.GetFileNameWithoutExtension(_params.linkTo).Replace("Turandot.", "");
+            //        Application.LoadLevel("Turandot");
+            //    }
+            //}
 
             if (finished)
             {
-                DiagnosticsManager.Instance.AdvanceProtocol();
+                //DiagnosticsManager.Instance.AdvanceProtocol();
 
-                string msg = "Finished! Press ENTER or tap screen to return.";
-                if (!string.IsNullOrEmpty(_params.screen.finalPrompt))
-                    msg = _params.screen.finalPrompt;
+                //string msg = "Finished! Press ENTER or tap screen to return.";
+                //if (!string.IsNullOrEmpty(_params.screen.finalPrompt))
+                //    msg = _params.screen.finalPrompt;
 
-                _message.color = 0x000800;
-                _message.text = msg;
-                prompt.Activate(_message);
+                //_message.color = 0x000800;
+                //_message.text = msg;
+                //prompt.Activate(_message);
 
-                _waitingForResponse = true;
-                _waitingForTap = true;
+                //_waitingForResponse = true;
+                //_waitingForTap = true;
+                Debug.Log("Finished!!!");
             }
         }
     }
-
+/*
     IEnumerator CheckIsTrainingPerformanceOK()
     {
         _performanceOK = false;
@@ -661,7 +578,7 @@ public class TurandotManager : MonoBehaviour
             _waitingForResponse = true;
         }
     }
-
+    */
     void AdvanceSequence()
     {
         _data.NewTrial(_blockNum+1, _SCL[0].trial, _SCL[0].group);
@@ -687,80 +604,82 @@ public class TurandotManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(error))
         {
-            HandleError(error);
+            //HandleError(error);
         }
         else
         {
             string logPath = _fileStem + "-Block" + _data.block + "-Trial" + _data.trial + ".json";
-            if (IPC.Instance.Use && !_params.bypassIPC && !IPC.Instance.SendCommand("Trial", System.IO.Path.GetFileNameWithoutExtension(logPath)))
-                throw new System.Exception("IPC error: " + IPC.Instance.LastError);
+            logPath = Path.Combine(Application.persistentDataPath, "shit.json");
+            //if (IPC.Instance.Use && !_params.bypassIPC && !IPC.Instance.SendCommand("Trial", System.IO.Path.GetFileNameWithoutExtension(logPath)))
+            //    throw new System.Exception("IPC error: " + IPC.Instance.LastError);
 
 #if !KDEBUG
-                StartCoroutine(_engine.ExecuteFlowchart(_SCL[0].trialType, _params.flags, logPath));
+            StartCoroutine(_engine.ExecuteFlowchart(_SCL[0].trialType, _params.flags, logPath));
 #else
             StartCoroutine(_engine.SimulateFlowchart(_SCL[0].trialType, _params.flags, logPath, "Go"));
 #endif
         }
     }
-
+    
     void OnFlowchartFinished()
     {
-        Match p = Regex.Match(_engine.Result, "outcome=\"([\\w\\d\\s]+)\"");
-        if (p.Success)
-        {
-            _results.Add(p.Groups[1].Value);
-        }
-        else
-        {
-            _results.Add(_engine.Result);
-        }
+        Debug.Log("Finished!!!!!!!");
+        //Match p = Regex.Match(_engine.Result, "outcome=\"([\\w\\d\\s]+)\"");
+        //if (p.Success)
+        //{
+        //    _results.Add(p.Groups[1].Value);
+        //}
+        //else
+        //{
+        //    _results.Add(_engine.Result);
+        //}
 
-        _resultsByStimulus.Add(_SCL[0].group, _SCL[0].ix, _SCL[0].iy, _engine.Result);
+        //_resultsByStimulus.Add(_SCL[0].group, _SCL[0].ix, _SCL[0].iy, _engine.Result);
 
-        _data.result = _engine.Result;
-        _data.reactionTime = _engine.ReactionTime;
-        _data.properties.AddRange(_params.GetPostTrialProperties(_data.properties));
+        //_data.result = _engine.Result;
+        //_data.reactionTime = _engine.ReactionTime;
+        //_data.properties.AddRange(_params.GetPostTrialProperties(_data.properties));
 
-        KLib.FileIO.AppendTextFile(_mainDataFile, _data.ToJSONString());
+        //KLib.FileIO.AppendTextFile(_mainDataFile, _data.ToJSONString());
 
-        if (IPC.Instance.Use && !_params.bypassIPC && !IPC.Instance.SendCommand("Trial End", ""))
-            throw new System.Exception("IPC error: " + IPC.Instance.LastError);
+        //if (IPC.Instance.Use && !_params.bypassIPC && !IPC.Instance.SendCommand("Trial End", ""))
+        //    throw new System.Exception("IPC error: " + IPC.Instance.LastError);
 
-        if (_engine.FlowchartEndAction != EndAction.None)
-        {
-            EndRun(_engine.FlowchartEndAction == EndAction.AbortAll);
-            return;
-        }
+        //if (_engine.FlowchartEndAction != EndAction.None)
+        //{
+        //    EndRun(_engine.FlowchartEndAction == EndAction.AbortAll);
+        //    return;
+        //}
 
-        _SCL.RemoveAt(0);
+        //_SCL.RemoveAt(0);
 
-        progressBar.value += _progressBarStep;
-        if (_usingServer && !_waitForServer && IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Progress", progressBar.value.ToString());
+        //progressBar.value += _progressBarStep;
+        //if (_usingServer && !_waitForServer && IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Progress", progressBar.value.ToString());
 
-        if (_SCL.Count > 0)
-        {
-            AdvanceSequence();
-        }
-        else
-        {
-            _isRunning = false;
-            _state.SetLastBlock(_blockNum);
-            ++_blockNum;
+        //if (_SCL.Count > 0)
+        //{
+        //    AdvanceSequence();
+        //}
+        //else
+        //{
+        //    _isRunning = false;
+        //    _state.SetLastBlock(_blockNum);
+        //    ++_blockNum;
 
-            if (_params.schedule.offerBreakAfter > 0 && ++_numSinceLastBreak == _params.schedule.offerBreakAfter && _blockNum < _params.schedule.numBlocks)
-            {
-                _numSinceLastBreak = 0;
-                _state.CanResume = true;
-                _state.Save();
-                ShowBreakInstructions(_params.schedule.breakInstructions);
-            }
-            else if (!_usingServer)
-            {
-                StartCoroutine(NextBlock());
-            }
-        }
+        //    if (_params.schedule.offerBreakAfter > 0 && ++_numSinceLastBreak == _params.schedule.offerBreakAfter && _blockNum < _params.schedule.numBlocks)
+        //    {
+        //        _numSinceLastBreak = 0;
+        //        _state.CanResume = true;
+        //        _state.Save();
+        //        ShowBreakInstructions(_params.schedule.breakInstructions);
+        //    }
+        //    else if (!_usingServer)
+        //    {
+        //        StartCoroutine(NextBlock());
+        //    }
+        //}
     }
-
+    /*
     void StopIPCRecording()
     {
         if (IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.StopRecording();
@@ -1083,6 +1002,18 @@ public class TurandotManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(ipcString) && _usingServer && IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Store", ipcString);
     }
+    */
+    void IRemoteControllable.ChangeScene(string newScene)
+    {
+
+    }
+
+    void IRemoteControllable.ProcessRPC(string command, string data)
+    {
+
+    }
+
+    /* 
 
     public void RpcLoadParameters(string configName)
     {

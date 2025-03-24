@@ -8,19 +8,13 @@ namespace Turandot.Scripts
 {
     public class TurandotCue : MonoBehaviour
     {
-        virtual public void Activate(Cue cue)
-        {
+        virtual public string Name { get { return ""; } }
 
-        }
         public void Initialize()
         {
         }
-        // TURANDOT FIX 
-        /*
-        public UIWidget widget;
-
         Cue _cue = null;
-        CueLog _log;
+/*        CueLog _log;
 
         private float _maxAlpha = 1;
 
@@ -46,31 +40,31 @@ namespace Turandot.Scripts
             _log.Clear();
         }
 
-        virtual public void Activate(Cue cue)
+  */      virtual public void Activate(Cue cue)
         {
             _cue = cue;
 
-            if (cue.changeAppearance)
-            {
-                widget.color = new Color(cue.R, cue.G, cue.B);
-                widget.alpha = 0;
-                _maxAlpha = cue.A;
-                widget.transform.localPosition = new Vector2(cue.X, cue.Y);
-            }
+            //if (cue.changeAppearance)
+            //{
+            //    widget.color = new Color(cue.R, cue.G, cue.B);
+            //    widget.alpha = 0;
+            //    _maxAlpha = cue.A;
+            //    widget.transform.localPosition = new Vector2(cue.X, cue.Y);
+            //}
 
-            if (_cue.delay_ms > 0 && _cue.startVisible && _cue.numFlash == 0)
-            {
-                StartCoroutine(ShowCueDelayed(_cue.delay_ms / 1000));
-            }
-            else
-            {
-                ShowCue(cue.startVisible);
-            }
+            //if (_cue.delay_ms > 0 && _cue.startVisible && _cue.numFlash == 0)
+            //{
+            //    StartCoroutine(ShowCueDelayed(_cue.delay_ms / 1000));
+            //}
+            //else
+            //{
+                ShowCue(cue.StartVisible);
+            //}
 
-            if (_cue.numFlash > 0)
-            {
-                StartCoroutine(FlashCue());
-            }
+            //if (_cue.numFlash > 0)
+            //{
+            //    StartCoroutine(FlashCue());
+            //}
         }
 
         public void Deactivate()
@@ -78,16 +72,16 @@ namespace Turandot.Scripts
             if (_cue != null)
             {
                 StopAllCoroutines();
-                ShowCue(_cue.endVisible);
+                ShowCue(_cue.EndVisible);
             }
         }
 
         void ShowCue(bool visible)
         {
-            widget.alpha = visible ? _maxAlpha : 0;
-            if (_log != null) _log.Add(Time.timeSinceLevelLoad, visible);
+            gameObject.SetActive(visible);
+//            if (_log != null) _log.Add(Time.timeSinceLevelLoad, visible);
         }
-
+/*
         private IEnumerator ShowCueDelayed(float delay_s)
         {
             yield return new WaitForSeconds(delay_s);

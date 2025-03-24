@@ -43,12 +43,12 @@ namespace Turandot.Scripts
                     break;
             }
 
-            ShowCue(_action.startVisible);
+            ShowCue(_action.StartVisible);
         }
 
         public void Deactivate()
         {
-            if (_action != null) ShowCue(_action.endVisible);
+            if (_action != null) ShowCue(_action.EndVisible);
             _action = null;
         }
 

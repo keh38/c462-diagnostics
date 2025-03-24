@@ -12,6 +12,6 @@ namespace Turandot
     [JsonObject(MemberSerialization.OptOut)]
     public class Instructions
     {
-        public List<string> pages = new List<string>();
+        public string Text { get; set; }
     }
 }

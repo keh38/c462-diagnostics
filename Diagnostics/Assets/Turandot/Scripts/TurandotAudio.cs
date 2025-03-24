@@ -13,6 +13,12 @@ namespace Turandot.Scripts
         //public AudioLowPassFilter lpFilter;
         public AudioSource audioSource;
         // TURANDOT FIX 
+
+        public delegate void TimeOutDelegate(string source);
+        public TimeOutDelegate TimeOut;
+        private void OnTimeOut(string source) { TimeOut?.Invoke(source); }
+
+
         //KStringDelegate _onTimeOut = null;
         SignalManager _sigMan;
         bool _isRunning = false;
@@ -59,20 +65,15 @@ namespace Turandot.Scripts
                 if (_sigMan != null && _sigMan.HaveException)
                     throw _sigMan.LastException;
 
-                //if (!_killAudio) _onTimeOut(name);
+                if (!_killAudio) OnTimeOut(name);
 
             }
         }
 
-        //public KStringDelegate OnTimeOut
-        //{
-        //    set { _onTimeOut = value; }
-        //}
-
-        public void Initialize(SignalManager sigMan, string transducer, float maxLevelMargin)
+        public void Initialize(SignalManager sigMan)
         {
             _sigMan = sigMan;
-            _transducer = transducer;
+            //_transducer = transducer;
             _isRunning = false;
 
             if (_sigMan != null)

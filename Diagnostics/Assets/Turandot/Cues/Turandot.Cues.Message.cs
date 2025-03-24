@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Xml.Serialization;
 
 using Newtonsoft.Json;
@@ -14,8 +15,12 @@ namespace Turandot.Cues
     {
         public enum Icon { None, Right, Wrong, Warning}
 
-        public string text;
+        [Category("Appearance")]
+        public string Text { get; set; }
+        private bool ShouldSerializeText() { return false; }
+
         public int fontSize = 40;
+
         public Icon icon = Icon.None;
         public int iconSize = 128;
  
@@ -25,7 +30,7 @@ namespace Turandot.Cues
 
 		public Message(string text)
         {
-            this.text = text;
+            this.Text = text;
         }
 
         [XmlIgnore]
@@ -35,6 +40,5 @@ namespace Turandot.Cues
         {
             get { return "Message"; }
         }
-
     }
 }

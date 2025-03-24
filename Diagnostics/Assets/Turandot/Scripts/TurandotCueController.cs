@@ -10,6 +10,7 @@ namespace Turandot.Scripts
 {
     public class TurandotCueController : MonoBehaviour
     {
+        [SerializeField] private GameObject _messagePrefab;
         public TurandotCue led;
         public TurandotCueMessage message;
         public TurandotFixationPoint fixationPoint;
@@ -22,9 +23,14 @@ namespace Turandot.Scripts
         private List<string> _used = new List<string>();
         private List<Flag> _flags = null;
 
+        private List<TurandotCue> _controls;
+        private List<Cue> _cues;
+
         public void Initialize(ScreenElements screen, List<string> cuesUsed)
         {
             _used = cuesUsed;
+
+            _controls = new List<TurandotCue>();
 
             //led.Initialize();
             //message.Initialize(screen.messageLayout);
@@ -34,6 +40,20 @@ namespace Turandot.Scripts
             //helpCue.Initialize();
             //counter.Initialize(screen.counter);
             //scoreboard.Initialize(screen.scoreboard);
+
+            var canvasRT = GameObject.Find("Canvas").GetComponent<RectTransform>();
+            foreach (var layout in screen.Cues)
+            {
+                if (layout is MessageLayout)
+                {
+                    var gobj = GameObject.Instantiate(_messagePrefab, canvasRT);
+                    var c = gobj.GetComponent<TurandotCueMessage>();
+                    c.Initialize(layout as MessageLayout);
+                    _controls.Add(c);
+                    gobj.SetActive(false);
+                }
+
+            }
         }
 
         public void ClearScreen()
@@ -48,14 +68,7 @@ namespace Turandot.Scripts
             //progressBar.ShowCue(false);
         }
 
-        public void ApplySkin(Skin skin)
-        {
-            message.ApplySkin(skin);
-            helpCue.ApplySkin(skin);
-            //progressBar.ApplySkin(skin);
-        }
-
-        public void ClearLog()
+       public void ClearLog()
         {
             //led.ClearLog();
             //message.ClearLog();
@@ -70,41 +83,50 @@ namespace Turandot.Scripts
 
         public void Activate(List<Cue> cues)
         {
+            _cues = cues;
             //led.Clear();
             //message.Clear();
 
             foreach (Cue c in cues)
             {
-                if (c is Message)
-                    message.ActivateMessage(c, _flags);
-                //else if (c is FixationPointAction)
-                //    fixationPoint.DoAction(c as FixationPointAction);
-                //else if (c is ProgressBarAction)
-                //    progressBar.DoAction(c as ProgressBarAction);
-                else if (c is Image)
-                    image.Activate(c as Image);
-                else if (c is Help)
-                    helpCue.Activate(c);
-                else if (c is CounterAction)
-                    counter.Activate(c as CounterAction);
-                else if (c is ScoreboardAction)
-                    scoreboard.Activate(c as ScoreboardAction);
-                else
-                    led.Activate(c);
+                var target = _controls.Find(x => x.Name.Equals(c.Target));
+                target?.Activate(c);
+                //if (c is Message)
+                //    message.Activate(c);
+                ////else if (c is FixationPointAction)
+                ////    fixationPoint.DoAction(c as FixationPointAction);
+                ////else if (c is ProgressBarAction)
+                ////    progressBar.DoAction(c as ProgressBarAction);
+                //else if (c is Image)
+                //    image.Activate(c as Image);
+                //else if (c is Help)
+                //    helpCue.Activate(c);
+                //else if (c is CounterAction)
+                //    counter.Activate(c as CounterAction);
+                //else if (c is ScoreboardAction)
+                //    scoreboard.Activate(c as ScoreboardAction);
+                //else
+                //    led.Activate(c);
             }
         }
 
         public void Deactivate()
         {
-            //led.Deactivate();
-            //message.Deactivate();
-            //fixationPoint.Deactivate();
-            //image.Deactivate();
-            //progressBar.Deactivate();
-            //helpCue.Deactivate();
-            //counter.Deactivate();
-            scoreboard.Deactivate();
-        }
+            foreach (Cue c in _cues)
+            {
+                var target = _controls.Find(x => x.Name.Equals(c.Target));
+                target?.Deactivate();
+            }
+                //if (c is Message)
+                //led.Deactivate();
+                //message.Deactivate();
+                //fixationPoint.Deactivate();
+                //image.Deactivate();
+                //progressBar.Deactivate();
+                //helpCue.Deactivate();
+                //counter.Deactivate();
+                //scoreboard.Deactivate();
+            }
 
         public string LogJSONString
         {
