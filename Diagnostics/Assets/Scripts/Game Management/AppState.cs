@@ -11,6 +11,7 @@ public class AppState
     public string subject;
     public string lastDemo;
     public List<string> updatesApplied = new List<string>();
+    public SerializeableDictionary<string> lastUsedItems = new SerializeableDictionary<string>();
 
     public AppState()
     {
@@ -19,13 +20,18 @@ public class AppState
         lastDemo = "";
     }
 
-    //public static void Save(string project, string subject)
-    //{
-    //    AppState state = Restore();
-    //    state.project = project;
-    //    state.subject = subject;
-    //    state.Save();
-    //}
+    public static string GetLastUsedItem(string key)
+    {
+        var state = Restore();
+        return state.lastUsedItems[key];
+    }
+
+    public static void SetLastUsedItem(string key, string value)
+    {
+        var state = Restore();
+        state.lastUsedItems[key] = value;
+        state.Save();
+    }
 
     public static void AddUpdate(string update)
     {

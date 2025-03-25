@@ -12,7 +12,6 @@ namespace Turandot
     [JsonObject(MemberSerialization.OptOut)]
     public class FileHeader
     {
-        public string masterID;
         public string programName;
         public string version;
         public string date;
@@ -29,13 +28,12 @@ namespace Turandot
 
         public void Initialize(string filePath, string paramFile)
         {
-            //masterID = SubjectManager.Instance.MasterID.ToString();
-            //programName = VersionInfo.AppName;
-            //version = VersionInfo.SemanticVersion;
-            //date = DateTime.Now.ToString();
-            //note = SubjectManager.Instance.Note;
-            //this.filePath = filePath;
-            //this.parameterFile = paramFile;
+            programName = UnityEngine.Application.productName;
+            version = UnityEngine.Application.version;
+            date = DateTime.Now.ToString();
+            //note = GameManager.Note;
+            this.filePath = filePath;
+            this.parameterFile = paramFile;
         }
 
     }

@@ -14,7 +14,7 @@ public class SubjectMetadata
     public string Transducer { set; get; }
     public Laterality Laterality { set; get; }
 
-    //public Dictionary<string, int> diagnosticsCounter = new Dictionary<string, int>();
+    public SerializeableDictionary<int> runCounter = new SerializeableDictionary<int>();
     //public Dictionary<string, MetricData> metrics = new Dictionary<string, MetricData>();
     //public System.Guid lastMsgID;
 

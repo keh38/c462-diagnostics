@@ -42,7 +42,7 @@ public class SubjectPanel : MonoBehaviour
     {
         _selectedProject = projectDropDown.Items[intSelected].name;
         FillSubjectDropDown();
-   }
+    }
 
     public void OnSubjectDropDownChange(GameObject go, int intSelected)
     {

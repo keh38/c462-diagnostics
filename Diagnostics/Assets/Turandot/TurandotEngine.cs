@@ -546,16 +546,16 @@ public class TurandotEngine : MonoBehaviour
 //        if (SubjectManager.Instance.UploadData && _params.trialLogOption == TrialLogOption.Upload) DataFileManager.UploadDataFile(_logPath);
     }
 
-//    public void WriteAudioLogFile(string path)
-//    {
-//        string json = "";
-//        foreach (var fe in _params.flowChart)
-//        {
-//            json = KLib.FileIO.JSONStringAdd(json, fe.name + "Audio", KLib.FileIO.JSONSerializeToString(_audio.Find(x => x.name.Equals(fe.name)).Log.Trim()));
-//        }
+    public void WriteAudioLogFile(string path)
+    {
+        string json = "";
+        foreach (var fe in _params.flowChart)
+        {
+            json = KLib.FileIO.JSONStringAdd(json, fe.name + "Audio", KLib.FileIO.JSONSerializeToString(_audio.Find(x => x.name.Equals(fe.name)).Log.Trim()));
+        }
 
-//        KLib.FileIO.WriteTextFile(path, json);
-////        if (SubjectManager.Instance.UploadData && _params.trialLogOption == TrialLogOption.Upload) DataFileManager.UploadDataFile(path);
-//        if (SubjectManager.Instance.UploadData) DataFileManager.UploadDataFile(path);
-//    }
+        File.WriteAllText(path, json);
+        //        if (SubjectManager.Instance.UploadData && _params.trialLogOption == TrialLogOption.Upload) DataFileManager.UploadDataFile(path);
+        //if (SubjectManager.Instance.UploadData) DataFileManager.UploadDataFile(path);
+    }
 }

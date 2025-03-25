@@ -124,14 +124,24 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 
     public void OnSubjectMenuButtonClick()
     {
-        SelectItem(_subjectMenuButton, _subjectPanel.gameObject);
+        StartCoroutine(SelectSubjectPanel());
+        //StartCoroutine(SelectItem(_subjectMenuButton, _subjectPanel.gameObject));
+        //_subjectPanel.ShowPanel();
+    }
+    private IEnumerator SelectSubjectPanel()
+    {
+        yield return StartCoroutine(SelectItem(_subjectMenuButton, _subjectPanel.gameObject));
         _subjectPanel.ShowPanel();
     }
 
     public void OnTurandotButtonClick()
     {
-        SelectItem(_turandotMenuButton, _turandotPanel.gameObject);
-        //_subjectPanel.ShowPanel();
+        StartCoroutine(SelectTurandotPanel());
+    }
+    private IEnumerator SelectTurandotPanel()
+    {
+        yield return StartCoroutine(SelectItem(_turandotMenuButton, _turandotPanel.gameObject));
+        _turandotPanel.ShowPanel();
     }
 
     private void OnSubjectChanged(string newSubject)
@@ -160,7 +170,7 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 #endif
     }
 
-    private void SelectItem(Button button, GameObject panel)
+    private IEnumerator SelectItem(Button button, GameObject panel)
     {
         ColorBlock cb;
 
@@ -181,6 +191,8 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
         cb.normalColor = new Color(cb.normalColor.r, cb.normalColor.g, cb.normalColor.b, 1);
         cb.selectedColor = cb.normalColor;
         _activeButton.colors = cb;
+
+        yield return null;
     }
 
     void IRemoteControllable.ProcessRPC(string command, string data="")

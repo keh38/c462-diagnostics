@@ -404,9 +404,8 @@ namespace KLib.Signals
 
         public void SetTimeout(float timeout)
         {
-            _maxCalls = Mathf.CeilToInt(timeout * SamplingRate_Hz / (float)Npts);
+            _maxCalls = Mathf.FloorToInt(timeout * SamplingRate_Hz / (float)Npts);
             _numCalls = 0;
-            //Debug.Log("timeout = " + timeout + " (" + _maxCalls + " calls)");
         }
 
         public bool TimedOut
@@ -444,14 +443,13 @@ namespace KLib.Signals
         }
 
         public bool Synth { set; get; }
-        public void Synthesize(float[] data)
+        public bool Synthesize(float[] data)
         {
+            bool started = false;
             string lastChannel = "";
 
             try
             {
-//                ++_numCalls;
-
                 int idx = 0;
                 for (int k = 0; k < Npts; k++)
                 {
@@ -462,7 +460,7 @@ namespace KLib.Signals
                     idx += Noutputs;
                 }
 
-                if (!_unpausePending && _paused) return;
+                if (!_unpausePending && _paused) return false;
 
                 Synth = true;
                 int iamp = 0;
@@ -523,6 +521,7 @@ namespace KLib.Signals
                 {
                     _unpausePending = false;
                     _paused = false;
+                    started = true;
                 }
                 ++_numCalls;
             }
@@ -538,6 +537,7 @@ namespace KLib.Signals
                 LastException = new Exception(LastErrorMessage);
                 throw LastException;
             }
+            return started;
         }
 
         public void Synthesize(float[,] data)

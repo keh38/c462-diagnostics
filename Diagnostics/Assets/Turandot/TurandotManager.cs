@@ -1,10 +1,11 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Text.RegularExpressions;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 using KLib.Signals.Waveforms;
 using Turandot;
@@ -16,6 +17,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 {
     [SerializeField] private TurandotEngine _engine;
     [SerializeField] private InstructionPanel _instructionPanel;
+    [SerializeField] private GameObject _finishPanel;
 
     //public UIProgressBar progressBar;
 
@@ -74,9 +76,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         string configName = "TServer";
         //DiagnosticsManager.Instance.MakeExtracurricular("Turandot", "Turandot." + configName);
 #else
-        //string configName = DiagnosticsManager.Instance.SettingsFile;
-        GameManager.SetSubject("Scratch", "_Ken");
-        string configName = "Test";
+        string configName = GameManager.DataForNextScene;
 #endif
 
         _engine = GetComponent<TurandotEngine>();
@@ -130,13 +130,12 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         //}
         if (!string.IsNullOrEmpty(_params.instructions.Text))
         {
-            //StartCoroutine(ShowInstructions());
+            StartCoroutine(ShowInstructions());
         }
         else
         {
             //StartRun();
         }
-        StartRun();
     }
     
     IEnumerator ShowInstructions()
@@ -278,7 +277,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     {
         _params.Initialize();
 
-        //InitDataFile();
+        InitDataFile();
+
         _blockNum = 0;
         _nominalNumBlocks = _params.schedule.numBlocks;
         _numSinceLastBreak = 0;
@@ -375,7 +375,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
             //StopIPCRecording();
 
-            //_engine.WriteAudioLogFile(_mainDataFile.Replace(".json", ".audio.json"));
+            _engine.WriteAudioLogFile(_mainDataFile.Replace(".json", ".audio.json"));
             //if (SubjectManager.Instance.UploadData) DataFileManager.UploadDataFile(_mainDataFile);
             //SubjectManager.Instance.DataFiles.Add(_mainDataFile);
 
@@ -440,11 +440,11 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
                 //_waitingForResponse = true;
                 //_waitingForTap = true;
-                Debug.Log("Finished!!!");
+                _finishPanel.SetActive(true);
             }
         }
     }
-/*
+/* 
     IEnumerator CheckIsTrainingPerformanceOK()
     {
         _performanceOK = false;
@@ -500,43 +500,43 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         AdvanceAdaptation();
         yield break;
     }
-
-    void StartIPCRecording()
-    {
-        if (IPC.Instance.Use && !_params.bypassIPC)
-        {
-            string fn = System.IO.Path.GetFileName(_fileStem);
-
-            if (!IPC.Instance.StartRecording(fn))
-                throw new System.Exception("Error starting IPC recording");
-        }
-    }
-
+*/
     void InitDataFile()
     {
-        _fileStem = SubjectManager.CurrentSubject;
+        var fileStemStart = GameManager.Subject;
         if (!string.IsNullOrEmpty(_params.tag))
         {
-            _fileStem += "-" + _params.tag;
+            fileStemStart += "-" + _params.tag;
         }
-        _fileStem += "-Run" + SubjectManager.Instance.AddDiagnosticsRun("Turandot");
-        _fileStem = System.IO.Path.Combine(DataFileLocations.DataFolder, _fileStem);
-        _mainDataFile = _fileStem + ".json";
-
-        Turandot.FileHeader header = new Turandot.FileHeader();
+        else
+        {
+            fileStemStart += "-Turandot";
+        }
+        while (true)
+        {
+            _fileStem = $"{fileStemStart}-Run{GameManager.GetNextRunNumber("Turandot"):000}";
+            _fileStem = Path.Combine(FileLocations.SubjectFolder, _fileStem);
+            _mainDataFile = _fileStem + ".json";
+            if (!File.Exists(_mainDataFile))
+            {
+                break;
+            }
+        }    
+        
+        FileHeader header = new FileHeader();
         header.Initialize(_mainDataFile, _paramFile);
         header.audioSamplingRate = AudioSettings.outputSampleRate;
         AudioSettings.GetDSPBufferSize(out header.audioBufferLength, out header.audioNumBuffers);
 
         string json = KLib.FileIO.JSONStringAdd("", "info", KLib.FileIO.JSONSerializeToString(header));
         json = KLib.FileIO.JSONStringAdd(json, "params", KLib.FileIO.JSONSerializeToString(_params));
-        json += System.Environment.NewLine;
+        json += Environment.NewLine;
 
-        KLib.FileIO.WriteTextFile(_mainDataFile, json);
+        File.WriteAllText(_mainDataFile, json);
 
         _state.SetDataFile(_mainDataFile);
     }
-
+/*
     void Update()
     {
         if (_waitingForResponse && (Input.GetKeyDown(KeyCode.Return) || Input.GetButtonDown("XboxA")))
@@ -624,23 +624,23 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     void OnFlowchartFinished()
     {
         Debug.Log("Finished!!!!!!!");
-        //Match p = Regex.Match(_engine.Result, "outcome=\"([\\w\\d\\s]+)\"");
-        //if (p.Success)
-        //{
-        //    _results.Add(p.Groups[1].Value);
-        //}
-        //else
-        //{
-        //    _results.Add(_engine.Result);
-        //}
+        Match p = Regex.Match(_engine.Result, "outcome=\"([\\w\\d\\s]+)\"");
+        if (p.Success)
+        {
+            _results.Add(p.Groups[1].Value);
+        }
+        else
+        {
+            _results.Add(_engine.Result);
+        }
 
-        //_resultsByStimulus.Add(_SCL[0].group, _SCL[0].ix, _SCL[0].iy, _engine.Result);
+        _resultsByStimulus.Add(_SCL[0].group, _SCL[0].ix, _SCL[0].iy, _engine.Result);
 
-        //_data.result = _engine.Result;
-        //_data.reactionTime = _engine.ReactionTime;
-        //_data.properties.AddRange(_params.GetPostTrialProperties(_data.properties));
+        _data.result = _engine.Result;
+        _data.reactionTime = _engine.ReactionTime;
+        _data.properties.AddRange(_params.GetPostTrialProperties(_data.properties));
 
-        //KLib.FileIO.AppendTextFile(_mainDataFile, _data.ToJSONString());
+        File.AppendAllText(_mainDataFile, _data.ToJSONString());
 
         //if (IPC.Instance.Use && !_params.bypassIPC && !IPC.Instance.SendCommand("Trial End", ""))
         //    throw new System.Exception("IPC error: " + IPC.Instance.LastError);
@@ -903,26 +903,32 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         _waitingForResponse = true;
         _waitingForTap = true;
     }
+*/
+
+    public void OnFinishButtonClick()
+    {
+        Return();
+    }
 
     void Return()
     {
-        if (IPC.Instance.Use && !_params.bypassIPC && !_usingServer)
-        {
-            IPC.Instance.StopRecording();
-            IPC.Instance.Disconnect();
-        }
+        //if (IPC.Instance.Use && !_params.bypassIPC && !_usingServer)
+        //{
+        //    IPC.Instance.StopRecording();
+        //    IPC.Instance.Disconnect();
+        //}
 
-        GameObject.Destroy(GameObject.Find("TurandotScripter"));
+        //GameObject.Destroy(GameObject.Find("TurandotScripter"));
 
-        string returnTo = DiagnosticsManager.Instance.ReturnToScene;
-        if (_runAborted && DiagnosticsManager.Instance.CurrentAutoRun)
-        {
-            returnTo = ProjectManager.Instance.HasScheduleAssigned ? "Home Scene" : "Backdoor Scene";
-        }
+        //string returnTo = DiagnosticsManager.Instance.ReturnToScene;
+        //if (_runAborted && DiagnosticsManager.Instance.CurrentAutoRun)
+        //{
+        //    returnTo = ProjectManager.Instance.HasScheduleAssigned ? "Home Scene" : "Backdoor Scene";
+        //}
 
-        Application.LoadLevel(returnTo);
+        SceneManager.LoadScene("Home");
     }
-
+/*
     public void HandleException(string condition, string stackTrace, LogType type)
     {
         if (type == LogType.Log || type == LogType.Warning || condition.Contains("Capability 'microphone'") || condition.Contains("<RI.Hid>"))

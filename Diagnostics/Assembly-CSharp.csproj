@@ -283,6 +283,7 @@
     <Compile Include="Assets\Scripts\Home\SubjectPanel.cs" />
     <Compile Include="Assets\Turandot\Scripts\InstructionPanel.cs" />
     <Compile Include="Assets\Turandot\Cues\Turandot.Cues.CueLayout.cs" />
+    <Compile Include="Assets\Scripts\KLib\Utilities\SerializeableDictionary.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Turandot/Interactive/Turandot Interactive.unity
     guid: bc2d5bc90bdba7848a002df2422f0743
+  - enabled: 1
+    path: Assets/Turandot/Turandot.unity
+    guid: ae325a888d921fb4fbdbc27d1f984727
   m_configObjects: {}

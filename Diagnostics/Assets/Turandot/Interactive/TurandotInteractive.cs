@@ -58,7 +58,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 #endif
         if (!string.IsNullOrEmpty(GameManager.DataForNextScene))
         {
-            var param = FileIO.XmlDeserialize<InteractiveSettings>(FileLocations.ConfigFile(GameManager.DataForNextScene));
+            var param = FileIO.XmlDeserialize<InteractiveSettings>(FileLocations.ConfigFile("Interactive", GameManager.DataForNextScene));
             param.ShowSliders = true;
             ApplyParameters(param);
 

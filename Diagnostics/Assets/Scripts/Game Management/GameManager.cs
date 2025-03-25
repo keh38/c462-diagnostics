@@ -91,6 +91,13 @@ public class GameManager : MonoBehaviour
         return transducers;
     }
 
+    public static int GetNextRunNumber(string measurementType)
+    {
+        int number = Mathf.Max(1, instance._subjectMetadata.runCounter[measurementType]);
+        instance._subjectMetadata.runCounter[measurementType] = number + 1;
+        instance._SaveSubjectMetadata();
+        return number;
+    }
 
     #endregion
 

@@ -134,7 +134,6 @@ namespace Turandot.Scripts
 
             if (_sigMan != null)
             {
-                _sigMan.Unpause();
                 //_sigMan.Activate(flags);
 
                 if (timeOut == 0)
@@ -149,6 +148,7 @@ namespace Turandot.Scripts
 
                 _sigMan.SetTimeout(_timeOut);
                 _sigMan.ResetSweepables();
+                _sigMan.Unpause();
                 _isRunning = true;
                 _name = name; // for debugging purposes: can't access 'name' from OnAudioFilterRead() 
             }
@@ -156,7 +156,6 @@ namespace Turandot.Scripts
             {
                 _timerOnly = true;
             }
-            _log.Add(AudioSettings.dspTime, "activated");
         }
 
         public void Deactivate()
@@ -178,41 +177,13 @@ namespace Turandot.Scripts
 
         private void OnAudioFilterRead(float[] data, int channels)
         {
-            //if (!_startLogged)
-            //{
-            //    _log.Add(AudioSettings.dspTime, "started");
-            //    _startLogged = true;
-
-            //    IPC.Instance.SendCommand("Special", AudioSettings.dspTime.ToString());
-
-            //    int idx = 0;
-            //    for (int k=0; k<data.Length/2; k++)
-            //    {
-            //        float val = (k % 2 == 1) ? 0 : 0.5f;
-            //        data[idx++] = val;
-            //        data[idx++] = val;
-            //    }
-            //}
-
             if ((_isRunning || _resumeAudio) && !_sigMan.TimedOut)
             {
-                //System.DateTime t = System.DateTime.Now;
-                //var dt = (t - tlast).TotalSeconds;
-                //tlast = t;
-                //var ddsp = AudioSettings.dspTime - dsplast;
-                //dsplast = AudioSettings.dspTime;
-
-                //if (dt < 1) tElapsed += dt;
-
-                //if (ddsp < 1) dspElapsed += ddsp;
-
-                //if (tElapsed - dspElapsed > ddsp)
-                //{
-                //    //Debug.Log(dspElapsed + " / " + tElapsed + " : d_dsp = " + 1000 * ddsp + " dt = " + 1000 * dt);
-                //    Debug.Log(dspElapsed + " : " + 1000 * (tElapsed - dspElapsed) + " dt = " + 1000 * dt);
-                //}
-
-                _sigMan.Synthesize(data);
+                var wasStarted = _sigMan.Synthesize(data);
+                if (wasStarted)
+                {
+                    _log.Add(AudioSettings.dspTime, "activated");
+                }
 
                 if (_resumeAudio)
                 {
