@@ -5,6 +5,7 @@ using System.Linq;
 using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 using KLib.Signals.Waveforms;
@@ -16,8 +17,11 @@ using Turandot.Screen;
 public class TurandotManager : MonoBehaviour, IRemoteControllable
 {
     [SerializeField] private TurandotEngine _engine;
+    [SerializeField] private GameObject _titleBar;
     [SerializeField] private InstructionPanel _instructionPanel;
+    [SerializeField] private Text _finishText;
     [SerializeField] private GameObject _finishPanel;
+    [SerializeField] private GameObject _quitPanel;
 
     //public UIProgressBar progressBar;
 
@@ -35,15 +39,13 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     bool _isRunning = false;
     bool _haveException = false;
     bool _isScripted = false;
-    bool _usingServer = false;
-    bool _waitForServer = false;
+    bool _isRemote = false;
 
     string _paramFile = "";
 
     int _nominalNumBlocks;
     int _blockNum;
     int _numSinceLastBreak;
-    int _numXDATrepeats = 5;
 
     float _progressBarStep = 1f;
     bool _runAborted = false;
@@ -70,6 +72,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
     void Start()
     {
+        HTS_Server.SetCurrentScene("Turandot", this);
+
 #if CONFIG_HACK
         SubjectManager.Instance.ChangeSubject("Scratch", "_Ken");
         //string configName = "RI-VAS";
@@ -78,6 +82,15 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 #else
         string configName = GameManager.DataForNextScene;
 #endif
+
+        if (string.IsNullOrEmpty(configName))
+        {
+            _isRemote = HTS_Server.RemoteConnected;
+            if (!_isRemote)
+            {
+                ShowFinishPanel("Nothing to do");
+            }
+        }
 
         _engine = GetComponent<TurandotEngine>();
         _engine.ClearScreen();
@@ -103,12 +116,21 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         //    localName = TurandotScripter.Instance.ParamFile;
         //}
         //else
+        if (!_isRemote)
         {
             localName = FileLocations.ConfigFile("Turandot", configName);
             _params = KLib.FileIO.XmlDeserialize<Parameters>(localName);
+            _paramFile = Path.GetFileName(localName);
+            _state = new TurandotState(GameManager.Project, GameManager.Subject, configName);
+
+            ApplyParameters();
+            Begin();
         }
 
-        _paramFile = Path.GetFileName(localName);
+    }
+    
+    private void ApplyParameters()
+    {
         _params.CheckParameters();
         _params.ApplyDefaultWavFolder(GameManager.Project);
 
@@ -122,27 +144,37 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         //    return;
         //}
 
-        _state = new TurandotState(GameManager.Project, GameManager.Subject, configName);
+        _params.Initialize();
 
+        InitDataFile();
+
+        HTS_Server.SendMessage("Turandot", $"File:{Path.GetFileName(_mainDataFile)}");
+    }
+
+    private void Begin()
+    {
         //if (_state.IsRunInProgress())
         //{
         ////    StartCoroutine(AskToResume());
         //}
+
         if (!string.IsNullOrEmpty(_params.instructions.Text))
         {
             StartCoroutine(ShowInstructions());
         }
         else
         {
-            //StartRun();
+            _titleBar.SetActive(false);
+            StartRun();
         }
     }
-    
+
     IEnumerator ShowInstructions()
     {
         //if (IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Instructions", "started");
 
         yield return new WaitForSeconds(1);
+        _titleBar.SetActive(false);
 
         _instructionPanel.gameObject.SetActive(true);
         _instructionPanel.InstructionsFinished = OnInstructionsFinished;
@@ -275,10 +307,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
     IEnumerator StartRunAsync()
     {
-        _params.Initialize();
-
-        InitDataFile();
-
         _blockNum = 0;
         _nominalNumBlocks = _params.schedule.numBlocks;
         _numSinceLastBreak = 0;
@@ -364,7 +392,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         //_audioTimer.StopThread();
 
-        if (_usingServer)
+        if (_isRemote)
         {
             _engine.ClearScreen();
             //if (!_waitForServer && IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Run", "finished");
@@ -440,67 +468,76 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
                 //_waitingForResponse = true;
                 //_waitingForTap = true;
-                _finishPanel.SetActive(true);
+                ShowFinishPanel();
             }
         }
     }
-/* 
-    IEnumerator CheckIsTrainingPerformanceOK()
+
+    private void ShowFinishPanel(string message = "")
     {
-        _performanceOK = false;
-        if (_params.schedule.targetPc > 0)
-        {
-            int nc = _results.FindAll(o => _synonymsForCorrect.Contains(o.ToLower())).Count;
-            float pc = (float)nc / _results.Count;
-            _performanceOK = (pc >= 0.01f * _params.schedule.targetPc);
-            yield break;
-        }
-        else
-        {
-            yield return StartCoroutine(diagnosticsUI.AskYesNoQuestion("Getting the hang of it?\nPress NO to practice some more."));
-            _performanceOK = diagnosticsUI.YesNoResult;
-        }
+        _titleBar.SetActive(true);
+        _finishText.text = message;
+        _finishPanel.SetActive(true);
     }
 
-    void MorePractice()
-    {
-        diagnosticsUI.transform.position = new Vector2(-2200, 0);
-        _results.Clear();
-        StartCoroutine(NextBlock());
-    }
 
-    void EndBreak()
-    {
-        diagnosticsUI.transform.position = new Vector2(-2200, 0);
-        if (_params.schedule.mode == Mode.Adapt)
+    /* 
+        IEnumerator CheckIsTrainingPerformanceOK()
         {
-            NextBlockOfTracks();
+            _performanceOK = false;
+            if (_params.schedule.targetPc > 0)
+            {
+                int nc = _results.FindAll(o => _synonymsForCorrect.Contains(o.ToLower())).Count;
+                float pc = (float)nc / _results.Count;
+                _performanceOK = (pc >= 0.01f * _params.schedule.targetPc);
+                yield break;
+            }
+            else
+            {
+                yield return StartCoroutine(diagnosticsUI.AskYesNoQuestion("Getting the hang of it?\nPress NO to practice some more."));
+                _performanceOK = diagnosticsUI.YesNoResult;
+            }
         }
-        else
+
+        void MorePractice()
         {
+            diagnosticsUI.transform.position = new Vector2(-2200, 0);
+            _results.Clear();
             StartCoroutine(NextBlock());
         }
-    }
 
-    void MoreAdaptation()
-    {
-        diagnosticsUI.transform.position = new Vector2(-2200, 0);
-        NextBlockOfTracks();
-    }
+        void EndBreak()
+        {
+            diagnosticsUI.transform.position = new Vector2(-2200, 0);
+            if (_params.schedule.mode == Mode.Adapt)
+            {
+                NextBlockOfTracks();
+            }
+            else
+            {
+                StartCoroutine(NextBlock());
+            }
+        }
 
-    void NextBlockOfTracks()
-    {
-        _params.adapt.InitBlock();
-        StartCoroutine(NextTrack());
-    }
+        void MoreAdaptation()
+        {
+            diagnosticsUI.transform.position = new Vector2(-2200, 0);
+            NextBlockOfTracks();
+        }
 
-    IEnumerator NextTrack()
-    {
-        _isRunning = true;
-        AdvanceAdaptation();
-        yield break;
-    }
-*/
+        void NextBlockOfTracks()
+        {
+            _params.adapt.InitBlock();
+            StartCoroutine(NextTrack());
+        }
+
+        IEnumerator NextTrack()
+        {
+            _isRunning = true;
+            AdvanceAdaptation();
+            yield break;
+        }
+    */
     void InitDataFile()
     {
         var fileStemStart = GameManager.Subject;
@@ -536,49 +573,30 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         _state.SetDataFile(_mainDataFile);
     }
-/*
-    void Update()
-    {
-        if (_waitingForResponse && (Input.GetKeyDown(KeyCode.Return) || Input.GetButtonDown("XboxA")))
-        {
-            Return();
-        }
-
-        if (_waitingForResponse && Input.GetKeyDown(KeyCode.R))
-        {
-            if (!_haveException)
-            {
-                _waitingForResponse = false;
-                prompt.Deactivate();
-                _runAborted = false;
-                _isRunning = true;
-                AdvanceSequence();
-            }
-        }
-
-        if (_waitingForResponse && _usingServer && Input.GetKeyDown(KeyCode.S))
-        {
-            _engine.Abort();
-            _engine.ClearScreen();
-            prompt.Deactivate();
-            _waitingForResponse = false;
-        }
-    }
 
     void OnGUI()
     {
         Event e = Event.current;
-        if ((_isRunning || _usingServer) && e.control && e.keyCode == KeyCode.A && !_waitingForResponse)
+        if (e.control && e.keyCode == KeyCode.A && !_waitingForResponse)
         {
             if (_isRunning) _engine.Abort();
             _isRunning = false;
-            _message.text = _haveException ? "Press ENTER or tap screen to quit" : "Paused. Press R to resume or ENTER to quit.";
-            prompt.Activate(_message);
-            _runAborted = true;
             _waitingForResponse = true;
+            _quitPanel.SetActive(true);
         }
     }
-    */
+
+    public void OnQuitConfirmButtonClick()
+    {
+        SceneManager.LoadScene("Home");
+    }
+
+    public void OnQuitCancelButtonClick()
+    {
+        _quitPanel.SetActive(false);
+        _waitingForResponse = false;
+    }
+
     void AdvanceSequence()
     {
         _data.NewTrial(_blockNum+1, _SCL[0].trial, _SCL[0].group);
@@ -673,7 +691,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
                 _state.Save();
                 //ShowBreakInstructions(_params.schedule.breakInstructions);
             }
-            else if (!_usingServer)
+            else
             {
                 StartCoroutine(NextBlock());
             }
@@ -1011,41 +1029,33 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     */
     void IRemoteControllable.ChangeScene(string newScene)
     {
-
+        SceneManager.LoadScene(newScene);
     }
 
     void IRemoteControllable.ProcessRPC(string command, string data)
     {
-
-    }
-
-    /* 
-
-    public void RpcLoadParameters(string configName)
-    {
-        string localName = DataFileLocations.ConfigFile("Turandot", configName);
-        _params = KLib.FileIO.XmlDeserialize<Parameters>(localName);
-
-        _paramFile = "Turandot TCP Server";
-        _params.CheckParameters();
-        _params.ApplyDefaultWavFolder(SubjectManager.Instance.Project);
-
-        Debug.Log(_params.schedule.numBlocks);
-        _state = new TurandotState(SubjectManager.Instance.Project, SubjectManager.CurrentSubject, configName);
+        switch (command)
+        {
+            case "SetParams":
+                RpcSetParameters(data);
+                break;
+            case "Begin":
+                Begin();
+                break;
+        }
     }
 
     public void RpcSetParameters(string xml)
     {
         _params = KLib.FileIO.XmlDeserializeFromString<Parameters>(xml);
-        _paramFile = "Turandot TCP Server";
-        _params.CheckParameters();
-        _params.ApplyDefaultWavFolder(SubjectManager.Instance.Project);
-
-        _state = new TurandotState(SubjectManager.Instance.Project, SubjectManager.CurrentSubject, "fromServer");
+        _paramFile = "remote";
+        _state = new TurandotState(GameManager.Project, GameManager.Subject, "remote");
         _state.Save();
+
+        ApplyParameters();
     }
 
-    public void RpcStart(bool wait)
+/*    public void RpcStart(bool wait)
     {
         _waitForServer = wait;
 

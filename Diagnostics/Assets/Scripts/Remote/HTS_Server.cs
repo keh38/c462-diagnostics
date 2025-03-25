@@ -57,6 +57,13 @@ public class HTS_Server : MonoBehaviour
             var result = KTcpClient.SendMessage(instance._remoteEndPoint, $"ChangedScene:{name}");
         }
     }
+    public static void SendMessage(string message, string data)
+    {
+        if (instance._remoteEndPoint != null)
+        {
+            var result = KTcpClient.SendMessage(instance._remoteEndPoint, $"{message}:{data}");
+        }
+    }
 
     private void _Init()
     {
@@ -122,6 +129,7 @@ public class HTS_Server : MonoBehaviour
                 catch (Exception ex)
                 {
                     Debug.Log("error processing TCP message: " + ex.Message);
+                    Debug.Log(ex.StackTrace);
                 }
             }
             yield return null;

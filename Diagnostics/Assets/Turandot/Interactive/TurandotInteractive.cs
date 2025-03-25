@@ -311,7 +311,6 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
                 SetActive(data);
                 break;
             case "ShowSliders":
-                Debug.Log("setsliders = " + data);
                 _sliderArea.SetActive(data.Equals("True"));
                 break;
         }
