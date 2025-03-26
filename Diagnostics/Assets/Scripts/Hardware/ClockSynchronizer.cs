@@ -2,16 +2,20 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
 [RequireComponent(typeof(SyncPulseDetector))]
 public class ClockSynchronizer : MonoBehaviour
 {
-    public float PollInterval_s = 1;
-    [SerializeField] private string _comPort = "COM23";
+    public enum SyncStatus { Idle, Recording, Error}
 
+    [SerializeField] private float _pollInterval_s = 1;
+    [SerializeField] private string _comPort = "COM23";
     [SerializeField] private SyncPulseDetector _syncPulseDetector;
+
+    public SyncStatus Status { get; private set; }
 
     private int _numPulsesPerPoll = 4;
     private float _pulseCarrierFreq = 1000f;
@@ -24,6 +28,10 @@ public class ClockSynchronizer : MonoBehaviour
     private double _lastAudioDSPTime = 0;
 
     private string _logPath = "";
+    private bool _serialPortOK;
+
+    private Thread _syncThread;
+    private bool _stopThread;
 
     void Start()
     {
@@ -33,13 +41,17 @@ public class ClockSynchronizer : MonoBehaviour
     public void Initialize(string comPort)
     {
         _comPort = comPort;
+        Status = SyncStatus.Idle;
+
         if (string.IsNullOrEmpty(_comPort))
         {
+            _serialPortOK = true;
             Debug.Log("[Clock Synchronizer] no COM port specified, running without");
             return;
         }
 
-        _syncPulseDetector.InitializeSerialPort(_comPort);
+        _serialPortOK = _syncPulseDetector.InitializeSerialPort(_comPort);
+
     }
 
     void CreateSignal()
@@ -66,13 +78,28 @@ public class ClockSynchronizer : MonoBehaviour
         InitializeLogFile(logPath);
 
         Debug.Log($"[ClockSynchronizer] Start synchronizing to {_logPath}");
-        InvokeRepeating("Synchronize", 1, PollInterval_s);
+
+        //_syncThread = new Thread(new ThreadStart(SyncThread));
+        //_syncThread.IsBackground = true;
+        //_stopThread = false;
+
+        //_syncThread.Start();
+
+
+        InvokeRepeating("Synchronize", 1, _pollInterval_s);
+
+        //Status = _serialPortOK ? SyncStatus.Recording : SyncStatus.Error;
+        Status = SyncStatus.Recording;
     }
 
     public void StopSynchronizing()
     {
         Debug.Log("[ClockSynchronizer] Stop synchronizing");
         CancelInvoke("Synchronize");
+        //_stopThread = true;
+        //_syncThread.Abort();
+
+        Status = SyncStatus.Idle;
     }
 
     private void InitializeLogFile(string logPath)
@@ -84,12 +111,12 @@ public class ClockSynchronizer : MonoBehaviour
             {
                 Directory.CreateDirectory(folder);
             }
-            var ts = System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            var ts = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             _logPath = Path.Combine(folder, $"Audio-Sync-{ts}.log");
         }
         else
         {
-            _logPath = logPath;
+            _logPath = Path.Combine(FileLocations.SubjectFolder, logPath.Replace(".json", "-sync.log"));
         }
 
         string headerText = 
@@ -104,6 +131,21 @@ public class ClockSynchronizer : MonoBehaviour
         File.WriteAllText(_logPath, headerText + Environment.NewLine);
     }
 
+    private void SyncThread()
+    {
+        var lastTime = DateTime.MinValue;
+        while (!_stopThread)
+        {
+            Synchronize();
+            lastTime = DateTime.Now;
+
+            while (!_stopThread && ((DateTime.Now - lastTime).TotalSeconds < _pollInterval_s))
+            {
+                Thread.Sleep(500);
+            }
+        }
+    }
+
     private async void Synchronize()
     {
         var systemTime = HighPrecisionClock.UtcNowIn100nsTicks;
@@ -112,7 +154,8 @@ public class ClockSynchronizer : MonoBehaviour
         _generatePulse = true;
 
         await Task.Delay(200);
-        var syncPulseEvent = await Task.Run(() => _syncPulseDetector.DetectOnePulse());
+        //var syncPulseEvent = await Task.Run(() => _syncPulseDetector.DetectOnePulse());
+        var syncPulseEvent = new SyncPulseDetector.SyncPulseEvent();
 
         string logEntry =
             $"{systemTime,20}\t" +
@@ -136,15 +179,6 @@ public class ClockSynchronizer : MonoBehaviour
         }
 
         File.AppendAllText(_logPath, logEntry + Environment.NewLine);
-    }
-
-    private void BlockingOperation()
-    {
-        //var startTime = Time.realtimeSinceStartup;
-        //while (Time.realtimeSinceStartup - startTime < 5) { }
-
-        var startTime = DateTime.Now;
-        while ((DateTime.Now - startTime).TotalSeconds < 5) { }
     }
 
     private void MeasureOnePulse()

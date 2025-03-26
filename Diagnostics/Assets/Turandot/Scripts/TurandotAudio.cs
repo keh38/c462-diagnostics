@@ -80,8 +80,6 @@ namespace Turandot.Scripts
             {
                 int npts, nbuf;
                 AudioSettings.GetDSPBufferSize(out npts, out nbuf);
-                Debug.Log("Npts = " + npts);
-                Debug.Log("Nbuf = " + nbuf);
 
                 audioSource.bypassEffects = true;
 

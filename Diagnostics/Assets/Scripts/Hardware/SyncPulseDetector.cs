@@ -19,8 +19,10 @@ public class SyncPulseDetector : MonoBehaviour
 
     private SerialPort _serialPort;
 
-    public void InitializeSerialPort(string comPort)
+    public bool InitializeSerialPort(string comPort)
     {
+        bool success = false;
+
         _serialPort = new SerialPort();
         _serialPort.PortName = comPort;
         _serialPort.BaudRate = 115200;
@@ -44,6 +46,7 @@ public class SyncPulseDetector : MonoBehaviour
             string response = _serialPort.ReadLine();
             Debug.Log($"[SyncPulseDetector] response to greeting: '{response}'");
             _serialPort.Close();
+            success = true;
         }
         catch(Exception ex)
         {
@@ -53,6 +56,8 @@ public class SyncPulseDetector : MonoBehaviour
         {
             _serialPort.Close();
         }
+
+        return success;
     }
 
     public SyncPulseEvent DetectOnePulse()

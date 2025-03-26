@@ -392,84 +392,76 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         //_audioTimer.StopThread();
 
-        if (_isRemote)
+        _engine.ClearScreen();
+
+        //StopIPCRecording();
+        _engine.WriteAudioLogFile(_mainDataFile.Replace(".json", ".audio.json"));
+        HTS_Server.SendMessage("Turandot", "Finished:OK");
+        //if (SubjectManager.Instance.UploadData) DataFileManager.UploadDataFile(_mainDataFile);
+        //SubjectManager.Instance.DataFiles.Add(_mainDataFile);
+
+        _state.Finish();
+
+        bool finished = true;
+        //if (_isScripted)
+        //{
+        //    TurandotScripter.Instance.Advance();
+        //    finished = TurandotScripter.Instance.IsFinished;
+
+        //    if (finished)
+        //    {
+        //        string linkTo = TurandotScripter.Instance.LinkTo;
+
+        //        GameObject.Destroy(GameObject.Find("TurandotScripter"));
+        //        if (!string.IsNullOrEmpty(linkTo))
+        //        {
+        //            finished = false;
+        //            if (DiagnosticsManager.Instance.IsExtraCurricular)
+        //                DiagnosticsManager.Instance.MakeExtracurricular("Turandot", System.IO.Path.GetFileNameWithoutExtension(linkTo).Replace("Turandot.", ""));
+        //            else
+        //                DiagnosticsManager.Instance.SettingsFile = System.IO.Path.GetFileNameWithoutExtension(linkTo).Replace("Turandot.", "");
+
+        //            Application.LoadLevel("Turandot");
+        //        }
+        //    }
+        //    else
+        //    {
+        //        Application.LoadLevel("Turandot");
+        //    }
+        //}
+        //else if (!string.IsNullOrEmpty(_params.linkTo) && !abort)
+        //{
+        //    finished = false;
+        //    if (_params.linkTo.Equals("return"))
+        //    {
+        //        DiagnosticsManager.Instance.AdvanceProtocol();
+        //        Return();
+        //    }
+        //    else
+        //    {
+        //        if (DiagnosticsManager.Instance.IsExtraCurricular)
+        //            DiagnosticsManager.Instance.MakeExtracurricular("Turandot", System.IO.Path.GetFileNameWithoutExtension(_params.linkTo).Replace("Turandot.", ""), DiagnosticsManager.Instance.ReturnToScene);
+        //        else
+        //            DiagnosticsManager.Instance.SettingsFile = System.IO.Path.GetFileNameWithoutExtension(_params.linkTo).Replace("Turandot.", "");
+        //        Application.LoadLevel("Turandot");
+        //    }
+        //}
+
+        if (finished && !_isRemote)
         {
-            _engine.ClearScreen();
-            //if (!_waitForServer && IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Run", "finished");
-        }
-        else
-        {
-            _engine.ClearScreen();
+            //DiagnosticsManager.Instance.AdvanceProtocol();
 
-            //StopIPCRecording();
+            //string msg = "Finished! Press ENTER or tap screen to return.";
+            //if (!string.IsNullOrEmpty(_params.screen.finalPrompt))
+            //    msg = _params.screen.finalPrompt;
 
-            _engine.WriteAudioLogFile(_mainDataFile.Replace(".json", ".audio.json"));
-            //if (SubjectManager.Instance.UploadData) DataFileManager.UploadDataFile(_mainDataFile);
-            //SubjectManager.Instance.DataFiles.Add(_mainDataFile);
+            //_message.color = 0x000800;
+            //_message.text = msg;
+            //prompt.Activate(_message);
 
-            _state.Finish();
-
-            bool finished = true;
-            //if (_isScripted)
-            //{
-            //    TurandotScripter.Instance.Advance();
-            //    finished = TurandotScripter.Instance.IsFinished;
-
-            //    if (finished)
-            //    {
-            //        string linkTo = TurandotScripter.Instance.LinkTo;
-
-            //        GameObject.Destroy(GameObject.Find("TurandotScripter"));
-            //        if (!string.IsNullOrEmpty(linkTo))
-            //        {
-            //            finished = false;
-            //            if (DiagnosticsManager.Instance.IsExtraCurricular)
-            //                DiagnosticsManager.Instance.MakeExtracurricular("Turandot", System.IO.Path.GetFileNameWithoutExtension(linkTo).Replace("Turandot.", ""));
-            //            else
-            //                DiagnosticsManager.Instance.SettingsFile = System.IO.Path.GetFileNameWithoutExtension(linkTo).Replace("Turandot.", "");
-
-            //            Application.LoadLevel("Turandot");
-            //        }
-            //    }
-            //    else
-            //    {
-            //        Application.LoadLevel("Turandot");
-            //    }
-            //}
-            //else if (!string.IsNullOrEmpty(_params.linkTo) && !abort)
-            //{
-            //    finished = false;
-            //    if (_params.linkTo.Equals("return"))
-            //    {
-            //        DiagnosticsManager.Instance.AdvanceProtocol();
-            //        Return();
-            //    }
-            //    else
-            //    {
-            //        if (DiagnosticsManager.Instance.IsExtraCurricular)
-            //            DiagnosticsManager.Instance.MakeExtracurricular("Turandot", System.IO.Path.GetFileNameWithoutExtension(_params.linkTo).Replace("Turandot.", ""), DiagnosticsManager.Instance.ReturnToScene);
-            //        else
-            //            DiagnosticsManager.Instance.SettingsFile = System.IO.Path.GetFileNameWithoutExtension(_params.linkTo).Replace("Turandot.", "");
-            //        Application.LoadLevel("Turandot");
-            //    }
-            //}
-
-            if (finished)
-            {
-                //DiagnosticsManager.Instance.AdvanceProtocol();
-
-                //string msg = "Finished! Press ENTER or tap screen to return.";
-                //if (!string.IsNullOrEmpty(_params.screen.finalPrompt))
-                //    msg = _params.screen.finalPrompt;
-
-                //_message.color = 0x000800;
-                //_message.text = msg;
-                //prompt.Activate(_message);
-
-                //_waitingForResponse = true;
-                //_waitingForTap = true;
-                ShowFinishPanel();
-            }
+            //_waitingForResponse = true;
+            //_waitingForTap = true;
+            ShowFinishPanel();
         }
     }
 
@@ -1038,6 +1030,12 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         {
             case "SetParams":
                 RpcSetParameters(data);
+                break;
+            case "StartSynchronizing":
+                HardwareInterface.ClockSync.StartSynchronizing(data);
+                break;
+            case "StopSynchronizing":
+                HardwareInterface.ClockSync.StopSynchronizing();
                 break;
             case "Begin":
                 Begin();

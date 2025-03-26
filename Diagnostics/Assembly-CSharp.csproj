@@ -241,6 +241,7 @@
     <Compile Include="Assets\Turandot\Screen\Turandot.Screen.MessageLayout.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\FM.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotSecondaryAudio.cs" />
+    <Compile Include="Assets\Scripts\Hardware\ClockNetworkInterface.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Enumerations\Waveshape.cs" />
     <Compile Include="Assets\Scripts\Game Management\GameManager.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Calibration\AcousticCalibration.cs" />
@@ -542,7 +543,7 @@
       <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@2.0.0\Runtime\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="protobuf-net">
-      <HintPath>Library\PackageCache\com.epl.klib@3c40450f6f\Runtime\Plugins\protobuf-net.dll</HintPath>
+      <HintPath>Library\PackageCache\com.epl.klib@7cffc28720\Runtime\Plugins\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2020.3.22f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\mscorlib.dll</HintPath>

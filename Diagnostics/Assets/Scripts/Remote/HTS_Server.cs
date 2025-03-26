@@ -3,8 +3,10 @@ using System.Collections;
 using System.Linq;
 using System.IO;
 using System.Net;
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 using KLib.Network;
 
 public class HTS_Server : MonoBehaviour
@@ -14,8 +16,8 @@ public class HTS_Server : MonoBehaviour
     private KTcpListener _listener = null;
     private bool _stopServer;
     private NetworkDiscoveryServer _discoveryServer;
+    private IPEndPoint _ipEndPoint;
     private string _address;
-    private int _port = 4950;
 
     private IRemoteControllable _currentScene = null;
     private string _currentSceneName = "";
@@ -85,16 +87,17 @@ public class HTS_Server : MonoBehaviour
 
         Use = true;
 
-        _address = NetworkUtils.FindServerAddress();
+        _ipEndPoint = NetworkUtils.FindNextAvailableEndPoint();
+        _address = _ipEndPoint.Address.ToString();
 
         _listener = new KTcpListener();
-        _listener.StartListener(_address, _port, bigEndian: false);
+        _listener.StartListener(_ipEndPoint, bigEndian: false);
 
         StartCoroutine(TCPServer());
-        _discoveryServer.StartReceiving("HEARING.TEST.SUITE", _address, _port);
-        Host = _address + ":" + _port;
+        _discoveryServer.StartReceiving("HEARING.TEST.SUITE", _ipEndPoint.Address.ToString(), _ipEndPoint.Port);
+        Host = _ipEndPoint.Address.ToString() + ":" + _ipEndPoint.Port;
 
-        Debug.Log("started HTS TCP server on " + Host);
+        Debug.Log("started HTS TCP server on " + _ipEndPoint.ToString());
     }
 
     public void StopServer()
