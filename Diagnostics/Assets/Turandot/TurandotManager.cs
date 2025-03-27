@@ -983,7 +983,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
                 RpcSetParameters(data);
                 break;
             case "StartSynchronizing":
-                HardwareInterface.ClockSync.StartSynchronizing(data);
+                HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
                 break;
             case "StopSynchronizing":
                 HardwareInterface.ClockSync.StopSynchronizing();

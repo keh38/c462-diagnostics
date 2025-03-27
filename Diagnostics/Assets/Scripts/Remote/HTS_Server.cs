@@ -132,7 +132,6 @@ public class HTS_Server : MonoBehaviour
                 catch (Exception ex)
                 {
                     Debug.Log("error processing TCP message: " + ex.Message);
-                    Debug.Log(ex.StackTrace);
                 }
             }
             yield return null;
@@ -175,6 +174,7 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "ChangeScene":
+                _listener.SendAcknowledgement();
                 GameManager.DataForNextScene = "";
                 _currentScene.ChangeScene(data);
                 break;
@@ -196,6 +196,7 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "SetSubjectInfo":
+                _listener.SendAcknowledgement();
                 GameManager.SetSubject(data);
                 _currentScene.ProcessRPC("SubjectChanged");
                 break;
@@ -205,6 +206,7 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "SetSubjectMetadata":
+                _listener.SendAcknowledgement();
                 GameManager.DeserializeSubjectMetadata(data);
                 _currentScene.ProcessRPC("SubjectMetadataChanged");
                 break;

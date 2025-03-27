@@ -33,6 +33,7 @@ public class ClockNetworkInterface : MonoBehaviour
         StartServer();
     }
 
+
     private void StartServer()
     {
         _remoteConnected = false;
@@ -62,6 +63,7 @@ public class ClockNetworkInterface : MonoBehaviour
             _listener = null;
         }
 
+        _readThread.Abort();
         _discoveryServer.StopReceiving();
         Debug.Log("stopped HTS Sync TCP listener");
     }
