@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Text;
 
 using KLib.Signals.Waveforms;
 using Turandot;
@@ -48,6 +49,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     int _numSinceLastBreak;
 
     float _progressBarStep = 1f;
+    float _progress = 0;
+
     bool _runAborted = false;
 
     bool _performanceOK = false;
@@ -171,7 +174,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
     IEnumerator ShowInstructions()
     {
-        //if (IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Instructions", "started");
+        HTS_Server.SendMessage("Turandot", "State:Instructions");
 
         yield return new WaitForSeconds(1);
         _titleBar.SetActive(false);
@@ -338,14 +341,13 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         //}
         yield break;
     }
-    /*
+    
     public void InitializeProgressBar(int numSteps)
     {
-        progressBar.numberOfSteps = numSteps + 1;
-        _progressBarStep = 1f / progressBar.numberOfSteps;
-        progressBar.value = 0;
+        _progressBarStep = 1f / numSteps;
+        _progress = 0;
     }
-    */
+    
     IEnumerator NextBlock()
     {
 #if !KDEBUG
@@ -376,7 +378,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
             if (_blockNum == 0)
             {
-                //InitializeProgressBar(_params.schedule.numBlocks * _SCL.Count);
+                InitializeProgressBar(_params.schedule.numBlocks * _SCL.Count);
             }
 
             _isRunning = true;
@@ -394,9 +396,13 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         _engine.ClearScreen();
 
-        //StopIPCRecording();
-        _engine.WriteAudioLogFile(_mainDataFile.Replace(".json", ".audio.json"));
-        HTS_Server.SendMessage("Turandot", "Finished:OK");
+        var audioFile = _mainDataFile.Replace(".json", ".audio.json");
+        _engine.WriteAudioLogFile(audioFile);
+
+        HTS_Server.SendMessage("Turandot", "Finished:");
+        HTS_Server.SendMessage("Turandot", $"ReceiveData:{Path.GetFileName(_mainDataFile)}:{File.ReadAllText(_mainDataFile)}");
+        HTS_Server.SendMessage("Turandot", $"ReceiveData:{Path.GetFileName(audioFile)}:{File.ReadAllText(audioFile)}");
+
         //if (SubjectManager.Instance.UploadData) DataFileManager.UploadDataFile(_mainDataFile);
         //SubjectManager.Instance.DataFiles.Add(_mainDataFile);
 
@@ -451,16 +457,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         {
             //DiagnosticsManager.Instance.AdvanceProtocol();
 
-            //string msg = "Finished! Press ENTER or tap screen to return.";
-            //if (!string.IsNullOrEmpty(_params.screen.finalPrompt))
-            //    msg = _params.screen.finalPrompt;
-
-            //_message.color = 0x000800;
-            //_message.text = msg;
-            //prompt.Activate(_message);
-
-            //_waitingForResponse = true;
-            //_waitingForTap = true;
             ShowFinishPanel();
         }
     }
@@ -600,10 +596,12 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         }
 
         string error = "";
+        var stringBuilder = new StringBuilder(100);
+        stringBuilder.AppendLine($"Block {_data.block}, Trial{_data.trial}");
         foreach (PropValPair pv in _SCL[0].propValPairs)
         {
-            _data.properties.Add(pv.property + "=" + pv.value);
-           Debug.Log(pv.property + "=" + pv.value);
+            stringBuilder.AppendLine($"{pv.property}={pv.value}");
+            _data.properties.Add($"{pv.property}={pv.value}");
             error = _params.SetParameter(pv.property, pv.value);
 
             if (!string.IsNullOrEmpty(error))
@@ -619,9 +617,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         else
         {
             string logPath = _fileStem + "-Block" + _data.block + "-Trial" + _data.trial + ".json";
-            logPath = Path.Combine(Application.persistentDataPath, "shit.json");
-            //if (IPC.Instance.Use && !_params.bypassIPC && !IPC.Instance.SendCommand("Trial", System.IO.Path.GetFileNameWithoutExtension(logPath)))
-            //    throw new System.Exception("IPC error: " + IPC.Instance.LastError);
+
+            HTS_Server.SendMessage("Turandot", $"Trial:{stringBuilder.ToString()}");
 
 #if !KDEBUG
             StartCoroutine(_engine.ExecuteFlowchart(_SCL[0].trialType, _params.flags, logPath));
@@ -633,7 +630,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     
     void OnFlowchartFinished()
     {
-        Debug.Log("Finished!!!!!!!");
         Match p = Regex.Match(_engine.Result, "outcome=\"([\\w\\d\\s]+)\"");
         if (p.Success)
         {
@@ -652,8 +648,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         File.AppendAllText(_mainDataFile, _data.ToJSONString());
 
-        //if (IPC.Instance.Use && !_params.bypassIPC && !IPC.Instance.SendCommand("Trial End", ""))
-        //    throw new System.Exception("IPC error: " + IPC.Instance.LastError);
+        HTS_Server.SendMessage("Turandot", "State:Finished");
 
         if (_engine.FlowchartEndAction != EndAction.None)
         {
@@ -663,8 +658,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         _SCL.RemoveAt(0);
 
-        //progressBar.value += _progressBarStep;
-        //if (_usingServer && !_waitForServer && IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Progress", progressBar.value.ToString());
+        _progress += _progressBarStep;
+        HTS_Server.SendMessage("Turandot", $"Progress:{Mathf.RoundToInt(_progress * 100)}");
 
         if (_SCL.Count > 0)
         {
@@ -689,12 +684,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             }
         }
     }
-    /*
-    void StopIPCRecording()
-    {
-        if (IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.StopRecording();
-    }
-
+/*
     void AdvanceAdaptation()
     {
         SCLElement sc = _params.adapt.InitTrial();
@@ -843,51 +833,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         }
     }
 
-    void StartOptimization()
-    {
-        AdvanceOptimization();
-    }
-
-    void AdvanceOptimization()
-    {
-        SCLElement sc = _params.optimization.InitTrial();
-
-        _data.NewTrial(sc.block, sc.track, sc.trial, sc.group);
-        _data.type = sc.trialType;
-
-        foreach (FlowElement fe in _params.flowChart)
-        {
-            fe.Initialize();
-        }
-
-        string error = "";
-        foreach (PropValPair pv in sc.propValPairs)
-        {
-            _data.properties.Add(pv.property + "=" + pv.value);
-            error = _params.SetParameter(pv.property, pv.value);
-
-            if (!string.IsNullOrEmpty(error))
-            {
-                break;
-            }
-        }
-
-        if (!string.IsNullOrEmpty(error))
-        {
-            HandleError(error);
-        }
-        else
-        {
-            string logPath = _fileStem + "-Trial" + _data.trial + ".json";
-            if (IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Trial", _data.trial.ToString());
-#if !KDEBUG
-            StartCoroutine(_engine.ExecuteFlowchart(sc.trialType, _params.flags, logPath));
-#else
-            StartCoroutine(_engine.SimulateFlowchart(sc.trialType, _params.flags, logPath, _params.optimization.Simulate()));
-#endif
-        }
-    }
-
+  
     void HandleError(string error)
     {
         _message.color = 0xF80000;
@@ -1021,7 +967,10 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     */
     void IRemoteControllable.ChangeScene(string newScene)
     {
-        SceneManager.LoadScene(newScene);
+        if (!newScene.Equals("Turandot"))
+        {
+            SceneManager.LoadScene(newScene);
+        }
     }
 
     void IRemoteControllable.ProcessRPC(string command, string data)
@@ -1040,6 +989,16 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             case "Begin":
                 Begin();
                 break;
+            case "Abort":
+                RpcAbort();
+                break;
+            case "SendSyncLog":
+                var logPath = HardwareInterface.ClockSync.LogFile;
+                if (!string.IsNullOrEmpty(logPath))
+                {
+                    HTS_Server.SendMessage("Turandot", $"ReceiveData:{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
+                }
+                break;
         }
     }
 
@@ -1052,93 +1011,12 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         ApplyParameters();
     }
-
-/*    public void RpcStart(bool wait)
-    {
-        _waitForServer = wait;
-
-        _engine.Initialize(_params, SubjectManager.Instance.Transducer, SubjectManager.Instance.MaxLevelMargin);
-
-        if (_params.instructions.pages.Count > 0)
-        {
-            StartCoroutine(ShowInstructions());
-        }
-        else
-        {
-            StartRun();
-        }
-    }
-
-    public void RpcAddBlock(string expr)
-    {
-        _params.schedule.families.Clear();
-
-        var f = new Family("TCPServer");
-        foreach (var e in expr.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
-        {
-            string line = e.Replace("\n", "").Replace("\r", "");
-
-            var parts = line.Split(new char[] { '=' });
-            if (parts.Length == 2)
-            {
-                var subvar = parts[0].Split(new char[] { '.' });
-                if (subvar.Length > 2)
-                {
-                    Variable v = new Variable(subvar[0], subvar[1], subvar[2].Trim());
-                    for (int k = 3; k < subvar.Length; k++) v.property += "." + subvar[k].Trim();
-                    v.expression = parts[1];
-                    f.variables.Add(v);
-                }
-            }
-        }
-
-        f.number = 1;
-        _params.schedule.families.Add(f);
-
-        if (_state.MasterSCL == null)
-        {
-            _params.schedule.numBlocks = 1;
-            _state.SetMasterSCL(_params.schedule.CreateStimConList());
-        }
-        else
-        {
-            _params.schedule.numBlocks++;
-            _params.schedule.AppendNewStimConList(_state.MasterSCL, 1);
-        }
-
-        _state.Save();
-    }
-
-    public void RpcMessage(string msg)
-    {
-        _message.text = msg;
-        prompt.Activate(_message);
-    }
-
-    public void RpcNextBlock()
-    {
-        prompt.Deactivate();
-        _engine.ClearScreen();
-        StartCoroutine(NextBlock());
-    }
-
+    
     public void RpcAbort()
     {
         _isRunning = false;
         _engine.Abort();
-        _engine.ClearScreen();
-        _blockNum++;
-        if (!_waitForServer && IPC.Instance.Use) IPC.Instance.SendCommand("Run", "aborted");
+        EndRun(abort: true);
     }
 
-    public void RpcShowState(string state)
-    {
-        _engine.ShowState(_params, state);
-    }
-
-    public void RpcExit()
-    {
-        Return();
-    }
-*/
 }

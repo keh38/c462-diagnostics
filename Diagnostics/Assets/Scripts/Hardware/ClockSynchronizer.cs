@@ -16,6 +16,7 @@ public class ClockSynchronizer : MonoBehaviour
     [SerializeField] private SyncPulseDetector _syncPulseDetector;
 
     public SyncStatus Status { get; private set; }
+    public string LogFile { get; private set; }
 
     private int _numPulsesPerPoll = 4;
     private float _pulseCarrierFreq = 1000f;
@@ -104,6 +105,7 @@ public class ClockSynchronizer : MonoBehaviour
 
     private void InitializeLogFile(string logPath)
     {
+        LogFile = "";
         if (string.IsNullOrEmpty(logPath))
         {
             var folder = Path.Combine(Application.persistentDataPath, "Audio Sync Logs");
@@ -116,8 +118,9 @@ public class ClockSynchronizer : MonoBehaviour
         }
         else
         {
-            _logPath = Path.Combine(FileLocations.SubjectFolder, logPath.Replace(".json", "-sync.log"));
+            _logPath = Path.Combine(FileLocations.SubjectFolder, logPath.Replace(".json", "-AudioSync.log"));
         }
+        LogFile = _logPath;
 
         string headerText = 
             $"{"SystemTime",20}\t" +

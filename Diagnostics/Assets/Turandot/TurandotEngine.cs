@@ -115,11 +115,6 @@ public class TurandotEngine : MonoBehaviour
 
     public IEnumerator ExecuteFlowchart(TrialType trialType, List<Flag> flags, string logPath)
     {
-#if !CONFIG_HACK
-        // TURANDOT FIX 
-        //_volumeManager.SetMasterVolume(1f, VolumeManager.VolumeUnit.Scalar);
-#endif
-
         _trialType = trialType;
         if (_trialType == TrialType.CSplus) _termType = TermType.CSplus;
         else if (_trialType == TrialType.CSminus) _termType = TermType.CSminus;
@@ -135,7 +130,6 @@ public class TurandotEngine : MonoBehaviour
         foreach (TurandotAudio a in _audio)
         {
             a.Reset();
-            a.ClearLog();
         }
 
         //inputMonitor.StartMonitor(flags);
@@ -226,6 +220,8 @@ public class TurandotEngine : MonoBehaviour
             var a = _audio.Find(o => o.name == _currentFlowElement.name);
             a.Activate(timeOut, _params.flags);
 
+            HTS_Server.SendMessage("Turandot", $"State:{_currentFlowElement.name}");
+
             // TURANDOT FIX 
             //if (IPC.Instance.Use && !_params.bypassIPC && !DoIPC(_currentFlowElement))
             //    throw new System.Exception("IPC error: " + IPC.Instance.LastError);
@@ -305,10 +301,10 @@ public class TurandotEngine : MonoBehaviour
     public void Abort()
     {
         if (_currentFlowElement != null) _audio.Find(a => a.name == _currentFlowElement.name).KillAudio();
-        WriteLogFile();
-        inputMonitor.StopMonitor();
-        inputMonitor.Deactivate();
-        _cueController.Deactivate();
+        //WriteLogFile();
+        //inputMonitor.StopMonitor();
+        //inputMonitor.Deactivate();
+        //_cueController.Deactivate();
     }
 
     void OnStateTimeout(string source)
@@ -551,7 +547,7 @@ public class TurandotEngine : MonoBehaviour
         string json = "";
         foreach (var fe in _params.flowChart)
         {
-            json = KLib.FileIO.JSONStringAdd(json, fe.name + "Audio", KLib.FileIO.JSONSerializeToString(_audio.Find(x => x.name.Equals(fe.name)).Log.Trim()));
+            json = KLib.FileIO.JSONStringAdd(json, fe.name, KLib.FileIO.JSONSerializeToString(_audio.Find(x => x.name.Equals(fe.name)).Log.Trim()));
         }
 
         File.WriteAllText(path, json);

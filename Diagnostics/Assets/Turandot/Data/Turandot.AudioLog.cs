@@ -52,6 +52,7 @@ namespace Turandot
             this.t[_index] = t;
             this.message[_index] = message;
             ++_index;
+            Debug.Log(message);
         }
 
         public AudioLog Trim()

@@ -111,8 +111,8 @@ namespace Turandot.Scripts
                 AudioSettings.GetDSPBufferSize(out npts, out nbuf);
 
                 _sigMan.Name = name;
-                // TURANDOT FIX 
-                //_sigMan.Initialize(_transducer, AudioSettings.outputSampleRate, npts);
+                _sigMan.Initialize(AudioSettings.outputSampleRate, npts);
+                _sigMan.StartPaused();
                 _isi = _sigMan.channels[0].gate.Active ? _sigMan.channels[0].gate.Period_ms / 1000f : float.PositiveInfinity;
             }
         }
