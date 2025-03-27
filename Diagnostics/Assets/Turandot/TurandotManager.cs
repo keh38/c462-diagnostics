@@ -597,7 +597,9 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         string error = "";
         var stringBuilder = new StringBuilder(100);
-        stringBuilder.AppendLine($"Block {_data.block}, Trial{_data.trial}");
+        stringBuilder.AppendLine($"Block = {_data.block}");
+        stringBuilder.AppendLine($"Trial = {_data.trial}");
+        stringBuilder.AppendLine("----------------------");
         foreach (PropValPair pv in _SCL[0].propValPairs)
         {
             stringBuilder.AppendLine($"{pv.property}={pv.value}");

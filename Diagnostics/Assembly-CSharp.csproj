@@ -543,7 +543,7 @@
       <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@2.0.0\Runtime\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="protobuf-net">
-      <HintPath>Library\PackageCache\com.epl.klib@7cffc28720\Runtime\Plugins\protobuf-net.dll</HintPath>
+      <HintPath>Library\PackageCache\com.epl.klib@82b20145ea\Runtime\Plugins\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2020.3.22f1\Editor\Data\MonoBleedingEdge\lib\mono\4.7.1-api\mscorlib.dll</HintPath>
@@ -896,9 +896,6 @@
     <Reference Include="Unity.VisualScripting.Flow.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Flow.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="KLib.Math">
-      <HintPath>Library\ScriptAssemblies\KLib.Math.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.VSCode.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VSCode.Editor.dll</HintPath>
     </Reference>
@@ -910,9 +907,6 @@
     </Reference>
     <Reference Include="Unity.VisualStudio.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VisualStudio.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="KLib.MSGraph">
-      <HintPath>Library\ScriptAssemblies\KLib.MSGraph.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
@@ -929,9 +923,6 @@
     <Reference Include="Unity.VisualScripting.State.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="KLib.Network">
-      <HintPath>Library\ScriptAssemblies\KLib.Network.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
     </Reference>
@@ -944,9 +935,6 @@
     <Reference Include="Unity.Rider.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="KLib">
-      <HintPath>Library\ScriptAssemblies\KLib.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
     </Reference>
@@ -958,6 +946,18 @@
     </Reference>
     <Reference Include="Unity.VisualScripting.Core">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="KLib">
+      <HintPath>Library\ScriptAssemblies\KLib.dll</HintPath>
+    </Reference>
+    <Reference Include="KLib.Math">
+      <HintPath>Library\ScriptAssemblies\KLib.Math.dll</HintPath>
+    </Reference>
+    <Reference Include="KLib.MSGraph">
+      <HintPath>Library\ScriptAssemblies\KLib.MSGraph.dll</HintPath>
+    </Reference>
+    <Reference Include="KLib.Network">
+      <HintPath>Library\ScriptAssemblies\KLib.Network.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

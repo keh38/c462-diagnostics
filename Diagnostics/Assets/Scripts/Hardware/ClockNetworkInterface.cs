@@ -119,8 +119,9 @@ public class ClockNetworkInterface : MonoBehaviour
                 _listener.Write((int)_clockSynchronizer.Status);
                 break;
             case "Sync":
-                _listener.Write(receiveTime);
-                _listener.Write(HighPrecisionClock.UtcNowIn100nsTicks);
+                var byteArray = new byte[16];
+                Buffer.BlockCopy(new long[] { receiveTime, HighPrecisionClock.UtcNowIn100nsTicks }, 0, byteArray, 0, 16);
+                _listener.Write(byteArray);
                 break;
         }
         _listener.CloseTcpClient();
