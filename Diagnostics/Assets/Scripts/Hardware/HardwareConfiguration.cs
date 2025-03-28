@@ -28,7 +28,7 @@ namespace KLib
 
         public bool UsesDigitimer()
         {
-            return GetSelectedMap().Items.Find(x => x.transducer.StartsWith("DSR")) != null;
+            return GetSelectedMap().Items.Find(x => x.transducer.StartsWith("DS8R")) != null;
         }
     }
 }

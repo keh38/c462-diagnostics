@@ -35,6 +35,7 @@ namespace Turandot.Scripts
 
         override public void Activate(Cue cue)
         {
+            Debug.Log("get fucked");
             Message m = cue as Message;
 
             _label.text = m.Text;

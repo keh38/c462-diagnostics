@@ -86,7 +86,7 @@ namespace Turandot.Scripts
                 _sigMan.Name = name;
                 // TURANDOT FIX 
                 //_sigMan.MaxLevelMargin = maxLevelMargin;
-                _sigMan.AdapterMap = KLib.AdapterMap.DefaultStereoMap("HD280");
+                _sigMan.AdapterMap = HardwareInterface.AdapterMap;;
                 _sigMan.Initialize(AudioSettings.outputSampleRate, npts);
                 _sigMan.StartPaused();
                 _isi = _sigMan.channels[0].gate.Period_ms / 1000f;
@@ -144,6 +144,8 @@ namespace Turandot.Scripts
                     _timeOut = Mathf.Round(timeOut / _isi) * _isi;
                 }
 
+                HardwareInterface.Digitimer?.EnableDevices(_sigMan.GetDigitimerChannels());
+
                 _sigMan.SetTimeout(_timeOut);
                 _sigMan.ResetSweepables();
                 _sigMan.Unpause();
@@ -160,6 +162,11 @@ namespace Turandot.Scripts
         {
             _isRunning = false;
             _timerOnly = false;
+
+            if (_sigMan != null)
+            {
+                HardwareInterface.Digitimer?.DisableDevices(_sigMan.GetDigitimerChannels());
+            }
         }
 
         public void KillAudio()

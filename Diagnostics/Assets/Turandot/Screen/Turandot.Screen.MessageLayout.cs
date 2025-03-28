@@ -27,16 +27,17 @@ namespace Turandot.Screen
 
         public MessageLayout() : base()
         {
+            Name = "Message";
             FontSize = 72;
             Color = 0xFF000000;
-            DefaultText = "Message";
+            DefaultText = "message goes here";
         }
 
         public Message GetDefaultCue()
         {
             return new Message()
             {
-                Text = "get bent"
+                Text = DefaultText
             };
         }
     }

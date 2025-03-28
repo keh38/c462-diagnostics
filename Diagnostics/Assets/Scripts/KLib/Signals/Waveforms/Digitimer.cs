@@ -115,6 +115,9 @@ namespace KLib.Signals.Waveforms
                     this.PulseRate_Hz = value;
                     _nptsPeriod = Mathf.RoundToInt(1 / (dt*PulseRate_Hz));
                     break;
+                case "Demand_mA":
+                    Demand = value;
+                    break;
             }
 
             return "";
@@ -126,6 +129,8 @@ namespace KLib.Signals.Waveforms
             {
                 case "PulseRate_Hz":
                     return PulseRate_Hz;
+                case "Demand_mA":
+                    return Demand;
             }
 
             return float.NaN;
@@ -135,6 +140,10 @@ namespace KLib.Signals.Waveforms
         {
             List<string> plist = new List<string>();
             plist.Add("PulseRate_Hz");
+            if (Source == DemandSource.Internal)
+            {
+                plist.Add("Demand_mA");
+            }
             return plist;
         }
 

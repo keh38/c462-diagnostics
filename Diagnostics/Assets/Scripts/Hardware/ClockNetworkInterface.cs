@@ -33,7 +33,6 @@ public class ClockNetworkInterface : MonoBehaviour
         StartServer();
     }
 
-
     private void StartServer()
     {
         _remoteConnected = false;

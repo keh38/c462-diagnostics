@@ -89,6 +89,7 @@ namespace Turandot.Scripts
 
             foreach (Cue c in cues)
             {
+                Debug.Log($"target = {c.Target}");
                 var target = _controls.Find(x => x.Name.Equals(c.Target));
                 target?.Activate(c);
                 //if (c is Message)
