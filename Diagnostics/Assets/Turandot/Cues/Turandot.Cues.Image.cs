@@ -35,7 +35,7 @@ namespace Turandot.Cues
         [JsonIgnore]
         override public bool IsSequenceable
         {
-            get { return StartVisible || EndVisible; }
+            get { return BeginVisible || EndVisible; }
         }
 
         override public List<string> GetPropertyNames()

@@ -43,7 +43,7 @@ namespace Turandot.Scripts
                     break;
             }
 
-            ShowCue(_action.StartVisible);
+            ShowCue(_action.BeginVisible);
         }
 
         public void Deactivate()

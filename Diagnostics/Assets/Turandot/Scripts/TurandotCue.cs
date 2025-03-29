@@ -58,7 +58,7 @@ namespace Turandot.Scripts
             //}
             //else
             //{
-                ShowCue(cue.StartVisible);
+                ShowCue(cue.BeginVisible);
             //}
 
             //if (_cue.numFlash > 0)

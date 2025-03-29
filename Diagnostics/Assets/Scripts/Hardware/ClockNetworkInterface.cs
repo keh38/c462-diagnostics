@@ -25,7 +25,7 @@ public class ClockNetworkInterface : MonoBehaviour
 
     private Thread _readThread;
 
-    private void Start()
+    public void Initialize()
     {
         var go = new GameObject("Discovery Server").AddComponent<NetworkDiscoveryServer>();
         go.transform.parent = this.gameObject.transform;

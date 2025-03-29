@@ -9,6 +9,7 @@ using KLib;
 public class HardwareInterface : MonoBehaviour
 {
     [SerializeField] private ClockSynchronizer _clockSynchronizer;
+    [SerializeField] private ClockNetworkInterface _clockNetwork;
     [SerializeField] private DigitimerControl _digitimer;
 
     private VolumeManager _volumeManager;
@@ -100,6 +101,7 @@ public class HardwareInterface : MonoBehaviour
         }
 
         _clockSynchronizer.Initialize(_hardwareConfig.SyncComPort);
+        _clockNetwork.Initialize();
 
         if (_hardwareConfig.UsesDigitimer())
         {

@@ -35,7 +35,6 @@ namespace Turandot.Scripts
 
         override public void Activate(Cue cue)
         {
-            Debug.Log("get fucked");
             Message m = cue as Message;
 
             _label.text = m.Text;
@@ -47,8 +46,11 @@ namespace Turandot.Scripts
         private void LayoutControl()
         {
             _label.fontSize = _layout.FontSize;
+            _label.color = KLib.ColorTranslator.ColorFromARGB(_layout.Color);
+
             var rt = GetComponent<RectTransform>();
-            rt.anchoredPosition = new Vector2(_layout.X, _layout.Y);
+            rt.anchorMin = new Vector2(_layout.X, _layout.Y);
+            rt.anchorMax = new Vector2(_layout.X, _layout.Y);
         }
 
         private void ChangeAppearance(Message m)

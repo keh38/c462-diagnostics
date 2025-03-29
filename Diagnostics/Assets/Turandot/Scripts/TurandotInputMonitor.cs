@@ -150,7 +150,7 @@ namespace Turandot.Scripts
             if (_used.Contains("keypad")) _buttons.Add(_keypad.button);
             if (_used.Contains("grapher"))
             {
-                grapher.Initialize(screen.grapherLayout);
+                //grapher.Initialize(screen.grapherLayout);
             }
             if (_used.Contains("sam")) _buttons.Add(SAM.button);
             if (_used.Contains("scaler")) _buttons.Add(_scaleSlider.button);

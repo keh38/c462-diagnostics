@@ -4957,6 +4957,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _clockSynchronizer: {fileID: 1681614340}
+  _clockNetwork: {fileID: 1681614344}
   _digitimer: {fileID: 1681614343}
 --- !u!4 &1681614342
 Transform:

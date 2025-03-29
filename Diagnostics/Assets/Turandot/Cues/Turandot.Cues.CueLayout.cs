@@ -2,13 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Xml.Serialization;
 
 using Newtonsoft.Json;
 using ProtoBuf;
 
-namespace Turandot.Cues
+namespace Turandot.Screen
 { 
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    [XmlInclude(typeof(MessageLayout))]
     [JsonObject(MemberSerialization.OptOut)]
     public class CueLayout
     {

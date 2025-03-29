@@ -20,7 +20,7 @@ namespace Turandot.Scripts
         {
             _image = image;
 
-            if (!_image.StartVisible || string.IsNullOrEmpty(image.filename))
+            if (!_image.BeginVisible || string.IsNullOrEmpty(image.filename))
                 return;
 
             if (string.IsNullOrEmpty(_lastFile) || image.filename != _lastFile)

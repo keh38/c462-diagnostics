@@ -72,7 +72,7 @@ namespace Turandot.Scripts
                 //label.color = KLib.Unity.ColorFromARGB(_action.newColor);
             }
 
-            ShowCue(_action.StartVisible);
+            ShowCue(_action.BeginVisible);
         }
 
         public void Deactivate()

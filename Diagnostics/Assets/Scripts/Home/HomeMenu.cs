@@ -156,7 +156,7 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 
     public void OnQuitMenuClick()
     {
-        SelectItem(_quitMenuButton, _quitPanel);
+        StartCoroutine(SelectItem(_quitMenuButton, _quitPanel));
     }
 
     public void OnQuitConfirmClick()
