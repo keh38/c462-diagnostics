@@ -26,11 +26,9 @@ namespace Turandot.Scripts
         private List<TurandotCue> _controls;
         private List<Cue> _cues;
 
-        public void Initialize(ScreenElements screen, List<string> cuesUsed)
+        public void Initialize(List<CueLayout> cues)
         {
-            _used = cuesUsed;
-
-            _controls = new List<TurandotCue>();
+           _controls = new List<TurandotCue>();
 
             //led.Initialize();
             //message.Initialize(screen.messageLayout);
@@ -42,7 +40,7 @@ namespace Turandot.Scripts
             //scoreboard.Initialize(screen.scoreboard);
 
             var canvasRT = GameObject.Find("Canvas").GetComponent<RectTransform>();
-            foreach (var layout in screen.Cues)
+            foreach (var layout in cues)
             {
                 if (layout is MessageLayout)
                 {

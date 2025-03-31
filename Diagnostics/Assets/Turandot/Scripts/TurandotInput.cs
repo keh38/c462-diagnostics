@@ -35,11 +35,6 @@ namespace Turandot.Scripts
             }
         }
 
-        virtual public void ApplySkin(Skin skin)
-        {
-            //button.ApplySkin(skin);
-        }
-
         void ShowInput(bool visible)
         {
             transform.localPosition = new Vector2(_input.X, visible ? _input.Y : -5000);

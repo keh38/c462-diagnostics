@@ -73,7 +73,7 @@ public class TurandotEngine : MonoBehaviour
         inputMonitor.ShowDefaultInputs(show);
     }
 
-    public void Initialize(Parameters par)//, string transducer, float maxLevelMargin)
+    public void Initialize(Parameters par)
     {
         _log = new History();
         _params = par;
@@ -83,7 +83,7 @@ public class TurandotEngine : MonoBehaviour
         CreateAudioPlayers();
         //inputMonitor.OnEventChanged = OnInputEventChanged;
         //inputMonitor.Initialize(_params.screen, _params.buttons, _params.inputEvents, _params.InputsUsed);
-        _cueController.Initialize(_params.screen, _params.CuesUsed);
+        _cueController.Initialize(_params.screen.Cues);
     }
 
     void CreateAudioPlayers()
@@ -150,7 +150,7 @@ public class TurandotEngine : MonoBehaviour
     {
         ClearScreen();
 
-        _cueController.Initialize(par.screen, par.CuesUsed);
+        _cueController.Initialize(par.screen.Cues);
         //inputMonitor.Initialize(par.screen, par.buttons, par.inputEvents, par.InputsUsed);
 
         //inputMonitor.Activate(par[state].inputs, null, 0);

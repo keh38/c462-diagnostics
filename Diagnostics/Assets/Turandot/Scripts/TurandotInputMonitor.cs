@@ -36,7 +36,6 @@ namespace Turandot.Scripts
         TurandotThumbSlider _thumbSlider;
         TurandotPupillometer _pupillometer;
         TurandotRandomProcess _randomProcess;
-        Skin _skin;
 
         //KStringDelegate _onEventChanged;
 
@@ -104,43 +103,26 @@ namespace Turandot.Scripts
             SAM.Deactivate();
         }
 
-        public void ApplySkin(Skin skin)
-        {
-            _skin = skin;
-
-            TurandotButton b = Square.GetComponent<TurandotButton>();
-            //b.ApplySkin(skin);
-
-            b = Circle.GetComponent<TurandotButton>();
-            //b.ApplySkin(skin);
-
-            SAM.ApplySkin(skin);
-            _categorizer.ApplySkin(skin);
-            _scaleSlider.ApplySkin(skin);
-            _thumbSlider.ApplySkin(skin);
-            paramSlider.ApplySkin(skin);
-        }
-
         //public KStringDelegate OnEventChanged
         //{
         //    set { _onEventChanged = value; }
         //}
 
-        public void Initialize(ScreenElements screen, List<ButtonSpec> buttonSpex, List<InputEvent> inputEvents, List<string> inputsUsed)
+        public void Initialize(ScreenElements screen, List<ButtonLayout> buttonSpex, List<InputEvent> inputEvents, List<string> inputsUsed)
         {
             _isRunning = false;
             _used = inputsUsed;
 
             _scalarData.Clear();
 
-            if (screen.inputs.elements.Contains("pupillometer"))
-            {
+            //if (screen.inputs.elements.Contains("pupillometer"))
+            //{
                 //_pupillometer.Activate();
                 //_scalarData.Add(_pupillometer.Data);
-            }
+            //}
 
             _buttons = new List<TurandotButton>();
-            foreach (ButtonSpec bs in buttonSpex)
+            foreach (ButtonLayout bs in buttonSpex)
             {
                 _buttons.Add(CreateTurandotButton(bs));
             }
@@ -185,52 +167,52 @@ namespace Turandot.Scripts
             ShowDefaultInputs(true);
         }
 
-        private TurandotButton CreateTurandotButton(ButtonSpec buttonSpec)
+        private TurandotButton CreateTurandotButton(ButtonLayout buttonSpec)
         {
-            int height = buttonSpec.size;
-            GameObject src = null;
-            switch (buttonSpec.style)
-            {
-                case ButtonSpec.ButtonStyle.Circle:
-                    src = Circle;
-                    break;
-                case ButtonSpec.ButtonStyle.None:
-                case ButtonSpec.ButtonStyle.Square:
-                    src = Square;
-                    break;
-                case ButtonSpec.ButtonStyle.Rectangle:
-                    src = Square;
-                    height = buttonSpec.height;
-                    break;
-                case ButtonSpec.ButtonStyle.Left:
-                    src = Left;
-                    height = buttonSpec.height;
-                    break;
-                case ButtonSpec.ButtonStyle.Right:
-                    src = Right;
-                    height = buttonSpec.height;
-                    break;
-            }
-            GameObject obj = GameObject.Instantiate(src);
-
-            obj.transform.parent = src.transform.parent;
-            obj.transform.localScale = Vector3.one;
-            obj.transform.localPosition = new Vector2(buttonSpec.x, buttonSpec.y);
-            obj.name = buttonSpec.name;
-
-            TurandotButton b = obj.GetComponent<TurandotButton>();
-            //b.SetSize(buttonSpec.size, height);
-
-            //b.ApplySkin(_skin);
-            //b.Initialize(buttonSpec);
-            //b.IsVisible = false;
-
-            //if (buttonSpec.style == ButtonSpec.ButtonStyle.None)
+            //int height = buttonSpec.size;
+            //GameObject src = null;
+            //switch (buttonSpec.style)
             //{
-            //    b.MakeHidden();
+            //    case ButtonLayout.ButtonStyle.Circle:
+            //        src = Circle;
+            //        break;
+            //    case ButtonLayout.ButtonStyle.None:
+            //    case ButtonLayout.ButtonStyle.Square:
+            //        src = Square;
+            //        break;
+            //    case ButtonLayout.ButtonStyle.Rectangle:
+            //        src = Square;
+            //        height = buttonSpec.height;
+            //        break;
+            //    case ButtonLayout.ButtonStyle.Left:
+            //        src = Left;
+            //        height = buttonSpec.height;
+            //        break;
+            //    case ButtonLayout.ButtonStyle.Right:
+            //        src = Right;
+            //        height = buttonSpec.height;
+            //        break;
             //}
+            //GameObject obj = GameObject.Instantiate(src);
 
-            return b;
+            //obj.transform.parent = src.transform.parent;
+            //obj.transform.localScale = Vector3.one;
+            //obj.transform.localPosition = new Vector2(buttonSpec.x, buttonSpec.y);
+            //obj.name = buttonSpec.name;
+
+            //TurandotButton b = obj.GetComponent<TurandotButton>();
+            ////b.SetSize(buttonSpec.size, height);
+
+            ////b.ApplySkin(_skin);
+            ////b.Initialize(buttonSpec);
+            ////b.IsVisible = false;
+
+            ////if (buttonSpec.style == ButtonSpec.ButtonStyle.None)
+            ////{
+            ////    b.MakeHidden();
+            ////}
+
+            return null;
         }
 
         public List<TurandotButton> Buttons

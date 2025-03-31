@@ -134,7 +134,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     
     private void ApplyParameters()
     {
-        _params.CheckParameters();
         _params.ApplyDefaultWavFolder(GameManager.Project);
 
         //try

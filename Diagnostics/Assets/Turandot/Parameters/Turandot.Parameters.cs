@@ -18,7 +18,6 @@ namespace Turandot
     {
         public int version = _currentVersion;
         public Instructions instructions = new Instructions();
-        public List<ButtonSpec> buttons = new List<ButtonSpec>();
         public ScreenElements screen = new ScreenElements();
         public List<InputEvent> inputEvents = new List<InputEvent>();
         public List<FlowElement> flowChart = new List<FlowElement>();
@@ -26,7 +25,6 @@ namespace Turandot
         public List<Flag> flags = new List<Flag>();
         public Schedules.Schedule schedule = new Schedules.Schedule();
         public Schedules.Adaptation adapt = new Schedules.Adaptation();
-        public Optimizations.Optimization optimization = new Optimizations.AnnealAFC();
         public string tag = "";
         public string linkTo = "";
         public string wavFolder = "";
@@ -136,44 +134,6 @@ namespace Turandot
             return props;
         }
 
-        public void CheckParameters()
-        {
-            CheckParameters(version);
-        }
-
-        public void CheckParameters(int fileVers)
-        {
-            // I screwed up the parameter update in the editor and broke the screen elements in files Kelly changed across versions. There's no reason not to perform
-            // this check everytime, and doing so will automatically fix Kelly's config files.
-            //if (fileVers < 4)
-            {
-                UpdateScreenElements();
-            }
-
-            if (fileVers == 1)
-            {
-                UpdateButtons();
-            }
-
-            version = _currentVersion;
-            foreach (FlowElement fe in flowChart)
-            {
-                List<Inputs.Input> toDelete = new List<Inputs.Input>();
-                foreach (Inputs.Input i in fe.inputs)
-                {
-                    if (i.name == "SAM" || i.name == "Scaler" || i.name == "Categorizer" || i.name == "Keypad" || i.name == "Param slider" || i.name == "Thumb slider" || i.name == "Grapher" || i.name == "Random process") continue;
-                    if (buttons.Find(o => o.name == i.name) == null) toDelete.Add(i);
-                }
-
-                foreach (Inputs.Input i in toDelete) fe.inputs.Remove(i);
-
-                // Not sure how the editor gets in this state:
-                foreach (Termination t in fe.term.FindAll(o => o.source == "???")) fe.term.Remove(t);
-            }
-
-            if (!allowExpertOptions) ClearExpertOptions();
-        }
-
         public void ClearExpertOptions()
         {
             foreach (var fe in flowChart)
@@ -181,12 +141,6 @@ namespace Turandot
                 if (fe.sigMan != null) fe.sigMan.ClearExpertOptions();
                 foreach (var t in fe.term) t.flagExpr = "";
             }
-        }
-
-        protected void UpdateScreenElements()
-        {
-            screen.cues.elements = new List<string>(CuesUsed);
-            screen.inputs.elements = new List<string>(InputsUsed);
         }
 
         public void Initialize()
@@ -224,129 +178,6 @@ namespace Turandot
                         //f.sigMan.WavFolder = System.IO.Path.Combine(DataFileLocations.UserWavFolder, wavFolder);
                     }
                 }
-            }
-        }
-
-        private void UpdateButtons()
-        {
-            List<ButtonSpec> toDelete = new List<ButtonSpec>();
-
-            foreach (ButtonSpec b in buttons)
-            {
-                if (string.IsNullOrEmpty(b.label))
-                {
-                    toDelete.Add(b);
-                }
-                else //if (b.size == 0) // our indication that the parameters have not been updated
-                {
-                    switch (b.name)
-                    {
-                        case "Left Thumb":
-                            b.size = 200;
-                            b.style = ButtonSpec.ButtonStyle.Circle;
-                            b.x = -820;
-                            b.y = -45;
-                            break;
-                        case "Right Thumb":
-                            b.size = 200;
-                            b.style = ButtonSpec.ButtonStyle.Circle;
-                            b.x = 820;
-                            b.y = -45;
-                            break;
-                        case "Left Button":
-                            b.size = 200;
-                            b.style = ButtonSpec.ButtonStyle.Square;
-                            b.x = -580;
-                            b.y = -35;
-                            break;
-                        case "Right Button":
-                            b.size = 200;
-                            b.style = ButtonSpec.ButtonStyle.Square;
-                            b.x = 580;
-                            b.y = -35;
-                            break;
-                    }
-                }
-            }
-            foreach (ButtonSpec b in toDelete) buttons.Remove(b);
-        }
-
-        public void CreateDefaultButtons()
-        {
-            buttons.Clear();
-
-            ButtonSpec b = new ButtonSpec("Left Thumb", "thumb here");
-            b.size = 200;
-            b.style = ButtonSpec.ButtonStyle.Circle;
-            b.x = -820;
-            b.y = -45;
-            buttons.Add(b);
-
-            b = new ButtonSpec("Right Thumb", "thumb here");
-            b.size = 200;
-            b.style = ButtonSpec.ButtonStyle.Circle;
-            b.x = 820;
-            b.y = -45;
-            buttons.Add(b);
-
-            b = new ButtonSpec("Left Button", "Respond");
-            b.size = 200;
-            b.style = ButtonSpec.ButtonStyle.Square;
-            b.x = -580;
-            b.y = -35;
-            buttons.Add(b);
-
-            b = new ButtonSpec("Right Button", "Respond");
-            b.size = 200;
-            b.style = ButtonSpec.ButtonStyle.Square;
-            b.x = 580;
-            b.y = -35;
-            buttons.Add(b);
-        }
-
-        [XmlIgnore]
-        [JsonIgnore]
-        [ProtoIgnore]
-        public List<string> CuesUsed
-        {
-            get
-            {
-                List<string> u = new List<string>();
-                foreach (FlowElement f in flowChart)
-                {
-                    foreach (Cue c in f.cues)
-                    {
-                        if (!u.Contains(c.Name.ToLower())) u.Add(c.Name.ToLower());
-                    }
-                }
-
-                return u;
-            }
-        }
-
-        [XmlIgnore]
-        [JsonIgnore]
-        [ProtoIgnore]
-        public List<string> InputsUsed
-        {
-            get
-            {
-                List<string> u = new List<string>();
-                foreach (ButtonSpec bs in buttons)
-                {
-                    if (!string.IsNullOrEmpty(bs.label) && !u.Contains(bs.name.ToLower())) u.Add(bs.name.ToLower());
-                    if (bs.xbox.control != XboxLink.ControlSource.None && !u.Contains("xbox")) u.Add("xbox");
-                }
-
-                foreach (FlowElement f in flowChart)
-                {
-                    foreach (Turandot.Inputs.Input i in f.inputs)
-                        if (!u.Contains(i.Name.ToLower())) u.Add(i.Name.ToLower());
-                }
-
-                if (screen.inputs.elements.Contains("pupillometer")) u.Add("pupillometer");
-
-                return u;
             }
         }
 

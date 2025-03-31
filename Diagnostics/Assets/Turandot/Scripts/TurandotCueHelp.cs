@@ -58,10 +58,6 @@ namespace Turandot.Scripts
             base.Initialize();
         }
 
-        public void ApplySkin(Skin skin)
-        {
-            _backgroundColor = skin.helpBackgroundColor;
-        }
 
         IEnumerator TextAnimator(string msg)
         {

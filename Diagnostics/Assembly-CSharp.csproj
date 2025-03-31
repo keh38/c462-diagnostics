@@ -78,6 +78,7 @@
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.Script.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Enumerations\Modality.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.InputLog.cs" />
+    <Compile Include="Assets\Scripts\KLib\Utilities\ColorTranslator.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\Sinusoid.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.InputSource.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptMode.cs" />
@@ -85,7 +86,6 @@
     <Compile Include="Assets\AlgLib\ap.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.ScalarData.cs" />
     <Compile Include="Assets\Scripts\Hardware\HardwareConfiguration.cs" />
-    <Compile Include="Assets\Turandot\Schedules\Optimizations\Turandot.Optimizations.AnnealContin.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.Comparison.cs" />
     <Compile Include="Assets\Scripts\KLib\Utilities\KLib.Expressions.cs" />
     <Compile Include="Assets\Turandot\Screen\Turandot.Screen.ParamSliderLayout.cs" />
@@ -100,7 +100,6 @@
     <Compile Include="Assets\Scripts\Game Management\FileLocations.cs" />
     <Compile Include="Assets\AlgLib\fasttransforms.cs" />
     <Compile Include="Assets\Unity UI Controls\Scripts\ProgressBar Scripts\ProgressBar.cs" />
-    <Compile Include="Assets\Turandot\Schedules\Optimizations\Turandot.Optimizations.AnnealAFC.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\WaveformFactory.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.SAM.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptHistory.cs" />
@@ -115,8 +114,6 @@
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.GrapherAction.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Gate.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Filters\IIRFilter.cs" />
-    <Compile Include="Assets\Turandot\Screen\Turandot.Screen.Skin.cs" />
-    <Compile Include="Assets\Turandot\Schedules\Optimizations\Turandot.Optimizations.Parameter.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.Input.cs" />
     <Compile Include="Assets\Turandot\Parameters\Turandot.Parameters.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotScripter.cs" />
@@ -128,7 +125,6 @@
     <Compile Include="Assets\Scripts\Menu Tools\TitleBarStyle.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.SCLElement.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Modulations\AM.cs" />
-    <Compile Include="Assets\Turandot\Screen\Turandot.Screen.AvailableElements.cs" />
     <Compile Include="Assets\Turandot\Data\Turandot.TrialData.cs" />
     <Compile Include="Assets\Turandot\Parameters\Turandot.TermType.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Calibration\DeviceCorrections.cs" />
@@ -144,7 +140,7 @@
     <Compile Include="Assets\Scripts\KLib\Signals\Audiograms\Audiograms.AudiogramData.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Filters\BPFilter.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Wave\KLib.Wave.WaveFormat.cs" />
-    <Compile Include="Assets\Turandot\Inputs\Turandot.ButtonSpec.cs" />
+    <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.ButtonLayout.cs" />
     <Compile Include="Assets\Scripts\Game Management\AppState.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Channel.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\MenuBarStyle.cs" />
@@ -171,8 +167,6 @@
     <Compile Include="Assets\Unity UI Controls\Scripts\_Demo Scripts\DemoListBox.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotButton.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.CatchInterval.cs" />
-    <Compile Include="Assets\Turandot\Screen\Turandot.Screen.AvailableCues.cs" />
-    <Compile Include="Assets\Turandot\Schedules\Optimizations\Turandot.Optimizations.Metric.cs" />
     <Compile Include="Assets\Unity UI Controls\Scripts\_Demo Scripts\DemoProgressBar.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\UserFileReferences.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Enumerations\BWUnits.cs" />
@@ -220,13 +214,11 @@
     <Compile Include="Assets\Turandot\Scripts\TurandotCueCounter.cs" />
     <Compile Include="Assets\Turandot\Cues\Turandot.Cues.Image.cs" />
     <Compile Include="Assets\Scripts\Hardware\SyncPulseDetector.cs" />
-    <Compile Include="Assets\Turandot\Screen\Turandot.Screen.AvailableInputs.cs" />
     <Compile Include="Assets\Unity UI Controls\Scripts\ListBox Scripts\ListBoxControl.cs" />
     <Compile Include="Assets\Scripts\KLib\Utilities\ExtensionMethods.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.Mode.cs" />
     <Compile Include="Assets\Turandot\Interactive\TurandotInteractive.cs" />
     <Compile Include="Assets\Turandot\TurandotManager.cs" />
-    <Compile Include="Assets\Turandot\Schedules\Optimizations\Turandot.Optimizations.Method.cs" />
     <Compile Include="Assets\Scripts\Home\HomeMenu.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\MenuButtonControl.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\UserFile.cs" />
@@ -238,7 +230,7 @@
     <Compile Include="Assets\Scripts\Game Management\Project.Settings.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.InputOperator.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptiveTrack.cs" />
-    <Compile Include="Assets\Turandot\Screen\Turandot.Screen.MessageLayout.cs" />
+    <Compile Include="Assets\Turandot\Screen\Cues\Turandot.Screen.MessageLayout.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\FM.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotSecondaryAudio.cs" />
     <Compile Include="Assets\Scripts\Hardware\ClockNetworkInterface.cs" />
@@ -281,11 +273,10 @@
     <Compile Include="Assets\Prefabs\MessageBox.cs" />
     <Compile Include="Assets\Turandot\Parameters\Turandot.Instructions.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Calibration\References.cs" />
-    <Compile Include="Assets\Turandot\Cues\Turandot.Cues.CueLayout.cs" />
+    <Compile Include="Assets\Turandot\Screen\Cues\Turandot.Screen.CueLayout.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\MenuBarControl.cs" />
-    <Compile Include="Assets\Turandot\Schedules\Optimizations\Turandot.Optimizations.Optimization.cs" />
     <Compile Include="Assets\Scripts\Home\SubjectPanel.cs" />
-    <Compile Include="Assets\Scripts\KLib\Utilities\ColorTranslator.cs" />
+    <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.InputLayout.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
