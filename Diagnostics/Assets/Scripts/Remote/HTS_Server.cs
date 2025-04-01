@@ -50,6 +50,7 @@ public class HTS_Server : MonoBehaviour
     public static void StartServer() => instance._StartServer();
     public static bool RemoteConnected { get { return instance._remoteConnected; } }
     public static string MyAddress { get { return instance._address.Equals("localhost") ? "127.0.0.1" : instance._address; } }
+    public static IPAddress RemoteAddress { get { return instance._remoteEndPoint.Address; } }
     public static void SetCurrentScene(string name, IRemoteControllable controllableScene)
     {
         instance._currentSceneName = name;

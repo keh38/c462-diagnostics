@@ -46,7 +46,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         _isRemoteConnected = HTS_Server.RemoteConnected;
         if (_isRemoteConnected)
         {
-            _udpEndPoint = new IPEndPoint(IPAddress.Parse(HTS_Server.MyAddress), _udpPort);
+            _udpEndPoint = new IPEndPoint(HTS_Server.RemoteAddress, _udpPort);
         }
 
 #if HACKING

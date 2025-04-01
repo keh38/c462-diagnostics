@@ -232,7 +232,7 @@ namespace Launcher
         private string ValidateDigitimerDevices()
         {
             var map = _config.GetSelectedMap();
-            var devices = map.Items.FindAll(x => x.modality.Equals("Electric") && x.transducer.StartsWith("DSR"));
+            var devices = map.Items.FindAll(x => x.modality.Equals("Electric") && x.transducer.StartsWith("DS8R"));
             if (devices.Count == 0)
             {
                 return "";
@@ -259,7 +259,7 @@ namespace Launcher
                     }
                     else
                     {
-                        var e = $"DSR #{id} not found";
+                        var e = $"DS8R #{id} not found";
                         result += e + Environment.NewLine;
                         Log.Error(e);
                     }

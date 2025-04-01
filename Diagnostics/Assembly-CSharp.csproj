@@ -159,6 +159,7 @@
     <Compile Include="Assets\Turandot\Cues\Turandot.Cues.CounterAction.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\RippleNoise.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotInputSlider.cs" />
+    <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.InputLayout.cs" />
     <Compile Include="Assets\Scripts\Admin Tools\OneDrivePanel.cs" />
     <Compile Include="Assets\Turandot\Interactive\InteractiveSettings.cs" />
     <Compile Include="Assets\Turandot\Cues\Turandot.Cues.Help.cs" />
@@ -276,7 +277,6 @@
     <Compile Include="Assets\Turandot\Screen\Cues\Turandot.Screen.CueLayout.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\MenuBarControl.cs" />
     <Compile Include="Assets\Scripts\Home\SubjectPanel.cs" />
-    <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.InputLayout.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
