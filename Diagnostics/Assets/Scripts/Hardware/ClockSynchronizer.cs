@@ -34,13 +34,10 @@ public class ClockSynchronizer : MonoBehaviour
     private Thread _syncThread;
     private bool _stopThread;
 
-    void Start()
-    {
-        CreateSignal();
-    }
-
     public void Initialize(string comPort)
     {
+        CreateSignal();
+
         _comPort = comPort;
         Status = SyncStatus.Idle;
 
@@ -52,7 +49,6 @@ public class ClockSynchronizer : MonoBehaviour
         }
 
         _serialPortOK = _syncPulseDetector.InitializeSerialPort(_comPort);
-
     }
 
     void CreateSignal()

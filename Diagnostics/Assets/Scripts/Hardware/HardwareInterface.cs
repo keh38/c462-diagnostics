@@ -11,7 +11,7 @@ public class HardwareInterface : MonoBehaviour
     [SerializeField] private ClockSynchronizer _clockSynchronizer;
     [SerializeField] private ClockNetworkInterface _clockNetwork;
     [SerializeField] private DigitimerControl _digitimer;
-
+    
     private VolumeManager _volumeManager;
     private float _startVolume;
 
@@ -20,6 +20,8 @@ public class HardwareInterface : MonoBehaviour
 
     private bool _audioReady = false;
     private bool _errorAcknowledged = false;
+
+    [SerializeField] private int _fuckme = 0;
 
     #region SINGLETON CREATION
     // Singleton
@@ -53,19 +55,14 @@ public class HardwareInterface : MonoBehaviour
     public static bool IsReady { get { return instance._audioReady; } }
     public static bool ErrorAcknowledged { get { return instance._errorAcknowledged; } }
     public static void AcknowledgeError() { instance._errorAcknowledged = true; }
-#endregion
+    public static void CleanUp() => instance._CleanUp();
+    #endregion
 
-#region PRIVATE METHODS
-    private void OnDestroy()
-    {
-        if (_volumeManager != null)
-        {
-            _volumeManager.SetMasterVolume(_startVolume, VolumeManager.VolumeUnit.Scalar);
-        }
-    }
+    #region PRIVATE METHODS
 
     private bool _Init()
     {
+        _fuckme = 12;
         _volumeManager = new VolumeManager();
         _startVolume = _volumeManager.GetMasterVolume(VolumeManager.VolumeUnit.Scalar);
         _volumeManager.SetMasterVolume(1.0f, VolumeManager.VolumeUnit.Scalar);
@@ -111,5 +108,18 @@ public class HardwareInterface : MonoBehaviour
 
         return true;
     }
-#endregion
+
+    public void _CleanUp()
+    {
+        if (_volumeManager != null)
+        {
+            _volumeManager.SetMasterVolume(_startVolume, VolumeManager.VolumeUnit.Scalar);
+        }
+
+        _clockNetwork.StopServer();
+        _digitimer.CleanUp();
+    }
+
+
+    #endregion
 }

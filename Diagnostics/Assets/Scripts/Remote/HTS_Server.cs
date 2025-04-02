@@ -236,7 +236,6 @@ public class HTS_Server : MonoBehaviour
 
     private void ReceiveFile(string data)
     {
-        Debug.Log(data);
         var parts = data.Split(new char[] { ':' }, 3);
         for (int k = 0; k < parts.Length; k++) Debug.Log(parts[k]);
         if (parts.Length != 3) return;

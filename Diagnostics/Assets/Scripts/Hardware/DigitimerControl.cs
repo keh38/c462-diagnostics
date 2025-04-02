@@ -9,12 +9,7 @@ public class DigitimerControl : MonoBehaviour
 {
     private D128ExAPI _d128 = null;
 
-    void Start()
-    {
-
-    }
-
-    private void OnDestroy()
+    public void CleanUp()
     {
         if (_d128 != null)
         {

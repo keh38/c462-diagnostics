@@ -67,11 +67,6 @@ public class ClockNetworkInterface : MonoBehaviour
         Debug.Log("stopped HTS Sync TCP listener");
     }
 
-    void OnDestroy()
-    {
-        StopServer();
-    }
-
     private void TCPServer()
     {
         while (!_stopServer)
