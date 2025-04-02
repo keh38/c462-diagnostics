@@ -205,6 +205,11 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
             slider.Setter = _sigMan.GetParamSetter(prop.FullParameterName);
             slider.Setter?.Invoke(prop.StartValue);
 
+            if (prop.Property.Contains("Digitimer.Demand"))
+            {
+                slider.Setter += x => this.UpdateDigitimer(x);
+            }
+
             sliderPanel.AddSlider(slider);
         }
 
@@ -212,6 +217,11 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         flowLayout.Add(panelObj);
 
         return sliderPanel;
+    }
+
+    private void UpdateDigitimer(float value)
+    {
+
     }
 
     private void ApplyParameters(InteractiveSettings settings)
@@ -226,7 +236,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
         _sigMan.StartPaused();
 
-        HardwareInterface.Digitimer?.EnableDevices(_sigMan.GetDigitimerChannels());
+        //HardwareInterface.Digitimer?.EnableDevices(_sigMan.GetDigitimerChannels());
 
         _audioInitialized = true;
     }
@@ -273,6 +283,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
     private void StartStreaming()
     {
+        HardwareInterface.Digitimer?.EnableDevices(_sigMan.GetDigitimerChannels());
         _sigMan.Unpause();
     }
 

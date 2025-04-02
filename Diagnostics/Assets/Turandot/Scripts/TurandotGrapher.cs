@@ -188,7 +188,7 @@ public class TurandotGrapher : MonoBehaviour
     public void Activate(Turandot.Inputs.Input action, KLib.Signals.SignalManager sigMan, float timeOut)
     {
         _action = action as Turandot.Inputs.GrapherAction;
-        if (!_action.startVisible)
+        if (!_action.BeginVisible)
         {
             transform.parent.transform.position = new Vector2(0, 2f);
             _isVisible = false;
@@ -214,9 +214,9 @@ public class TurandotGrapher : MonoBehaviour
 
     public void Deactivate()
     {
-        transform.parent.transform.position = new Vector2(0, _action!=null && _action.endVisible ? _layout.graphY : 2f);
+        transform.parent.transform.position = new Vector2(0, _action!=null && _action.EndVisible ? _layout.graphY : 2f);
         _isRunning = false;
-        _isVisible = _action != null && _action.endVisible;
+        _isVisible = _action != null && _action.EndVisible;
 
         //if (_action != null && !_action.endVisible && _trailLine != null)
         //{

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
@@ -23,13 +24,24 @@ namespace Turandot.Inputs
     public class Input
     {
         public string label = "";
-        public bool startVisible = true;
-        public bool endVisible = false;
+        [Category("Action")]
+        public bool BeginVisible { get; set; }
+        private bool ShouldSerializeBeginVisible() { return false; }
+
+        [Category("Action")]
+        public bool EndVisible { get; set; }
+        private bool ShouldSerializeEndVisible() { return false; }
+
         public bool enabled = true;
+
         public int X = 0;
         public int Y = 0;
         public float value;
         public string name;
+
+        [ReadOnly(true)]
+        public string Target { get; set; }
+
 
         public Input() { }
         public Input(string name)

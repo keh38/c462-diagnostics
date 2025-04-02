@@ -23,7 +23,7 @@ namespace Turandot.Scripts
             _input = input;
 
             if (label != null) label.text = _input.label;
-            ShowInput(input.startVisible);
+            ShowInput(input.BeginVisible);
         }
 
         virtual public void Deactivate()
@@ -31,7 +31,7 @@ namespace Turandot.Scripts
             if (_input != null)
             {
                 //StopAllCoroutines();
-                ShowInput(_input.endVisible);
+                ShowInput(_input.EndVisible);
             }
         }
 

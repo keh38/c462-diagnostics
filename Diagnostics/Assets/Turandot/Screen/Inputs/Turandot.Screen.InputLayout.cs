@@ -10,7 +10,7 @@ using ProtoBuf;
 namespace Turandot.Screen
 {
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
-    //[XmlInclude(typeof(MessageLayout))]
+    [XmlInclude(typeof(ButtonLayout))]
     [JsonObject(MemberSerialization.OptOut)]
     public class InputLayout
     {
