@@ -11,6 +11,8 @@ namespace Turandot.Scripts
 {
     public class TurandotInputMonitor : MonoBehaviour
     {
+        [SerializeField] private GameObject _buttonPrefab;
+
         // TURANDOT FIX
         public TurandotSAM SAM;
         public GameObject Circle;
@@ -36,24 +38,16 @@ namespace Turandot.Scripts
         TurandotThumbSlider _thumbSlider;
         TurandotPupillometer _pupillometer;
         TurandotRandomProcess _randomProcess;
+        List<TurandotInput> _inputObjects;
+        List<Input> _currentStateInputs;
 
-        //KStringDelegate _onEventChanged;
+        public delegate void EventChangedDelegate(string eventName);
+        public EventChangedDelegate EventChanged;
+        private void OnEventChanged(string eventName) { EventChanged?.Invoke(eventName); }
 
         List<Flag> _flags;
-        List<string> _used;
         int _numButtons = 0;
 
-        void Start()
-        {
-            _categorizer = GameObject.Find("Inputs/Categorizer").GetComponent<TurandotInputCategorizer>();
-            _scaleSlider = GameObject.Find("Inputs/Scale").GetComponent<TurandotInputSlider>();
-            _keypad = GameObject.Find("Inputs/Keypad").GetComponent<TurandotKeypad>();
-            _thumbSlider = GameObject.Find("Inputs/Thumb Slider").GetComponent<TurandotThumbSlider>();
-            _pupillometer = GameObject.Find("Pupillometer").GetComponent<TurandotPupillometer>();
-            _randomProcess = GameObject.Find("Inputs/Random Process").GetComponent<TurandotRandomProcess>();
-        }
-
-        // Update is called once per frame
         void Update()
         {
             if (!_isRunning) return;
@@ -67,7 +61,7 @@ namespace Turandot.Scripts
             {
                 if (ie.Update(_buttonData, _flags, _scalarData, Time.deltaTime))
                 {
-                    //_onEventChanged(ie.name);
+                    OnEventChanged(ie.name);
                 }
             }
 
@@ -85,50 +79,54 @@ namespace Turandot.Scripts
             {
                 if (ie.Value)
                 {
-                    //_onEventChanged(ie.name);
+                    OnEventChanged(ie.name);
                 }
             }
         }
 
-        public void ShowDefaultInputs(bool show)
-        {
-            //for (int k = 0; k < _numButtons; k++) _buttons[k].Deactivate();
-//                NGUITools.SetActive(_buttons[k].gameObject, show);
-        }
-
         public void ClearScreen()
         {
-            ShowDefaultInputs(false);
-            _thumbSlider.transform.localPosition = new Vector2(-1800, -1500);
-            SAM.Deactivate();
+            if (_inputObjects == null) return;
+            foreach (var i in _inputObjects) i.gameObject.SetActive(false);
         }
 
-        //public KStringDelegate OnEventChanged
-        //{
-        //    set { _onEventChanged = value; }
-        //}
-
-        public void Initialize(ScreenElements screen, List<ButtonLayout> buttonSpex, List<InputEvent> inputEvents, List<string> inputsUsed)
+        public void Initialize(List<InputLayout> inputLayouts, List<InputEvent> inputEvents)
         {
             _isRunning = false;
-            _used = inputsUsed;
 
             _scalarData.Clear();
 
+            _inputObjects = new List<TurandotInput>();
+            _buttons = new List<TurandotButton>();
+
+            var canvasRT = GameObject.Find("Canvas").GetComponent<RectTransform>();
+            foreach (var layout in inputLayouts)
+            {
+                if (layout is ButtonLayout)
+                {
+                    var gobj = GameObject.Instantiate(_buttonPrefab, canvasRT);
+                    var i = gobj.GetComponent<TurandotButton>();
+                    i.Initialize(layout as ButtonLayout);
+                    _inputObjects.Add(i);
+                    gobj.SetActive(false);
+                    _buttons.Add(i);
+                }
+
+            }
             //if (screen.inputs.elements.Contains("pupillometer"))
             //{
-                //_pupillometer.Activate();
-                //_scalarData.Add(_pupillometer.Data);
+            //_pupillometer.Activate();
+            //_scalarData.Add(_pupillometer.Data);
             //}
 
-            _buttons = new List<TurandotButton>();
-            foreach (ButtonLayout bs in buttonSpex)
-            {
-                _buttons.Add(CreateTurandotButton(bs));
-            }
-            _numButtons = _buttons.Count;
+            //_buttons = new List<TurandotButton>();
+            //foreach (ButtonLayout bs in buttonSpex)
+            //{
+            //    _buttons.Add(CreateTurandotButton(bs));
+            //}
+            //_numButtons = _buttons.Count;
 
-            if (_used.Contains("categorizer")) _buttons.Add(_categorizer.button);
+/*            if (_used.Contains("categorizer")) _buttons.Add(_categorizer.button);
             if (_used.Contains("keypad")) _buttons.Add(_keypad.button);
             if (_used.Contains("grapher"))
             {
@@ -150,21 +148,19 @@ namespace Turandot.Scripts
             {
                 _scalarData.Add(_randomProcess.Data);
             }
-
+*/
             _buttonData = new List<ButtonData>();
-            //foreach (var b in _buttons) _buttonData.Add(b.data);
-            if (_used.Contains("grapher"))
-            {
-                _buttonData.Add(grapher.ButtonData);
-            }
+            foreach (var b in _buttons) _buttonData.Add(b.Data);
+            //if (_used.Contains("grapher"))
+            //{
+            //    _buttonData.Add(grapher.ButtonData);
+            //}
 
             _log.Initialize(_buttonData.Select(b => b.name).ToArray(), inputEvents.Select(ie => ie.name).ToArray());
             _controlValues = new int[_buttonData.Count];
 
             _inputEvents = inputEvents;
             _eventValues = new int[inputEvents.Count];
-
-            ShowDefaultInputs(true);
         }
 
         private TurandotButton CreateTurandotButton(ButtonLayout buttonSpec)
@@ -222,44 +218,61 @@ namespace Turandot.Scripts
 
         public void Activate(List<Input> inputs, TurandotAudio audio, float timeOut)
         {
-            foreach (Input input in inputs)
+            _currentStateInputs = inputs;
+
+            foreach (InputEvent ie in _inputEvents)
             {
-                if (input is Turandot.Inputs.Categorizer)
-                    _categorizer.Activate(input);
-                else if (input is Turandot.Inputs.GrapherAction)
-                    grapher.Activate(input, audio.SigMan, timeOut);
-                else if (input is Turandot.Inputs.Keypad)
-                    _keypad.Activate(input);
-                //else if (input is Turandot.Inputs.ParamSliderAction)
-                //    paramSlider.Activate(input, audio);
-                else if (input is Turandot.Inputs.SAM)
-                    SAM.Activate(input);
-                else if (input is Turandot.Inputs.Scaler)
-                    _scaleSlider.Activate(input);
-                else if (input is Turandot.Inputs.ThumbSliderAction)
-                    _thumbSlider.Activate(input);
-                else if (input is Turandot.Inputs.RandomProcess)
-                    _randomProcess.Activate(input);
-                else if (input is Turandot.Inputs.Button)
-                {
-                    //_buttons.Find(b => b.name == input.name).Activate(input);
-                }
+                ie.Reset();
+            }
+
+            foreach (var i in inputs)
+            {
+                var target = _inputObjects.Find(x => x.Name.Equals(i.Target));
+                target?.Activate(i);
+            }
+                foreach (Input input in inputs)
+            {
+                //if (input is Turandot.Inputs.Categorizer)
+                //    _categorizer.Activate(input);
+                //else if (input is Turandot.Inputs.GrapherAction)
+                //    grapher.Activate(input, audio.SigMan, timeOut);
+                //else if (input is Turandot.Inputs.Keypad)
+                //    _keypad.Activate(input);
+                ////else if (input is Turandot.Inputs.ParamSliderAction)
+                ////    paramSlider.Activate(input, audio);
+                //else if (input is Turandot.Inputs.SAM)
+                //    SAM.Activate(input);
+                //else if (input is Turandot.Inputs.Scaler)
+                //    _scaleSlider.Activate(input);
+                //else if (input is Turandot.Inputs.ThumbSliderAction)
+                //    _thumbSlider.Activate(input);
+                //else if (input is Turandot.Inputs.RandomProcess)
+                //    _randomProcess.Activate(input);
+                //else if (input is Turandot.Inputs.Button)
+                //{
+                //    //_buttons.Find(b => b.name == input.name).Activate(input);
+                //}
             }
         }
 
         public void Deactivate()
         {
-            _categorizer.Deactivate();
-            grapher.Deactivate();
-            _keypad.Deactivate();
-            paramSlider.Deactivate();
-            SAM.Deactivate();
-            _scaleSlider.Deactivate();
-            _thumbSlider.Deactivate();
-            _randomProcess.Deactivate();
+            foreach (var i in _currentStateInputs)
+            {
+                var target = _inputObjects.Find(x => x.Name.Equals(i.Target));
+                target?.Deactivate();
+            }
+            //_categorizer.Deactivate();
+            //grapher.Deactivate();
+            //_keypad.Deactivate();
+            //paramSlider.Deactivate();
+            //SAM.Deactivate();
+            //_scaleSlider.Deactivate();
+            //_thumbSlider.Deactivate();
+            //_randomProcess.Deactivate();
 
             //for (int k = 0; k < _numButtons; k++) _buttons[k].Deactivate();
-            foreach (var ie in _inputEvents) ie.ClearRisingFalling();
+            //foreach (var ie in _inputEvents) ie.ClearRisingFalling();
         }
 
         public void StartMonitor(List<Flag> flags)

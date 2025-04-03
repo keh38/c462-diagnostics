@@ -51,11 +51,9 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
 #if HACKING
         GameManager.SetSubject("Scratch/_Ken");
-        var param = FileIO.XmlDeserialize<InteractiveSettings>(FileLocations.ConfigFile("Interactive.Audio-Only"));
-        ApplyParameters(param);
-
-        InitializeSliders(param.Sliders);
+        GameManager.DataForNextScene = "Audio-Only";
 #endif
+
         if (!string.IsNullOrEmpty(GameManager.DataForNextScene))
         {
             var param = FileIO.XmlDeserialize<InteractiveSettings>(FileLocations.ConfigFile("Interactive", GameManager.DataForNextScene));

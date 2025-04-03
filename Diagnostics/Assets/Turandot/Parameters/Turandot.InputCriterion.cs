@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -9,6 +10,7 @@ namespace Turandot
 {
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     [JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
     public class InputCriterion
     {
         public string control;
@@ -23,26 +25,7 @@ namespace Turandot
         [JsonIgnore]
         bool _lastValue;
 
-        public InputCriterion()
-        {
-        }
-
-        public InputCriterion(string control) : this(control, InputState.Rising, 0, InputOperator.None, Comparison.EQ)
-        {
-        }
-
-        public InputCriterion(string control, float time_ms) : this(control, InputState.High, time_ms, InputOperator.None, Comparison.EQ)
-        {
-        }
-
-        public InputCriterion(string control, InputState state, float time_ms, InputOperator op, Comparison comparison)
-        {
-            this.control = control;
-            this.state = state;
-            this.time_ms = time_ms;
-            this.op = op;
-            this.comparison = comparison;
-        }
+        public InputCriterion() { }
 
         public void Reset()
         {

@@ -8,8 +8,112 @@ using Turandot.Screen;
 
 namespace Turandot.Scripts
 {
-    public class TurandotButton : MonoBehaviour
+    public class TurandotButton : TurandotInput
     {
+        [SerializeField] private Image _image;
+        [SerializeField] private TMPro.TMP_Text _label;
+
+        [SerializeField] private Sprite _circle;
+
+        public ButtonData Data { get; private set; }
+        
+        private ButtonLayout _layout;
+        private Rect _myRect;
+
+        private bool _value;
+        private bool _lastvalue;
+        private bool _isVisible = true;
+        private bool _enabled = true;
+
+        public override string Name { get { return _layout.Name; } }
+
+        public void Initialize(ButtonLayout layout)
+        {
+            _layout = layout;
+            LayoutControl();
+
+            Data = new ButtonData() { name = _layout.Name };
+            var rt = this.gameObject.GetComponent<RectTransform>();
+
+            Vector2 position = new Vector2(
+                rt.anchorMin.x * UnityEngine.Screen.width - rt.rect.width/2, 
+                rt.anchorMin.y * UnityEngine.Screen.height - rt.rect.height/2);
+
+            _myRect = new Rect(position.x, position.y, rt.rect.width, rt.rect.height);
+        }
+
+        private void LayoutControl()
+        {
+            _label.text = _layout.Label;
+
+            if (_layout.Style == ButtonLayout.ButtonStyle.Circle)
+            {
+                _image.sprite = _circle;
+            }
+
+            var rt = GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(_layout.X, _layout.Y);
+            rt.anchorMax = new Vector2(_layout.X, _layout.Y);
+            rt.sizeDelta = new Vector2(_layout.Width, _layout.Height);
+        }
+
+        override public void Activate(Turandot.Inputs.Input input)
+        {
+            //Message m = cue as Message;
+
+            //_label.text = m.Text;
+            ////ChangeAppearance(m);
+
+            base.Activate(input);
+        }
+
+        public override void Deactivate()
+        {
+            _value = false;
+            Data.value = false;
+            base.Deactivate();
+        }
+
+#if UNITY_EDITOR
+        public void FixedUpdate()
+#else
+        public void OnGUI()
+#endif
+        {
+            //if (!_isVisible || !_enabled) return;
+
+#if UNITY_EDITOR
+            _lastvalue = _value;
+
+            //_value = !_isHidden && UnityEngine.Input.GetMouseButton(0) && rect.Contains(UnityEngine.Input.mousePosition);
+            _value = UnityEngine.Input.GetMouseButton(0) && _myRect.Contains(UnityEngine.Input.mousePosition);
+
+            //if (_useXbox)
+            //{
+            //    _value |= UnityEngine.Input.GetButton(_xboxControl);
+            //}
+
+#else
+
+            _lastvalue = _value;
+            _value = UnityEngine.Input.GetMouseButton(0) && rect.Contains(UnityEngine.Input.mousePosition);
+            if (_useXbox)
+            {
+                _value |= UnityEngine.Input.GetButtonDown(_xboxControl);
+            }
+
+#endif
+            //if (_useKeyboard && _keyboardValue != KeyCode.None && UnityEngine.Input.GetKeyDown(_keyboardValue))
+            //{
+            //    _value = true;
+            //}
+
+            Data.value = _value;
+
+            //if (_value && !_lastvalue && _showPress) StartCoroutine(ShowButtonPress());
+        }
+
+
         // TURANDOT FIX
         /*
         [System.NonSerialized]

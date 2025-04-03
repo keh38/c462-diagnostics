@@ -77,10 +77,10 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     {
         HTS_Server.SetCurrentScene("Turandot", this);
 
-#if CONFIG_HACK
-        SubjectManager.Instance.ChangeSubject("Scratch", "_Ken");
-        //string configName = "RI-VAS";
-        string configName = "TServer";
+#if HACKING
+        Application.targetFrameRate = 60;
+        GameManager.SetSubject("Scratch/_Ken");
+        string configName = "ButtonTest";
         //DiagnosticsManager.Instance.MakeExtracurricular("Turandot", "Turandot." + configName);
 #else
         string configName = GameManager.DataForNextScene;

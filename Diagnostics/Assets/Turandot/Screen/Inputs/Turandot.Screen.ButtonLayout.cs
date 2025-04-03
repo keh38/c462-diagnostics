@@ -11,7 +11,7 @@ namespace Turandot.Screen
     [Serializable]
     public class ButtonLayout : InputLayout
     {
-        public enum ButtonStyle { None, Circle, Square, Rectangle, Right, Left};
+        public enum ButtonStyle { Rectangle, Circle};
 
         [Category("Design")]
         public string Label { set; get; }
@@ -33,8 +33,8 @@ namespace Turandot.Screen
         {
             Name = "Button";
             Label = "Button";
-            Width = 200;
-            Height = 150;
+            Width = 300;
+            Height = 200;
             Style = ButtonStyle.Rectangle;
         }
 

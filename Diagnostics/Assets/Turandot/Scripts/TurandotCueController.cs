@@ -30,15 +30,6 @@ namespace Turandot.Scripts
         {
            _controls = new List<TurandotCue>();
 
-            //led.Initialize();
-            //message.Initialize(screen.messageLayout);
-            //fixationPoint.Initialize(screen.fixationPoint);
-            //image.Initialize();
-            //progressBar.Initialize(screen.progressBarLayout);
-            //helpCue.Initialize();
-            //counter.Initialize(screen.counter);
-            //scoreboard.Initialize(screen.scoreboard);
-
             var canvasRT = GameObject.Find("Canvas").GetComponent<RectTransform>();
             foreach (var layout in cues)
             {
@@ -56,6 +47,9 @@ namespace Turandot.Scripts
 
         public void ClearScreen()
         {
+            if (_controls == null) return;
+
+            foreach (var c in _controls) c.gameObject.SetActive(false);
             //led.HideCue();
             //message.HideCue();
             //fixationPoint.ShowCue(false);
@@ -87,7 +81,6 @@ namespace Turandot.Scripts
 
             foreach (Cue c in cues)
             {
-                Debug.Log($"target = {c.Target}");
                 var target = _controls.Find(x => x.Name.Equals(c.Target));
                 target?.Activate(c);
                 //if (c is Message)

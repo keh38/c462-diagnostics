@@ -11,8 +11,9 @@ using Turandot.Scripts;
 
 public class TurandotEngine : MonoBehaviour
 {
-    public TurandotInputMonitor inputMonitor;
     [SerializeField] private TurandotCueController _cueController;
+    [SerializeField] private TurandotInputMonitor _inputMonitor;
+
     [SerializeField] private GameObject _audioPrefab;
     [SerializeField] private GameObject _audioDummyPrefab;
 
@@ -38,15 +39,6 @@ public class TurandotEngine : MonoBehaviour
     public FlowchartFinishedDelegate FlowchartFinished;
     private void OnFlowchartFinished() { FlowchartFinished?.Invoke(); }
 
-    void Awake()
-    {
-    }
-
-    //public KEventDelegate OnFinished
-    //{
-    //    set { _onFinished = value; }
-    //}
-
     public string Result
     {
         get { return _result; }
@@ -64,13 +56,8 @@ public class TurandotEngine : MonoBehaviour
 
     public void ClearScreen()
     {
-        //inputMonitor.ClearScreen();
+        _inputMonitor.ClearScreen();
         _cueController.ClearScreen();
-    }
-
-    public void ShowInputs(bool show)
-    {
-        inputMonitor.ShowDefaultInputs(show);
     }
 
     public void Initialize(Parameters par)
@@ -81,8 +68,10 @@ public class TurandotEngine : MonoBehaviour
         _actionInProgress = false;
 
         CreateAudioPlayers();
-        //inputMonitor.OnEventChanged = OnInputEventChanged;
-        //inputMonitor.Initialize(_params.screen, _params.buttons, _params.inputEvents, _params.InputsUsed);
+
+        _inputMonitor.EventChanged = OnInputEventChanged;
+        _inputMonitor.Initialize(_params.screen.Inputs, _params.inputEvents);
+
         _cueController.Initialize(_params.screen.Cues);
     }
 
@@ -132,7 +121,7 @@ public class TurandotEngine : MonoBehaviour
             a.Reset();
         }
 
-        //inputMonitor.StartMonitor(flags);
+        _inputMonitor.StartMonitor(flags);
         _cueController.ClearLog();
         _cueController.SetFlags(flags);
 
@@ -150,10 +139,10 @@ public class TurandotEngine : MonoBehaviour
     {
         ClearScreen();
 
-        _cueController.Initialize(par.screen.Cues);
+//        _cueController.Initialize(par.screen.Cues);
         //inputMonitor.Initialize(par.screen, par.buttons, par.inputEvents, par.InputsUsed);
 
-        //inputMonitor.Activate(par[state].inputs, null, 0);
+        _inputMonitor.Activate(par[state].inputs, null, 0);
         _cueController.Activate(par[state].cues);
     }
 
@@ -197,8 +186,8 @@ public class TurandotEngine : MonoBehaviour
         {
             _log.Add(Time.timeSinceLevelLoad, HistoryEvent.EndTrial);
 
-            //inputMonitor.StopMonitor();
-            //if (_params.trialLogOption != TrialLogOption.None) WriteLogFile();
+            _inputMonitor.StopMonitor();
+            if (_params.trialLogOption != TrialLogOption.None) WriteLogFile();
 
 #if KDEBUG
             _endAction = EndAction.None;
@@ -222,15 +211,11 @@ public class TurandotEngine : MonoBehaviour
 
             HTS_Server.SendMessage("Turandot", $"State:{_currentFlowElement.name}");
 
-            // TURANDOT FIX 
-            //if (IPC.Instance.Use && !_params.bypassIPC && !DoIPC(_currentFlowElement))
-            //    throw new System.Exception("IPC error: " + IPC.Instance.LastError);
-
             _log.Add(Time.timeSinceLevelLoad, HistoryEvent.StartState, _currentFlowElement.name);
 
             _cueController.Activate(_currentFlowElement.cues);
-            //inputMonitor.Activate(_currentFlowElement.inputs, a, timeOut);
-            //inputMonitor.PollEvents();
+            _inputMonitor.Activate(_currentFlowElement.inputs, a, timeOut);
+            _inputMonitor.PollEvents();
         }
     }
     // TURANDOT FIX 
@@ -263,7 +248,7 @@ public class TurandotEngine : MonoBehaviour
         _cueController.Activate(actionState.cues);
 
         var a = _audio.Find(o => o.name == actionState.name);
-        inputMonitor.Activate(actionState.inputs, a, 0);
+        _inputMonitor.Activate(actionState.inputs, a, 0);
 
         _audio.Find(x => x.name == _currentFlowElement.name).PauseAudio(true);
         a.Activate(a.SigMan.GetMaxInterval(1) / 1000f, null);
@@ -301,10 +286,10 @@ public class TurandotEngine : MonoBehaviour
     public void Abort()
     {
         if (_currentFlowElement != null) _audio.Find(a => a.name == _currentFlowElement.name).KillAudio();
-        //WriteLogFile();
-        //inputMonitor.StopMonitor();
-        //inputMonitor.Deactivate();
-        //_cueController.Deactivate();
+        WriteLogFile();
+        _inputMonitor.StopMonitor();
+        _inputMonitor.Deactivate();
+        _cueController.Deactivate();
     }
 
     void OnStateTimeout(string source)
@@ -332,7 +317,7 @@ public class TurandotEngine : MonoBehaviour
             _log.Add(Time.timeSinceLevelLoad, HistoryEvent.EndState, _stateEndReason);
 
             _cueController.Deactivate();
-            //inputMonitor.Deactivate();
+            _inputMonitor.Deactivate();
             NextState(linkTo);
         }
     }
@@ -372,7 +357,7 @@ public class TurandotEngine : MonoBehaviour
             if (term.action == TerminationAction.EndImmediately && !nextIsAction)
             {
                 _cueController.Deactivate();
-                inputMonitor.Deactivate();
+                _inputMonitor.Deactivate();
                 _audio.Find(a => a.name == _currentFlowElement.name).KillAudio();
                 _log.Add(Time.timeSinceLevelLoad, HistoryEvent.EndState, _stateEndReason);
                 NextState(term.linkTo);
@@ -402,23 +387,23 @@ public class TurandotEngine : MonoBehaviour
 
         if (result.ToLower().Contains("{category}"))
         {
-            expanded = expanded.Replace("{category}", inputMonitor.Category);
+            expanded = expanded.Replace("{category}", _inputMonitor.Category);
         }
         if (result.ToLower().Contains("{scale}"))
         {
-            expanded = expanded.Replace("{scale}", inputMonitor.SliderResult);
+            expanded = expanded.Replace("{scale}", _inputMonitor.SliderResult);
         }
         if (result.ToLower().Contains("{sam}"))
         {
-            expanded = expanded.Replace("{sam}", inputMonitor.SAMResult);
+            expanded = expanded.Replace("{sam}", _inputMonitor.SAMResult);
         }
         if (result.ToLower().Contains("{keypad}"))
         {
-            expanded = expanded.Replace("{keypad}", inputMonitor.KeypadResult);
+            expanded = expanded.Replace("{keypad}", _inputMonitor.KeypadResult);
         }
         if (result.ToLower().Contains("{param}"))
         {
-            expanded = expanded.Replace("{param}", inputMonitor.ParamResult);
+            expanded = expanded.Replace("{param}", _inputMonitor.ParamResult);
         }
         if (result.ToLower().Contains("{score}"))
         {
@@ -430,7 +415,7 @@ public class TurandotEngine : MonoBehaviour
         }
         if (result.ToLower().Contains("{trace}"))
         {
-            expanded = expanded.Replace("{trace}", inputMonitor.TraceResult);
+            expanded = expanded.Replace("{trace}", _inputMonitor.TraceResult);
         }
         if (result.Contains("{sigMan"))
         {
@@ -446,11 +431,11 @@ public class TurandotEngine : MonoBehaviour
 
         if (result.ToLower().Contains("{scale}"))
         {
-            expanded = expanded.Replace("{scale}", inputMonitor.SliderSubstitution);
+            expanded = expanded.Replace("{scale}", _inputMonitor.SliderSubstitution);
         }
         if (result.ToLower().Contains("{param}"))
         {
-            expanded = expanded.Replace("{param}", inputMonitor.ParamSubstitution);
+            expanded = expanded.Replace("{param}", _inputMonitor.ParamSubstitution);
         }
         expanded = ExpandSignalExpression(expanded);
 
@@ -517,15 +502,15 @@ public class TurandotEngine : MonoBehaviour
         _log.Trim();
 
         string json = KLib.FileIO.JSONStringAdd("", "history", KLib.FileIO.JSONSerializeToString(_log));
-        json = KLib.FileIO.JSONStringAdd(json, "events", inputMonitor.EventLogJSONString);
+        json = KLib.FileIO.JSONStringAdd(json, "events", _inputMonitor.EventLogJSONString);
 
         string cueJson = _cueController.LogJSONString;
         if (!string.IsNullOrEmpty(cueJson))
             json = KLib.FileIO.JSONStringAdd(json, "cues", cueJson);
 
-        string inputJson = inputMonitor.InputLogJSONString;
-        if (!string.IsNullOrEmpty(inputJson))
-            json = KLib.FileIO.JSONStringAdd(json, "inputs", inputJson);
+        //string inputJson = _inputMonitor.InputLogJSONString;
+        //if (!string.IsNullOrEmpty(inputJson))
+        //    json = KLib.FileIO.JSONStringAdd(json, "inputs", inputJson);
 
         foreach (var fe in _params.flowChart.FindAll(x => x.HasSequence))
         {

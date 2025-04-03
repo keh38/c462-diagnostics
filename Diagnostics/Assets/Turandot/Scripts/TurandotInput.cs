@@ -9,10 +9,11 @@ namespace Turandot.Scripts
 {
     public class TurandotInput : MonoBehaviour
     {
-        public Text label;
-        public TurandotButton button;
 
+        public TurandotButton button;
         Input _input = null;
+
+        virtual public string Name { get { return ""; } }
 
         public void Initialize()
         {
@@ -22,7 +23,6 @@ namespace Turandot.Scripts
         {
             _input = input;
 
-            if (label != null) label.text = _input.label;
             ShowInput(input.BeginVisible);
         }
 
@@ -37,8 +37,7 @@ namespace Turandot.Scripts
 
         void ShowInput(bool visible)
         {
-            transform.localPosition = new Vector2(_input.X, visible ? _input.Y : -5000);
-            //button.Move();
+            gameObject.SetActive(visible);
         }
 
 

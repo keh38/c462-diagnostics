@@ -1282,6 +1282,7 @@ GameObject:
   - component: {fileID: 886566273}
   - component: {fileID: 886566275}
   - component: {fileID: 886566276}
+  - component: {fileID: 886566277}
   m_Layer: 0
   m_Name: SceneController
   m_TagString: Untagged
@@ -1333,8 +1334,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da2277637756ebf4db9b217775918148, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputMonitor: {fileID: 0}
   _cueController: {fileID: 886566276}
+  _inputMonitor: {fileID: 886566277}
   _audioPrefab: {fileID: 809218868539846170, guid: 668eccda0ff4b554cb611a6b69e485ec, type: 3}
   _audioDummyPrefab: {fileID: 3292315420622059586, guid: f90a69d678715724783ffd73a2dc47c3, type: 3}
 --- !u!114 &886566276
@@ -1358,6 +1359,26 @@ MonoBehaviour:
   counter: {fileID: 0}
   scoreboard: {fileID: 0}
   image: {fileID: 0}
+--- !u!114 &886566277
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 886566272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ff8d2a45a63d384bb7a3885139683b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _buttonPrefab: {fileID: 5192189175699314462, guid: 1ef4afa2c7fdb2b48a86b391c55af320, type: 3}
+  SAM: {fileID: 0}
+  Circle: {fileID: 0}
+  Square: {fileID: 0}
+  Left: {fileID: 0}
+  Right: {fileID: 0}
+  grapher: {fileID: 0}
+  paramSlider: {fileID: 0}
 --- !u!1 &1318155428
 GameObject:
   m_ObjectHideFlags: 0
