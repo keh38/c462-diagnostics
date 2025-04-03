@@ -261,7 +261,7 @@
     <Compile Include="Assets\Turandot\Cues\Turandot.Cues.ScoreboardAction.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Enumerations\GateState.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotKeypadButton.cs" />
-    <Compile Include="Assets\Turandot\Screen\Turandot.Screen.FixationPoint.cs" />
+    <Compile Include="Assets\Turandot\Screen\Cues\Turandot.Screen.FixationPointLayout.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Audiograms\Audiograms.Audiogram.cs" />
     <Compile Include="Assets\Turandot\Data\Turandot.AudioLog.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotCueController.cs" />

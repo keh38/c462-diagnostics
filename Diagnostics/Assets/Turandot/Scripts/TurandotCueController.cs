@@ -10,10 +10,10 @@ namespace Turandot.Scripts
 {
     public class TurandotCueController : MonoBehaviour
     {
+        [SerializeField] private GameObject _fixationPrefab;
         [SerializeField] private GameObject _messagePrefab;
+
         public TurandotCue led;
-        public TurandotCueMessage message;
-        public TurandotFixationPoint fixationPoint;
         public TurandotProgressBarCue progressBar;
         public TurandotCueHelp helpCue;
         public TurandotCueCounter counter;
@@ -33,7 +33,15 @@ namespace Turandot.Scripts
             var canvasRT = GameObject.Find("Canvas").GetComponent<RectTransform>();
             foreach (var layout in cues)
             {
-                if (layout is MessageLayout)
+                if (layout is FixationPointLayout)
+                {
+                    var gobj = GameObject.Instantiate(_fixationPrefab, canvasRT);
+                    var c = gobj.GetComponent<TurandotFixationPoint>();
+                    c.Initialize(layout as FixationPointLayout);
+                    _controls.Add(c);
+                    gobj.SetActive(false);
+                }
+                else if (layout is MessageLayout)
                 {
                     var gobj = GameObject.Instantiate(_messagePrefab, canvasRT);
                     var c = gobj.GetComponent<TurandotCueMessage>();
@@ -41,8 +49,7 @@ namespace Turandot.Scripts
                     _controls.Add(c);
                     gobj.SetActive(false);
                 }
-
-            }
+;            }
         }
 
         public void ClearScreen()
@@ -50,14 +57,6 @@ namespace Turandot.Scripts
             if (_controls == null) return;
 
             foreach (var c in _controls) c.gameObject.SetActive(false);
-            //led.HideCue();
-            //message.HideCue();
-            //fixationPoint.ShowCue(false);
-            //image.HideCue();
-            //helpCue.HideCue();
-            //counter.ShowCue(false);
-            //scoreboard.ShowCue(false);
-            //progressBar.ShowCue(false);
         }
 
        public void ClearLog()

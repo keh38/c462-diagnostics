@@ -10,9 +10,15 @@ namespace Turandot.Scripts
     {
         virtual public string Name { get { return ""; } }
 
-        public void Initialize()
+        public void Initialize() { }
+
+        protected void SetPosition(float x, float y)
         {
+            var rt = GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(x, y);
+            rt.anchorMax = new Vector2(x, y);
         }
+
         Cue _cue = null;
 /*        CueLog _log;
 

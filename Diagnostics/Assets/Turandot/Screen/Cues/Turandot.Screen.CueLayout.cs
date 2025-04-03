@@ -10,6 +10,7 @@ using ProtoBuf;
 namespace Turandot.Screen
 { 
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    [XmlInclude(typeof(FixationPointLayout))]
     [XmlInclude(typeof(MessageLayout))]
     [JsonObject(MemberSerialization.OptOut)]
     public class CueLayout

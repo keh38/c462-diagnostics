@@ -30,7 +30,6 @@ namespace Turandot
         public string wavFolder = "";
         public TrialLogOption trialLogOption = TrialLogOption.Upload;
         public bool allowExpertOptions = false;
-        public bool bypassIPC = false;
 
         private static int _currentVersion = 5;
 

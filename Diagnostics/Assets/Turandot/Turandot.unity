@@ -1350,10 +1350,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 185349ce4f417c54badc683eb3358f73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _fixationPrefab: {fileID: 6740508835576663551, guid: 66230e210e138e149aa403e056caa696, type: 3}
   _messagePrefab: {fileID: 3018359816832450523, guid: 13e767f2c0f50824795356ebf09fdb82, type: 3}
   led: {fileID: 0}
-  message: {fileID: 0}
-  fixationPoint: {fileID: 0}
   progressBar: {fileID: 0}
   helpCue: {fileID: 0}
   counter: {fileID: 0}

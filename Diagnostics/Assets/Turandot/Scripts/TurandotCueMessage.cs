@@ -48,9 +48,7 @@ namespace Turandot.Scripts
             _label.fontSize = _layout.FontSize;
             _label.color = KLib.ColorTranslator.ColorFromARGB(_layout.Color);
 
-            var rt = GetComponent<RectTransform>();
-            rt.anchorMin = new Vector2(_layout.X, _layout.Y);
-            rt.anchorMax = new Vector2(_layout.X, _layout.Y);
+            SetPosition(_layout.X, _layout.Y);
         }
 
         private void ChangeAppearance(Message m)
