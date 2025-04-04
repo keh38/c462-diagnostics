@@ -21,8 +21,6 @@ public class HardwareInterface : MonoBehaviour
     private bool _audioReady = false;
     private bool _errorAcknowledged = false;
 
-    [SerializeField] private int _fuckme = 0;
-
     #region SINGLETON CREATION
     // Singleton
     private static HardwareInterface _instance;
@@ -62,7 +60,6 @@ public class HardwareInterface : MonoBehaviour
 
     private bool _Init()
     {
-        _fuckme = 12;
         _volumeManager = new VolumeManager();
         _startVolume = _volumeManager.GetMasterVolume(VolumeManager.VolumeUnit.Scalar);
         _volumeManager.SetMasterVolume(1.0f, VolumeManager.VolumeUnit.Scalar);

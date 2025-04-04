@@ -14,6 +14,7 @@ public class ClockSynchronizer : MonoBehaviour
     [SerializeField] private float _pollInterval_s = 1;
     [SerializeField] private string _comPort = "COM23";
     [SerializeField] private SyncPulseDetector _syncPulseDetector;
+    [SerializeField] private AudioSource _audioSource;
 
     public SyncStatus Status { get; private set; }
     public string LogFile { get; private set; }
@@ -72,6 +73,8 @@ public class ClockSynchronizer : MonoBehaviour
 
     public void StartSynchronizing(string logPath = "")
     {
+        _audioSource.Play();
+
         InitializeLogFile(logPath);
 
         Debug.Log($"[ClockSynchronizer] Start synchronizing to {_logPath}");
@@ -93,6 +96,8 @@ public class ClockSynchronizer : MonoBehaviour
     {
         Debug.Log("[ClockSynchronizer] Stop synchronizing");
         CancelInvoke("Synchronize");
+
+        _audioSource.Stop();
         //_stopThread = true;
         //_syncThread.Abort();
 
