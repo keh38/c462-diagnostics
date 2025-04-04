@@ -63,7 +63,7 @@ namespace Launcher
             {
                 LaunchUnityApp();
             }
-            else if (e.KeyCode == Keys.F2 && !_configButtonPressed)
+            else if ((e.KeyCode == Keys.F2 || e.KeyCode == Keys.C) && !_configButtonPressed)
             {
                 _timer.Enabled = false;
                 _configButtonPressed = true;

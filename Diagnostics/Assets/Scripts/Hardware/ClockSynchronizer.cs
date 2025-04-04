@@ -157,7 +157,7 @@ public class ClockSynchronizer : MonoBehaviour
 
         _generatePulse = true;
 
-        await Task.Delay(200);
+        await Task.Delay(500);
         var syncPulseEvent = await Task.Run(() => _syncPulseDetector.DetectOnePulse());
 
         string logEntry =
@@ -198,6 +198,7 @@ public class ClockSynchronizer : MonoBehaviour
             _generatePulse = false;
 
             int index = _pulseChannel >=0 ? _pulseChannel : (channels - 1);
+            Debug.Log($"fuck this {index}");
             for (int k=0; k < _signal.Length; k++)
             {
                 data[index] = _signal[k];
