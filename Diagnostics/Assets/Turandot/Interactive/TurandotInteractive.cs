@@ -260,7 +260,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
             _sliders.Find(x => x.FullParameterName.Equals(parts[0]))?.SetValue(value);
 
-            if (param.Equals("Digitimer.Demand"))
+            if (param.StartsWith("Digitimer.Demand"))
             {
                 HardwareInterface.Digitimer?.EnableDevices(_sigMan.GetDigitimerChannels());
             }

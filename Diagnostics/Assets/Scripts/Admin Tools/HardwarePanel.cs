@@ -9,7 +9,17 @@ public class HardwarePanel : MonoBehaviour
 
     void Start()
     {
-        _messageBox.Show("There were one or more errors initializing the hardware", MessageBox.IconShape.Error);
+        //_messageBox.Show("There were one or more errors initializing the hardware", MessageBox.IconShape.Error);
+    }
+
+    public void OnSyncStartButtonClick()
+    {
+        HardwareInterface.ClockSync.StartSynchronizing();
+    }
+
+    public void OnSyncStopButtonClick()
+    {
+        HardwareInterface.ClockSync.StopSynchronizing();
     }
 
 }

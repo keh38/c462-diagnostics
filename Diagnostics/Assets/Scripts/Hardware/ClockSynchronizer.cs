@@ -153,8 +153,7 @@ public class ClockSynchronizer : MonoBehaviour
         _generatePulse = true;
 
         await Task.Delay(200);
-        //var syncPulseEvent = await Task.Run(() => _syncPulseDetector.DetectOnePulse());
-        var syncPulseEvent = new SyncPulseDetector.SyncPulseEvent();
+        var syncPulseEvent = await Task.Run(() => _syncPulseDetector.DetectOnePulse());
 
         string logEntry =
             $"{systemTime,20}\t" +

@@ -96,11 +96,11 @@ namespace Turandot.Scripts
 #else
 
             _lastvalue = _value;
-            _value = UnityEngine.Input.GetMouseButton(0) && rect.Contains(UnityEngine.Input.mousePosition);
-            if (_useXbox)
-            {
-                _value |= UnityEngine.Input.GetButtonDown(_xboxControl);
-            }
+            _value = UnityEngine.Input.GetMouseButton(0) && _myRect.Contains(UnityEngine.Input.mousePosition);
+            //if (_useXbox)
+            //{
+            //    _value |= UnityEngine.Input.GetButtonDown(_xboxControl);
+            //}
 
 #endif
             //if (_useKeyboard && _keyboardValue != KeyCode.None && UnityEngine.Input.GetKeyDown(_keyboardValue))
