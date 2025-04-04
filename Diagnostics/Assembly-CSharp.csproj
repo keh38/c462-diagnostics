@@ -277,6 +277,9 @@
     <Compile Include="Assets\Turandot\Screen\Cues\Turandot.Screen.CueLayout.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\MenuBarControl.cs" />
     <Compile Include="Assets\Scripts\Home\SubjectPanel.cs" />
+    <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.CheckListLayout.cs" />
+    <Compile Include="Assets\Turandot\Scripts\TurandotChecklist.cs" />
+    <Compile Include="Assets\Turandot\Inputs\ChecklistItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

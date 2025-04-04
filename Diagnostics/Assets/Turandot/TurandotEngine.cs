@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 using Turandot;
@@ -385,42 +386,51 @@ public class TurandotEngine : MonoBehaviour
         string expanded = result;
         if (!expanded.Contains("=") && !expanded.Contains("{")) expanded = "outcome=\"" + result + "\";";
 
-        if (result.ToLower().Contains("{category}"))
+        var regex = new Regex(@"{([a-zA-Z0-9\.]+)}");
+        foreach (var match in regex.Matches(result).Cast<Match>().Select(x => x.Groups[1].Value))
         {
-            expanded = expanded.Replace("{category}", _inputMonitor.Category);
+            if (_inputMonitor.Contains(match))
+            {
+                expanded = expanded.Replace($"{{{match}}}", _inputMonitor.ExpandResult(match));
+            }
         }
-        if (result.ToLower().Contains("{scale}"))
-        {
-            expanded = expanded.Replace("{scale}", _inputMonitor.SliderResult);
-        }
-        if (result.ToLower().Contains("{sam}"))
-        {
-            expanded = expanded.Replace("{sam}", _inputMonitor.SAMResult);
-        }
-        if (result.ToLower().Contains("{keypad}"))
-        {
-            expanded = expanded.Replace("{keypad}", _inputMonitor.KeypadResult);
-        }
-        if (result.ToLower().Contains("{param}"))
-        {
-            expanded = expanded.Replace("{param}", _inputMonitor.ParamResult);
-        }
-        if (result.ToLower().Contains("{score}"))
-        {
-            expanded = expanded.Replace("{score}", "score=" + _cueController.counter.Count + ";");
-        }
-        if (result.ToLower().Contains("{-score}"))
-        {
-            expanded = expanded.Replace("{-score}", "score=" + (-_cueController.counter.Count).ToString() + ";");
-        }
-        if (result.ToLower().Contains("{trace}"))
-        {
-            expanded = expanded.Replace("{trace}", _inputMonitor.TraceResult);
-        }
-        if (result.Contains("{sigMan"))
-        {
-            expanded = ExpandSignalExpression(expanded);
-        }
+
+        //if (result.ToLower().Contains("{category}"))
+        //{
+        //    expanded = expanded.Replace("{category}", _inputMonitor.Category);
+        //}
+        //if (result.ToLower().Contains("{scale}"))
+        //{
+        //    expanded = expanded.Replace("{scale}", _inputMonitor.SliderResult);
+        //}
+        //if (result.ToLower().Contains("{sam}"))
+        //{
+        //    expanded = expanded.Replace("{sam}", _inputMonitor.SAMResult);
+        //}
+        //if (result.ToLower().Contains("{keypad}"))
+        //{
+        //    expanded = expanded.Replace("{keypad}", _inputMonitor.KeypadResult);
+        //}
+        //if (result.ToLower().Contains("{param}"))
+        //{
+        //    expanded = expanded.Replace("{param}", _inputMonitor.ParamResult);
+        //}
+        //if (result.ToLower().Contains("{score}"))
+        //{
+        //    expanded = expanded.Replace("{score}", "score=" + _cueController.counter.Count + ";");
+        //}
+        //if (result.ToLower().Contains("{-score}"))
+        //{
+        //    expanded = expanded.Replace("{-score}", "score=" + (-_cueController.counter.Count).ToString() + ";");
+        //}
+        //if (result.ToLower().Contains("{trace}"))
+        //{
+        //    expanded = expanded.Replace("{trace}", _inputMonitor.TraceResult);
+        //}
+        //if (result.Contains("{sigMan"))
+        //{
+        //    expanded = ExpandSignalExpression(expanded);
+        //}
 
         return previous + expanded;
     }

@@ -14,7 +14,8 @@ namespace Turandot.Scripts
         Input _input = null;
 
         virtual public string Name { get { return ""; } }
-
+        virtual public string Result { get { return ""; } }
+            
         public void Initialize()
         {
         }

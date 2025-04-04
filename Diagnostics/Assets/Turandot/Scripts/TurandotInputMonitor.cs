@@ -12,6 +12,7 @@ namespace Turandot.Scripts
     public class TurandotInputMonitor : MonoBehaviour
     {
         [SerializeField] private GameObject _buttonPrefab;
+        [SerializeField] private GameObject _checklistPrefab;
 
         // TURANDOT FIX
         public TurandotSAM SAM;
@@ -23,7 +24,6 @@ namespace Turandot.Scripts
         public TurandotParamSlider paramSlider;
 
         bool _isRunning = false;
-        List<TurandotButton> _buttons = new List<TurandotButton>();
         List<ButtonData> _buttonData = new List<ButtonData>();
         List<ScalarData> _scalarData = new List<ScalarData>();
         EventLog _log = new EventLog();
@@ -97,8 +97,8 @@ namespace Turandot.Scripts
             _scalarData.Clear();
 
             _inputObjects = new List<TurandotInput>();
-            _buttons = new List<TurandotButton>();
-
+            _buttonData = new List<ButtonData>();
+            
             var canvasRT = GameObject.Find("Canvas").GetComponent<RectTransform>();
             foreach (var layout in inputLayouts)
             {
@@ -109,7 +109,16 @@ namespace Turandot.Scripts
                     i.Initialize(layout as ButtonLayout);
                     _inputObjects.Add(i);
                     gobj.SetActive(false);
-                    _buttons.Add(i);
+                    _buttonData.Add(i.Data);
+                }
+                else if (layout is ChecklistLayout)
+                {
+                    var gobj = GameObject.Instantiate(_checklistPrefab, canvasRT);
+                    var i = gobj.GetComponent<TurandotChecklist>();
+                    i.Initialize(layout as ChecklistLayout);
+                    _inputObjects.Add(i);
+                    gobj.SetActive(false);
+                    _buttonData.Add(i.ButtonData);
                 }
 
             }
@@ -126,94 +135,35 @@ namespace Turandot.Scripts
             //}
             //_numButtons = _buttons.Count;
 
-/*            if (_used.Contains("categorizer")) _buttons.Add(_categorizer.button);
-            if (_used.Contains("keypad")) _buttons.Add(_keypad.button);
-            if (_used.Contains("grapher"))
-            {
-                //grapher.Initialize(screen.grapherLayout);
-            }
-            if (_used.Contains("sam")) _buttons.Add(SAM.button);
-            if (_used.Contains("scaler")) _buttons.Add(_scaleSlider.button);
-            if (_used.Contains("param slider"))
-            {
-                //paramSlider.Initialize(screen.paramSliderLayout);
-                //_buttons.Add(paramSlider.button);
-            }
-            if (_used.Contains("thumb slider"))
-            {
-                //_thumbSlider.Initialize(screen.thumbSliderLayout);
-            }
+            /*            if (_used.Contains("categorizer")) _buttons.Add(_categorizer.button);
+                        if (_used.Contains("keypad")) _buttons.Add(_keypad.button);
+                        if (_used.Contains("grapher"))
+                        {
+                            //grapher.Initialize(screen.grapherLayout);
+                        }
+                        if (_used.Contains("sam")) _buttons.Add(SAM.button);
+                        if (_used.Contains("scaler")) _buttons.Add(_scaleSlider.button);
+                        if (_used.Contains("param slider"))
+                        {
+                            //paramSlider.Initialize(screen.paramSliderLayout);
+                            //_buttons.Add(paramSlider.button);
+                        }
+                        if (_used.Contains("thumb slider"))
+                        {
+                            //_thumbSlider.Initialize(screen.thumbSliderLayout);
+                        }
 
-            if (_used.Contains("random process"))
-            {
-                _scalarData.Add(_randomProcess.Data);
-            }
-*/
-            _buttonData = new List<ButtonData>();
-            foreach (var b in _buttons) _buttonData.Add(b.Data);
-            //if (_used.Contains("grapher"))
-            //{
-            //    _buttonData.Add(grapher.ButtonData);
-            //}
+                        if (_used.Contains("random process"))
+                        {
+                            _scalarData.Add(_randomProcess.Data);
+                        }
+            */
 
             _log.Initialize(_buttonData.Select(b => b.name).ToArray(), inputEvents.Select(ie => ie.name).ToArray());
             _controlValues = new int[_buttonData.Count];
 
             _inputEvents = inputEvents;
             _eventValues = new int[inputEvents.Count];
-        }
-
-        private TurandotButton CreateTurandotButton(ButtonLayout buttonSpec)
-        {
-            //int height = buttonSpec.size;
-            //GameObject src = null;
-            //switch (buttonSpec.style)
-            //{
-            //    case ButtonLayout.ButtonStyle.Circle:
-            //        src = Circle;
-            //        break;
-            //    case ButtonLayout.ButtonStyle.None:
-            //    case ButtonLayout.ButtonStyle.Square:
-            //        src = Square;
-            //        break;
-            //    case ButtonLayout.ButtonStyle.Rectangle:
-            //        src = Square;
-            //        height = buttonSpec.height;
-            //        break;
-            //    case ButtonLayout.ButtonStyle.Left:
-            //        src = Left;
-            //        height = buttonSpec.height;
-            //        break;
-            //    case ButtonLayout.ButtonStyle.Right:
-            //        src = Right;
-            //        height = buttonSpec.height;
-            //        break;
-            //}
-            //GameObject obj = GameObject.Instantiate(src);
-
-            //obj.transform.parent = src.transform.parent;
-            //obj.transform.localScale = Vector3.one;
-            //obj.transform.localPosition = new Vector2(buttonSpec.x, buttonSpec.y);
-            //obj.name = buttonSpec.name;
-
-            //TurandotButton b = obj.GetComponent<TurandotButton>();
-            ////b.SetSize(buttonSpec.size, height);
-
-            ////b.ApplySkin(_skin);
-            ////b.Initialize(buttonSpec);
-            ////b.IsVisible = false;
-
-            ////if (buttonSpec.style == ButtonSpec.ButtonStyle.None)
-            ////{
-            ////    b.MakeHidden();
-            ////}
-
-            return null;
-        }
-
-        public List<TurandotButton> Buttons
-        {
-            get { return _buttons; }
         }
 
         public void Activate(List<Input> inputs, TurandotAudio audio, float timeOut)
@@ -230,29 +180,6 @@ namespace Turandot.Scripts
                 var target = _inputObjects.Find(x => x.Name.Equals(i.Target));
                 target?.Activate(i);
             }
-                foreach (Input input in inputs)
-            {
-                //if (input is Turandot.Inputs.Categorizer)
-                //    _categorizer.Activate(input);
-                //else if (input is Turandot.Inputs.GrapherAction)
-                //    grapher.Activate(input, audio.SigMan, timeOut);
-                //else if (input is Turandot.Inputs.Keypad)
-                //    _keypad.Activate(input);
-                ////else if (input is Turandot.Inputs.ParamSliderAction)
-                ////    paramSlider.Activate(input, audio);
-                //else if (input is Turandot.Inputs.SAM)
-                //    SAM.Activate(input);
-                //else if (input is Turandot.Inputs.Scaler)
-                //    _scaleSlider.Activate(input);
-                //else if (input is Turandot.Inputs.ThumbSliderAction)
-                //    _thumbSlider.Activate(input);
-                //else if (input is Turandot.Inputs.RandomProcess)
-                //    _randomProcess.Activate(input);
-                //else if (input is Turandot.Inputs.Button)
-                //{
-                //    //_buttons.Find(b => b.name == input.name).Activate(input);
-                //}
-            }
         }
 
         public void Deactivate()
@@ -262,17 +189,9 @@ namespace Turandot.Scripts
                 var target = _inputObjects.Find(x => x.Name.Equals(i.Target));
                 target?.Deactivate();
             }
-            //_categorizer.Deactivate();
-            //grapher.Deactivate();
-            //_keypad.Deactivate();
-            //paramSlider.Deactivate();
-            //SAM.Deactivate();
-            //_scaleSlider.Deactivate();
-            //_thumbSlider.Deactivate();
-            //_randomProcess.Deactivate();
 
-            //for (int k = 0; k < _numButtons; k++) _buttons[k].Deactivate();
-            //foreach (var ie in _inputEvents) ie.ClearRisingFalling();
+            for (int k = 0; k < _inputObjects.Count; k++) _inputObjects[k].Deactivate();
+            foreach (var ie in _inputEvents) ie.ClearRisingFalling();
         }
 
         public void StartMonitor(List<Flag> flags)
@@ -326,6 +245,19 @@ namespace Turandot.Scripts
 
                 return json;
             }
+        }
+
+        public bool Contains(string item)
+        {
+            return _inputObjects.Find(x => x.Name.Equals(item)) != null;
+        }
+
+        public string ExpandResult(string item)
+        {
+            var i = _inputObjects.Find(x => x.Name.Equals(item));
+            if (i == null) return "";
+
+            return i.Result;
         }
 
         public string Category

@@ -11,6 +11,7 @@ namespace Turandot.Screen
 {
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     [XmlInclude(typeof(ButtonLayout))]
+    [XmlInclude(typeof(ChecklistLayout))]
     [JsonObject(MemberSerialization.OptOut)]
     public class InputLayout
     {

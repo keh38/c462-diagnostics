@@ -43,8 +43,12 @@ namespace Turandot.Inputs
         public string Target { get; set; }
 
 
-        public Input() { }
-        public Input(string name)
+        public Input()
+        {
+            BeginVisible = true;
+            EndVisible = false;
+        }
+        public Input(string name) : this()
         {
             this.name = name;
         }

@@ -8,7 +8,6 @@ using ProtoBuf;
 
 namespace Turandot.Inputs
 {
-
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     [JsonObject(MemberSerialization.OptOut)]
     public class Categorizer : Input
