@@ -11,7 +11,7 @@ public class ClockSynchronizer : MonoBehaviour
 {
     public enum SyncStatus { Idle, Recording, Error}
 
-    [SerializeField] private float _pollInterval_s = 1;
+    [SerializeField] public float pollInterval_s = 5;
     [SerializeField] private string _comPort = "COM23";
     [SerializeField] private SyncPulseDetector _syncPulseDetector;
     [SerializeField] private AudioSource _audioSource;
@@ -32,10 +32,11 @@ public class ClockSynchronizer : MonoBehaviour
     private string _logPath = "";
     private bool _serialPortOK;
 
-    private Thread _syncThread;
-    private bool _stopThread;
+    public int ChannelIndex { get; private set; }
+    public int PulsesGenerated { get; private set; }
+    public int PulsesDetected { get; private set; }
 
-    public void Initialize(string comPort)
+    public bool Initialize(string comPort)
     {
         CreateSignal();
 
@@ -46,10 +47,12 @@ public class ClockSynchronizer : MonoBehaviour
         {
             _serialPortOK = true;
             Debug.Log("[Clock Synchronizer] no COM port specified, running without");
-            return;
         }
-
-        _serialPortOK = _syncPulseDetector.InitializeSerialPort(_comPort);
+        else
+        {
+            _serialPortOK = _syncPulseDetector.InitializeSerialPort(_comPort);
+        }
+        return _serialPortOK;
     }
 
     void CreateSignal()
@@ -74,21 +77,15 @@ public class ClockSynchronizer : MonoBehaviour
     public void StartSynchronizing(string logPath = "")
     {
         _audioSource.Play();
+        PulsesGenerated = 0;
+        PulsesDetected = 0;
 
         InitializeLogFile(logPath);
 
         Debug.Log($"[ClockSynchronizer] Start synchronizing to {_logPath}");
 
-        //_syncThread = new Thread(new ThreadStart(SyncThread));
-        //_syncThread.IsBackground = true;
-        //_stopThread = false;
+        InvokeRepeating("Synchronize", 1, pollInterval_s);
 
-        //_syncThread.Start();
-
-
-        InvokeRepeating("Synchronize", 1, _pollInterval_s);
-
-        //Status = _serialPortOK ? SyncStatus.Recording : SyncStatus.Error;
         Status = SyncStatus.Recording;
     }
 
@@ -98,8 +95,6 @@ public class ClockSynchronizer : MonoBehaviour
         CancelInvoke("Synchronize");
 
         _audioSource.Stop();
-        //_stopThread = true;
-        //_syncThread.Abort();
 
         Status = SyncStatus.Idle;
     }
@@ -135,27 +130,13 @@ public class ClockSynchronizer : MonoBehaviour
         File.WriteAllText(_logPath, headerText + Environment.NewLine);
     }
 
-    private void SyncThread()
-    {
-        var lastTime = DateTime.MinValue;
-        while (!_stopThread)
-        {
-            Synchronize();
-            lastTime = DateTime.Now;
-
-            while (!_stopThread && ((DateTime.Now - lastTime).TotalSeconds < _pollInterval_s))
-            {
-                Thread.Sleep(500);
-            }
-        }
-    }
-
     private async void Synchronize()
     {
         var systemTime = HighPrecisionClock.UtcNowIn100nsTicks;
         var unityTime = Time.realtimeSinceStartupAsDouble;
 
         _generatePulse = true;
+        PulsesGenerated++;
 
         await Task.Delay(500);
         var syncPulseEvent = await Task.Run(() => _syncPulseDetector.DetectOnePulse());
@@ -166,6 +147,8 @@ public class ClockSynchronizer : MonoBehaviour
             $"{syncPulseEvent.result,18}\t";
         if (syncPulseEvent.result == SyncPulseDetector.SyncPulseEvent.Result.Detected)
         {
+            Status = SyncStatus.Recording;
+            PulsesDetected++;
             logEntry +=
                 $"{_lastAudioDSPTime,12:0.000000}\t" +
                 $"{syncPulseEvent.systemTime,20}\t" +
@@ -174,6 +157,7 @@ public class ClockSynchronizer : MonoBehaviour
         }
         else
         {
+            Status = SyncStatus.Error;
             logEntry +=
                 $"{float.NaN,12}\t" +
                 $"{float.NaN,20}\t" +
@@ -197,8 +181,8 @@ public class ClockSynchronizer : MonoBehaviour
             _lastAudioDSPTime = AudioSettings.dspTime;
             _generatePulse = false;
 
-            int index = _pulseChannel >=0 ? _pulseChannel : (channels - 1);
-            Debug.Log($"fuck this {index}");
+            ChannelIndex = _pulseChannel >= 0 ? _pulseChannel : (channels - 1);
+            int index = ChannelIndex;
             for (int k=0; k < _signal.Length; k++)
             {
                 data[index] = _signal[k];

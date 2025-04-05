@@ -219,7 +219,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
     private void UpdateDigitimer(float value)
     {
-
+        HardwareInterface.Digitimer?.EnableDevices(_sigMan.GetDigitimerChannels());
     }
 
     private void ApplyParameters(InteractiveSettings settings)

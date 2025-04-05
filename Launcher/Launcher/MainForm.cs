@@ -381,7 +381,7 @@ namespace Launcher
             {
                 var processStartInfo = new ProcessStartInfo("net.exe", "stop audiosrv /y");
                 processStartInfo.UseShellExecute = true;
-                //processStartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                processStartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 processStartInfo.WorkingDirectory = Environment.SystemDirectory;
 
                 Log.Information("stopping audiosrv");

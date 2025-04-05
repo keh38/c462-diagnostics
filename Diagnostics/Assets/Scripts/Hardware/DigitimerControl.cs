@@ -17,18 +17,21 @@ public class DigitimerControl : MonoBehaviour
         }
     }
 
-    public void Initialize()
+    public bool Initialize()
     {
+        bool success = false;
         try
         {
             _d128 = new D128ExAPI();
             _d128.Initialize();
             _d128.GetState();
+            success = true;
         }
         catch (Exception ex)
         {
             Debug.Log("Failed to initialize Digitimer control: " + ex.Message);
         }
+        return success;
     }
 
     public bool EnableDevices(List<KLib.Signals.Channel> channels)

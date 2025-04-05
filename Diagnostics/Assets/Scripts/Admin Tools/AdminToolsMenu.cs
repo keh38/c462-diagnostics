@@ -13,7 +13,7 @@ public class AdminToolsMenu : MonoBehaviour
     [SerializeField] private SyncPanel _syncPanel;
     [SerializeField] private UpdatePanel _updatePanel;
     [SerializeField] private OneDrivePanel _oneDrivePanel;
-    [SerializeField] private GameObject _hardwarePanel;
+    [SerializeField] private HardwarePanel _hardwarePanel;
 
     [SerializeField] private Button _syncMenuButton;
     [SerializeField] private Button _updateMenuButton;
@@ -27,14 +27,14 @@ public class AdminToolsMenu : MonoBehaviour
 
     private TMPro.TMP_Text _subjectLabel;
 
-    void Start()
+    IEnumerator Start()
     {
         _cloudIcon.color = OneDrivePanel.GetStatusColor(MSGraphClient.GetConnectionStatus(out string details));
         if (!HardwareInterface.IsReady && !HardwareInterface.ErrorAcknowledged)
         {
             HardwareInterface.AcknowledgeError();
-            _hardwareMenuButton.Select();
-            OnHardwareMenuButtonClick();
+            yield return StartCoroutine(SelectHardwarePanel());
+            _hardwarePanel.ShowHardwareErrorMessage();
         }
     }
 
@@ -56,7 +56,11 @@ public class AdminToolsMenu : MonoBehaviour
 
     public void OnUpdateMenuButtonClick()
     {
-        SelectItem(_updateMenuButton, _updatePanel.gameObject);
+        StartCoroutine(SelectUpdatePanel());
+    }
+    private IEnumerator SelectUpdatePanel()
+    {
+        yield return StartCoroutine(SelectItem(_updateMenuButton, _updatePanel.gameObject));
         _updatePanel.CheckForUpdates();
     }
 
@@ -74,25 +78,40 @@ public class AdminToolsMenu : MonoBehaviour
 
     public void OnHardwareMenuButtonClick()
     {
-        SelectItem(_hardwareMenuButton, _hardwarePanel.gameObject);
+        StartCoroutine(SelectHardwarePanel());
     }
-
+    private IEnumerator SelectHardwarePanel()
+    {
+        yield return StartCoroutine(SelectItem(_hardwareMenuButton, _hardwarePanel.gameObject));
+    }
 
     public void OnBackButtonClick()
     {
         SceneManager.LoadScene("Home");
     }
 
-    private void SelectItem(Button button, GameObject panel)
+    private IEnumerator SelectItem(Button button, GameObject panel)
     {
+        ColorBlock cb;
+
         if (_activePanel != null)
         {
             _activePanel.SetActive(false);
+            cb = _activeButton.colors;
+            cb.normalColor = new Color(cb.normalColor.r, cb.normalColor.g, cb.normalColor.b, 0);
+            cb.selectedColor = cb.normalColor;
+            _activeButton.colors = cb;
         }
 
         _activePanel = panel;
         _activeButton = button;
 
         _activePanel.SetActive(true);
+        cb = _activeButton.colors;
+        cb.normalColor = new Color(cb.normalColor.r, cb.normalColor.g, cb.normalColor.b, 1);
+        cb.selectedColor = cb.normalColor;
+        _activeButton.colors = cb;
+
+        yield return null;
     }
 }

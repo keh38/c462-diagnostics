@@ -24,6 +24,7 @@ PrivilegesRequired=admin
 [Files]
 Source: "..\Diagnostics\Build\*.*"; DestDir: "{app}"; Flags: replacesameversion recursesubdirs;
 Source: "..\Launcher\Launcher\bin\x64\Release\*.*"; DestDir: "{app}\Launcher"; Flags: replacesameversion recursesubdirs;
+Source: "..\CHANGELOG.md"; DestDir: "{app}\\"; Flags: replacesameversion;
 ;Source: "D:\Development\C462\c462-odi\Installer\Output\ODI_Installer_1-0.exe"; DestDir: "{tmp}";
 
 [Icons]

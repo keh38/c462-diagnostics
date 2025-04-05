@@ -7,6 +7,7 @@ using System.Net;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+using KLib;
 using KLib.Network;
 
 public class HTS_Server : MonoBehaviour
@@ -176,6 +177,7 @@ public class HTS_Server : MonoBehaviour
 
             case "ChangeScene":
                 _listener.SendAcknowledgement();
+                KLogger.Log.FlushLog();
                 GameManager.DataForNextScene = "";
                 _currentScene.ChangeScene(data);
                 break;

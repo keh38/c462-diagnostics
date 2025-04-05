@@ -15,6 +15,11 @@ public class MessageBox : MonoBehaviour
 
     private Image _currentIcon;
 
+    private void Awake()
+    {
+        _currentIcon = infoIcon;
+    }
+
     public void Show(string message, IconShape iconShape = IconShape.Info)
     {
         gameObject.SetActive(true);

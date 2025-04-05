@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEngine;
 
 using KLib;
@@ -20,6 +21,7 @@ public class HardwareInterface : MonoBehaviour
 
     private bool _audioReady = false;
     private bool _errorAcknowledged = false;
+    private string _errorMessage = "";
 
     #region SINGLETON CREATION
     // Singleton
@@ -52,6 +54,7 @@ public class HardwareInterface : MonoBehaviour
     public static VolumeManager VolumeManager { get { return instance._volumeManager; } }
     public static bool IsReady { get { return instance._audioReady; } }
     public static bool ErrorAcknowledged { get { return instance._errorAcknowledged; } }
+    public static string ErrorMessage { get { return instance._errorMessage; } }
     public static void AcknowledgeError() { instance._errorAcknowledged = true; }
     public static void CleanUp() => instance._CleanUp();
     #endregion
@@ -60,6 +63,8 @@ public class HardwareInterface : MonoBehaviour
 
     private bool _Init()
     {
+        StringBuilder errors = new StringBuilder(100);
+
         _volumeManager = new VolumeManager();
         _startVolume = _volumeManager.GetMasterVolume(VolumeManager.VolumeUnit.Scalar);
         _volumeManager.SetMasterVolume(1.0f, VolumeManager.VolumeUnit.Scalar);
@@ -90,18 +95,28 @@ public class HardwareInterface : MonoBehaviour
             else
             {
                 Debug.Log("Audio adapter not configured for 7.1");
+                errors.AppendLine("- Audio adapter not configured for 7.1");
                 _audioReady = false;
             }
         }
 
-        _clockSynchronizer.Initialize(_hardwareConfig.SyncComPort);
+        var clockOK = _clockSynchronizer.Initialize(_hardwareConfig.SyncComPort);
+        if (!clockOK)
+        {
+            errors.AppendLine("- Failed to initialize clock sync serial port");
+        }
         _clockNetwork.Initialize();
 
         if (_hardwareConfig.UsesDigitimer())
         {
-            _digitimer.Initialize();
+            var success = _digitimer.Initialize();
+            if (!success)
+            {
+                errors.AppendLine("- Failed to initialize Digitimer(s)");
+            }
         }
         _errorAcknowledged = false;
+        _errorMessage = errors.ToString();
 
         return true;
     }
