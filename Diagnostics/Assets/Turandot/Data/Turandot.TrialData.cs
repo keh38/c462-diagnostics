@@ -40,8 +40,8 @@ namespace Turandot
             this.track = track;
         }
 
-        public string ToJSONString()
-        {
+        public string ToJSONString(string eventsJSON)
+        { 
             string json = "{\"block\":" + block + ",";
             if (track > -1) json += "\"track\":" + track + ",";
             json += "\"trial\":" + trial + ",";
@@ -91,7 +91,13 @@ namespace Turandot
                 propJSON = b.AddToJSON(propJSON, true);
             }
 
-            json += propJSON + "}" + System.Environment.NewLine;
+            json += propJSON;
+            if (!string.IsNullOrEmpty(eventsJSON))
+            {
+                json += ", " + eventsJSON;
+            }
+
+            json += "}" + System.Environment.NewLine;
 
             return json;
         }

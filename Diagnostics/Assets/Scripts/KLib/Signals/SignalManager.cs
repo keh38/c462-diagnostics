@@ -120,6 +120,11 @@ namespace KLib.Signals
         [XmlIgnore]
         public float[] CurrentAmplitudes { get { return _currentAmplitudes; } }
 
+        [ProtoIgnore]
+        [JsonIgnore]
+        [XmlIgnore]
+        public float LoopOffset {  get { return channels.Count > 0 ? channels[0].LoopOffset / SamplingRate_Hz : -1; } }
+
         #endregion
 
         public void AddChannel(string name, Waveform wf)

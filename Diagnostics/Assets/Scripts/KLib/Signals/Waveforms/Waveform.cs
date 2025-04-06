@@ -81,6 +81,7 @@ namespace KLib.Signals.Waveforms
         /// <seealso cref="Initialize"/>
         protected float T;
 
+        [XmlIgnore]
         protected Channel _channel;
         protected CalibrationData _calib;
 

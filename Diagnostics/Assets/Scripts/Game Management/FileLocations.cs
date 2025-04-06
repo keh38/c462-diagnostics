@@ -31,6 +31,22 @@ public static class FileLocations
         }
     }
 
+    public static void CheckFolderStructure()
+    {
+        if (!Directory.Exists(DataRoot))
+        {
+            Directory.CreateDirectory(DataRoot);
+            CreateProjectFolder("Scratch");
+        }
+    }
+
+    public static void CreateProjectFolder(string projectName)
+    {
+        Directory.CreateDirectory(Path.Combine(DataRoot, projectName));
+        Directory.CreateDirectory(Path.Combine(DataRoot, projectName, "Subjects"));
+        Directory.CreateDirectory(Path.Combine(DataRoot, projectName, "Resources"));
+    }
+
     public static List<string> EnumerateProjects()
     {
         return FileIO.EnumerateFolderNames(DataRoot);

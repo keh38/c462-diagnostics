@@ -78,16 +78,11 @@ public class HTS_Server : MonoBehaviour
         DontDestroyOnLoad(this);
     }
 
-    public bool Use { get; private set; }
-    public string Host { get; private set; }
-
     #region private methods
     private void _StartServer()
     {
         _remoteConnected = false;
         _stopServer = false;
-
-        Use = true;
 
         _ipEndPoint = NetworkUtils.FindNextAvailableEndPoint();
         _address = _ipEndPoint.Address.ToString();
@@ -97,14 +92,12 @@ public class HTS_Server : MonoBehaviour
 
         StartCoroutine(TCPServer());
         _discoveryServer.StartReceiving("HEARING.TEST.SUITE", _ipEndPoint.Address.ToString(), _ipEndPoint.Port);
-        Host = _ipEndPoint.Address.ToString() + ":" + _ipEndPoint.Port;
 
         Debug.Log("started HTS TCP server on " + _ipEndPoint.ToString());
     }
 
     public void StopServer()
     {
-        Use = false;
         _stopServer = true;
         if (_listener != null)
         {
@@ -153,7 +146,10 @@ public class HTS_Server : MonoBehaviour
             data = parts[1];
         }
 
-        Debug.Log("Command received: " + command);
+        if (!command.Equals("Ping"))
+        {
+            Debug.Log("Command received: " + command);
+        }
 
         switch (command)
         {
@@ -172,7 +168,7 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "Ping":
-                _listener.SendAcknowledgement();
+                _listener.SendAcknowledgement(_remoteConnected);
                 break;
 
             case "ChangeScene":
@@ -222,6 +218,11 @@ public class HTS_Server : MonoBehaviour
                 _listener.WriteStringAsByteArray(KLib.FileIO.XmlSerializeToString(HardwareInterface.AdapterMap));
                 break;
 
+            case "GetLog":
+                KLogger.Log.FlushLog();
+                _listener.WriteStringAsByteArray($"{Path.GetFileName(KLogger.LogPath)}:{File.ReadAllText(KLogger.LogPath)}");
+                break;
+
             case "TransferFile":
                 _listener.SendAcknowledgement();
                 ReceiveFile(data);
@@ -242,6 +243,10 @@ public class HTS_Server : MonoBehaviour
         for (int k = 0; k < parts.Length; k++) Debug.Log(parts[k]);
         if (parts.Length != 3) return;
         var folder = FileLocations.LocalResourceFolder(parts[0]);
+        if (!Directory.Exists(folder))
+        {
+            Directory.CreateDirectory(folder);
+        }
         var filePath = Path.Combine(folder, parts[1]);
         File.WriteAllText(filePath, parts[2]);
     }

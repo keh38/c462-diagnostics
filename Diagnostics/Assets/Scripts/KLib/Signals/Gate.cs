@@ -86,28 +86,24 @@ namespace KLib.Signals
 
         private GateState _state;
         private bool _wasLooped = false;
+        private int _loopOffset = -1;
 
 
         [JsonIgnore]
         [ProtoIgnore]
-        public GateState State
-        {
-            get { return _state; }
-        }
+        public GateState State { get { return _state; } }
 
         [JsonIgnore]
         [ProtoIgnore]
-        public bool Looped
-        {
-            get { return _wasLooped; }
-        }
+        public bool Looped { get { return _wasLooped; } }
 
         [JsonIgnore]
         [ProtoIgnore]
-        public bool Running
-        {
-            get { return Active && _state != GateState.Finished; }
-        }
+        public int LoopOffset { get { return _loopOffset; } }
+
+        [JsonIgnore]
+        [ProtoIgnore]
+        public bool Running { get { return Active && _state != GateState.Finished; } }
 
         [JsonIgnore]
         [ProtoIgnore]
@@ -437,6 +433,7 @@ namespace KLib.Signals
             float value = 0;
 
             _wasLooped = false;
+            _loopOffset = -1;
 
             for (int k=0; k<data.Length; k++)
             {
@@ -493,6 +490,7 @@ namespace KLib.Signals
                     {
                         _gateIndex = 0;
                         _wasLooped = true;
+                        _loopOffset = k + 1;
                     }
                 }
             }

@@ -12,14 +12,11 @@ namespace Turandot.Scripts
         //public AudioHighPassFilter hpFilter;
         //public AudioLowPassFilter lpFilter;
         public AudioSource audioSource;
-        // TURANDOT FIX 
 
         public delegate void TimeOutDelegate(string source);
         public TimeOutDelegate TimeOut;
         private void OnTimeOut(string source) { TimeOut?.Invoke(source); }
 
-
-        //KStringDelegate _onTimeOut = null;
         SignalManager _sigMan;
         bool _isRunning = false;
         bool _timerOnly = false;
@@ -33,6 +30,9 @@ namespace Turandot.Scripts
         bool _pauseAudio = false;
         bool _resumeAudio = false;
 
+        double[] _stimTimes = new double[1000];
+        int _numStimTimes = 0;
+
         string _name;
 
         AudioLog _log = new AudioLog();
@@ -40,11 +40,8 @@ namespace Turandot.Scripts
 
         public bool IsRunning { get { return _isRunning; } }
         public AudioLog Log { get { return _log; } }
-
-        //private System.DateTime tlast = System.DateTime.MinValue;
-        //private double dsplast = 0;
-        //private double dspElapsed = 0;
-        //private double tElapsed = 0;
+        public int NumEvents { get { return _numStimTimes; } }
+        public double[] EventTimes { get { return _stimTimes; } }
 
         void Start()
         {
@@ -54,7 +51,7 @@ namespace Turandot.Scripts
         {
             get { return _sigMan; }
         }
-        // TURANDOT FIX 
+
         void Update()
         {
             if ((_timerOnly && (_killAudio || Time.timeSinceLevelLoad > _startTime + _timeOut && _timeOut > 0)) ||
@@ -101,6 +98,7 @@ namespace Turandot.Scripts
             _timerOnly = false;
             _isRunning = false;
             _killAudio = false;
+            _numStimTimes = 0;
 
             if (_sigMan != null)
             {
@@ -115,11 +113,6 @@ namespace Turandot.Scripts
                 _sigMan.StartPaused();
                 _isi = _sigMan.channels[0].gate.Active ? _sigMan.channels[0].gate.Period_ms / 1000f : float.PositiveInfinity;
             }
-        }
-
-        public void ClearLog()
-        {
-            _log.Clear();
         }
 
         public void Activate(float timeOut, List<Turandot.Flag> flags)
@@ -188,8 +181,16 @@ namespace Turandot.Scripts
                 if (wasStarted)
                 {
                     _log.Add(AudioSettings.dspTime, "activated");
+                    _stimTimes[_numStimTimes] = AudioSettings.dspTime;
+                    _numStimTimes++;
                 }
-
+                else if (_sigMan.LoopOffset >= 0)
+                {
+                    _log.Add(AudioSettings.dspTime + _sigMan.LoopOffset, "activated");
+                    _stimTimes[_numStimTimes] = AudioSettings.dspTime + _sigMan.LoopOffset;
+                    _numStimTimes++;
+                }
+                
                 if (_resumeAudio)
                 {
                     Gate.RampUp(data);

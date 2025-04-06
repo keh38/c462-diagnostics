@@ -28,6 +28,7 @@ public class InstructionPanel : MonoBehaviour
 
         _pages = _instructions.Text.Split(new string[] { "[br]\n" }, System.StringSplitOptions.RemoveEmptyEntries);
         ShowPage(_pageIndex);
+        UpdateContinueButtonLabel();
     }
 
     private void ShowPage(int index)
@@ -40,7 +41,7 @@ public class InstructionPanel : MonoBehaviour
     {
         _pageIndex--;
         ShowPage(_pageIndex);
-        UpdateContinueBuittonLabel();
+        UpdateContinueButtonLabel();
     }
 
     public void OnContinueButtonClick()
@@ -49,7 +50,7 @@ public class InstructionPanel : MonoBehaviour
         if (_pageIndex < _pages.Length)
         {
             ShowPage(_pageIndex);
-            UpdateContinueBuittonLabel();
+            UpdateContinueButtonLabel();
         }
         else
         {
@@ -57,7 +58,7 @@ public class InstructionPanel : MonoBehaviour
         }
     }
 
-    private void UpdateContinueBuittonLabel()
+    private void UpdateContinueButtonLabel()
     {
         _continueButton.GetComponentInChildren<TMPro.TMP_Text>().text = _pageIndex < _pages.Length - 1 ? "Next" : "Begin";
     }

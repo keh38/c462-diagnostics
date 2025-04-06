@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 using Turandot;
@@ -80,7 +81,7 @@ public class TurandotEngine : MonoBehaviour
     {
         foreach (TurandotAudio a in _audio)
         {
-            Destroy(a);
+            Destroy(a.gameObject);
         }
         _audio.Clear();
 
@@ -535,6 +536,22 @@ public class TurandotEngine : MonoBehaviour
         File.WriteAllText(_logPath, json);
         // TURANDOT FIX
 //        if (SubjectManager.Instance.UploadData && _params.trialLogOption == TrialLogOption.Upload) DataFileManager.UploadDataFile(_logPath);
+    }
+
+    public string GetEventsAsJSON()
+    {
+        var names = new StringBuilder(1000);
+        var times = new StringBuilder(1000);
+        foreach (var fe in _params.flowChart)
+        {
+            var a = _audio.Find(x => x.name.Equals(fe.name));
+            for (int k=0; k < a.NumEvents; k++)
+            {
+                names.Append($"\"{fe.name}\", ");
+                times.Append($"{a.EventTimes[k]:0.000000}, ");
+            }
+        }
+        return names.Length > 0 ? $"\"Events\" : {{\"name\" : [{names.ToString()}], \"time\" : [{times.ToString()}]}}" : "";
     }
 
     public void WriteAudioLogFile(string path)

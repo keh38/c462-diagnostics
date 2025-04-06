@@ -31,6 +31,7 @@ public class ClockSynchronizer : MonoBehaviour
 
     private string _logPath = "";
     private bool _serialPortOK;
+    private bool _detectPulses = true;
 
     public int ChannelIndex { get; private set; }
     public int PulsesGenerated { get; private set; }
@@ -46,6 +47,7 @@ public class ClockSynchronizer : MonoBehaviour
         if (string.IsNullOrEmpty(_comPort))
         {
             _serialPortOK = true;
+            _detectPulses = false;
             Debug.Log("[Clock Synchronizer] no COM port specified, running without");
         }
         else
@@ -139,12 +141,17 @@ public class ClockSynchronizer : MonoBehaviour
         PulsesGenerated++;
 
         await Task.Delay(500);
-        var syncPulseEvent = await Task.Run(() => _syncPulseDetector.DetectOnePulse());
+        var syncPulseEvent = new SyncPulseDetector.SyncPulseEvent();
+        if (_detectPulses)
+        {
+            syncPulseEvent = await Task.Run(() => _syncPulseDetector.DetectOnePulse());
+        }
 
         string logEntry =
             $"{systemTime,20}\t" +
             $"{unityTime,12:0.000000}\t" +
             $"{syncPulseEvent.result,18}\t";
+
         if (syncPulseEvent.result == SyncPulseDetector.SyncPulseEvent.Result.Detected)
         {
             Status = SyncStatus.Recording;
@@ -157,7 +164,7 @@ public class ClockSynchronizer : MonoBehaviour
         }
         else
         {
-            Status = SyncStatus.Error;
+            Status = _detectPulses ? SyncStatus.Error : SyncStatus.Recording;
             logEntry +=
                 $"{float.NaN,12}\t" +
                 $"{float.NaN,20}\t" +
@@ -176,6 +183,7 @@ public class ClockSynchronizer : MonoBehaviour
 
     private void OnAudioFilterRead(float[] data, int channels)
     {
+        return;
         if (_generatePulse)
         {
             _lastAudioDSPTime = AudioSettings.dspTime;

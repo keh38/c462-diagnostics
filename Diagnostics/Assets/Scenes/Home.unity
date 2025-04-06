@@ -4942,7 +4942,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98832fe888e569742a2724ad1f2dbf61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _pollInterval_s: 5
+  pollInterval_s: 5
   _comPort: COM23
   _syncPulseDetector: {fileID: 1681614339}
   _audioSource: {fileID: 1681614345}

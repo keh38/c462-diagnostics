@@ -135,6 +135,10 @@ namespace KLib.Signals
 
         [ProtoIgnore]
         [XmlIgnore]
+        public int LoopOffset { get { return gate.Active ? gate.LoopOffset : -1; } }
+
+        [ProtoIgnore]
+        [XmlIgnore]
         public bool IsFinished { get { return gate.Active ? gate.State == GateState.Finished : false; } }
 
         [ProtoIgnore]

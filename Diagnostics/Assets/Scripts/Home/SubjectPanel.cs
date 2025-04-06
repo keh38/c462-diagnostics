@@ -35,6 +35,8 @@ public class SubjectPanel : MonoBehaviour
         subjectInputField.gameObject.SetActive(false);
 
         subjectDropDown.Clear();
+
+        FileLocations.CheckFolderStructure();
         FillProjectDropDown();
     }
 
@@ -98,7 +100,6 @@ public class SubjectPanel : MonoBehaviour
         for (int k = 0; k < projects.Count; k++)
         {
             projectDropDown.AddItem(k, projects[k]);
-            Debug.Log(projects[k]);
         }
 
         projectDropDown.SelectByText(_selectedProject);
