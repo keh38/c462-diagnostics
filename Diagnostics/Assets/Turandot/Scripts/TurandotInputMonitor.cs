@@ -13,15 +13,15 @@ namespace Turandot.Scripts
     {
         [SerializeField] private GameObject _buttonPrefab;
         [SerializeField] private GameObject _checklistPrefab;
+        [SerializeField] private GameObject _sliderPrefab;
 
         // TURANDOT FIX
-        public TurandotSAM SAM;
-        public GameObject Circle;
-        public GameObject Square;
-        public GameObject Left;
-        public GameObject Right;
-        public TurandotGrapher grapher;
-        public TurandotParamSlider paramSlider;
+        //public TurandotSAM SAM;
+        //public GameObject Circle;
+        //public GameObject Square;
+        //public GameObject Left;
+        //public GameObject Right;
+        //public TurandotGrapher grapher;
 
         bool _isRunning = false;
         List<ButtonData> _buttonData = new List<ButtonData>();
@@ -120,7 +120,15 @@ namespace Turandot.Scripts
                     gobj.SetActive(false);
                     _buttonData.Add(i.ButtonData);
                 }
-
+                else if (layout is ParamSliderLayout)
+                {
+                    var gobj = GameObject.Instantiate(_sliderPrefab, canvasRT);
+                    var i = gobj.GetComponent<TurandotParamSlider>();
+                    i.Initialize(layout as ParamSliderLayout);
+                    _inputObjects.Add(i);
+                    gobj.SetActive(false);
+                    _buttonData.Add(i.ButtonData);
+                }
             }
             //if (screen.inputs.elements.Contains("pupillometer"))
             //{
@@ -178,7 +186,7 @@ namespace Turandot.Scripts
             foreach (var i in inputs)
             {
                 var target = _inputObjects.Find(x => x.Name.Equals(i.Target));
-                target?.Activate(i);
+                target?.Activate(i, audio);
             }
         }
 
@@ -279,10 +287,10 @@ namespace Turandot.Scripts
             //get { return _scaleSlider.slider.value.ToString("F4"); }
         }
 
-        public string SAMResult
-        {
-            get { return SAM.Result; }
-        }
+        //public string SAMResult
+        //{
+        //    get { return SAM.Result; }
+        //}
 
         public string KeypadResult
         {

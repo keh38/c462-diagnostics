@@ -31,7 +31,6 @@ namespace Turandot.Scripts
             ButtonData = new ButtonData() { name = layout.Name };
         }
 
-
         public void LayoutControl()
         {
             _label.text = _layout.Label;
@@ -71,11 +70,11 @@ namespace Turandot.Scripts
             ButtonData.value = true;
         }
 
-        public override void Activate(Inputs.Input input)
+        public override void Activate(Inputs.Input input, TurandotAudio audio)
         {
             _result = "";
             ButtonData.value = false;
-            base.Activate(input);
+            base.Activate(input, audio);
         }
 
         public override void Deactivate()

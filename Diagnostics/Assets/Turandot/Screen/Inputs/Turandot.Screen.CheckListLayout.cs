@@ -22,7 +22,7 @@ namespace Turandot.Screen
 
         public ChecklistLayout()
         {
-            Name = " CheckList";
+            Name = "Checklist";
             Label = "Select one";
         }
 

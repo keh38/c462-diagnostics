@@ -42,7 +42,6 @@ namespace Turandot.Inputs
         [ReadOnly(true)]
         public string Target { get; set; }
 
-
         public Input()
         {
             BeginVisible = true;

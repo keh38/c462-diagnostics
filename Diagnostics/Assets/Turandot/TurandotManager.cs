@@ -69,16 +69,14 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         Application.logMessageReceived -= HandleException;
     }
 
-    //public string MainDataFile { get { return _mainDataFile; } }
-
     void Start()
     {
         HTS_Server.SetCurrentScene("Turandot", this);
 
 #if HACKING
         Application.targetFrameRate = 60;
-        GameManager.SetSubject("Scratch/_Ken");
-        string configName = "ButtonTest";
+        GameManager.SetSubject("Scratch/_shit");
+        string configName = "SliderTest";
         //DiagnosticsManager.Instance.MakeExtracurricular("Turandot", "Turandot." + configName);
 #else
         string configName = GameManager.DataForNextScene;
@@ -174,6 +172,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         yield return new WaitForSeconds(1);
         _titleBar.SetActive(false);
+
+        if (_haveException) yield break;
 
         _instructionPanel.gameObject.SetActive(true);
         _instructionPanel.InstructionsFinished = OnInstructionsFinished;

@@ -57,14 +57,14 @@ namespace Turandot.Scripts
             rt.sizeDelta = new Vector2(_layout.Width, _layout.Height);
         }
 
-        override public void Activate(Turandot.Inputs.Input input)
+        override public void Activate(Turandot.Inputs.Input input, TurandotAudio audio)
         {
             //Message m = cue as Message;
 
             //_label.text = m.Text;
             ////ChangeAppearance(m);
 
-            base.Activate(input);
+            base.Activate(input, audio);
         }
 
         public override void Deactivate()

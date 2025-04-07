@@ -20,7 +20,7 @@ namespace Turandot.Scripts
         {
         }
 
-        virtual public void Activate(Input input)
+        virtual public void Activate(Input input, TurandotAudio audio)
         {
             _input = input;
 

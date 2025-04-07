@@ -28,7 +28,7 @@ namespace Turandot.Scripts
             //loudnessSlider.NotifyOnMove = OnLoudnessChanged;
         }
 
-        override public void Activate(Input input)
+        override public void Activate(Input input, TurandotAudio audio)
         {
             _sam = input as SAM;
 
@@ -83,7 +83,7 @@ namespace Turandot.Scripts
 
             button.transform.localPosition = new Vector3(button.transform.localPosition.x, y + dy);
 
-            base.Activate(input);
+            base.Activate(input, audio);
         }
 
         override public void Deactivate()

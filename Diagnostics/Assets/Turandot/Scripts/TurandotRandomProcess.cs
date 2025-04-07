@@ -36,12 +36,12 @@ namespace Turandot.Scripts
             }
         }
 
-        override public void Activate(Turandot.Inputs.Input input)
-        {
-            _randomProcess = input as RandomProcess;
-            GenerateNextTimeAndValue();
-            _isEnabled = true;
-        }
+        //override public void Activate(Turandot.Inputs.Input input)
+        //{
+        //    _randomProcess = input as RandomProcess;
+        //    GenerateNextTimeAndValue();
+        //    _isEnabled = true;
+        //}
 
         override public void Deactivate()
         {
