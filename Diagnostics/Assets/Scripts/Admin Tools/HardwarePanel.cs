@@ -40,7 +40,7 @@ public class HardwarePanel : MonoBehaviour
     private void UpdateSyncStatus()
     {
         _messageBox.ShowMarkdown(
-            "Sync status:" +
+            "Sync status:\n" +
             $"- channel index = {HardwareInterface.ClockSync.ChannelIndex}\n" +
             $"- pulses generated = {HardwareInterface.ClockSync.PulsesGenerated}\n" +
             $"- pulses detected = {HardwareInterface.ClockSync.PulsesDetected}\n");
