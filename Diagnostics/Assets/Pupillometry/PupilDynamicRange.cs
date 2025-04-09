@@ -5,52 +5,95 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
+using Pupillometry;
+
 public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 {
     [SerializeField] private Camera _camera;
 
-    private float off1 = 1f;
-    private float on = 5f;
-    private float off2 = 1.5f;
-    private int numReps = 4;
-
     private bool _isRunning = false;
+
+    private float _preBaseLine = 2f;
+    private float _postBaseLine = 2f;
     private float _curTime = 0;
     private float _modRateHz = 0.05f;
     private int _curPeriod = 0;
+    private int _numReps = 4;
+
+    private float _endStimTime;
+    private float _endRunTime;
+
+    private float _nextUpdate;
+
+    private string _dataPath;
+    private DynamicRangeData _data;
+
+    private bool _stopMeasurement;
+
+    private string _mySceneName = "Pupil Dynamic Range";
 
     void Start()
     {
-        HTS_Server.SetCurrentScene("Pupil Dynamic Range", this);
-
-        //StartCoroutine(RunTest());
+        HTS_Server.SetCurrentScene(_mySceneName, this);
     }
 
     void InitializeMeasurement(string data)
     {
-        string fn = GameManager.Subject + "-PupilDR-" + System.DateTime.Now.ToString("yyyy-MM-dd_HHmmss");
+        _stopMeasurement = false;
+
+        _endStimTime = _preBaseLine + _numReps / _modRateHz;
+        _endRunTime = _endStimTime + _postBaseLine;
+
+        _nextUpdate = 1;
+
+        string fn = $"{GameManager.Subject}-PupilDR-{DateTime.Now.ToString("yyyy-MM-dd_HHmmss")}.json";
+        _dataPath = Path.Combine(FileLocations.SubjectFolder, fn);
+
+        float approxDuration = 10;
+        int npts = Mathf.RoundToInt(approxDuration * 100);
+
+        _data = new DynamicRangeData(_dataPath, npts);
+        HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
+    }
+
+    void Begin()
+    {
+        _isRunning = true;
     }
 
     void Update()
     {
         if (!_isRunning) return;
 
-        int nper = Mathf.FloorToInt(_curTime * _modRateHz) + 1;
-        if (nper > _curPeriod)
-        {
-            _curPeriod++;
-            //IPC.Instance.SendCommand("Trial", _curPeriod.ToString());
+        float intensity = 0;
 
-            if (_curPeriod > numReps)
+        if (_curTime >= _preBaseLine && _curTime < _endStimTime)
+        {
+            int nper = Mathf.FloorToInt(_curTime * _modRateHz) + 1;
+            if (nper > _curPeriod)
             {
-                _isRunning = false;
-                StartCoroutine(EndTest());
+                _curPeriod++;
             }
+
+            intensity = 0.5f * (1 - Mathf.Cos(2 * Mathf.PI * (_curTime - _preBaseLine) * _modRateHz));
         }
 
-        float intensity = 0.5f * (1 - Mathf.Cos(2 * Mathf.PI * _curTime * _modRateHz));
+        _data.Add(Time.realtimeSinceStartupAsDouble, intensity);
         SetScreenIntensity(intensity);
         _curTime += Time.deltaTime;
+
+        if (_curTime > _nextUpdate)
+        {
+            _nextUpdate += 1;
+            HTS_Server.SendMessage(_mySceneName, $"Progress:{Mathf.RoundToInt(_curTime/_endRunTime * 100)}");
+        }
+
+        if (_curTime > _endRunTime || _stopMeasurement)
+        {
+            _isRunning = false;
+            EndTest();
+        }
     }
 
     private void SetScreenIntensity(float intensity)
@@ -58,27 +101,13 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
         _camera.backgroundColor = new Color(intensity, intensity, intensity);
     }
 
-    private IEnumerator RunTest()
+    private void EndTest()
     {
+        _data.Trim();
+        KLib.FileIO.JSONSerialize(_data, _dataPath);
 
-        //IPC.Instance.Connect();
-        //IPC.Instance.StartRecording(fn);
-        yield return new WaitForSeconds(2f);
-
-        _curTime = 0;
-        _curPeriod = 0;
-        _isRunning = true;
-        yield return null;
-    }
-
-    private IEnumerator EndTest()
-    {
-        yield return new WaitForSeconds(2f);
-        //IPC.Instance.StopRecording();
-        //IPC.Instance.Disconnect();
-
-        //DiagnosticsManager.Instance.AdvanceProtocol();
-        //Application.LoadLevel(DiagnosticsManager.Instance.ReturnToScene);
+        HTS_Server.SendMessage(_mySceneName, "Finished:");
+        HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
     }
 
     void OnGUI()
@@ -110,16 +139,16 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
                 HardwareInterface.ClockSync.StopSynchronizing();
                 break;
             case "Begin":
-                //Begin();
+                Begin();
                 break;
             case "Abort":
-                //RpcAbort();
+                _stopMeasurement = true;
                 break;
             case "SendSyncLog":
                 var logPath = HardwareInterface.ClockSync.LogFile;
                 if (!string.IsNullOrEmpty(logPath))
                 {
-                    HTS_Server.SendMessage("Turandot", $"ReceiveData:{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
+                    HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
                 }
                 break;
         }

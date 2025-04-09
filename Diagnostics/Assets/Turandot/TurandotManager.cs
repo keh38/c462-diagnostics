@@ -544,7 +544,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             }
         }    
         
-        FileHeader header = new FileHeader();
+        var header = new Turandot.FileHeader();
         header.Initialize(_mainDataFile, _paramFile);
         header.audioSamplingRate = AudioSettings.outputSampleRate;
         AudioSettings.GetDSPBufferSize(out header.audioBufferLength, out header.audioNumBuffers);
