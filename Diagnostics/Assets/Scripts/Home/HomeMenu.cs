@@ -16,12 +16,14 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 
     [SerializeField] private Button _subjectMenuButton;
     [SerializeField] private Button _turandotMenuButton;
+    [SerializeField] private Button _pupilMenuButton;
     [SerializeField] private Button _configMenuButton;
     [SerializeField] private Button _quitMenuButton;
 
     [SerializeField] private PlayPanel _playPanel;
     [SerializeField] private SubjectPanel _subjectPanel;
     [SerializeField] private TurandotPanel _turandotPanel;
+    [SerializeField] private PupilPanel _pupilPanel;
     [SerializeField] private GameObject _quitPanel;
 
     [SerializeField] private Image _oneDriveIcon;
@@ -142,6 +144,16 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
     {
         yield return StartCoroutine(SelectItem(_turandotMenuButton, _turandotPanel.gameObject));
         _turandotPanel.ShowPanel();
+    }
+
+    public void OnPupilButtonClick()
+    {
+        StartCoroutine(SelectPupilPanel());
+    }
+    private IEnumerator SelectPupilPanel()
+    {
+        yield return StartCoroutine(SelectItem(_pupilMenuButton, _pupilPanel.gameObject));
+        //_turandotPanel.ShowPanel();
     }
 
     private void OnSubjectChanged(string newSubject)

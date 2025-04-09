@@ -280,6 +280,8 @@
     <Compile Include="Assets\Turandot\Screen\Cues\Turandot.Screen.CueLayout.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\MenuBarControl.cs" />
     <Compile Include="Assets\Scripts\Home\SubjectPanel.cs" />
+    <Compile Include="Assets\Scripts\Home\PupilPanel.cs" />
+    <Compile Include="Assets\Pupillometry\PupilDynamicRange.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
