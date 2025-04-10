@@ -58,11 +58,11 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
             _bottom = Screen.height;
         }
 
-        float size = Screen.width * _settings.TargetSizeFactor;
+        float size = Screen.width / _settings.TargetSizeFactor;
         _target.rectTransform.sizeDelta = new Vector2(size, size);
         _target.color = KLib.ColorTranslator.ColorFromARGB(_settings.TargetColor);
 
-        size = Screen.width * _settings.HoleSizeFactor;
+        size = Screen.width / _settings.HoleSizeFactor;
         _hole.rectTransform.sizeDelta = new Vector2(size, size);
         _hole.color = KLib.ColorTranslator.ColorFromARGB(_settings.BackgroundColor);
 
@@ -74,7 +74,11 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
     private void ShowTarget(int x, int y)
     {
         _target.gameObject.SetActive(true);
+        Debug.Log($"set target to {x}, {y}");
 
+
+
+        //_target.rectTransform.anchoredPosition = new Vector2(x, Screen.height - y);
         _target.rectTransform.position = new Vector2(x, Screen.height - y);
         _numAcquired++;
     }
@@ -94,8 +98,9 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
     void Update()
     {
         //if (!_finished && (Input.GetButtonDown("XboxA") || Input.GetMouseButtonDown(0) || Input.GetKeyDown(_settings.keyCode)))
-        if (!_isFinished && Input.GetKeyDown(KeyCode.Return))
+        if (!_isFinished && Input.GetKeyDown(KeyCode.K))
         {
+            Debug.Log("response");
             HTS_Server.SendMessage("Gaze Calibration", "Response");
 
             if (_numAcquired == _numTargets)
