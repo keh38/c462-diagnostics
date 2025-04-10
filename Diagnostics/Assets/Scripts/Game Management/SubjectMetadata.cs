@@ -13,6 +13,7 @@ public class SubjectMetadata
     public string Project { set; get; }
     public string Transducer { set; get; }
     public Laterality Laterality { set; get; }
+    public int BackgroundColor { set; get; }
 
     public SerializeableDictionary<int> runCounter = new SerializeableDictionary<int>();
     //public Dictionary<string, MetricData> metrics = new Dictionary<string, MetricData>();

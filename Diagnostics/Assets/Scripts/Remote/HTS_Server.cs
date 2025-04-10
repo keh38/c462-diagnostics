@@ -223,6 +223,10 @@ public class HTS_Server : MonoBehaviour
                 _listener.WriteStringAsByteArray($"{Path.GetFileName(KLogger.LogPath)}:{File.ReadAllText(KLogger.LogPath)}");
                 break;
 
+            case "GetScreenSize":
+                _listener.WriteStringAsByteArray($"{Screen.width},{Screen.height}");
+                break;
+
             case "TransferFile":
                 _listener.SendAcknowledgement();
                 ReceiveFile(data);

@@ -153,7 +153,6 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
                 }
                 break;
         }
-
     }
 }
 

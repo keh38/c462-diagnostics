@@ -96,7 +96,7 @@
     <Compile Include="Assets\Turandot\Inputs\Turandot.XboxLink.cs" />
     <Compile Include="Assets\Turandot\Parameters\Turandot.Flag.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.Variable.cs" />
-    <Compile Include="Assets\Pupillometry\Pupillometry.Calibration.Settings.cs" />
+    <Compile Include="Assets\Pupillometry\Pupillometry.GazeCalibrationSettings.cs" />
     <Compile Include="Assets\Turandot\Screen\Turandot.Screen.ProgressBarLayout.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\MenuButtonStyle.cs" />
     <Compile Include="Assets\Turandot\Parameters\Turandot.Timeout.cs" />
@@ -105,7 +105,7 @@
     <Compile Include="Assets\Unity UI Controls\Scripts\ProgressBar Scripts\ProgressBar.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\WaveformFactory.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.SAM.cs" />
-    <Compile Include="Assets\Pupillometry\PupilCalibration.cs" />
+    <Compile Include="Assets\Pupillometry\GazeCalibration.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptHistory.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.Schedule.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptTrialResult.cs" />

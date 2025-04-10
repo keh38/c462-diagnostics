@@ -91,6 +91,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             }
         }
 
+        GetComponent<Camera>().backgroundColor = GameManager.BackgroundColor;
+
         _engine.ClearScreen();
 
         _isScripted = (GameObject.Find("TurandotScripter") != null);
