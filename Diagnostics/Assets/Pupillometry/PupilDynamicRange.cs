@@ -106,7 +106,8 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
         _data.Trim();
         KLib.FileIO.JSONSerialize(_data, _dataPath);
 
-        HTS_Server.SendMessage(_mySceneName, "Finished:");
+        string status = _stopMeasurement ? "Measurement aborted" : "Measurement finished";
+        HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
         HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
     }
 
