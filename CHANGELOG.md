@@ -1,6 +1,6 @@
 ## Changelog
 
-### v0.4 (unreleased)
+### v0.4 (2025-04-11)
 #### Added
 - gaze calibration (by remote control)
 - subject-specific background color
