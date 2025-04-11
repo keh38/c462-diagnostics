@@ -17,6 +17,7 @@ using Turandot.Screen;
 
 public class TurandotManager : MonoBehaviour, IRemoteControllable
 {
+    [SerializeField] private Camera _camera;
     [SerializeField] private TurandotEngine _engine;
     [SerializeField] private GameObject _titleBar;
     [SerializeField] private InstructionPanel _instructionPanel;
@@ -91,7 +92,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             }
         }
 
-        GetComponent<Camera>().backgroundColor = GameManager.BackgroundColor;
+        _camera.backgroundColor = GameManager.BackgroundColor;
 
         _engine.ClearScreen();
 

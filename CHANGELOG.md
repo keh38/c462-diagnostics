@@ -1,5 +1,12 @@
 ## Changelog
 
+### v0.4 (unreleased)
+#### Added
+- gaze calibration (by remote control)
+- subject-specific background color
+
+---
+
 ### v0.3 (2025-04-10)
 #### Added pupil dynamic range measurement (by remote control)
 

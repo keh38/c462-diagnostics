@@ -17,14 +17,10 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
     private bool _stopServer;
 
     bool _isFinished = false;
+    bool _canRespond = false;
 
     int _numTargets;
     int _numAcquired;
-
-    int _left = 0;
-    int _top = 0;
-    int _right = 0;
-    int _bottom = 0;
 
     private GazeCalibrationSettings _settings;
 
@@ -42,21 +38,6 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
 
         _numTargets = int.Parse(_settings.CalibrationType.Substring(_settings.CalibrationType.Length - 1)) + 1;
         _numAcquired = 0;
-
-        if (_settings.Width > 0)
-        {
-            _left = (Screen.width - _settings.Width) / 2;
-            _top = (Screen.height - _settings.Height) / 2;
-            _right = _left + _settings.Width;
-            _bottom = _top + _settings.Height;
-        }
-        else
-        {
-            _left = 0;
-            _top = 0;
-            _right = Screen.width;
-            _bottom = Screen.height;
-        }
 
         float size = Screen.width / _settings.TargetSizeFactor;
         _target.rectTransform.sizeDelta = new Vector2(size, size);
@@ -76,9 +57,6 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
         _target.gameObject.SetActive(true);
         Debug.Log($"set target to {x}, {y}");
 
-
-
-        //_target.rectTransform.anchoredPosition = new Vector2(x, Screen.height - y);
         _target.rectTransform.position = new Vector2(x, Screen.height - y);
         _numAcquired++;
     }
@@ -98,16 +76,17 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
     void Update()
     {
         //if (!_finished && (Input.GetButtonDown("XboxA") || Input.GetMouseButtonDown(0) || Input.GetKeyDown(_settings.keyCode)))
-        if (!_isFinished && Input.GetKeyDown(KeyCode.K))
+        if (!_isFinished && _canRespond && (Input.GetMouseButtonDown(0) || Input.GetKeyDown(_settings.KeyCode)))
         {
-            Debug.Log("response");
             HTS_Server.SendMessage("Gaze Calibration", "Response");
+            _canRespond = false;
 
             if (_numAcquired == _numTargets)
             {
                 _numAcquired++;
                 _target.gameObject.SetActive(false);
                 _isFinished = true;
+                HTS_Server.SendMessage("Gaze Calibration", "GazeCalibrationFinished");
             }
         }
     }
@@ -132,6 +111,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
                 var parts = data.Split(',');
                 int x = int.Parse(parts[0]);
                 int y = int.Parse(parts[1]);
+                _canRespond = true;
                 ShowTarget(x, y);
                 break;
         }

@@ -47,7 +47,8 @@ namespace Pupillometry
         public string CalibrationType { get; set; }
         private bool ShouldSerializeCalibrationType() { return false; }
 
-        public UnityEngine.KeyCode keyCode = UnityEngine.KeyCode.None;
+        public UnityEngine.KeyCode KeyCode { get; set; }
+        private bool ShouldSerializeKeyCode() { return false; }
 
         public GazeCalibrationSettings()
         {
@@ -61,7 +62,7 @@ namespace Pupillometry
             TargetColor = KLib.ColorTranslator.ColorInt(0.75f, 0.75f, 0.75f, 1);
             BackgroundColor = KLib.ColorTranslator.ColorInt(0, 0, 0, 1);
 
-            keyCode = UnityEngine.KeyCode.None;
+            KeyCode = UnityEngine.KeyCode.Space;
         }
     }
 }

@@ -159,7 +159,7 @@ public class GameManager : MonoBehaviour
                 Project = project,
                 Transducer = _projectSettings.DefaultTransducer,
                 Laterality = KLib.Signals.Laterality.Binaural,
-                BackgroundColor = -1
+                BackgroundColor = 0
             };
             _SaveSubjectMetadata();
         }
@@ -173,7 +173,7 @@ public class GameManager : MonoBehaviour
 
     private Color _GetBackgroundColor()
     {
-        if (_subjectMetadata.BackgroundColor > 0)
+        if (_subjectMetadata.BackgroundColor != 0)
         {
             return KLib.ColorTranslator.ColorFromARGB(_subjectMetadata.BackgroundColor);
         }

@@ -1302,6 +1302,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e444aeeac6526944f9ccda16079ae916, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _camera: {fileID: 65420988}
   _engine: {fileID: 886566275}
   _titleBar: {fileID: 1969611750}
   _instructionPanel: {fileID: 12453397}
