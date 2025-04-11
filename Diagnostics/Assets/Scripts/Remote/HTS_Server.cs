@@ -164,7 +164,7 @@ public class HTS_Server : MonoBehaviour
                 _listener.SendAcknowledgement();
                 _remoteConnected = false;
                 _currentScene.ProcessRPC("Disconnect");
-                //SceneManager.LoadScene("Home");
+                SceneManager.LoadScene("Home");
                 break;
 
             case "Ping":
