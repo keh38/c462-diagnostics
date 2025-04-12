@@ -387,7 +387,7 @@ public class TurandotEngine : MonoBehaviour
         string expanded = result;
         if (!expanded.Contains("=") && !expanded.Contains("{")) expanded = "outcome=\"" + result + "\";";
 
-        var regex = new Regex(@"{([a-zA-Z0-9\.]+)}");
+        var regex = new Regex(@"{([a-zA-Z0-9\.\s]+)}");
         foreach (var match in regex.Matches(result).Cast<Match>().Select(x => x.Groups[1].Value))
         {
             if (_inputMonitor.Contains(match))

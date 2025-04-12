@@ -32,14 +32,14 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 8228716641639139672}
-  m_Father: {fileID: 8438942426066391180}
-  m_RootOrder: 2
+  m_Father: {fileID: 8438942426096313293}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 0, y: -250}
+  m_SizeDelta: {x: 200, y: 100}
+  m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &7805397065663964765
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -122,9 +122,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: PlayPanel, Assembly-CSharp
-        m_MethodName: PlayButtonClick
+      - m_Target: {fileID: 3869957216492088721}
+        m_TargetAssemblyTypeName: Turandot.Scripts.TurandotParamSlider, Assembly-CSharp
+        m_MethodName: OnButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -827,7 +827,8 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 220737014922608625}
   m_Father: {fileID: 8438942425356969154}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1145,7 +1146,7 @@ GameObject:
   - component: {fileID: 8438942426644436468}
   - component: {fileID: 8438942426644436469}
   - component: {fileID: 5667713823681906710}
-  - component: {fileID: 3703218151287449912}
+  - component: {fileID: 9090141228554261870}
   m_Layer: 5
   m_Name: Slider
   m_TagString: Untagged
@@ -1174,7 +1175,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 75}
+  m_SizeDelta: {x: 0, y: 100}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &8438942426644436469
 MonoBehaviour:
@@ -1259,7 +1260,7 @@ MonoBehaviour:
   m_FlexibleWidth: 1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!114 &3703218151287449912
+--- !u!114 &9090141228554261870
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1268,12 +1269,42 @@ MonoBehaviour:
   m_GameObject: {fileID: 8438942426644436471}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 737a52c1220c9e74788db5790ebf3f5f, type: 3}
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _label: {fileID: 0}
-  _slider: {fileID: 0}
-  _inputField: {fileID: 0}
+  m_Delegates:
+  - eventID: 3
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 3869957216492088721}
+          m_TargetAssemblyTypeName: Turandot.Scripts.TurandotParamSlider, Assembly-CSharp
+          m_MethodName: OnPointerUp
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 2
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 3869957216492088721}
+          m_TargetAssemblyTypeName: Turandot.Scripts.TurandotParamSlider, Assembly-CSharp
+          m_MethodName: OnPointerDown
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &8554861414393898976
 GameObject:
   m_ObjectHideFlags: 0
@@ -1443,7 +1474,6 @@ RectTransform:
   m_Children:
   - {fileID: 8438942426644436468}
   - {fileID: 8438942426414603972}
-  - {fileID: 220737014922608625}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1531,3 +1561,4 @@ MonoBehaviour:
   button: {fileID: 0}
   _label: {fileID: 8438942424799060644}
   _slider: {fileID: 8438942426644436469}
+  _button: {fileID: 4278910112594081539}

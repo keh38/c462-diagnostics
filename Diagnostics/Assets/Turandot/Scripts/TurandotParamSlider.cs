@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 using KLib.Signals;
@@ -17,13 +18,8 @@ namespace Turandot.Scripts
     {
         [SerializeField] private TMPro.TMP_Text _label;
         [SerializeField] private Slider _slider;
+        [SerializeField] private GameObject _button;
 
-        // TURANDOT FIX
-        /*
-                public KUISlider slider;
-                public UILabel leftLabel;
-                public UILabel rightLabel;
-                */
         private ParamSliderLayout _layout = new ParamSliderLayout();
         private ParamSliderAction _action = null;
 
@@ -38,6 +34,9 @@ namespace Turandot.Scripts
 
         public override string Name { get { return _layout.Name; } }
         public ButtonData ButtonData { get; private set; }
+
+        private string _result;
+        public override string Result { get { return _result; } }
         /*
                 private InputLog _log = new InputLog("paramslider");
 
@@ -70,6 +69,7 @@ namespace Turandot.Scripts
 
             LayoutControl();
             ButtonData = new ButtonData() { name = layout.Name };
+
         }
 
         private void LayoutControl()
@@ -96,6 +96,10 @@ namespace Turandot.Scripts
             //button.IsVisible = false;
             //_started = false;
 
+            ButtonData.value = false;
+            _button.SetActive(false);
+            _result = "";
+
             if (action.BeginVisible)
             {
                 _action = action;
@@ -106,6 +110,11 @@ namespace Turandot.Scripts
                 //_setFilters = _noise != null && _action.parameter == "Frequency";
                 //_paramSetter = _sigMan[_action.channel].ParamSetter(_setFilters ? "CF" : _action.parameter);
                 _paramSetter = _sigMan[_action.Channel].GetParamSetter(_action.Property);
+                if (_action.Property.Contains("Digitimer.Demand"))
+                {
+                   _paramSetter += x => this.UpdateDigitimer(x);
+                }
+
                 if (_paramSetter == null)
                 {
                     throw new Exception($"{_action.Channel}.{_action.Property} not found");
@@ -172,8 +181,15 @@ namespace Turandot.Scripts
             base.Activate(input, audio);
         }
 
+        private void UpdateDigitimer(float value)
+        {
+            HardwareInterface.Digitimer?.EnableDevices(_sigMan.GetDigitimerChannels());
+        }
+
+
         override public void Deactivate()
         {
+            ButtonData.value = false;
             base.Deactivate();
         }
 
@@ -192,6 +208,22 @@ namespace Turandot.Scripts
                 }
                 _paramSetter?.Invoke(_value);
             }
+        }
+
+        public void OnPointerDown(BaseEventData data)
+        {
+            _button.SetActive(false);
+        }
+
+        public void OnPointerUp(BaseEventData data)
+        {
+            _button.SetActive(true);
+        }
+
+        public void OnButtonClick()
+        {
+            ButtonData.value = true;
+            _result = _value.ToString();
         }
 /*
                 public string Value
