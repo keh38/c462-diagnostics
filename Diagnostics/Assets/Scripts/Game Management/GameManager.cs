@@ -80,6 +80,12 @@ public class GameManager : MonoBehaviour
         instance._SaveSubjectMetadata();
     }
 
+    public static void DeserializeSubjectMetrics(string data)
+    {
+        instance._subjectMetadata.metrics = FileIO.XmlDeserializeFromString<SerializeableDictionary<string>>(data);
+        instance._SaveSubjectMetadata();
+    }
+
     public static List<string> EnumerateTransducers()
     {
         var transducers = new List<string>();
@@ -156,8 +162,7 @@ public class GameManager : MonoBehaviour
                 ID = subject,
                 Project = project,
                 Transducer = _projectSettings.DefaultTransducer,
-                Laterality = KLib.Signals.Laterality.Binaural,
-                BackgroundColor = 0
+                Laterality = KLib.Signals.Laterality.Binaural
             };
             _SaveSubjectMetadata();
         }
@@ -171,16 +176,17 @@ public class GameManager : MonoBehaviour
 
     private Color _GetBackgroundColor()
     {
-        if (_subjectMetadata.BackgroundColor != 0)
+        string screenColor = _subjectMetadata.metrics["ScreenColor"];
+        if (!string.IsNullOrEmpty(screenColor))
         {
-            return KLib.ColorTranslator.ColorFromARGB(_subjectMetadata.BackgroundColor);
+            return KLib.ColorTranslator.ColorFromString(screenColor);
         }
         return new Color(214f / 255, 214f / 255, 214f / 255);
     }
 
     private void _SetBackgroundColor(Color color)
     {
-        _subjectMetadata.BackgroundColor = KLib.ColorTranslator.ColorInt(color);
+        //_subjectMetadata.BackgroundColor = KLib.ColorTranslator.ColorInt(color);
         _SaveSubjectMetadata();
     }
 

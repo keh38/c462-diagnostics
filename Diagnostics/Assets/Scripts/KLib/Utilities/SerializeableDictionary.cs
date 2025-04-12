@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace KLib
 {
@@ -38,5 +39,37 @@ namespace KLib
                 }
             }
         }
+
+        public void RenameKey(int index, string newName)
+        {
+            if (index < entries.Count)
+            {
+                entries[index].key = newName;
+            }
+        }
+
+        public void RenameKey(string oldName, string newName)
+        {
+            var e = entries.Find(x => x.key.Equals(oldName));
+            if (e != null)
+            {
+                e.key = newName;
+            }
+        }
+
+        public void RemoveKey(string key)
+        {
+            var e = entries.Find(x => x.key.Equals(key));
+            if (e != null)
+            {
+                entries.Remove(e);
+            }
+        }
+
+        public void Sort()
+        {
+            entries.Sort((x, y) => x.key.CompareTo(y.key));
+        }
+
     }
 }

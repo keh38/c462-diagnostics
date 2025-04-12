@@ -210,6 +210,11 @@ public class HTS_Server : MonoBehaviour
                 _currentScene.ProcessRPC("SubjectMetadataChanged");
                 break;
 
+            case "SetSubjectMetrics":
+                _listener.SendAcknowledgement();
+                GameManager.DeserializeSubjectMetrics(data);
+                break;
+
             case "GetTransducers":
                 _listener.WriteStringAsByteArray(KLib.FileIO.XmlSerializeToString(GameManager.EnumerateTransducers()));
                 break;
