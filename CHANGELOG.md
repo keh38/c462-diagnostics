@@ -1,5 +1,11 @@
 ## Changelog
 
+### v0.5 (unreleased)
+#### Added
+- Turandot: restored slider functionality
+
+---
+
 ### v0.4 (2025-04-11)
 #### Added
 - gaze calibration (by remote control)
