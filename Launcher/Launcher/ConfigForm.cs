@@ -51,6 +51,11 @@ namespace Launcher
             mapDropDown.SelectedIndex = _config.AdapterMaps.FindIndex(x => x.Name.Equals(_config.CurrentAdapterMap));
 
             FillComPortDropDown();
+            FillLEDComPortDropDown();
+
+            _ignoreEvents = true;
+            brightnessNumeric.IntValue = _config.ScreenBrightness;
+            _ignoreEvents = false;
         }
 
         private void FillTable(AdapterMap map)
@@ -78,6 +83,18 @@ namespace Launcher
 
             _ignoreEvents = true;
             comPortDropDown.SelectedIndex = ports.ToList().IndexOf(_config.SyncComPort);
+            _ignoreEvents = false;
+        }
+
+        private void FillLEDComPortDropDown()
+        {
+            ledComPortDropDown.Items.Clear();
+            var ports = SerialPort.GetPortNames();
+            ledComPortDropDown.Items.AddRange(ports);
+            ledComPortDropDown.Items.Add("none");
+
+            _ignoreEvents = true;
+            ledComPortDropDown.SelectedIndex = ports.ToList().IndexOf(_config.LEDComPort);
             _ignoreEvents = false;
         }
 
@@ -128,7 +145,7 @@ namespace Launcher
             if (!_ignoreEvents)
             {
                 _config.SyncComPort = comPortDropDown.Text.Equals("none") ? "" : comPortDropDown.Text;
-             }
+            }
         }
 
         private async void detectButton_Click(object sender, EventArgs e)
@@ -138,11 +155,13 @@ namespace Launcher
 
             _config.SyncComPort = "";
 
+            var firmware = "";
+
             var ports = SerialPort.GetPortNames();
             foreach (var port in ports)
             {
-                var isSyncDevice = await Task.Run(() => TestComPort(port));
-                if (isSyncDevice)
+                firmware = await Task.Run(() => TestComPort(port, "livin' the dream"));
+                if (!string.IsNullOrEmpty(firmware))
                 {
                     _config.SyncComPort = port;
                     break;
@@ -156,13 +175,18 @@ namespace Launcher
                 messageLabel.Text = "No sync device found.";
                 messageLabel.Visible = true;
             }
+            else
+            {
+                messageLabel.Text = $"Sync firmware V{firmware}";
+                messageLabel.Visible = true;
+            }
 
             detectButton.Enabled = true;
         }
 
-        public static bool TestComPort(string comPort)
+        public static string TestComPort(string comPort, string targetResponse)
         {
-            bool success = false;
+            string firmwareVersion = "";
 
             var serialPort = new SerialPort();
             serialPort.PortName = comPort;
@@ -185,9 +209,17 @@ namespace Launcher
                 serialPort.Open();
                 serialPort.WriteLine("'sup");
                 string response = serialPort.ReadLine();
-                if (response.Equals("livin' the dream"))
+                if (response.StartsWith(targetResponse))
                 {
-                    success = true;
+                    var parts = response.Split(':');
+                    if (parts.Length > 1)
+                    {
+                        firmwareVersion = parts[1];
+                    }
+                    else
+                    {
+                        firmwareVersion = "???";
+                    }
                 }
                 serialPort.Close();
             }
@@ -196,7 +228,7 @@ namespace Launcher
             {
                 serialPort.Close();
             }
-            return success;
+            return firmwareVersion;
         }
 
         private List<string> EnumerateDigitimerDevices()
@@ -343,5 +375,60 @@ namespace Launcher
             //if (!dsrDropDown.Focused) dsrDropDown.Visible = false;
         }
 
+        private async void ledDetectButton_Click(object sender, EventArgs e)
+        {
+            messageLabel.Visible = false;
+            ledDetectButton.Enabled = false;
+
+            _config.LEDComPort = "";
+
+            string firmware = "";
+
+            var ports = SerialPort.GetPortNames();
+            foreach (var port in ports)
+            {
+                firmware = await Task.Run(() => TestComPort(port, "lightin' the way, big man"));
+                if (!string.IsNullOrEmpty(firmware))
+                {
+                    _config.LEDComPort = port;
+                    break;
+                }
+            }
+
+            FillComPortDropDown();
+
+            if (string.IsNullOrEmpty(_config.LEDComPort))
+            {
+                messageLabel.Text = "No LED device found.";
+                messageLabel.Visible = true;
+            }
+            else
+            {
+                messageLabel.Text = $"LED firmware V{firmware}";
+                messageLabel.Visible = true;
+            }
+
+            ledDetectButton.Enabled = true;
+        }
+
+        private void brightnessNumeric_ValueChanged(object sender, EventArgs e)
+        {
+            if (!_ignoreEvents)
+            {
+                _config.ScreenBrightness = brightnessNumeric.IntValue;
+            }
+            if (_config.ScreenBrightness >= 0)
+            {
+                WindowsSettingsBrightnessController.SetBrightness((byte)_config.ScreenBrightness);
+            }
+        }
+
+        private void ledComPortDropDown_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!_ignoreEvents)
+            {
+                _config.LEDComPort = ledComPortDropDown.Text.Equals("none") ? "" : ledComPortDropDown.Text;
+            }
+        }
     }
 }

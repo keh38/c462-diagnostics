@@ -201,12 +201,15 @@ namespace Launcher
             errMsg = ValidateSyncDevice();
             if (!string.IsNullOrEmpty(errMsg)) sb.AppendLine(errMsg);
 
+            errMsg = ValidateLEDDevice();
+            if (!string.IsNullOrEmpty(errMsg)) sb.AppendLine(errMsg);
+
             errMsg = ValidateDigitimerDevices();
             if (!string.IsNullOrEmpty(errMsg)) sb.AppendLine(errMsg);
 
             return sb.ToString();
         }
-  
+
         private string ValidateSyncDevice()
         {
             if (string.IsNullOrEmpty(_config.SyncComPort))
@@ -219,14 +222,71 @@ namespace Launcher
             statusTextBox.AppendText("Checking sync device..." + Environment.NewLine);
             Log.Information("Pinging sync device");
 
-            var success = ConfigForm.TestComPort(_config.SyncComPort);
-            if (!success)
+            var firmware = ConfigForm.TestComPort(_config.SyncComPort, "livin' the dream");
+            if (string.IsNullOrEmpty(firmware))
             {
                 string msg = $"Sync device not responding at: {_config.SyncComPort}";
                 Log.Information(msg);
                 return msg;
             }
+            else
+            {
+                string msg = $"Sync device running firmware V{firmware}";
+                statusTextBox.AppendText(msg + Environment.NewLine);
+                Log.Information(msg);
+
+            }
             return "";
+        }
+
+        private string ValidateLEDDevice()
+        {
+            if (string.IsNullOrEmpty(_config.LEDComPort))
+            {
+                statusTextBox.AppendText("-- No LED device --" + Environment.NewLine);
+                Log.Information("No LED COM port specified");
+                return "";
+            }
+
+            statusTextBox.AppendText("Checking LED device..." + Environment.NewLine);
+            Log.Information("Pinging LED device");
+
+            var firmware = ConfigForm.TestComPort(_config.SyncComPort, "lightin' the way, big man");
+            if (string.IsNullOrEmpty(firmware))
+            {
+                string msg = $"LED device not responding at: {_config.LEDComPort}";
+                Log.Information(msg);
+                return msg;
+            }
+            else
+            {
+                string msg = $"LED device running firmware V{firmware}";
+                statusTextBox.AppendText(msg + Environment.NewLine);
+                Log.Information(msg);
+
+            }
+            return "";
+        }
+
+        private string SetScreenBrightness()
+        {
+            string errMsg = "";
+            if (_config.ScreenBrightness >= 0)
+            {
+                statusTextBox.AppendText($"Setting screen brightness to {_config.ScreenBrightness}" + Environment.NewLine);
+                Log.Information($"Setting screen brightness to {_config.ScreenBrightness}");
+                try
+                {
+
+                }
+                catch (Exception ex)
+                {
+                    errMsg = "Failed to set screen brightness";
+                    Log.Error($"Failed to set screen brightness: {ex.Message}");
+                }
+            }
+
+            return errMsg;
         }
 
         private string ValidateDigitimerDevices()

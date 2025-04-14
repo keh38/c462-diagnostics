@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dataGridView = new System.Windows.Forms.DataGridView();
             this.Jack = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Modality = new System.Windows.Forms.DataGridViewComboBoxColumn();
@@ -44,6 +44,11 @@
             this.detectButton = new System.Windows.Forms.Button();
             this.messageLabel = new System.Windows.Forms.Label();
             this.dsrDropDown = new System.Windows.Forms.ComboBox();
+            this.ledDetectButton = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.ledComPortDropDown = new System.Windows.Forms.ComboBox();
+            this.brightnessNumeric = new KLib.Controls.KNumericBox();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -74,8 +79,8 @@
             // 
             // Jack
             // 
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.Jack.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.Jack.DefaultCellStyle = dataGridViewCellStyle2;
             this.Jack.HeaderText = "Jack";
             this.Jack.Name = "Jack";
             this.Jack.ReadOnly = true;
@@ -182,7 +187,7 @@
             this.messageLabel.Location = new System.Drawing.Point(11, 382);
             this.messageLabel.Name = "messageLabel";
             this.messageLabel.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.messageLabel.Size = new System.Drawing.Size(290, 33);
+            this.messageLabel.Size = new System.Drawing.Size(290, 77);
             this.messageLabel.TabIndex = 8;
             this.messageLabel.Text = "label3";
             this.messageLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -200,11 +205,79 @@
             this.dsrDropDown.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.dsrDropDown_DrawItem);
             this.dsrDropDown.SelectedIndexChanged += new System.EventHandler(this.dsrDropDown_SelectedIndexChanged);
             // 
+            // ledDetectButton
+            // 
+            this.ledDetectButton.Location = new System.Drawing.Point(459, 410);
+            this.ledDetectButton.Name = "ledDetectButton";
+            this.ledDetectButton.Size = new System.Drawing.Size(55, 23);
+            this.ledDetectButton.TabIndex = 12;
+            this.ledDetectButton.Text = "Detect";
+            this.ledDetectButton.UseVisualStyleBackColor = true;
+            this.ledDetectButton.Click += new System.EventHandler(this.ledDetectButton_Click);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(318, 415);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(63, 13);
+            this.label3.TabIndex = 11;
+            this.label3.Text = "LED control";
+            // 
+            // ledComPortDropDown
+            // 
+            this.ledComPortDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ledComPortDropDown.FormattingEnabled = true;
+            this.ledComPortDropDown.Location = new System.Drawing.Point(383, 411);
+            this.ledComPortDropDown.Name = "ledComPortDropDown";
+            this.ledComPortDropDown.Size = new System.Drawing.Size(70, 21);
+            this.ledComPortDropDown.TabIndex = 10;
+            this.ledComPortDropDown.SelectedIndexChanged += new System.EventHandler(this.ledComPortDropDown_SelectedIndexChanged);
+            // 
+            // brightnessNumeric
+            // 
+            this.brightnessNumeric.AllowInf = false;
+            this.brightnessNumeric.AutoSize = true;
+            this.brightnessNumeric.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.brightnessNumeric.ClearOnDisable = false;
+            this.brightnessNumeric.FloatValue = 0F;
+            this.brightnessNumeric.IntValue = 0;
+            this.brightnessNumeric.IsInteger = true;
+            this.brightnessNumeric.Location = new System.Drawing.Point(383, 439);
+            this.brightnessNumeric.MaxCoerce = true;
+            this.brightnessNumeric.MaximumSize = new System.Drawing.Size(20000, 20);
+            this.brightnessNumeric.MaxValue = 100D;
+            this.brightnessNumeric.MinCoerce = true;
+            this.brightnessNumeric.MinimumSize = new System.Drawing.Size(10, 20);
+            this.brightnessNumeric.MinValue = -1D;
+            this.brightnessNumeric.Name = "brightnessNumeric";
+            this.brightnessNumeric.Size = new System.Drawing.Size(70, 20);
+            this.brightnessNumeric.TabIndex = 13;
+            this.brightnessNumeric.TextFormat = "K4";
+            this.brightnessNumeric.ToolTip = "";
+            this.brightnessNumeric.Units = "";
+            this.brightnessNumeric.Value = 0D;
+            this.brightnessNumeric.ValueChanged += new System.EventHandler(this.brightnessNumeric_ValueChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(325, 442);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(56, 13);
+            this.label4.TabIndex = 14;
+            this.label4.Text = "Brightness";
+            // 
             // ConfigForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(529, 428);
+            this.ClientSize = new System.Drawing.Size(529, 480);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.brightnessNumeric);
+            this.Controls.Add(this.ledDetectButton);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.ledComPortDropDown);
             this.Controls.Add(this.dsrDropDown);
             this.Controls.Add(this.messageLabel);
             this.Controls.Add(this.detectButton);
@@ -243,5 +316,10 @@
         private System.Windows.Forms.Button detectButton;
         private System.Windows.Forms.Label messageLabel;
         private System.Windows.Forms.ComboBox dsrDropDown;
+        private System.Windows.Forms.Button ledDetectButton;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ComboBox ledComPortDropDown;
+        private KLib.Controls.KNumericBox brightnessNumeric;
+        private System.Windows.Forms.Label label4;
     }
 }

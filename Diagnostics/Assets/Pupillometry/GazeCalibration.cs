@@ -17,7 +17,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
     private bool _stopServer;
 
     bool _isFinished = false;
-    bool _canRespond = false;
+    bool _canRespond = true;
 
     int _numTargets;
     int _numAcquired;
@@ -76,10 +76,10 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
     void Update()
     {
         //if (!_finished && (Input.GetButtonDown("XboxA") || Input.GetMouseButtonDown(0) || Input.GetKeyDown(_settings.keyCode)))
-        if (!_isFinished && _canRespond && (Input.GetMouseButtonDown(0) || Input.GetKeyDown(_settings.KeyCode)))
+        if (!_isFinished && (Input.GetMouseButtonDown(0) || Input.GetKeyDown(_settings.KeyCode)))
         {
             HTS_Server.SendMessage("Gaze Calibration", "Response");
-            _canRespond = false;
+            //_canRespond = false;
 
             if (_numAcquired == _numTargets)
             {
