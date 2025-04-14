@@ -60,7 +60,7 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
                 .StartLogging();
 
             Debug.Log($"Started V{Application.version}");
-
+            
             _subjectPanel.SubjectChangedEvent.AddListener(OnSubjectChanged);
 
             _message.text = "";
