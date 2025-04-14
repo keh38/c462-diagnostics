@@ -56,7 +56,7 @@ void loop() {
     }
     else if (message.startsWith("'sup"))
     {
-      Serial.println("livin' the dream");
+      Serial.println("livin' the dream:1.0");
     }
   }
 

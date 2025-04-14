@@ -277,7 +277,7 @@ namespace Launcher
                 Log.Information($"Setting screen brightness to {_config.ScreenBrightness}");
                 try
                 {
-
+                    Brightness.Set(this.Handle, _config.ScreenBrightness);
                 }
                 catch (Exception ex)
                 {

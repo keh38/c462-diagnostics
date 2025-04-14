@@ -419,7 +419,7 @@ namespace Launcher
             }
             if (_config.ScreenBrightness >= 0)
             {
-                WindowsSettingsBrightnessController.SetBrightness((byte)_config.ScreenBrightness);
+                KLib.Brightness.Set(this.Handle, _config.ScreenBrightness);
             }
         }
 
