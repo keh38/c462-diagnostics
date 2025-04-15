@@ -45,6 +45,10 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
     {
         Application.runInBackground = true;
 
+#if UNITY_EDITOR
+        Application.targetFrameRate = 60;
+#endif
+
         _versionLabel.text = "V" + Application.version;
         yield return null;
 
@@ -69,6 +73,9 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
             HardwareInterface.Initialize();
 
             HTS_Server.StartServer();
+
+            StartCoroutine(InitializeHardware());
+
             GameManager.Initialized = true;
         }
 
@@ -86,7 +93,7 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 
         _networkIcon.color = HTS_Server.RemoteConnected ? _networkActiveColor : Color.gray;
 
-        StartCoroutine(InitializeHardware());
+        //StartCoroutine(InitializeHardware());
     }
 
     private IEnumerator InitializeHardware()

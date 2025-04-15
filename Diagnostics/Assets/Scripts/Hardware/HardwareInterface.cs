@@ -12,6 +12,7 @@ public class HardwareInterface : MonoBehaviour
     [SerializeField] private ClockSynchronizer _clockSynchronizer;
     [SerializeField] private ClockNetworkInterface _clockNetwork;
     [SerializeField] private DigitimerControl _digitimer;
+    [SerializeField] private LEDController _ledController;
     
     private VolumeManager _volumeManager;
     private float _startVolume;
@@ -56,6 +57,8 @@ public class HardwareInterface : MonoBehaviour
     public static bool ErrorAcknowledged { get { return instance._errorAcknowledged; } }
     public static string ErrorMessage { get { return instance._errorMessage; } }
     public static void AcknowledgeError() { instance._errorAcknowledged = true; }
+    public static bool SetLEDColor(int red, int green, int blue, int white) { return instance._ledController.SetColor(red, green, blue, white); }
+    public static LEDController LED { get { return instance._ledController; } }
     public static void CleanUp() => instance._CleanUp();
     #endregion
 
@@ -107,6 +110,19 @@ public class HardwareInterface : MonoBehaviour
         }
         _clockNetwork.Initialize();
 
+        if (!string.IsNullOrEmpty(_hardwareConfig.LEDComPort))
+        {
+            var ledOK = _ledController.InitializeSerialPort(_hardwareConfig.LEDComPort);
+            if (ledOK)
+            {
+                _ledController.Clear();
+            }
+            else
+            {
+                errors.AppendLine("- Failed to initialize LED serial port");
+            }
+        }
+
         if (_hardwareConfig.UsesDigitimer())
         {
             var success = _digitimer.Initialize();
@@ -130,6 +146,7 @@ public class HardwareInterface : MonoBehaviour
 
         _clockNetwork.StopServer();
         _digitimer.CleanUp();
+        _ledController.CleanUp();
     }
 
 

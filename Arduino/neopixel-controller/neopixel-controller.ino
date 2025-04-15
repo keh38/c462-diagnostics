@@ -11,14 +11,14 @@
 #define PIN            6
 
 // How many NeoPixels are attached to the Arduino?
-#define NUMPIXELS      24
+#define NUMPIXELS      64
 
 // When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
 // Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
 // example for more information on possible values.
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_RGBW + NEO_KHZ800);
 
-#define BAUD_RATE 115200   // (bits/second)          serial buffer baud rate
+#define BAUD_RATE 9600     // (bits/second)          serial buffer baud rate
 #define BUFF_SIZE 64       // (bytes)                maximum message size
 #define MSG_TIMEOUT 5000   // (milliseconds)         timeout from last character received
 #define NUM_CMDS 3
@@ -37,6 +37,7 @@ typedef struct {
 } CmdStruct;
 
 void Command_Clear(int argc = 0, char* argv[] = { NULL });
+void Command_Identify(int argc = 0, char* argv[] = { NULL });
 void Command_SetColor(int argc = 0, char* argv[] = { NULL });
 
 // command table
@@ -48,9 +49,9 @@ CmdStruct cmdTable[NUM_CMDS] = {
   },
 
   {
-    .commandArgs = 1,                  // CLEAR
-    .commandString = "'SUP'",          // capitalized command for clearing display
-    .commandFunction = &Command_Identify  // run Command_Clear
+    .commandArgs = 1,                     // 'SUP
+    .commandString = "'SUP",             // capitalized command for identifying self to host
+    .commandFunction = &Command_Identify  // run Command_Identify
   },
 
   {
@@ -157,7 +158,7 @@ void process_message(void) {
         }
 
         // send acknowledgement
- //       Serial.write("OK\n");
+        //Serial.write("OK\n");
 
         // execute the command and pass any arguments
         cmdTable[i].commandFunction(argc, argv);
@@ -179,9 +180,9 @@ void Command_Clear(int argc, char* argv[]) {
 }
 
 // identify myself
-void Command_Identify(int argc, char* argv)
+void Command_Identify(int argc, char* argv[])
 {
-  Serial.println("Lightin' the way, big man: 1.0");
+  Serial.write("lightin' the way, big man:1.0\n");
 }
 
 // change RGB values of LED
@@ -194,8 +195,9 @@ void Command_SetColor(int argc, char* argv[]) {
 
   for(int i=0;i<NUMPIXELS;i++){
     // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-    pixels.setPixelColor(i, pixels.Color(G, R, G, W));
+    pixels.setPixelColor(i, pixels.Color(G, R, B, W));
   }
   pixels.show(); // This sends the updated pixel color to the hardware.
-
+  
+  Serial.write("OK\n");
 }

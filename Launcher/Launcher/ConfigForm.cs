@@ -160,7 +160,7 @@ namespace Launcher
             var ports = SerialPort.GetPortNames();
             foreach (var port in ports)
             {
-                firmware = await Task.Run(() => TestComPort(port, "livin' the dream"));
+                firmware = await Task.Run(() => TestComPort(port, 115200, "livin' the dream"));
                 if (!string.IsNullOrEmpty(firmware))
                 {
                     _config.SyncComPort = port;
@@ -184,22 +184,25 @@ namespace Launcher
             detectButton.Enabled = true;
         }
 
-        public static string TestComPort(string comPort, string targetResponse)
+        public static string TestComPort(string comPort, int baudRate, string targetResponse)
         {
             string firmwareVersion = "";
 
             var serialPort = new SerialPort();
             serialPort.PortName = comPort;
-            serialPort.BaudRate = 115200;
+            serialPort.BaudRate = baudRate;
             serialPort.Parity = Parity.None;
             serialPort.DataBits = 8;
             serialPort.StopBits = StopBits.One;
             serialPort.Handshake = Handshake.None;
-            serialPort.NewLine = "\r";
+            serialPort.NewLine = "\n";
 
             // Need the next two lines: https://forum.arduino.cc/t/c-program-can-t-receive-any-data-from-arduino-serialusb-class/956418/7
-            serialPort.RtsEnable = true;
-            serialPort.DtrEnable = true;
+            if (baudRate > 9600)
+            {
+                serialPort.RtsEnable = true;
+                serialPort.DtrEnable = true;
+            }
 
             serialPort.ReadTimeout = 1000;
             serialPort.WriteTimeout = 1000;
@@ -207,7 +210,7 @@ namespace Launcher
             try
             {
                 serialPort.Open();
-                serialPort.WriteLine("'sup");
+                serialPort.Write("'sup\n");
                 string response = serialPort.ReadLine();
                 if (response.StartsWith(targetResponse))
                 {
@@ -387,7 +390,7 @@ namespace Launcher
             var ports = SerialPort.GetPortNames();
             foreach (var port in ports)
             {
-                firmware = await Task.Run(() => TestComPort(port, "lightin' the way, big man"));
+                firmware = await Task.Run(() => TestComPort(port, 9600, "lightin' the way, big man"));
                 if (!string.IsNullOrEmpty(firmware))
                 {
                     _config.LEDComPort = port;
@@ -395,7 +398,7 @@ namespace Launcher
                 }
             }
 
-            FillComPortDropDown();
+            FillLEDComPortDropDown();
 
             if (string.IsNullOrEmpty(_config.LEDComPort))
             {

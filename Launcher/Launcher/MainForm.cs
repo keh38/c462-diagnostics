@@ -222,7 +222,7 @@ namespace Launcher
             statusTextBox.AppendText("Checking sync device..." + Environment.NewLine);
             Log.Information("Pinging sync device");
 
-            var firmware = ConfigForm.TestComPort(_config.SyncComPort, "livin' the dream");
+            var firmware = ConfigForm.TestComPort(_config.SyncComPort, 115200, "livin' the dream");
             if (string.IsNullOrEmpty(firmware))
             {
                 string msg = $"Sync device not responding at: {_config.SyncComPort}";
@@ -251,7 +251,7 @@ namespace Launcher
             statusTextBox.AppendText("Checking LED device..." + Environment.NewLine);
             Log.Information("Pinging LED device");
 
-            var firmware = ConfigForm.TestComPort(_config.SyncComPort, "lightin' the way, big man");
+            var firmware = ConfigForm.TestComPort(_config.LEDComPort, 9600, "lightin' the way, big man");
             if (string.IsNullOrEmpty(firmware))
             {
                 string msg = $"LED device not responding at: {_config.LEDComPort}";

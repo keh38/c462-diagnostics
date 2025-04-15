@@ -14,6 +14,8 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 
     private bool _isRunning = false;
 
+    private bool _useLEDs = false;
+
     private float _preBaseLine = 2f;
     private float _postBaseLine = 2f;
     private float _curTime = 0;
@@ -55,6 +57,13 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 
         _data = new DynamicRangeData(_dataPath, npts);
         HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
+
+        _useLEDs = HardwareInterface.LED.IsInitialized;
+        if (_useLEDs)
+        {
+            HardwareInterface.LED.Clear();
+            HardwareInterface.LED.Open();
+        }
     }
 
     void Begin()
@@ -81,6 +90,13 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 
         _data.Add(Time.realtimeSinceStartupAsDouble, intensity);
         SetScreenIntensity(intensity);
+
+        if (_useLEDs)
+        {
+            int ledValue = Mathf.RoundToInt(Mathf.Pow(intensity, 2.2f) * 100);
+            HardwareInterface.LED.SetColorDynamically(ledValue);
+        }
+
         _curTime += Time.deltaTime;
 
         if (_curTime > _nextUpdate)
@@ -103,6 +119,11 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 
     private void EndTest()
     {
+        if (_useLEDs)
+        {
+            HardwareInterface.LED.Close();
+        }
+
         _data.Trim();
         KLib.FileIO.JSONSerialize(_data, _dataPath);
 
