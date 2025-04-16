@@ -7,14 +7,17 @@ using UnityEngine;
 public class LEDController : MonoBehaviour
 {
     private bool _isPortOpen = false;
+    private float _gamma = 2.8f;
 
     private SerialPort _serialPort;
 
     public bool IsInitialized { get; private set; }
 
-    public bool InitializeSerialPort(string comPort)
+    public bool Initialize(string comPort, float gamma)
     {
         bool success = false;
+
+        _gamma = gamma;
 
         _serialPort = new SerialPort();
         _serialPort.PortName = comPort;
@@ -49,6 +52,22 @@ public class LEDController : MonoBehaviour
         }
 
         return success;
+    }
+
+    public bool SetColorFromString(string colorSpec)
+    {
+        var parts = colorSpec.Split(',');
+        int r = ApplyGamma(float.Parse(parts[0]));
+        int g = ApplyGamma(float.Parse(parts[1]));
+        int b = ApplyGamma(float.Parse(parts[2]));
+        int w = ApplyGamma(float.Parse(parts[3]));
+
+        return SetColor(r, g, b, w);
+    }
+
+    private int ApplyGamma(float intensity)
+    {
+        return Mathf.RoundToInt(Mathf.Pow(intensity, _gamma) * 255);
     }
 
     public bool SetColor(int red, int green, int blue, int white)
@@ -88,6 +107,11 @@ public class LEDController : MonoBehaviour
             Debug.Log($"[LEDController] error opening serial port: {ex.Message}");
         }
         return success;
+    }
+
+    public bool SetColorDynamically(float intensity)
+    {
+        return SetColorDynamically(ApplyGamma(intensity));
     }
 
     public bool SetColorDynamically(int intensity)

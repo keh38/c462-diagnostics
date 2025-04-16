@@ -93,6 +93,11 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         }
 
         _camera.backgroundColor = GameManager.BackgroundColor;
+        if (HardwareInterface.LED.IsInitialized)
+        {
+            //HardwareInterface.LED.set
+        }
+
 
         _engine.ClearScreen();
 

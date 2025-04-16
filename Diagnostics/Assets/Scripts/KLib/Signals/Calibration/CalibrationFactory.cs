@@ -27,7 +27,7 @@ namespace KLib.Signals.Calibration
             }
             else if (refMode == LevelUnits.dB_Vrms)
             {
-                result = CalibrationData.Create_dBVrms(acal);
+                return CalibrationData.Create_dBVrms(acal);
             }
             else if (refMode == LevelUnits.mA)
             {

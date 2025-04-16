@@ -8,6 +8,7 @@ namespace KLib
         public List<AdapterMap> AdapterMaps { set; get; }
         public string SyncComPort { set; get; }
         public string LEDComPort { set; get; }
+        public float LEDGamma { get; set; }
         public int ScreenBrightness { set; get; }
 
         public HardwareConfiguration() { }
@@ -26,6 +27,7 @@ namespace KLib
             config.CurrentAdapterMap = config.AdapterMaps[0].Name;
             config.SyncComPort = "";
             config.LEDComPort = "";
+            config.LEDGamma = 2.8f;
             config.ScreenBrightness = -1;
             return config;
         }

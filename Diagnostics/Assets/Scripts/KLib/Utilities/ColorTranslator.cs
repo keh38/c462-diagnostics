@@ -40,6 +40,15 @@ namespace KLib
             return new UnityEngine.Color(r, g, b);
         }
 
+        public static UnityEngine.Color ColorFromFloatString(string colorString)
+        {
+            var parts = colorString.Split(',');
+            float r = float.Parse(parts[0]);
+            float g = float.Parse(parts[1]);
+            float b = float.Parse(parts[2]);
+            return new UnityEngine.Color(r, g, b);
+        }
+
         public static UnityEngine.Color ColorFromARGB(int color)
         {
             return new UnityEngine.Color(ColorIntToRed((uint)color), ColorIntToGreen((uint)color), ColorIntToBlue((uint)color), 1.0f);

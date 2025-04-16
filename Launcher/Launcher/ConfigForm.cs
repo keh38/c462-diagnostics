@@ -54,6 +54,7 @@ namespace Launcher
             FillLEDComPortDropDown();
 
             _ignoreEvents = true;
+            gammaNumeric.FloatValue = _config.LEDGamma;
             brightnessNumeric.IntValue = _config.ScreenBrightness;
             _ignoreEvents = false;
         }
@@ -431,6 +432,14 @@ namespace Launcher
             if (!_ignoreEvents)
             {
                 _config.LEDComPort = ledComPortDropDown.Text.Equals("none") ? "" : ledComPortDropDown.Text;
+            }
+        }
+
+        private void gammaNumeric_ValueChanged(object sender, EventArgs e)
+        {
+            if (!_ignoreEvents)
+            {
+                _config.LEDGamma = gammaNumeric.FloatValue;
             }
         }
     }

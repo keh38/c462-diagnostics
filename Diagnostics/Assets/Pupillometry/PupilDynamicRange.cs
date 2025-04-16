@@ -93,8 +93,7 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 
         if (_useLEDs)
         {
-            int ledValue = Mathf.RoundToInt(Mathf.Pow(intensity, 2.2f) * 100);
-            HardwareInterface.LED.SetColorDynamically(ledValue);
+            HardwareInterface.LED.SetColorDynamically(intensity);
         }
 
         _curTime += Time.deltaTime;

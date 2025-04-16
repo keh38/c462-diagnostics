@@ -57,7 +57,6 @@ public class HardwareInterface : MonoBehaviour
     public static bool ErrorAcknowledged { get { return instance._errorAcknowledged; } }
     public static string ErrorMessage { get { return instance._errorMessage; } }
     public static void AcknowledgeError() { instance._errorAcknowledged = true; }
-    public static bool SetLEDColor(int red, int green, int blue, int white) { return instance._ledController.SetColor(red, green, blue, white); }
     public static LEDController LED { get { return instance._ledController; } }
     public static void CleanUp() => instance._CleanUp();
     #endregion
@@ -112,7 +111,7 @@ public class HardwareInterface : MonoBehaviour
 
         if (!string.IsNullOrEmpty(_hardwareConfig.LEDComPort))
         {
-            var ledOK = _ledController.InitializeSerialPort(_hardwareConfig.LEDComPort);
+            var ledOK = _ledController.Initialize(_hardwareConfig.LEDComPort, _hardwareConfig.LEDGamma);
             if (ledOK)
             {
                 _ledController.Clear();

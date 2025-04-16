@@ -3,6 +3,7 @@
 ### v0.5 (unreleased)
 #### Added
 - Turandot: restored slider functionality
+- LED control
 
 ---
 

@@ -49,6 +49,8 @@
             this.ledComPortDropDown = new System.Windows.Forms.ComboBox();
             this.brightnessNumeric = new KLib.Controls.KNumericBox();
             this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.gammaNumeric = new KLib.Controls.KNumericBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -184,10 +186,10 @@
             // messageLabel
             // 
             this.messageLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.messageLabel.Location = new System.Drawing.Point(11, 382);
+            this.messageLabel.Location = new System.Drawing.Point(11, 383);
             this.messageLabel.Name = "messageLabel";
             this.messageLabel.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.messageLabel.Size = new System.Drawing.Size(290, 77);
+            this.messageLabel.Size = new System.Drawing.Size(290, 106);
             this.messageLabel.TabIndex = 8;
             this.messageLabel.Text = "label3";
             this.messageLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -243,7 +245,7 @@
             this.brightnessNumeric.FloatValue = 0F;
             this.brightnessNumeric.IntValue = 0;
             this.brightnessNumeric.IsInteger = true;
-            this.brightnessNumeric.Location = new System.Drawing.Point(383, 439);
+            this.brightnessNumeric.Location = new System.Drawing.Point(383, 473);
             this.brightnessNumeric.MaxCoerce = true;
             this.brightnessNumeric.MaximumSize = new System.Drawing.Size(20000, 20);
             this.brightnessNumeric.MaxValue = 100D;
@@ -262,17 +264,53 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(325, 442);
+            this.label4.Location = new System.Drawing.Point(325, 476);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(56, 13);
             this.label4.TabIndex = 14;
             this.label4.Text = "Brightness";
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(314, 443);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(67, 13);
+            this.label5.TabIndex = 16;
+            this.label5.Text = "LED Gamma";
+            // 
+            // gammaNumeric
+            // 
+            this.gammaNumeric.AllowInf = false;
+            this.gammaNumeric.AutoSize = true;
+            this.gammaNumeric.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.gammaNumeric.ClearOnDisable = false;
+            this.gammaNumeric.FloatValue = 0F;
+            this.gammaNumeric.IntValue = 0;
+            this.gammaNumeric.IsInteger = false;
+            this.gammaNumeric.Location = new System.Drawing.Point(383, 439);
+            this.gammaNumeric.MaxCoerce = false;
+            this.gammaNumeric.MaximumSize = new System.Drawing.Size(20000, 20);
+            this.gammaNumeric.MaxValue = 100D;
+            this.gammaNumeric.MinCoerce = true;
+            this.gammaNumeric.MinimumSize = new System.Drawing.Size(10, 20);
+            this.gammaNumeric.MinValue = 1D;
+            this.gammaNumeric.Name = "gammaNumeric";
+            this.gammaNumeric.Size = new System.Drawing.Size(70, 20);
+            this.gammaNumeric.TabIndex = 15;
+            this.gammaNumeric.TextFormat = "K4";
+            this.gammaNumeric.ToolTip = "";
+            this.gammaNumeric.Units = "";
+            this.gammaNumeric.Value = 0D;
+            this.gammaNumeric.ValueChanged += new System.EventHandler(this.gammaNumeric_ValueChanged);
+            // 
             // ConfigForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(529, 480);
+            this.ClientSize = new System.Drawing.Size(529, 505);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.gammaNumeric);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.brightnessNumeric);
             this.Controls.Add(this.ledDetectButton);
@@ -321,5 +359,7 @@
         private System.Windows.Forms.ComboBox ledComPortDropDown;
         private KLib.Controls.KNumericBox brightnessNumeric;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
+        private KLib.Controls.KNumericBox gammaNumeric;
     }
 }

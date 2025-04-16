@@ -241,10 +241,18 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
     private void SetParams(string data)
     {
-        var settings = FileIO.XmlDeserializeFromString<InteractiveSettings>(data);
-        ApplyParameters(settings);
-        InitializeSliders(settings.Sliders);
-        _sliderArea.SetActive(settings.ShowSliders);
+        try
+        {
+            var settings = FileIO.XmlDeserializeFromString<InteractiveSettings>(data);
+            ApplyParameters(settings);
+            InitializeSliders(settings.Sliders);
+            _sliderArea.SetActive(settings.ShowSliders);
+        }
+        catch (Exception ex)
+        {
+            Debug.Log($"[Turandot Interactive] error setting parameters: {ex.Message}");
+            HTS_Server.SendMessage("TurandotInteractive", "Error:failed to set parameters...check log");
+        }
     }
 
     private void SetProperty(string data)
