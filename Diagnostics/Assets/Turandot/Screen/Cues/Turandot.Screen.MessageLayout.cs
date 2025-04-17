@@ -50,7 +50,8 @@ namespace Turandot.Screen
         {
             return new Message()
             {
-                Text = DefaultText
+                Text = DefaultText,
+                BeginVisible = true
             };
         }
     }

@@ -228,6 +228,7 @@
     <Compile Include="Assets\Turandot\Interactive\TurandotInteractive.cs" />
     <Compile Include="Assets\Turandot\TurandotManager.cs" />
     <Compile Include="Assets\Scripts\Home\HomeMenu.cs" />
+    <Compile Include="Assets\Scripts\Hardware\LEDController.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\MenuButtonControl.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\UserFile.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.Family.cs" />
@@ -285,7 +286,6 @@
     <Compile Include="Assets\Turandot\Screen\Cues\Turandot.Screen.CueLayout.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\MenuBarControl.cs" />
     <Compile Include="Assets\Scripts\Home\SubjectPanel.cs" />
-    <Compile Include="Assets\Scripts\Hardware\LEDController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

@@ -52,12 +52,12 @@ namespace Turandot.Inputs
             this.name = name;
         }
 
-        [XmlIgnore]
-        [ProtoIgnore]
-        [JsonIgnore]
-        virtual public string Name
-        {
-            get { return name; }
-        }
+        //[XmlIgnore]
+        //[ProtoIgnore]
+        //[JsonIgnore]
+        //virtual public string Name
+        //{
+        //    get { return name; }
+        //}
     }
 }

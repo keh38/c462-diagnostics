@@ -37,7 +37,18 @@ namespace Turandot
             this.source = source;
             this.linkTo = linkTo;
             this.type = termType;
-            this.result = termType == TermType.CSplus ? "Hit" : "False Alarm";
+            switch (termType)
+            {
+                case TermType.CSplus:
+                    this.result = "Hit";
+                    break;
+                case TermType.CSminus:
+                    this.result = "False Alarm";
+                    break;
+                default:
+                    this.result = "";
+                    break;
+            }
         }
         public Termination(string source, string linkTo, TerminationAction action)
         {
