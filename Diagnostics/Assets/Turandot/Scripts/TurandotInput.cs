@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 
+using Turandot.Inputs;
 using Input = Turandot.Inputs.Input;
 using Turandot.Screen;
 
@@ -15,6 +16,9 @@ namespace Turandot.Scripts
 
         virtual public string Name { get { return ""; } }
         virtual public string Result { get { return ""; } }
+
+        protected InputLog _log = null;
+        public InputLog Log { get { return _log; } }
             
         public void Initialize()
         {

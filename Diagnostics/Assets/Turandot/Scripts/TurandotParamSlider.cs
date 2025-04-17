@@ -37,6 +37,7 @@ namespace Turandot.Scripts
 
         private string _result;
         public override string Result { get { return _result; } }
+
         /*
                 private InputLog _log = new InputLog("paramslider");
 
@@ -70,6 +71,7 @@ namespace Turandot.Scripts
             LayoutControl();
             ButtonData = new ButtonData() { name = layout.Name };
 
+            _log = new InputLog(layout.Name);
         }
 
         private void LayoutControl()
@@ -79,12 +81,12 @@ namespace Turandot.Scripts
             rt.anchorMax = new Vector2(_layout.X, _layout.Y);
             rt.sizeDelta = new Vector2(_layout.Width, _layout.Height);
         }
-        /*
-                public void ClearLog()
-                {
-                    _log.Clear();
-                }
-*/
+        
+        public void ClearLog()
+        {
+            _log.Clear();
+        }
+
         override public void Activate(Input input, TurandotAudio audio)
         {
             var action = input as ParamSliderAction;
@@ -167,6 +169,7 @@ namespace Turandot.Scripts
                 //if (_action.thumbTogglesSound) _sigMan.StartPaused();
                 //ApplyValue();
                 _paramSetter?.Invoke(_value);
+                _log.Add(Time.timeSinceLevelLoad, _value);
 
                 //++_ncalls;
 
@@ -208,6 +211,7 @@ namespace Turandot.Scripts
 
                 }
                 _paramSetter?.Invoke(_value);
+                _log.Add(Time.timeSinceLevelLoad, _value);
             }
         }
 
@@ -285,14 +289,6 @@ namespace Turandot.Scripts
                 {
                     _paramSetter.Invoke(_value);
                 }
-
-                public string LogJSONString
-                {
-                    get
-                    {
-                        _log.Trim();
-                        return KLib.FileIO.JSONSerializeToString(_log);
-                    }
-                }*/
+                */
     }
 }

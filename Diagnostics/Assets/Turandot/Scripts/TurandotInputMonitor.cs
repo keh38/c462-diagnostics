@@ -238,6 +238,14 @@ namespace Turandot.Scripts
             {
                 string json = "";
 
+                foreach (var i in _inputObjects)
+                {
+                    if (i.Log != null)
+                    {
+                        json = KLib.FileIO.JSONStringAdd(json, i.Name, i.Log.JSONString);
+                    }
+                }
+
                 //if (_used.Contains("categorizer")) json = KLib.FileIO.JSONStringAdd(json, "Category", _categorizer.LogJSONString);
                 //if (_used.Contains("grapher")) json = KLib.FileIO.JSONStringAdd(json, "Grapher", grapher.LogJSONString);
                 //if (_used.Contains("keypad")) json = KLib.FileIO.JSONStringAdd(json, "Keypad", _keypad.LogJSONString);

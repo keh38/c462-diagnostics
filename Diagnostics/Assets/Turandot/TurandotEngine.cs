@@ -519,9 +519,11 @@ public class TurandotEngine : MonoBehaviour
         if (!string.IsNullOrEmpty(cueJson))
             json = KLib.FileIO.JSONStringAdd(json, "cues", cueJson);
 
-        //string inputJson = _inputMonitor.InputLogJSONString;
-        //if (!string.IsNullOrEmpty(inputJson))
-        //    json = KLib.FileIO.JSONStringAdd(json, "inputs", inputJson);
+        string inputJson = _inputMonitor.InputLogJSONString;
+        if (!string.IsNullOrEmpty(inputJson))
+        {
+            json = KLib.FileIO.JSONStringAdd(json, "inputs", inputJson);
+        }
 
         foreach (var fe in _params.flowChart.FindAll(x => x.HasSequence))
         {

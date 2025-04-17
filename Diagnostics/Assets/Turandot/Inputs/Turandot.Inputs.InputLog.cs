@@ -16,10 +16,6 @@ namespace Turandot.Inputs
         public float[] value;
 
         [JsonIgnore]
-        private int _numControls;
-        [JsonIgnore]
-        private int _numEvents;
-        [JsonIgnore]
         private int _index;
         [JsonIgnore]
         private int _lengthIncrement;
@@ -36,7 +32,6 @@ namespace Turandot.Inputs
         {
             this.name = name;
             _lengthIncrement = lengthIncrement;
-            _numControls = 0;
             Clear();
         }
 
@@ -77,6 +72,15 @@ namespace Turandot.Inputs
         {
             System.Array.Resize(ref this.t, _index);
             System.Array.Resize(ref this.value, _index);
+        }
+
+        public string JSONString
+        {
+            get
+            {
+                Trim();
+                return KLib.FileIO.JSONSerializeToString(this);
+            }
         }
 
     }

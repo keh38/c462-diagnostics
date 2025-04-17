@@ -120,10 +120,12 @@ namespace KLib.Signals
         [XmlIgnore]
         public float[] CurrentAmplitudes { get { return _currentAmplitudes; } }
 
+        private Channel _gatedChannel;
+
         [ProtoIgnore]
         [JsonIgnore]
         [XmlIgnore]
-        public float LoopOffset {  get { return channels.Count > 0 ? channels[0].LoopOffset / SamplingRate_Hz : -1; } }
+        public float LoopOffset { get { return _gatedChannel != null ? _gatedChannel.LoopOffset : -1; } }
 
         #endregion
 
@@ -397,6 +399,7 @@ namespace KLib.Signals
                     }
                 }
                 _currentAmplitudes = new float[channels.Count];
+                _gatedChannel = channels.Find(x => x.gate.Active);
             }
             catch (Exception ex)
             {
