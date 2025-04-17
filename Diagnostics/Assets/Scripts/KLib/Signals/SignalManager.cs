@@ -125,7 +125,7 @@ namespace KLib.Signals
         [ProtoIgnore]
         [JsonIgnore]
         [XmlIgnore]
-        public float LoopOffset { get { return _gatedChannel != null ? _gatedChannel.LoopOffset : -1; } }
+        public float LoopOffset { get { return _gatedChannel != null ? _gatedChannel.LoopOffset / SamplingRate_Hz : -1; } }
 
         #endregion
 

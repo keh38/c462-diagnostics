@@ -74,6 +74,7 @@ namespace Turandot.Inputs
             System.Array.Resize(ref this.value, _index);
         }
 
+        [JsonIgnore]
         public string JSONString
         {
             get
