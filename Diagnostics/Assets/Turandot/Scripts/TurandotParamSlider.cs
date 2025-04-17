@@ -166,6 +166,7 @@ namespace Turandot.Scripts
                 //_action.thumbTogglesSound = false;
                 //if (_action.thumbTogglesSound) _sigMan.StartPaused();
                 //ApplyValue();
+                _paramSetter?.Invoke(_value);
 
                 //++_ncalls;
 

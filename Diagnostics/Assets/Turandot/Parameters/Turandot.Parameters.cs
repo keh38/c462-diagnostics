@@ -30,6 +30,7 @@ namespace Turandot
         public string wavFolder = "";
         public TrialLogOption trialLogOption = TrialLogOption.Upload;
         public bool allowExpertOptions = false;
+        public string matlabFunction = "";
 
         private static int _currentVersion = 5;
 
