@@ -99,7 +99,7 @@ namespace Turandot.Scripts
             //_started = false;
 
             ButtonData.value = false;
-            _button.SetActive(false);
+            //_button.SetActive(false);
             _result = "";
 
             if (action.BeginVisible)
@@ -217,12 +217,12 @@ namespace Turandot.Scripts
 
         public void OnPointerDown(BaseEventData data)
         {
-            _button.SetActive(false);
+            //_button.SetActive(false);
         }
 
         public void OnPointerUp(BaseEventData data)
         {
-            _button.SetActive(true);
+            //_button.SetActive(true);
         }
 
         public void OnButtonClick()

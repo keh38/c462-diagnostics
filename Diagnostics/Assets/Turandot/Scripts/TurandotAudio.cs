@@ -186,7 +186,6 @@ namespace Turandot.Scripts
                 }
                 else if (_sigMan.LoopOffset >= 0)
                 {
-                    Debug.Log(_sigMan.LoopOffset);
                     _log.Add(AudioSettings.dspTime + _sigMan.LoopOffset, "activated");
                     _stimTimes[_numStimTimes] = AudioSettings.dspTime + _sigMan.LoopOffset;
                     _numStimTimes++;

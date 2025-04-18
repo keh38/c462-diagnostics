@@ -1,9 +1,10 @@
 ## Changelog
 
-### v0.5 (unreleased)
+### v0.5 (2025-04-18)
 #### Added
 - Turandot: restored slider functionality
 - LED control
+- Restored metrics
 
 ---
 
