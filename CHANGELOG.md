@@ -16,7 +16,8 @@
 ---
 
 ### v0.3 (2025-04-10)
-#### Added pupil dynamic range measurement (by remote control)
+#### Added
+- pupil dynamic range measurement (by remote control)
 
 ---
 
