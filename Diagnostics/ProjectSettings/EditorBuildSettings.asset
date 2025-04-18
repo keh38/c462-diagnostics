@@ -23,4 +23,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Pupillometry/Gaze Calibration.unity
     guid: fe86e6b6ec5af8d40acb73c95007c560
+  - enabled: 1
+    path: Assets/Scenes/Protocol.unity
+    guid: 65c55ad6e7fbd5641a788a744a7fed0c
   m_configObjects: {}
