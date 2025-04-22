@@ -243,6 +243,7 @@
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptiveTrack.cs" />
     <Compile Include="Assets\Turandot\Screen\Cues\Turandot.Screen.MessageLayout.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\FM.cs" />
+    <Compile Include="Assets\Scripts\Protocols\ProtocolHistory.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotSecondaryAudio.cs" />
     <Compile Include="Assets\Scripts\Hardware\ClockNetworkInterface.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Enumerations\Waveshape.cs" />
@@ -274,6 +275,7 @@
     <Compile Include="Assets\Scripts\Protocols\Protocol.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotKeypadButton.cs" />
     <Compile Include="Assets\Turandot\Screen\Cues\Turandot.Screen.FixationPointLayout.cs" />
+    <Compile Include="Assets\Scripts\Protocols\ProtocolData.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Audiograms\Audiograms.Audiogram.cs" />
     <Compile Include="Assets\Turandot\Data\Turandot.AudioLog.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotCueController.cs" />
@@ -289,8 +291,6 @@
     <Compile Include="Assets\Turandot\Screen\Cues\Turandot.Screen.CueLayout.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\MenuBarControl.cs" />
     <Compile Include="Assets\Scripts\Home\SubjectPanel.cs" />
-    <Compile Include="Assets\Scripts\Protocols\ProtocolHistory.cs" />
-    <Compile Include="Assets\Scripts\Protocols\ProtocolData.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

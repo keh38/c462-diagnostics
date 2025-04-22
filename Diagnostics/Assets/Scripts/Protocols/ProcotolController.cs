@@ -40,10 +40,10 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
 
     void Update()
     {
-        //if (!_finished && (Input.GetButtonDown("XboxA") || Input.GetMouseButtonDown(0) || Input.GetKeyDown(_settings.keyCode)))
         if (_waitingForResponse && (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space)))
         {
             _waitingForResponse = false;
+            _outline.gameObject.SetActive(false);
             HTS_Server.SendMessage("Protocol", "Advance");
         }
     }
@@ -62,6 +62,7 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
 
     private IEnumerator AnimateOutline()
     {
+        yield return new WaitForSeconds(0.5f);
         for (int k=0; k<_history.Data.Count; k++)
         {
             DrawOutline(k+1, -1);
@@ -81,7 +82,7 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
             string line = _history.Data[k].Title;
             if (k == selected)
             {
-                line = $"<color=#00aa00>{line}</color>";
+                line = $"<color=#00aa00><b>{line}</b></color>";
             }
             else if (!string.IsNullOrEmpty(_history.Data[k].DataFile))
             {
@@ -127,9 +128,9 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
     private void RpcBegin(int testIndex)
     {
         _nextTestIndex = testIndex;
-        HTS_Server.SendMessage("Protocol", "Instructions");
         if (testIndex == 0 && !string.IsNullOrEmpty(_protocol.Introduction))
         {
+            HTS_Server.SendMessage("Protocol", "Instructions");
             ShowInstructions();
         }
         else
