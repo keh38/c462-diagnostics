@@ -16,7 +16,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
 
     private bool _stopServer;
 
-    bool _isFinished = false;
+    bool _isRunning = false;
     bool _canRespond = true;
 
     int _numTargets;
@@ -49,7 +49,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
 
         GetComponent<Camera>().backgroundColor = KLib.ColorTranslator.ColorFromARGB(_settings.BackgroundColor);
 
-        _isFinished = false;
+        _isRunning = true;
     }
 
     private void ShowTarget(int x, int y)
@@ -66,7 +66,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
         Event e = Event.current;
         if (e.control && e.keyCode == KeyCode.A)
         {
-            if (!_isFinished)
+            if (_isRunning)
             {
                 _target.gameObject.SetActive(false);
             }
@@ -76,7 +76,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
     void Update()
     {
         //if (!_finished && (Input.GetButtonDown("XboxA") || Input.GetMouseButtonDown(0) || Input.GetKeyDown(_settings.keyCode)))
-        if (!_isFinished && (Input.GetMouseButtonDown(0) || Input.GetKeyDown(_settings.KeyCode)))
+        if (_isRunning && (Input.GetMouseButtonDown(0) || Input.GetKeyDown(_settings.KeyCode)))
         {
             HTS_Server.SendMessage("Gaze Calibration", "Response");
             //_canRespond = false;
@@ -85,7 +85,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
             {
                 _numAcquired++;
                 _target.gameObject.SetActive(false);
-                _isFinished = true;
+                _isRunning = false;
                 HTS_Server.SendMessage("Gaze Calibration", "GazeCalibrationFinished");
             }
         }
@@ -104,7 +104,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
                 Initialize(data);
                 break;
             case "Abort":
-                _isFinished = true;
+                _isRunning = false;
                 _target.gameObject.SetActive(false);
                 break;
             case "Location":

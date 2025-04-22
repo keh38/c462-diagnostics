@@ -1,5 +1,11 @@
 ## Changelog
 
+### v0.6 (unreleased)
+#### Added
+- Protocols (by remote control)
+
+---
+
 ### v0.5 (2025-04-18)
 #### Added
 - Turandot: restored slider functionality

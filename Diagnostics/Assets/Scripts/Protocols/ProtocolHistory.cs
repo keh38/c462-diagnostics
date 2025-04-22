@@ -13,6 +13,18 @@ namespace Protocols
 
         public List<ProtocolData> Data { get; set; }
 
+        [JsonIgnore]
+        public bool Finished
+        {
+            get { return Data?.Find(x => string.IsNullOrEmpty(x.Date)) == null; }
+        }
+
+        [JsonIgnore]
+        public int NextTextIndex
+        {
+            get { return Data.FindIndex(x => string.IsNullOrEmpty(x.Date)); }
+        }
+
         public ProtocolHistory() { }
         public ProtocolHistory(Protocol protocol)
         {
@@ -24,6 +36,25 @@ namespace Protocols
             }
         }
 
+        public bool Matches(Protocol protocol)
+        {
+            if (protocol.Tests.Count != Data.Count)
+            {
+                return false;
+            }
+
+            bool matches = true;
+            for (int k=0; k<protocol.Tests.Count; k++)
+            {
+                if (protocol.Tests[k].Scene != Data[k].Scene || protocol.Tests[k].Settings != Data[k].Settings)
+                {
+                    matches = false;
+                    break;
+                }
+            }
+
+            return matches;
+        }
     }
 
 }
