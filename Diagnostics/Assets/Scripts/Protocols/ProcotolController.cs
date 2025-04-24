@@ -84,7 +84,7 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
             {
                 line = $"<color=#00aa00><b>{line}</b></color>";
             }
-            else if (!string.IsNullOrEmpty(_history.Data[k].DataFile))
+            else if (!string.IsNullOrEmpty(_history.Data[k].Date))
             {
                 line = $"<color=#888888><i>{line}</i></color>";
             }
@@ -139,6 +139,11 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
         }
     }
 
+    private void RpcFinish()
+    {
+        DrawOutline(_history.Data.Count, -1);
+    }
+
     void IRemoteControllable.ProcessRPC(string command, string data)
     {
         var parts = data.Split(':');
@@ -153,6 +158,9 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
                 break;
             case "Begin":
                 RpcBegin(int.Parse(data));
+                break;
+            case "Finish":
+                RpcFinish();
                 break;
         }
     }

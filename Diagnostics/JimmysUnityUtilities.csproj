@@ -581,7 +581,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="protobuf-net">
-      <HintPath>Library\PackageCache\com.epl.klib@7d9d8a7a5053\Runtime\Plugins\protobuf-net.dll</HintPath>
+      <HintPath>Library\PackageCache\com.epl.klib@86202b89f868\Runtime\Plugins\protobuf-net.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="D128NET">
