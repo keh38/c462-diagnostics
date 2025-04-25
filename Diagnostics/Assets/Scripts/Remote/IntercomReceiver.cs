@@ -25,7 +25,6 @@ public class IntercomReceiver : MonoBehaviour
     private int _udpPort = 52247;
 
     private Queue<float[]> _audioQueue = new Queue<float[]>();
-    private float[] _receiveBuffer;
     private int _bytesPerBuffer;
         
     #region SINGLETON CREATION
@@ -61,7 +60,6 @@ public class IntercomReceiver : MonoBehaviour
     {
         _audioConfig = AudioSettings.GetConfiguration();
         _bytesPerBuffer = _audioConfig.dspBufferSize * 4;
-        _receiveBuffer = new float[_audioConfig.dspBufferSize];
 
         var go = new GameObject("Discovery Server").AddComponent<NetworkDiscoveryServer>();
         go.transform.parent = this.gameObject.transform;
@@ -137,7 +135,6 @@ public class IntercomReceiver : MonoBehaviour
                 _listener.SendAcknowledgement();
                 break;
             case "GetConfig":
-                Debug.Log("yo");
                 _listener.WriteStringAsByteArray($"{_udpPort}:{_audioConfig.sampleRate}:{_audioConfig.dspBufferSize}");
                 break;
         }
@@ -169,15 +166,13 @@ public class IntercomReceiver : MonoBehaviour
                 int offset = 0;
                 for (int k = 0; k < numBuffers; k++)
                 {
-                    Buffer.BlockCopy(_receiveBuffer, 0, data, offset, _bytesPerBuffer);
+                    var audioBuffer = new float[_audioConfig.dspBufferSize];
+                    Buffer.BlockCopy(data, offset, audioBuffer, 0, _bytesPerBuffer);
                     offset += _bytesPerBuffer;
-                    _audioQueue.Enqueue(_receiveBuffer);
+                    _audioQueue.Enqueue(audioBuffer);
                 }
             }
-            catch (Exception ex)
-            {
-                //Debug.Log(ex.Message);
-            }
+            catch (Exception ex) { }
         }
     }
 

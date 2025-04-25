@@ -69,7 +69,9 @@ public class HardwareInterface : MonoBehaviour
 
         _volumeManager = new VolumeManager();
         _startVolume = _volumeManager.GetMasterVolume(VolumeManager.VolumeUnit.Scalar);
+#if !UNITY_EDITOR
         _volumeManager.SetMasterVolume(1.0f, VolumeManager.VolumeUnit.Scalar);
+#endif
 
         string configFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EPL", "HTS");
         string configFile = Path.Combine(configFolder, "HardwareConfiguration.xml");
@@ -149,5 +151,5 @@ public class HardwareInterface : MonoBehaviour
     }
 
 
-    #endregion
+#endregion
 }

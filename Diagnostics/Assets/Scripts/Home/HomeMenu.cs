@@ -183,7 +183,7 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
     {
         Debug.Log("Quitting");
         HardwareInterface.CleanUp();
-        IntercomReceiver.
+        //IntercomReceiver.CleanUp();
         KLogger.Log.StopLogging();
 #if UNITY_STANDALONE_WIN
         //        Application.Quit();
