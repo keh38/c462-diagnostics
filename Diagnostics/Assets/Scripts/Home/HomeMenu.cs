@@ -71,6 +71,7 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
             EnableMenu(true);
 
             HardwareInterface.Initialize();
+            IntercomReceiver.Initialize();
 
             HTS_Server.StartServer();
 
