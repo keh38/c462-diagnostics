@@ -1,5 +1,9 @@
 ## Changelog
 
+### v0.7 (unreleased)
+#### Added
+- intercom
+
 ### v0.6 (2025-04-24)
 #### Added
 - Protocols (by remote control)
