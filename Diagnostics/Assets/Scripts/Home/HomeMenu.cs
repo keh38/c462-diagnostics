@@ -93,8 +93,6 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
         OnSubjectMenuButtonClick();
 
         _networkIcon.color = HTS_Server.RemoteConnected ? _networkActiveColor : Color.gray;
-
-        //StartCoroutine(InitializeHardware());
     }
 
     private IEnumerator InitializeHardware()

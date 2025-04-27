@@ -383,7 +383,7 @@ namespace KLib.Signals
         {
             string error = "";
 
-            string[] s = paramName.Split('.');
+            string[] s = paramName.Split(new char[] { '.' });
             if (s.Length != 2 && s[0] != "Level" && s[0] != "Ear")
             {
                 error = Name + ": invalid parameter: " + paramName;

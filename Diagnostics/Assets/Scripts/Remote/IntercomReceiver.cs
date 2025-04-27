@@ -52,8 +52,8 @@ public class IntercomReceiver : MonoBehaviour
 
     private void OnDestroy()
     {
-        Debug.Log("Destroy intercom");
-        StopServers();
+        //Debug.Log("Destroy intercom");
+        //StopServers();
     }
 
     private bool _Init()
@@ -66,7 +66,7 @@ public class IntercomReceiver : MonoBehaviour
         _discoveryServer = go.GetComponent<NetworkDiscoveryServer>();
 
         StartTCPServer();
-        StartReceivingUDP();
+        //StartReceivingUDP();
 
         return true;
     }
@@ -100,7 +100,7 @@ public class IntercomReceiver : MonoBehaviour
         }
 
         _readThreadTCP.Abort();
-        _readThreadUDP.Abort();
+        //_readThreadUDP.Abort();
         _discoveryServer.StopReceiving();
         Debug.Log("stopped Intercom TCP listener");
     }
@@ -135,7 +135,10 @@ public class IntercomReceiver : MonoBehaviour
                 _listener.SendAcknowledgement();
                 break;
             case "GetConfig":
-                _listener.WriteStringAsByteArray($"{_udpPort}:{_audioConfig.sampleRate}:{_audioConfig.dspBufferSize}");
+                _listener.WriteStringAsByteArray($"{_audioConfig.sampleRate}:{_audioConfig.dspBufferSize}");
+                break;
+            case "Talk":
+                Talk();
                 break;
         }
         _listener.CloseTcpClient();
@@ -148,17 +151,49 @@ public class IntercomReceiver : MonoBehaviour
         _readThreadUDP.Start();
     }
 
+    private void Talk()
+    {
+        while (true)
+        {
+            try
+            {
+                byte[] data = _listener.ReadByteArray();
+
+                if (data == null || data.Length == 4)
+                {
+                    Debug.Log("done");
+                    break;
+                }
+
+                var numBuffers = data.Length / _bytesPerBuffer;
+
+                int offset = 0;
+                for (int k = 0; k < numBuffers; k++)
+                {
+                    var audioBuffer = new float[_audioConfig.dspBufferSize];
+                    Buffer.BlockCopy(data, offset, audioBuffer, 0, _bytesPerBuffer);
+                    offset += _bytesPerBuffer;
+                    _audioQueue.Enqueue(audioBuffer);
+                }
+            }
+            catch (Exception ex) { }
+        }
+    }
+
+
     private void ReceiveData()
     {
         _udpClient = new UdpClient(_udpPort);
         _udpClient.Client.ReceiveTimeout = 1000;
+        //IPEndPoint anyIP = new IPEndPoint(IPAddress.Any, _udpPort);
+        //IPEndPoint anyIP = new IPEndPoint(IPAddress.Parse("169.254.10.78"), _udpPort);
 
         while (true)
         {
             try
             {
+                IPEndPoint anyIP = new IPEndPoint(IPAddress.Parse("169.254.10.78"), _udpPort);
                 // receive bytes
-                IPEndPoint anyIP = new IPEndPoint(IPAddress.Any, _udpPort);
                 byte[] data = _udpClient.Receive(ref anyIP);
 
                 var numBuffers = data.Length / _bytesPerBuffer;

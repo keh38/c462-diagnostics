@@ -799,7 +799,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="protobuf-net">
-      <HintPath>Library\PackageCache\com.epl.klib@d0cabb41af79\Runtime\Plugins\protobuf-net.dll</HintPath>
+      <HintPath>Library\PackageCache\com.epl.klib@6bf45126fbf3\Runtime\Plugins\protobuf-net.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="D128NET">
