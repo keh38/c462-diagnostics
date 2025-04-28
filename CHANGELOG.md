@@ -4,6 +4,8 @@
 #### Added
 - intercom
 - Turandot: option to apply custom screen color
+#### Fixed
+- Turandot: restored application of metrics to Turandot sequence
 
 ---
 

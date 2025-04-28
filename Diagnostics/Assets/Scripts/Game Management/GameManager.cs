@@ -63,6 +63,8 @@ public class GameManager : MonoBehaviour
         set { instance._SetTransducer(value); }
     }
 
+    public static SerializeableDictionary<string> Metrics { get { return instance._subjectMetadata.metrics; } }
+
     public static Color BackgroundColor
     {
         get { return instance._GetBackgroundColor(); }

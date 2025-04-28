@@ -40,6 +40,11 @@ namespace KLib
             }
         }
 
+        public bool ContainsKey(string keyName)
+        {
+            return entries.Find(x => x.key == keyName) != null;
+        }
+
         public void RenameKey(int index, string newName)
         {
             if (index < entries.Count)

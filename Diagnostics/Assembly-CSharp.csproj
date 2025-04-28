@@ -92,7 +92,6 @@
     <Compile Include="Assets\Turandot\Scripts\TurandotSecondaryAudio.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Enumerations\BWUnits.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Enumerations\AMShape.cs" />
-    <Compile Include="Assets\Scripts\Game Management\MetricData.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotKeypad.cs" />
     <Compile Include="Assets\Scripts\KLib\Utilities\KLib.Expressions.cs" />
     <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.InputLayout.cs" />

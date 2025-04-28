@@ -12,7 +12,7 @@ namespace KLib
     {
         private readonly string operatorSymbols = "+-*/^";
         private static string _lastError = "";
-        public static Dictionary<string, MetricData> Metrics = new Dictionary<string, MetricData>();
+        public static SerializeableDictionary<string> Metrics = new SerializeableDictionary<string>();
         public static Audiograms.AudiogramData Audiogram = null;
         public static Audiograms.AudiogramData LDL = null;
         private static System.Random _rng = null;
@@ -242,7 +242,7 @@ namespace KLib
                 string metricVal = "NaN";
                 if (Metrics.ContainsKey(metricName))
                 {
-                    metricVal = Metrics[metricName].val.ToString();
+                    metricVal = Metrics[metricName];
                 }
                 else if (!string.IsNullOrEmpty(defaultVal))
                     metricVal = defaultVal;
@@ -542,7 +542,7 @@ namespace KLib
                     startIndex = FindParentheticalOpen(s, idx); // ...find the beginning
                     break;
                 }
-                if (operatorSymbols.Contains(s[idx]) && s[idx]!='-') // operator does not belong to vector spec...
+                if (operatorSymbols.IndexOf(s[idx]) >= 0 && s[idx]!='-') // operator does not belong to vector spec...
                 {
                     startIndex = idx + 1; // ..."A" begins the character after the operator
                     break;
@@ -550,7 +550,7 @@ namespace KLib
                 if (--idx == -1) break; // "A" begins the string
             }
 
-            if (s.TrimStart()[0] == '(') // "A" beginning with (...
+            if (s.TrimStart(null)[0] == '(') // "A" beginning with (...
             {
                 // ... can mean the vector spec is already in parentheses
                 if (FindParentheticalClose(s, '(', startIndex) > icolon) // closing parenthesis is beyond the first colon
@@ -568,7 +568,7 @@ namespace KLib
                     break;
                 }
 
-                if (operatorSymbols.Contains(s[idx]))
+                if (operatorSymbols.IndexOf(s[idx]) != -1)
                 {
                     endIndex = idx - 1;
                     break;
@@ -667,7 +667,7 @@ namespace KLib
             int len = -1;
             int idx = 0;
 
-            s = s.TrimStart();
+            s = s.TrimStart(null);
 
             if (s[0] == '(')
             {
@@ -684,7 +684,7 @@ namespace KLib
 
             while (true)
             {
-                if (operatorSymbols.Contains(s[idx]) && idx > 0)
+                if (operatorSymbols.IndexOf(s[idx])!=-1 && idx > 0)
                     break;
                 if (++idx == s.Length)
                     break;
@@ -734,7 +734,7 @@ namespace KLib
                     throw new Exception("Invalid expression: can't handle nested []'s");
 
                 if (nopen == 0 && end < 0) end = idx;
-                if (nopen <= 0 && operatorSymbols.Contains(s[idx])) break;
+                if (nopen <= 0 && operatorSymbols.IndexOf(s[idx])!=-1) break;
                 if (++idx == s.Length) break;
             }
 
@@ -775,7 +775,7 @@ namespace KLib
             {
                 result = ParseMatrixString(operand);
             }
-            else if (operand.Contains(':'))
+            else if (operand.Contains(":"))
             {
                 result = ParseVectorString(operand);
             }

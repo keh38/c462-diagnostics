@@ -96,7 +96,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         _isScripted = (GameObject.Find("TurandotScripter") != null);
 
-        //KLib.Expressions.Metrics = SubjectManager.Instance.Metrics;
+        KLib.Expressions.Metrics = GameManager.Metrics;
         KLib.Expressions.Audiogram = Audiograms.AudiogramData.Load();
         var ldl = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
         if (ldl != null) ldl.ReplaceNaNWithMax(GameManager.Transducer);
