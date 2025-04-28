@@ -134,9 +134,11 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
     void OnGUI()
     {
         Event e = Event.current;
-        if (e.control && e.keyCode == KeyCode.A)
+        if (_isRunning && e.control && e.keyCode == KeyCode.A)
         {
             _isRunning = false;
+            _stopMeasurement = true;
+            EndTest();
             SceneManager.LoadScene("Home");
         }
     }

@@ -92,13 +92,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             }
         }
 
-        _camera.backgroundColor = GameManager.BackgroundColor;
-        if (HardwareInterface.LED.IsInitialized)
-        {
-            //HardwareInterface.LED.set
-        }
-
-
         _engine.ClearScreen();
 
         _isScripted = (GameObject.Find("TurandotScripter") != null);
@@ -148,6 +141,15 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         //    //HandleException(ex.Message, ex.StackTrace, LogType.Exception);
         //    return;
         //}
+
+        if (_params.screen.ApplyCustomScreenColor)
+        {
+            _camera.backgroundColor = GameManager.BackgroundColor;
+            if (HardwareInterface.LED.IsInitialized)
+            {
+                //HardwareInterface.LED.set
+            }
+        }
 
         _params.Initialize();
 
@@ -580,6 +582,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
     public void OnQuitConfirmButtonClick()
     {
+        HTS_Server.SendMessage("Turandot", "Error:Quit");
         SceneManager.LoadScene("Home");
     }
 

@@ -13,6 +13,7 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
     [SerializeField] private TMPro.TMP_Text _outline;
     [SerializeField] private Text _finishText;
     [SerializeField] private GameObject _finishPanel;
+    [SerializeField] private GameObject _quitPanel;
 
     private Protocol _protocol;
     private ProtocolHistory _history;
@@ -40,12 +41,40 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
 
     void Update()
     {
-        if (_waitingForResponse && (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space)))
+        if (!_waitingForResponse) return;
+
+        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
         {
             _waitingForResponse = false;
             _outline.gameObject.SetActive(false);
             HTS_Server.SendMessage("Protocol", "Advance");
         }
+    }
+
+    void OnGUI()
+    {
+        if (!_waitingForResponse) return;
+
+        Event e = Event.current;
+        if (e.control && e.keyCode == KeyCode.A)
+        {
+            _waitingForResponse = false;
+            _outline.gameObject.SetActive(false);
+            _quitPanel.SetActive(true);
+        }
+    }
+
+    public void OnQuitConfirmButtonClick()
+    {
+        HTS_Server.SendMessage("Protocol", "Quit");
+        SceneManager.LoadScene("Home");
+    }
+
+    public void OnQuitCancelButtonClick()
+    {
+        _quitPanel.SetActive(false);
+        _outline.gameObject.SetActive(true);
+        _waitingForResponse = true;
     }
 
     private void ShowInstructions()

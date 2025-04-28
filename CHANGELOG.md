@@ -3,6 +3,9 @@
 ### v0.7 (unreleased)
 #### Added
 - intercom
+- Turandot: option to apply custom screen color
+
+---
 
 ### v0.6 (2025-04-24)
 #### Added
