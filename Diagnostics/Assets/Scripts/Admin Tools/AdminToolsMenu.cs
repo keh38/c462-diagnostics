@@ -66,14 +66,20 @@ public class AdminToolsMenu : MonoBehaviour
 
     public void OnOneDriveClick()
     {
-        if (_activePanel != _oneDrivePanel.gameObject)
-        {
-            SelectItem(_oneDriveMenuButton, _oneDrivePanel.gameObject);
-        }
-//        else
-        {
-            StartCoroutine(_oneDrivePanel.ConnectToOneDrive());
-        }
+//        if (_activePanel != _oneDrivePanel.gameObject)
+//        {
+//            SelectItem(_oneDriveMenuButton, _oneDrivePanel.gameObject);
+//        }
+////        else
+//        {
+//            StartCoroutine(_oneDrivePanel.ConnectToOneDrive());
+//        }
+        StartCoroutine(SelectOneDrivePanel());
+    }
+    private IEnumerator SelectOneDrivePanel()
+    {
+        yield return StartCoroutine(SelectItem(_oneDriveMenuButton, _oneDrivePanel.gameObject));
+        yield return StartCoroutine(_oneDrivePanel.ConnectToOneDrive());
     }
 
     public void OnHardwareMenuButtonClick()

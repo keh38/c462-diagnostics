@@ -54,10 +54,12 @@ public class OneDrivePanel : MonoBehaviour
         var status = MSGraphClient.GetConnectionStatus(out string details);
         cloud.color = GetStatusColor(status);
         messageBox.Show("Connecting...");
-
+        Debug.Log(details);
+        Debug.Log(status);
         if ((status & MSGraphClient.ConnectionStatus.HaveAccessToken) > 0)
         {
             string user = MSGraphClient.GetUser();
+            FuckMe();
             if (string.IsNullOrEmpty(user)) user = "???";
             messageBox.Show("Signed in as: " + user);
             signInLabel.text = "Sign out";
@@ -80,6 +82,12 @@ public class OneDrivePanel : MonoBehaviour
             }
             messageBox.ShowMarkdown(details, MessageBox.IconShape.Error);
         }
+    }
+
+    private async void FuckMe()
+    {
+        string user2 = await MSGraphClient.GetUser2();
+        Debug.Log($"user2 = {user2}");
     }
 
     public void SignInOutButtonClick()
