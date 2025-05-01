@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -18,6 +19,7 @@ using Serilog;
 
 namespace Launcher
 {
+    [SupportedOSPlatform("windows")]
     public partial class ConfigForm : Form
     {
         private HardwareConfiguration _config;

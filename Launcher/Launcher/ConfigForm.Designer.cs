@@ -28,312 +28,322 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.dataGridView = new System.Windows.Forms.DataGridView();
-            this.Jack = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Modality = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.Transducer = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Channel = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Extra = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.mapDropDown = new System.Windows.Forms.ComboBox();
-            this.saveButton = new System.Windows.Forms.Button();
-            this.comPortDropDown = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.continueButton = new System.Windows.Forms.Button();
-            this.detectButton = new System.Windows.Forms.Button();
-            this.messageLabel = new System.Windows.Forms.Label();
-            this.dsrDropDown = new System.Windows.Forms.ComboBox();
-            this.ledDetectButton = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
-            this.ledComPortDropDown = new System.Windows.Forms.ComboBox();
-            this.brightnessNumeric = new KLib.Controls.KNumericBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.gammaNumeric = new KLib.Controls.KNumericBox();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
-            this.SuspendLayout();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigForm));
+            dataGridView = new System.Windows.Forms.DataGridView();
+            Jack = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            Modality = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            Transducer = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            Channel = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            Extra = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            mapDropDown = new System.Windows.Forms.ComboBox();
+            saveButton = new System.Windows.Forms.Button();
+            comPortDropDown = new System.Windows.Forms.ComboBox();
+            label1 = new System.Windows.Forms.Label();
+            label2 = new System.Windows.Forms.Label();
+            continueButton = new System.Windows.Forms.Button();
+            detectButton = new System.Windows.Forms.Button();
+            messageLabel = new System.Windows.Forms.Label();
+            dsrDropDown = new System.Windows.Forms.ComboBox();
+            ledDetectButton = new System.Windows.Forms.Button();
+            label3 = new System.Windows.Forms.Label();
+            ledComPortDropDown = new System.Windows.Forms.ComboBox();
+            brightnessNumeric = new KLib.Controls.KNumericBox();
+            label4 = new System.Windows.Forms.Label();
+            label5 = new System.Windows.Forms.Label();
+            gammaNumeric = new KLib.Controls.KNumericBox();
+            ((System.ComponentModel.ISupportInitialize)dataGridView).BeginInit();
+            SuspendLayout();
             // 
             // dataGridView
             // 
-            this.dataGridView.AllowUserToAddRows = false;
-            this.dataGridView.AllowUserToDeleteRows = false;
-            this.dataGridView.AllowUserToResizeColumns = false;
-            this.dataGridView.AllowUserToResizeRows = false;
-            this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Jack,
-            this.Modality,
-            this.Transducer,
-            this.Channel,
-            this.Extra});
-            this.dataGridView.Location = new System.Drawing.Point(11, 76);
-            this.dataGridView.Margin = new System.Windows.Forms.Padding(2);
-            this.dataGridView.Name = "dataGridView";
-            this.dataGridView.RowHeadersVisible = false;
-            this.dataGridView.RowTemplate.Height = 24;
-            this.dataGridView.Size = new System.Drawing.Size(503, 291);
-            this.dataGridView.TabIndex = 0;
-            this.dataGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellClick);
-            this.dataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellValueChanged);
-            this.dataGridView.CurrentCellDirtyStateChanged += new System.EventHandler(this.dataGridView_CurrentCellDirtyStateChanged);
-            this.dataGridView.Leave += new System.EventHandler(this.dataGridView_Leave);
+            dataGridView.AllowUserToAddRows = false;
+            dataGridView.AllowUserToDeleteRows = false;
+            dataGridView.AllowUserToResizeColumns = false;
+            dataGridView.AllowUserToResizeRows = false;
+            dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { Jack, Modality, Transducer, Channel, Extra });
+            dataGridView.Location = new System.Drawing.Point(13, 88);
+            dataGridView.Margin = new System.Windows.Forms.Padding(2);
+            dataGridView.Name = "dataGridView";
+            dataGridView.RowHeadersVisible = false;
+            dataGridView.RowTemplate.Height = 24;
+            dataGridView.Size = new System.Drawing.Size(587, 336);
+            dataGridView.TabIndex = 0;
+            dataGridView.CellClick += dataGridView_CellClick;
+            dataGridView.CellValueChanged += dataGridView_CellValueChanged;
+            dataGridView.CurrentCellDirtyStateChanged += dataGridView_CurrentCellDirtyStateChanged;
+            dataGridView.Leave += dataGridView_Leave;
             // 
             // Jack
             // 
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.Jack.DefaultCellStyle = dataGridViewCellStyle2;
-            this.Jack.HeaderText = "Jack";
-            this.Jack.Name = "Jack";
-            this.Jack.ReadOnly = true;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(224, 224, 224);
+            Jack.DefaultCellStyle = dataGridViewCellStyle1;
+            Jack.HeaderText = "Jack";
+            Jack.Name = "Jack";
+            Jack.ReadOnly = true;
             // 
             // Modality
             // 
-            this.Modality.HeaderText = "Modality";
-            this.Modality.Items.AddRange(new object[] {
-            "Audio",
-            "Haptic",
-            "Electric"});
-            this.Modality.Name = "Modality";
+            Modality.HeaderText = "Modality";
+            Modality.Items.AddRange(new object[] { "Audio", "Haptic", "Electric" });
+            Modality.Name = "Modality";
             // 
             // Transducer
             // 
-            this.Transducer.HeaderText = "Transducer";
-            this.Transducer.Name = "Transducer";
-            this.Transducer.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.Transducer.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            Transducer.HeaderText = "Transducer";
+            Transducer.Name = "Transducer";
+            Transducer.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            Transducer.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // Channel
             // 
-            this.Channel.HeaderText = "Channel";
-            this.Channel.Name = "Channel";
+            Channel.HeaderText = "Channel";
+            Channel.Name = "Channel";
             // 
             // Extra
             // 
-            this.Extra.HeaderText = "Max";
-            this.Extra.Name = "Extra";
+            Extra.HeaderText = "Max";
+            Extra.Name = "Extra";
             // 
             // mapDropDown
             // 
-            this.mapDropDown.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.mapDropDown.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.mapDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.mapDropDown.FormattingEnabled = true;
-            this.mapDropDown.Location = new System.Drawing.Point(11, 38);
-            this.mapDropDown.Name = "mapDropDown";
-            this.mapDropDown.Size = new System.Drawing.Size(160, 21);
-            this.mapDropDown.TabIndex = 1;
-            this.mapDropDown.SelectedIndexChanged += new System.EventHandler(this.mapDropDown_SelectedIndexChanged);
+            mapDropDown.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            mapDropDown.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            mapDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            mapDropDown.FormattingEnabled = true;
+            mapDropDown.Location = new System.Drawing.Point(13, 44);
+            mapDropDown.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            mapDropDown.Name = "mapDropDown";
+            mapDropDown.Size = new System.Drawing.Size(186, 23);
+            mapDropDown.TabIndex = 1;
+            mapDropDown.SelectedIndexChanged += mapDropDown_SelectedIndexChanged;
             // 
             // saveButton
             // 
-            this.saveButton.Location = new System.Drawing.Point(358, 36);
-            this.saveButton.Name = "saveButton";
-            this.saveButton.Size = new System.Drawing.Size(75, 23);
-            this.saveButton.TabIndex = 2;
-            this.saveButton.Text = "Save";
-            this.saveButton.UseVisualStyleBackColor = true;
-            this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
+            saveButton.Location = new System.Drawing.Point(418, 42);
+            saveButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            saveButton.Name = "saveButton";
+            saveButton.Size = new System.Drawing.Size(88, 27);
+            saveButton.TabIndex = 2;
+            saveButton.Text = "Save";
+            saveButton.UseVisualStyleBackColor = true;
+            saveButton.Click += saveButton_Click;
             // 
             // comPortDropDown
             // 
-            this.comPortDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comPortDropDown.FormattingEnabled = true;
-            this.comPortDropDown.Location = new System.Drawing.Point(383, 383);
-            this.comPortDropDown.Name = "comPortDropDown";
-            this.comPortDropDown.Size = new System.Drawing.Size(70, 21);
-            this.comPortDropDown.TabIndex = 3;
-            this.comPortDropDown.SelectedIndexChanged += new System.EventHandler(this.comPortDropDown_SelectedIndexChanged);
+            comPortDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            comPortDropDown.FormattingEnabled = true;
+            comPortDropDown.Location = new System.Drawing.Point(447, 442);
+            comPortDropDown.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            comPortDropDown.Name = "comPortDropDown";
+            comPortDropDown.Size = new System.Drawing.Size(81, 23);
+            comPortDropDown.TabIndex = 3;
+            comPortDropDown.SelectedIndexChanged += comPortDropDown_SelectedIndexChanged;
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(322, 387);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(59, 13);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "Audio sync";
+            label1.AutoSize = true;
+            label1.Location = new System.Drawing.Point(376, 447);
+            label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(66, 15);
+            label1.TabIndex = 4;
+            label1.Text = "Audio sync";
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 18);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(101, 13);
-            this.label2.TabIndex = 5;
-            this.label2.Text = "Select configuration";
+            label2.AutoSize = true;
+            label2.Location = new System.Drawing.Point(14, 21);
+            label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(113, 15);
+            label2.TabIndex = 5;
+            label2.Text = "Select configuration";
             // 
             // continueButton
             // 
-            this.continueButton.Location = new System.Drawing.Point(439, 36);
-            this.continueButton.Name = "continueButton";
-            this.continueButton.Size = new System.Drawing.Size(75, 23);
-            this.continueButton.TabIndex = 6;
-            this.continueButton.Text = "Continue";
-            this.continueButton.UseVisualStyleBackColor = true;
-            this.continueButton.Click += new System.EventHandler(this.continueButton_Click);
+            continueButton.Location = new System.Drawing.Point(512, 42);
+            continueButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            continueButton.Name = "continueButton";
+            continueButton.Size = new System.Drawing.Size(88, 27);
+            continueButton.TabIndex = 6;
+            continueButton.Text = "Continue";
+            continueButton.UseVisualStyleBackColor = true;
+            continueButton.Click += continueButton_Click;
             // 
             // detectButton
             // 
-            this.detectButton.Location = new System.Drawing.Point(459, 382);
-            this.detectButton.Name = "detectButton";
-            this.detectButton.Size = new System.Drawing.Size(55, 23);
-            this.detectButton.TabIndex = 7;
-            this.detectButton.Text = "Detect";
-            this.detectButton.UseVisualStyleBackColor = true;
-            this.detectButton.Click += new System.EventHandler(this.detectButton_Click);
+            detectButton.Location = new System.Drawing.Point(536, 441);
+            detectButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            detectButton.Name = "detectButton";
+            detectButton.Size = new System.Drawing.Size(64, 27);
+            detectButton.TabIndex = 7;
+            detectButton.Text = "Detect";
+            detectButton.UseVisualStyleBackColor = true;
+            detectButton.Click += detectButton_Click;
             // 
             // messageLabel
             // 
-            this.messageLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.messageLabel.Location = new System.Drawing.Point(11, 383);
-            this.messageLabel.Name = "messageLabel";
-            this.messageLabel.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.messageLabel.Size = new System.Drawing.Size(290, 106);
-            this.messageLabel.TabIndex = 8;
-            this.messageLabel.Text = "label3";
-            this.messageLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.messageLabel.Visible = false;
+            messageLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            messageLabel.Location = new System.Drawing.Point(13, 442);
+            messageLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            messageLabel.Name = "messageLabel";
+            messageLabel.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
+            messageLabel.Size = new System.Drawing.Size(338, 122);
+            messageLabel.TabIndex = 8;
+            messageLabel.Text = "label3";
+            messageLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            messageLabel.Visible = false;
             // 
             // dsrDropDown
             // 
-            this.dsrDropDown.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.dsrDropDown.FormattingEnabled = true;
-            this.dsrDropDown.Location = new System.Drawing.Point(207, 27);
-            this.dsrDropDown.Name = "dsrDropDown";
-            this.dsrDropDown.Size = new System.Drawing.Size(104, 21);
-            this.dsrDropDown.TabIndex = 9;
-            this.dsrDropDown.Visible = false;
-            this.dsrDropDown.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.dsrDropDown_DrawItem);
-            this.dsrDropDown.SelectedIndexChanged += new System.EventHandler(this.dsrDropDown_SelectedIndexChanged);
+            dsrDropDown.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            dsrDropDown.FormattingEnabled = true;
+            dsrDropDown.Location = new System.Drawing.Point(241, 31);
+            dsrDropDown.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            dsrDropDown.Name = "dsrDropDown";
+            dsrDropDown.Size = new System.Drawing.Size(121, 24);
+            dsrDropDown.TabIndex = 9;
+            dsrDropDown.Visible = false;
+            dsrDropDown.DrawItem += dsrDropDown_DrawItem;
+            dsrDropDown.SelectedIndexChanged += dsrDropDown_SelectedIndexChanged;
             // 
             // ledDetectButton
             // 
-            this.ledDetectButton.Location = new System.Drawing.Point(459, 410);
-            this.ledDetectButton.Name = "ledDetectButton";
-            this.ledDetectButton.Size = new System.Drawing.Size(55, 23);
-            this.ledDetectButton.TabIndex = 12;
-            this.ledDetectButton.Text = "Detect";
-            this.ledDetectButton.UseVisualStyleBackColor = true;
-            this.ledDetectButton.Click += new System.EventHandler(this.ledDetectButton_Click);
+            ledDetectButton.Location = new System.Drawing.Point(536, 473);
+            ledDetectButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            ledDetectButton.Name = "ledDetectButton";
+            ledDetectButton.Size = new System.Drawing.Size(64, 27);
+            ledDetectButton.TabIndex = 12;
+            ledDetectButton.Text = "Detect";
+            ledDetectButton.UseVisualStyleBackColor = true;
+            ledDetectButton.Click += ledDetectButton_Click;
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(318, 415);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(63, 13);
-            this.label3.TabIndex = 11;
-            this.label3.Text = "LED control";
+            label3.AutoSize = true;
+            label3.Location = new System.Drawing.Point(371, 479);
+            label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label3.Name = "label3";
+            label3.Size = new System.Drawing.Size(68, 15);
+            label3.TabIndex = 11;
+            label3.Text = "LED control";
             // 
             // ledComPortDropDown
             // 
-            this.ledComPortDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.ledComPortDropDown.FormattingEnabled = true;
-            this.ledComPortDropDown.Location = new System.Drawing.Point(383, 411);
-            this.ledComPortDropDown.Name = "ledComPortDropDown";
-            this.ledComPortDropDown.Size = new System.Drawing.Size(70, 21);
-            this.ledComPortDropDown.TabIndex = 10;
-            this.ledComPortDropDown.SelectedIndexChanged += new System.EventHandler(this.ledComPortDropDown_SelectedIndexChanged);
+            ledComPortDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            ledComPortDropDown.FormattingEnabled = true;
+            ledComPortDropDown.Location = new System.Drawing.Point(447, 474);
+            ledComPortDropDown.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            ledComPortDropDown.Name = "ledComPortDropDown";
+            ledComPortDropDown.Size = new System.Drawing.Size(81, 23);
+            ledComPortDropDown.TabIndex = 10;
+            ledComPortDropDown.SelectedIndexChanged += ledComPortDropDown_SelectedIndexChanged;
             // 
             // brightnessNumeric
             // 
-            this.brightnessNumeric.AllowInf = false;
-            this.brightnessNumeric.AutoSize = true;
-            this.brightnessNumeric.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.brightnessNumeric.ClearOnDisable = false;
-            this.brightnessNumeric.FloatValue = 0F;
-            this.brightnessNumeric.IntValue = 0;
-            this.brightnessNumeric.IsInteger = true;
-            this.brightnessNumeric.Location = new System.Drawing.Point(383, 473);
-            this.brightnessNumeric.MaxCoerce = true;
-            this.brightnessNumeric.MaximumSize = new System.Drawing.Size(20000, 20);
-            this.brightnessNumeric.MaxValue = 100D;
-            this.brightnessNumeric.MinCoerce = true;
-            this.brightnessNumeric.MinimumSize = new System.Drawing.Size(10, 20);
-            this.brightnessNumeric.MinValue = -1D;
-            this.brightnessNumeric.Name = "brightnessNumeric";
-            this.brightnessNumeric.Size = new System.Drawing.Size(70, 20);
-            this.brightnessNumeric.TabIndex = 13;
-            this.brightnessNumeric.TextFormat = "K4";
-            this.brightnessNumeric.ToolTip = "";
-            this.brightnessNumeric.Units = "";
-            this.brightnessNumeric.Value = 0D;
-            this.brightnessNumeric.ValueChanged += new System.EventHandler(this.brightnessNumeric_ValueChanged);
+            brightnessNumeric.AllowInf = false;
+            brightnessNumeric.AutoSize = true;
+            brightnessNumeric.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            brightnessNumeric.ClearOnDisable = false;
+            brightnessNumeric.FloatValue = 0F;
+            brightnessNumeric.IntValue = 0;
+            brightnessNumeric.IsInteger = true;
+            brightnessNumeric.Location = new System.Drawing.Point(447, 546);
+            brightnessNumeric.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+            brightnessNumeric.MaxCoerce = true;
+            brightnessNumeric.MaximumSize = new System.Drawing.Size(23333, 27);
+            brightnessNumeric.MaxValue = 100D;
+            brightnessNumeric.MinCoerce = true;
+            brightnessNumeric.MinimumSize = new System.Drawing.Size(12, 27);
+            brightnessNumeric.MinValue = -1D;
+            brightnessNumeric.Name = "brightnessNumeric";
+            brightnessNumeric.Size = new System.Drawing.Size(82, 27);
+            brightnessNumeric.TabIndex = 13;
+            brightnessNumeric.TextFormat = "K4";
+            brightnessNumeric.ToolTip = "";
+            brightnessNumeric.Units = "";
+            brightnessNumeric.Value = 0D;
+            brightnessNumeric.ValueChanged += brightnessNumeric_ValueChanged;
             // 
             // label4
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(325, 476);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(56, 13);
-            this.label4.TabIndex = 14;
-            this.label4.Text = "Brightness";
+            label4.AutoSize = true;
+            label4.Location = new System.Drawing.Point(379, 549);
+            label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label4.Name = "label4";
+            label4.Size = new System.Drawing.Size(62, 15);
+            label4.TabIndex = 14;
+            label4.Text = "Brightness";
             // 
             // label5
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(314, 443);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(67, 13);
-            this.label5.TabIndex = 16;
-            this.label5.Text = "LED Gamma";
+            label5.AutoSize = true;
+            label5.Location = new System.Drawing.Point(366, 511);
+            label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label5.Name = "label5";
+            label5.Size = new System.Drawing.Size(72, 15);
+            label5.TabIndex = 16;
+            label5.Text = "LED Gamma";
             // 
             // gammaNumeric
             // 
-            this.gammaNumeric.AllowInf = false;
-            this.gammaNumeric.AutoSize = true;
-            this.gammaNumeric.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.gammaNumeric.ClearOnDisable = false;
-            this.gammaNumeric.FloatValue = 0F;
-            this.gammaNumeric.IntValue = 0;
-            this.gammaNumeric.IsInteger = false;
-            this.gammaNumeric.Location = new System.Drawing.Point(383, 439);
-            this.gammaNumeric.MaxCoerce = false;
-            this.gammaNumeric.MaximumSize = new System.Drawing.Size(20000, 20);
-            this.gammaNumeric.MaxValue = 100D;
-            this.gammaNumeric.MinCoerce = true;
-            this.gammaNumeric.MinimumSize = new System.Drawing.Size(10, 20);
-            this.gammaNumeric.MinValue = 1D;
-            this.gammaNumeric.Name = "gammaNumeric";
-            this.gammaNumeric.Size = new System.Drawing.Size(70, 20);
-            this.gammaNumeric.TabIndex = 15;
-            this.gammaNumeric.TextFormat = "K4";
-            this.gammaNumeric.ToolTip = "";
-            this.gammaNumeric.Units = "";
-            this.gammaNumeric.Value = 0D;
-            this.gammaNumeric.ValueChanged += new System.EventHandler(this.gammaNumeric_ValueChanged);
+            gammaNumeric.AllowInf = false;
+            gammaNumeric.AutoSize = true;
+            gammaNumeric.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            gammaNumeric.ClearOnDisable = false;
+            gammaNumeric.FloatValue = 1F;
+            gammaNumeric.IntValue = 1;
+            gammaNumeric.IsInteger = false;
+            gammaNumeric.Location = new System.Drawing.Point(447, 507);
+            gammaNumeric.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+            gammaNumeric.MaxCoerce = false;
+            gammaNumeric.MaximumSize = new System.Drawing.Size(23333, 27);
+            gammaNumeric.MaxValue = 100D;
+            gammaNumeric.MinCoerce = true;
+            gammaNumeric.MinimumSize = new System.Drawing.Size(12, 27);
+            gammaNumeric.MinValue = 1D;
+            gammaNumeric.Name = "gammaNumeric";
+            gammaNumeric.Size = new System.Drawing.Size(82, 27);
+            gammaNumeric.TabIndex = 15;
+            gammaNumeric.TextFormat = "K4";
+            gammaNumeric.ToolTip = "";
+            gammaNumeric.Units = "";
+            gammaNumeric.Value = 1D;
+            gammaNumeric.ValueChanged += gammaNumeric_ValueChanged;
             // 
             // ConfigForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(529, 505);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.gammaNumeric);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.brightnessNumeric);
-            this.Controls.Add(this.ledDetectButton);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.ledComPortDropDown);
-            this.Controls.Add(this.dsrDropDown);
-            this.Controls.Add(this.messageLabel);
-            this.Controls.Add(this.detectButton);
-            this.Controls.Add(this.continueButton);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.comPortDropDown);
-            this.Controls.Add(this.saveButton);
-            this.Controls.Add(this.mapDropDown);
-            this.Controls.Add(this.dataGridView);
-            this.Margin = new System.Windows.Forms.Padding(2);
-            this.Name = "ConfigForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Adapter Map";
-            this.Load += new System.EventHandler(this.ConfigForm_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(617, 583);
+            Controls.Add(label5);
+            Controls.Add(gammaNumeric);
+            Controls.Add(label4);
+            Controls.Add(brightnessNumeric);
+            Controls.Add(ledDetectButton);
+            Controls.Add(label3);
+            Controls.Add(ledComPortDropDown);
+            Controls.Add(dsrDropDown);
+            Controls.Add(messageLabel);
+            Controls.Add(detectButton);
+            Controls.Add(continueButton);
+            Controls.Add(label2);
+            Controls.Add(label1);
+            Controls.Add(comPortDropDown);
+            Controls.Add(saveButton);
+            Controls.Add(mapDropDown);
+            Controls.Add(dataGridView);
+            Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
+            Margin = new System.Windows.Forms.Padding(2);
+            Name = "ConfigForm";
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            Text = "Adapter Map";
+            Load += ConfigForm_Load;
+            ((System.ComponentModel.ISupportInitialize)dataGridView).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 

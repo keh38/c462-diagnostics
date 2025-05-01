@@ -18,9 +18,11 @@ using CoreAudio.Interfaces;
 
 using D128NET;
 using KLib;
+using System.Runtime.Versioning;
 
 namespace Launcher
 {
+    [SupportedOSPlatform("windows")]
     public partial class MainForm : Form
     {
         bool _configButtonPressed = false;
