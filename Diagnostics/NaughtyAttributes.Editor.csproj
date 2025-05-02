@@ -603,10 +603,6 @@
       <HintPath>Library\PackageCache\com.unity.visualscripting@7dcdc439b230\Editor\VisualScripting.Core\Dependencies\DotNetZip\Unity.VisualScripting.IonicZip.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.IO.Ports">
-      <HintPath>Assets\Plugins\System.IO.Ports.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System.Diagnostics.DiagnosticSource">
       <HintPath>Library\PackageCache\com.epl.klib@d67fcf7735bb\Runtime\Plugins\System.Diagnostics.DiagnosticSource\netstandard1.3\System.Diagnostics.DiagnosticSource.dll</HintPath>
       <Private>False</Private>

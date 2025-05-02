@@ -242,7 +242,6 @@ public class HTS_Server : MonoBehaviour
                 _currentScene.ProcessRPC(command, data);
                 break;
         }
-
         _listener.CloseTcpClient();
     }
 
