@@ -182,6 +182,10 @@ public class HTS_Server : MonoBehaviour
                 _listener.WriteStringAsByteArray(_currentSceneName);
                 break;
 
+            case "GetVersionNumber":
+                _listener.WriteStringAsByteArray(Application.version);
+                break;
+
             case "GetSubjectInfo":
                 _listener.WriteStringAsByteArray($"{GameManager.Project}/{GameManager.Subject}");
                 break;
