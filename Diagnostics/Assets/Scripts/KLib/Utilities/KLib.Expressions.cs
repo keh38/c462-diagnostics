@@ -828,7 +828,7 @@ namespace KLib
 
             return result;
         }
-        
+
 
         private float[] ParseVectorString(string vectorString)
         {
@@ -837,7 +837,7 @@ namespace KLib
             //    vectorString = vectorString.Substring(1, vectorString.Length - 2);
             //}
 
-            string[] split = vectorString.Split(':');
+            string[] split = vectorString.Split(new char[] { ':' });
 
             if (split.Length > 3)
                 throw new Exception("Invalid vector expression: '" + vectorString + "'");
