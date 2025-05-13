@@ -1,6 +1,6 @@
 ## Changelog
 
-### v0.7 (unreleased)
+### v0.7 (2025-05-13)
 #### Added
 - intercom
 - Turandot: option to apply custom screen color
