@@ -21,10 +21,15 @@ Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_RGBW + NEO_KHZ8
 #define BAUD_RATE 9600     // (bits/second)          serial buffer baud rate
 #define BUFF_SIZE 64       // (bytes)                maximum message size
 #define MSG_TIMEOUT 5000   // (milliseconds)         timeout from last character received
-#define NUM_CMDS 3
+#define NUM_CMDS 4
 
 uint8_t buff[BUFF_SIZE];         // message read buffer
 unsigned long lastCharTime;      // used to timeout a message that is cut off or too slow
+
+uint8_t _red;
+uint8_t _green;
+uint8_t _blue;
+uint8_t _white;
 
 // custom data type that is a pointer to a command function
 typedef void (*CmdFunc)(int argc, char* argv[]);
@@ -39,6 +44,7 @@ typedef struct {
 void Command_Clear(int argc = 0, char* argv[] = { NULL });
 void Command_Identify(int argc = 0, char* argv[] = { NULL });
 void Command_SetColor(int argc = 0, char* argv[] = { NULL });
+void Command_GetColor(int argc = 0, char* argv[] = { NULL });
 
 // command table
 CmdStruct cmdTable[NUM_CMDS] = {
@@ -52,6 +58,12 @@ CmdStruct cmdTable[NUM_CMDS] = {
     .commandArgs = 1,                     // 'SUP
     .commandString = "'SUP",             // capitalized command for identifying self to host
     .commandFunction = &Command_Identify  // run Command_Identify
+  },
+
+  {
+    .commandArgs = 1,                    // SET_COLOR <R> <G> <B> <W>
+    .commandString = "GETCOLOR",        // capitalized command for getting current colors
+    .commandFunction = &Command_GetColor // run Command_SetColor
   },
 
   {
@@ -188,16 +200,28 @@ void Command_Identify(int argc, char* argv[])
 // change RGB values of LED
 void Command_SetColor(int argc, char* argv[]) {
   // ensure RGB arguments are byte sized
-  uint8_t R = constrain(atoi(argv[1]), 0, 255);
-  uint8_t G = constrain(atoi(argv[2]), 0, 255);
-  uint8_t B = constrain(atoi(argv[3]), 0, 255);
-  uint8_t W = constrain(atoi(argv[4]), 0, 255);
+  _red = constrain(atoi(argv[1]), 0, 255);
+  _green = constrain(atoi(argv[2]), 0, 255);
+  _blue = constrain(atoi(argv[3]), 0, 255);
+  _white = constrain(atoi(argv[4]), 0, 255);
 
-  for(int i=0;i<NUMPIXELS;i++){
+  for(int i=0; i<NUMPIXELS; i++){
     // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-    pixels.setPixelColor(i, pixels.Color(G, R, B, W));
+    pixels.setPixelColor(i, pixels.Color(_green, _red, _blue, _white));
   }
   pixels.show(); // This sends the updated pixel color to the hardware.
   
   Serial.write("OK\n");
+}
+
+// Return current colors
+void Command_GetColor(int argc, char* argv[])
+{
+  String response = "OK ";
+  response += _red + " ";
+  response += _green + " ";
+  response += _blue + " ";
+  response += _white + " ";
+  response += "\n";
+  Serial.print(response);
 }

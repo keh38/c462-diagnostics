@@ -23,6 +23,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="KLib.Controls" Version="1.0.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Serilog" Version="4.2.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
@@ -45,10 +46,10 @@
       <HintPath>..\..\..\c462-digitimer\D128NET\bin\x64\Debug\D128NET.dll</HintPath>
     </Reference>
     <Reference Include="KLib">
-      <HintPath>..\..\..\..\KLib\Framework\KLib.dll</HintPath>
+      <HintPath>..\..\..\..\klib\Library\net8\KLib.dll</HintPath>
     </Reference>
     <Reference Include="KLib.Controls">
-      <HintPath>..\..\..\..\KLib\Framework\KLib.Controls.dll</HintPath>
+      <HintPath>..\..\..\..\klib\Library\net8\KLib.Controls.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

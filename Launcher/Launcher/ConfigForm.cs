@@ -49,7 +49,7 @@ namespace Launcher
             _digitimerDevices = EnumerateDigitimerDevices();
 
             mapDropDown.Items.Clear();
-            mapDropDown.Items.AddRange(_config.AdapterMaps.Select(x => x.Name).ToArray());
+            mapDropDown.Items.AddRange([.. _config.AdapterMaps.Select(x => x.Name)]);
             mapDropDown.SelectedIndex = _config.AdapterMaps.FindIndex(x => x.Name.Equals(_config.CurrentAdapterMap));
 
             FillComPortDropDown();
@@ -98,6 +98,7 @@ namespace Launcher
 
             _ignoreEvents = true;
             ledComPortDropDown.SelectedIndex = ports.ToList().IndexOf(_config.LEDComPort);
+            //testButton.Enabled = ledComPortDropDown.SelectedIndex > -1;
             _ignoreEvents = false;
         }
 
@@ -333,7 +334,7 @@ namespace Launcher
             Rectangle r = dataGridView.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
 
             dsrDropDown.Items.Clear();
-            dsrDropDown.Items.AddRange(_digitimerDevices.ToArray());
+            dsrDropDown.Items.AddRange([.. _digitimerDevices]);
             dsrDropDown.Items.Add("---");
             dsrDropDown.Tag = false;
             dsrDropDown.ForeColor = Color.Black;
@@ -346,7 +347,7 @@ namespace Launcher
                 dsrDropDown.ForeColor = Color.Red;
                 index = 0;
             }
-            
+
 
             _ignoreEvents = true;
             dsrDropDown.SelectedIndex = index;
@@ -365,7 +366,7 @@ namespace Launcher
             {
                 Graphics g = e.Graphics;
                 Brush brush = new SolidBrush(e.BackColor);
-                Brush tBrush = ((bool) dsrDropDown.Tag && e.Index==0) ? new SolidBrush(Color.Red) : new SolidBrush(Color.Black);
+                Brush tBrush = ((bool)dsrDropDown.Tag && e.Index == 0) ? new SolidBrush(Color.Red) : new SolidBrush(Color.Black);
 
                 g.FillRectangle(brush, e.Bounds);
                 e.Graphics.DrawString(dsrDropDown.Items[e.Index].ToString(), e.Font,
@@ -434,6 +435,7 @@ namespace Launcher
             if (!_ignoreEvents)
             {
                 _config.LEDComPort = ledComPortDropDown.Text.Equals("none") ? "" : ledComPortDropDown.Text;
+                testButton.Enabled = !ledComPortDropDown.Text.Equals("none");
             }
         }
 
@@ -443,6 +445,20 @@ namespace Launcher
             {
                 _config.LEDGamma = gammaNumeric.FloatValue;
             }
+        }
+
+        private async void testButton_Click(object sender, EventArgs e)
+        {
+            var firmware = await Task.Run(() => TestComPort(_config.LEDComPort, 9600, "lightin' the way, big man"));
+            if (!string.IsNullOrEmpty(firmware))
+            {
+                messageLabel.Text = "No LED device found.";
+                messageLabel.Visible = true;
+                return;
+            }
+
+            var dlg = new LEDTestForm(_config.LEDComPort, 9600, _config.LEDGamma);
+            dlg.ShowDialog();
         }
     }
 }
