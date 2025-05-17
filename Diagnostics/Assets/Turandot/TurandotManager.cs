@@ -14,6 +14,7 @@ using Turandot;
 using Turandot.Schedules;
 using Turandot.Scripts;
 using Turandot.Screen;
+using UnityEngine.Video;
 
 public class TurandotManager : MonoBehaviour, IRemoteControllable
 {
@@ -24,6 +25,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     [SerializeField] private Text _finishText;
     [SerializeField] private GameObject _finishPanel;
     [SerializeField] private GameObject _quitPanel;
+
+    [SerializeField] private VideoPlayer _videoPlayer;
 
     Parameters _params = new Parameters();
 
@@ -77,7 +80,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 #if HACKING
         Application.targetFrameRate = 60;
         GameManager.SetSubject("Scratch/_shit");
-        string configName = "SliderTest";
+        string configName = "ImageTest";
         //DiagnosticsManager.Instance.MakeExtracurricular("Turandot", "Turandot." + configName);
 #else
         string configName = GameManager.DataForNextScene;

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
@@ -11,16 +12,13 @@ namespace Turandot.Cues
 {
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     [JsonObject(MemberSerialization.OptOut)]
-    public class Image : Cue
+    public class ImageAction : Cue
     {
-        public enum HorizontalAlignment { Left, Center, Right};
-        public enum VerticalAlignment { Top, Middle, Bottom};
+        [Category("Content")]
+        public string Filename { get; set; }
+        private bool ShouldSerializeFilename() { return false; }
 
-        public string filename;
-        public HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center;
-        public VerticalAlignment verticalAlignment = VerticalAlignment.Middle;
-
-        public Image() 
+        public ImageAction() 
         {
         }
 
@@ -42,11 +40,11 @@ namespace Turandot.Cues
         {
             var names = new List<string>();
 
-            if (!string.IsNullOrEmpty(filename))
+            if (!string.IsNullOrEmpty(Filename))
             {
 
                 string pattern = @"(\-[a-zA-Z]+)";
-                Match m = Regex.Match(filename, pattern);
+                Match m = Regex.Match(Filename, pattern);
                 while (m.Success)
                 {
                     names.Add(Name + "." + m.Groups[1].Value.Substring(1));
@@ -59,10 +57,10 @@ namespace Turandot.Cues
         public override string SetProperty(string property, float value)
         {
             string pattern = @"(\-" + property + "[0-9]+)";
-            Match m = Regex.Match(filename, pattern);
+            Match m = Regex.Match(Filename, pattern);
             while (m.Success)
             {
-                filename = filename.Replace(m.Groups[1].Value, "-" + property + value.ToString());
+                Filename = Filename.Replace(m.Groups[1].Value, "-" + property + value.ToString());
                 m = m.NextMatch();
             }
             return "";

@@ -11,6 +11,7 @@ namespace Turandot.Scripts
     public class TurandotCueController : MonoBehaviour
     {
         [SerializeField] private GameObject _fixationPrefab;
+        [SerializeField] private GameObject _imagePrefab;
         [SerializeField] private GameObject _messagePrefab;
 
         public TurandotCue led;
@@ -38,6 +39,14 @@ namespace Turandot.Scripts
                     var gobj = GameObject.Instantiate(_fixationPrefab, canvasRT);
                     var c = gobj.GetComponent<TurandotFixationPoint>();
                     c.Initialize(layout as FixationPointLayout);
+                    _controls.Add(c);
+                    gobj.SetActive(false);
+                }
+                else if (layout is ImageLayout)
+                {
+                    var gobj = GameObject.Instantiate(_imagePrefab, canvasRT);
+                    var c = gobj.GetComponent<TurandotImage>();
+                    c.Initialize(layout as ImageLayout);
                     _controls.Add(c);
                     gobj.SetActive(false);
                 }
@@ -82,6 +91,7 @@ namespace Turandot.Scripts
             {
                 var target = _controls.Find(x => x.Name.Equals(c.Target));
                 target?.Activate(c);
+                Debug.Log("CUE = " + c.Name + " " + target);
                 //if (c is Message)
                 //    message.Activate(c);
                 ////else if (c is FixationPointAction)

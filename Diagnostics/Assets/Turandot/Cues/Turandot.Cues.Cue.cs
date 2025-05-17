@@ -17,7 +17,7 @@ namespace Turandot.Cues
     [XmlInclude(typeof(Help))]
     [XmlInclude(typeof(CounterAction))]
     [XmlInclude(typeof(ScoreboardAction))]
-    [XmlInclude(typeof(Image))]
+    [XmlInclude(typeof(ImageAction))]
     public class Cue
     {
         public int color = 0xFFFFFF;
@@ -42,9 +42,7 @@ namespace Turandot.Cues
         public int X = 0;
         public int Y = 0;
 
-        public Cue()
-        {
-        }
+        public Cue() { }
 
         [XmlIgnore]
         [ProtoIgnore]
