@@ -1,5 +1,12 @@
 ## Changelog
 
+### v0.8 (unreleased)
+#### Added
+- restored Image cue
+- added Video cue
+
+---
+
 ### v0.7 (2025-05-13)
 #### Added
 - intercom
