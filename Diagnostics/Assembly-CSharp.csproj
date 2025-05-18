@@ -90,6 +90,7 @@
     <Compile Include="Assets\Prefabs\StateDependentToggle.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.TrackState.cs" />
     <Compile Include="Assets\Scripts\KLib\ChannelProperties.cs" />
+    <Compile Include="Assets\Turandot\Scripts\TurandotVideo.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Enumerations\GateState.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.ParamSliderAction.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\MenuButtonControl.cs" />
@@ -231,6 +232,7 @@
     <Compile Include="Assets\Turandot\Inputs\Turandot.InputEvent.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Filters\IIRFilter.cs" />
     <Compile Include="Assets\Turandot\Scripts\InstructionPanel.cs" />
+    <Compile Include="Assets\Turandot\Cues\Turandot.Cues.VideoAction.cs" />
     <Compile Include="Assets\Prefabs\FlowLayout.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Wave\KLib.Wave.WaveData.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotButton.cs" />

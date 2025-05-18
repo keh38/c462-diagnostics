@@ -11,13 +11,14 @@ namespace Turandot.Cues
 {
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     [JsonObject(MemberSerialization.OptOut)]
-    [XmlInclude(typeof(Message))]
     [XmlInclude(typeof(FixationPointAction))]
+    [XmlInclude(typeof(ImageAction))]
+    [XmlInclude(typeof(Message))]
     [XmlInclude(typeof(ProgressBarAction))]
     [XmlInclude(typeof(Help))]
     [XmlInclude(typeof(CounterAction))]
     [XmlInclude(typeof(ScoreboardAction))]
-    [XmlInclude(typeof(ImageAction))]
+    [XmlInclude(typeof(VideoAction))]
     public class Cue
     {
         public int color = 0xFFFFFF;

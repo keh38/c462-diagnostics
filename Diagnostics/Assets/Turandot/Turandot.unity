@@ -1368,12 +1368,7 @@ MonoBehaviour:
   _fixationPrefab: {fileID: 6740508835576663551, guid: 66230e210e138e149aa403e056caa696, type: 3}
   _imagePrefab: {fileID: 3250324672790255597, guid: b77b7ea458dd2724390cf0f9f32330c4, type: 3}
   _messagePrefab: {fileID: 3018359816832450523, guid: 13e767f2c0f50824795356ebf09fdb82, type: 3}
-  led: {fileID: 0}
-  progressBar: {fileID: 0}
-  helpCue: {fileID: 0}
-  counter: {fileID: 0}
-  scoreboard: {fileID: 0}
-  image: {fileID: 0}
+  _videoPrefab: {fileID: 5370318812726528228, guid: f4558795d013bd04b972a198166e6e02, type: 3}
 --- !u!114 &886566277
 MonoBehaviour:
   m_ObjectHideFlags: 0

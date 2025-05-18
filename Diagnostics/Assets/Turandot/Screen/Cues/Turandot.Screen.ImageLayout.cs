@@ -15,21 +15,21 @@ namespace Turandot.Screen
     [JsonObject(MemberSerialization.OptOut)]
     public class ImageLayout : CueLayout
     {
-        [Category("Layout")]
-        [Description("Horizontal width of the image as fraction of the screen size")]
-        public float Width { get; set; }
-        private bool ShouldSerializeWidth() { return false; }
+        //[Category("Layout")]
+        //[Description("Horizontal width of the image as fraction of the screen size")]
+        //public float Width { get; set; }
+        //private bool ShouldSerializeWidth() { return false; }
 
-        [Category("Layout")]
-        [Description("Verticalheight of the image as fraction of the screen size")]
-        public float Height { get; set; }
-        private bool ShouldSerializeHeight() { return false; }
+        //[Category("Layout")]
+        //[Description("Verticalheight of the image as fraction of the screen size")]
+        //public float Height { get; set; }
+        //private bool ShouldSerializeHeight() { return false; }
 
 
         public ImageLayout()
         {
-            Width = 0.9f;
-            Height = 0.9f;
+            //Width = 0.9f;
+            //Height = 0.9f;
         }
 
         public ImageAction GetDefaultCue()

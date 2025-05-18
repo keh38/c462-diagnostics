@@ -13,13 +13,7 @@ namespace Turandot.Scripts
         [SerializeField] private GameObject _fixationPrefab;
         [SerializeField] private GameObject _imagePrefab;
         [SerializeField] private GameObject _messagePrefab;
-
-        public TurandotCue led;
-        public TurandotProgressBarCue progressBar;
-        public TurandotCueHelp helpCue;
-        public TurandotCueCounter counter;
-        public TurandotCueScoreboard scoreboard;
-        public TurandotImage image;
+        [SerializeField] private GameObject _videoPrefab;
 
         private List<string> _used = new List<string>();
         private List<Flag> _flags = null;
@@ -58,7 +52,15 @@ namespace Turandot.Scripts
                     _controls.Add(c);
                     gobj.SetActive(false);
                 }
-;            }
+                else if (layout is VideoLayout)
+                {
+                    var gobj = GameObject.Instantiate(_videoPrefab, canvasRT);
+                    var c = gobj.GetComponent<TurandotVideo>();
+                    c.Initialize(layout as VideoLayout);
+                    _controls.Add(c);
+                    gobj.SetActive(false);
+                }
+            }
         }
 
         public void ClearScreen()
@@ -84,30 +86,11 @@ namespace Turandot.Scripts
         public void Activate(List<Cue> cues)
         {
             _cues = cues;
-            //led.Clear();
-            //message.Clear();
 
             foreach (Cue c in cues)
             {
                 var target = _controls.Find(x => x.Name.Equals(c.Target));
                 target?.Activate(c);
-                Debug.Log("CUE = " + c.Name + " " + target);
-                //if (c is Message)
-                //    message.Activate(c);
-                ////else if (c is FixationPointAction)
-                ////    fixationPoint.DoAction(c as FixationPointAction);
-                ////else if (c is ProgressBarAction)
-                ////    progressBar.DoAction(c as ProgressBarAction);
-                //else if (c is Image)
-                //    image.Activate(c as Image);
-                //else if (c is Help)
-                //    helpCue.Activate(c);
-                //else if (c is CounterAction)
-                //    counter.Activate(c as CounterAction);
-                //else if (c is ScoreboardAction)
-                //    scoreboard.Activate(c as ScoreboardAction);
-                //else
-                //    led.Activate(c);
             }
         }
 
@@ -118,15 +101,6 @@ namespace Turandot.Scripts
                 var target = _controls.Find(x => x.Name.Equals(c.Target));
                 target?.Deactivate();
             }
-                //if (c is Message)
-                //led.Deactivate();
-                //message.Deactivate();
-                //fixationPoint.Deactivate();
-                //image.Deactivate();
-                //progressBar.Deactivate();
-                //helpCue.Deactivate();
-                //counter.Deactivate();
-                //scoreboard.Deactivate();
             }
 
         public string LogJSONString

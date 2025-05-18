@@ -32,9 +32,9 @@ namespace Turandot.Screen
             Height = 0.9f;
         }
 
-        public ImageAction GetDefaultCue()
+        public VideoAction GetDefaultCue()
         {
-            return new ImageAction()
+            return new VideoAction()
             {
                 BeginVisible = true,
                 EndVisible = true
