@@ -31,6 +31,10 @@ namespace Launcher
         public LEDTestForm(string comPort, int baudRate, float gamma)
         {
             InitializeComponent();
+
+            _comPort = comPort;
+            _baudRate = baudRate;
+            _gamma = gamma;
         }
 
         private void LEDTestForm_Shown(object sender, EventArgs e)
@@ -119,10 +123,10 @@ namespace Launcher
                     var parts = response.Split(' ');
                     if (parts.Length == 5)
                     {
-                        _red = int.Parse(parts[1]);
-                        _green = int.Parse(parts[2]);
-                        _blue = int.Parse(parts[3]);
-                        _white = int.Parse(parts[4]);
+                        _red = (int)(100 * (float)int.Parse(parts[1]) / 255f);
+                        _green = (int)(100 * (float)int.Parse(parts[2]) / 255f);
+                        _blue = (int)(100 * (float)int.Parse(parts[3]) / 255f);
+                        _white = (int)(100 * (float)int.Parse(parts[4]) / 255f);
 
                         ShowColor();
                     }

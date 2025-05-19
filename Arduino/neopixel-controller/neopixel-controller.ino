@@ -217,11 +217,7 @@ void Command_SetColor(int argc, char* argv[]) {
 // Return current colors
 void Command_GetColor(int argc, char* argv[])
 {
-  String response = "OK ";
-  response += _red + " ";
-  response += _green + " ";
-  response += _blue + " ";
-  response += _white + " ";
-  response += "\n";
-  Serial.print(response);
+  char response[80];
+  sprintf(response, "OK %d %d %d %d\n", _red, _green, _blue, _white);
+  Serial.write(response);
 }

@@ -1,7 +1,7 @@
 #include <digitalWriteFast.h>
 
-#define ANALOG_IN A5
-#define TTL_PIN 12
+#define ANALOG_IN A0
+#define TTL_PIN 13
 
 const unsigned int SAMPLING_RATE = 50000; // Hz
 const unsigned long SAMPLE_PERIOD = 1000000 / SAMPLING_RATE; // us
@@ -56,7 +56,7 @@ void loop() {
     }
     else if (message.startsWith("'sup"))
     {
-      Serial.println("livin' the dream");
+      Serial.println("livin' the dream:1.1");
     }
   }
 

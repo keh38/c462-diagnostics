@@ -450,7 +450,7 @@ namespace Launcher
         private async void testButton_Click(object sender, EventArgs e)
         {
             var firmware = await Task.Run(() => TestComPort(_config.LEDComPort, 9600, "lightin' the way, big man"));
-            if (!string.IsNullOrEmpty(firmware))
+            if (string.IsNullOrEmpty(firmware))
             {
                 messageLabel.Text = "No LED device found.";
                 messageLabel.Visible = true;
