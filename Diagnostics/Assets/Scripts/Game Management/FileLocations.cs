@@ -15,7 +15,14 @@ public static class FileLocations
 
     public static string SubjectFolder { get; private set; } = "";
     public static string ProjectFolder { get; private set; } = "";
-    public static string DataRoot { get; } = Path.Combine(Application.persistentDataPath, "Projects");
+    public static string DataRoot { get; private set; } = Path.Combine(Application.persistentDataPath, "Projects");
+
+    public static void SetDataRoot(string folder)
+    {
+        DataRoot = folder;
+
+        ProjectFolder = Path.Combine(DataRoot, _currentProject);
+    }
 
     public static void SetSubject(string project, string subject)
     {
@@ -45,6 +52,27 @@ public static class FileLocations
         Directory.CreateDirectory(Path.Combine(DataRoot, projectName));
         Directory.CreateDirectory(Path.Combine(DataRoot, projectName, "Subjects"));
         Directory.CreateDirectory(Path.Combine(DataRoot, projectName, "Resources"));
+
+        var resourceFolder = Path.Combine(DataRoot, projectName, "Resources");
+        var subFolders = new List<string>()
+        {
+            "Config Files",
+            "Images",
+            "MATLAB",
+            "Plugins",
+            "Protocols",
+            "Schedules",
+            "Wav Files"
+        };
+
+        foreach (var subFolder in subFolders)
+        {
+            var folder = Path.Combine(resourceFolder, subFolder);
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+        }
     }
 
     public static List<string> EnumerateProjects()

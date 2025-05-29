@@ -160,6 +160,12 @@ public class HTS_Server : MonoBehaviour
                 _currentScene.ProcessRPC("Connect");
                 break;
 
+            case "SetDataRoot":
+                _listener.SendAcknowledgement();
+                FileLocations.SetDataRoot(data);
+                _currentScene.ProcessRPC("SetDataRoot");
+                break;
+
             case "Disconnect":
                 _listener.SendAcknowledgement();
                 _remoteConnected = false;
@@ -176,6 +182,11 @@ public class HTS_Server : MonoBehaviour
                 KLogger.Log.FlushLog();
                 GameManager.DataForNextScene = "";
                 _currentScene.ChangeScene(data);
+                break;
+
+            case "CreateProject":
+                _listener.SendAcknowledgement();
+                FileLocations.CreateProjectFolder(data);
                 break;
 
             case "GetCurrentSceneName":

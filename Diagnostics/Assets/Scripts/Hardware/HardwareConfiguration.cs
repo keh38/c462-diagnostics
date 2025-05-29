@@ -10,6 +10,9 @@ namespace KLib
         public string LEDComPort { set; get; }
         public float LEDGamma { get; set; }
         public int ScreenBrightness { set; get; }
+        public bool RunWindowed { set; get; }
+        public int ScreenWidth { set; get; }
+        public int ScreenHeight { set; get; }
 
         public HardwareConfiguration() { }
 
@@ -29,6 +32,9 @@ namespace KLib
             config.LEDComPort = "";
             config.LEDGamma = 2.8f;
             config.ScreenBrightness = -1;
+            config.RunWindowed = false;
+            config.ScreenWidth = 640;
+            config.ScreenHeight = 480;
             return config;
         }
 

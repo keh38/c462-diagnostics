@@ -223,6 +223,15 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
                 _networkIcon.color = _networkActiveColor;
                 break;
 
+            case "SetDataRoot":
+                //StartCoroutine(SelectSubjectPanel());
+                break;
+
+            case "SetProject":
+                GameManager.SetSubject(data, GameManager.Subject);
+                StartCoroutine(SelectSubjectPanel());
+                break;
+
             case "Disconnect":
                 _networkIcon.color = Color.gray;
                 break;

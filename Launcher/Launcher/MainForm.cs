@@ -19,6 +19,7 @@ using CoreAudio.Interfaces;
 using D128NET;
 using KLib;
 using System.Runtime.Versioning;
+using Microsoft.Win32;
 
 namespace Launcher
 {
@@ -159,7 +160,25 @@ namespace Launcher
                 try
                 {
                     Log.Information($"App path = {htsPath}");
-                    Process.Start(htsPath);
+                    string args = "-screen-fullscreen 1";
+                    
+                    if (_config.RunWindowed)
+                    {
+                        args = $"-screen-fullscreen 0 -screen-width {_config.ScreenWidth} -screen-height {_config.ScreenHeight}";
+                    }
+                    else
+                    {
+                        string key = @"SOFTWARE\Eaton-Peabody Labs\Hearing Test Suite";
+                        using (var view64 = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64))
+                        {
+                            using (var subKey = view64.OpenSubKey(key, true))
+                            {
+                                subKey.SetValue("Screenmanager Resolution Use Native_h1405027254", 1, RegistryValueKind.DWord);
+                            }
+                        }
+                    }
+
+                    Process.Start(htsPath, args);
                 }
                 catch (Exception ex)
                 {

@@ -58,6 +58,11 @@ namespace Launcher
             _ignoreEvents = true;
             gammaNumeric.FloatValue = _config.LEDGamma;
             brightnessNumeric.IntValue = _config.ScreenBrightness;
+
+            windowedCheckBox.Checked = _config.RunWindowed;
+            widthNumeric.IntValue = _config.ScreenWidth;
+            heightNumeric.IntValue = _config.ScreenHeight;
+
             _ignoreEvents = false;
         }
 
@@ -459,6 +464,30 @@ namespace Launcher
 
             var dlg = new LEDTestForm(_config.LEDComPort, 9600, _config.LEDGamma);
             dlg.ShowDialog();
+        }
+
+        private void windowedCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!_ignoreEvents)
+            {
+                _config.RunWindowed = windowedCheckBox.Checked;
+            }
+        }
+
+        private void widthNumeric_ValueChanged(object sender, EventArgs e)
+        {
+            if (!_ignoreEvents)
+            {
+                _config.ScreenWidth = widthNumeric.IntValue;
+            }
+        }
+
+        private void heightNumeric_ValueChanged(object sender, EventArgs e)
+        {
+            if (!_ignoreEvents)
+            {
+                _config.ScreenHeight = heightNumeric.IntValue;
+            }
         }
     }
 }

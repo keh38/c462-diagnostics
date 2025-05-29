@@ -99,7 +99,7 @@ public class GameManager : MonoBehaviour
         foreach (string path in Directory.GetFiles(localCalFolder))
         {
             var fn = Path.GetFileNameWithoutExtension(path);
-            if (!fn.Contains("_") && (GameManager.ProjectSettings.ValidTransducers == null || GameManager.ProjectSettings.ValidTransducers.Contains(fn)))
+            if (!fn.Contains("_") && (GameManager.ProjectSettings.ValidTransducers == null || GameManager.ProjectSettings.ValidTransducers.Count==0 || GameManager.ProjectSettings.ValidTransducers.Contains(fn)))
             {
                 transducers.Add(fn);
             }

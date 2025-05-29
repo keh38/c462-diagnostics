@@ -183,7 +183,7 @@ public class ClockSynchronizer : MonoBehaviour
 
     private void OnAudioFilterRead(float[] data, int channels)
     {
-        if (_generatePulse)
+        if (_generatePulse && channels > 2)
         {
             _lastAudioDSPTime = AudioSettings.dspTime;
             _generatePulse = false;

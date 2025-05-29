@@ -51,7 +51,12 @@ public class TurandotPanel : MonoBehaviour
         var prefix = GetPrefix(fileType);
 
         var files = Directory.GetFiles(FileLocations.LocalResourceFolder("Config Files"), $"{prefix}.*.xml");
+        foreach (var i in _listBox.Items)
+        {
+            i.Destroy();
+        }
         _listBox.Items.Clear();
+
         for (int k=0; k < files.Length; k++)
         {
             var item = Path.GetFileNameWithoutExtension(files[k]).Remove(0, prefix.Length + 1);
