@@ -7,6 +7,8 @@
 - features to facilitate developing project
   - option to launch in windowed mode
   - use controller's project folder when running on localhost
+#### Changed
+- use project-specific resource folders
 
 ---
 
