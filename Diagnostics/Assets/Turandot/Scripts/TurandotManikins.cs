@@ -6,7 +6,7 @@ using Input = Turandot.Inputs.Input;
 
 namespace Turandot.Scripts
 {
-    public class TurandotSAM : TurandotInput
+    public class TurandotManikins : TurandotInput
     {
         public TurandotSAMSlider valenceSlider;
         public TurandotSAMSlider arousalSlider;

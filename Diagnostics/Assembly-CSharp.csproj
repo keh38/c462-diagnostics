@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Generated file, do not modify, your changes will be overwritten (use AssetPostprocessor.OnGeneratedCSProject) -->
   <PropertyGroup>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -54,6 +54,12 @@
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>6000.0.47f1</UnityVersion>
   </PropertyGroup>
+  <ItemGroup>
+    <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
+    <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.47f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
+    <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.47f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
+    <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.47f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Turandot\Scripts\TurandotKeypadButton.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.ScalarData.cs" />
@@ -156,6 +162,7 @@
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.VariableOrder.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Level.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotRandomProcess.cs" />
+    <Compile Include="Assets\Turandot\Scripts\TurandotManikins.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.TrialType.cs" />
     <Compile Include="Assets\Scripts\Home\SubjectPanel.cs" />
     <Compile Include="Assets\Unity UI Controls\Scripts\_Demo Scripts\DemoListBox.cs" />
@@ -180,6 +187,7 @@
     <Compile Include="Assets\Turandot\Scripts\TurandotCueMessage.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\UserFileReferences.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptHistory.cs" />
+    <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.ManikinLayout.cs" />
     <Compile Include="Assets\Scripts\Home\PlayPanel.cs" />
     <Compile Include="Assets\Turandot\Parameters\Turandot.FlowElement.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.Input.cs" />
@@ -231,7 +239,6 @@
     <Compile Include="Assets\Scripts\KLib\Signals\Wave\KLib.Wave.WaveData.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotButton.cs" />
     <Compile Include="Assets\AlgLib\ap.cs" />
-    <Compile Include="Assets\Turandot\Scripts\TurandotSAM.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\WaveformFactory.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.Categorizer.cs" />
     <Compile Include="Assets\Turandot\Cues\Turandot.Cues.CueLog.cs" />

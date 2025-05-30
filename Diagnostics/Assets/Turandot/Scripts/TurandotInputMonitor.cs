@@ -14,14 +14,7 @@ namespace Turandot.Scripts
         [SerializeField] private GameObject _buttonPrefab;
         [SerializeField] private GameObject _checklistPrefab;
         [SerializeField] private GameObject _sliderPrefab;
-
-        // TURANDOT FIX
-        //public TurandotSAM SAM;
-        //public GameObject Circle;
-        //public GameObject Square;
-        //public GameObject Left;
-        //public GameObject Right;
-        //public TurandotGrapher grapher;
+        [SerializeField] private GameObject _manikinPrefab;
 
         bool _isRunning = false;
         List<ButtonData> _buttonData = new List<ButtonData>();
@@ -32,12 +25,6 @@ namespace Turandot.Scripts
         int[] _eventValues;
 
         List<InputEvent> _inputEvents;
-        TurandotInputSlider _scaleSlider;
-        TurandotInputCategorizer _categorizer;
-        TurandotKeypad _keypad;
-        TurandotThumbSlider _thumbSlider;
-        TurandotPupillometer _pupillometer;
-        TurandotRandomProcess _randomProcess;
         List<TurandotInput> _inputObjects;
         List<Input> _currentStateInputs;
 
@@ -120,6 +107,15 @@ namespace Turandot.Scripts
                     gobj.SetActive(false);
                     _buttonData.Add(i.ButtonData);
                 }
+                else if (layout is ManikinLayout)
+                {
+                    var gobj = GameObject.Instantiate(_manikinPrefab, canvasRT);
+                    var i = gobj.GetComponent<TurandotChecklist>();
+                    i.Initialize(layout as ChecklistLayout);
+                    _inputObjects.Add(i);
+                    gobj.SetActive(false);
+                    _buttonData.Add(i.ButtonData);
+                }
                 else if (layout is ParamSliderLayout)
                 {
                     var gobj = GameObject.Instantiate(_sliderPrefab, canvasRT);
@@ -130,43 +126,6 @@ namespace Turandot.Scripts
                     _buttonData.Add(i.ButtonData);
                 }
             }
-            //if (screen.inputs.elements.Contains("pupillometer"))
-            //{
-            //_pupillometer.Activate();
-            //_scalarData.Add(_pupillometer.Data);
-            //}
-
-            //_buttons = new List<TurandotButton>();
-            //foreach (ButtonLayout bs in buttonSpex)
-            //{
-            //    _buttons.Add(CreateTurandotButton(bs));
-            //}
-            //_numButtons = _buttons.Count;
-
-            /*            if (_used.Contains("categorizer")) _buttons.Add(_categorizer.button);
-                        if (_used.Contains("keypad")) _buttons.Add(_keypad.button);
-                        if (_used.Contains("grapher"))
-                        {
-                            //grapher.Initialize(screen.grapherLayout);
-                        }
-                        if (_used.Contains("sam")) _buttons.Add(SAM.button);
-                        if (_used.Contains("scaler")) _buttons.Add(_scaleSlider.button);
-                        if (_used.Contains("param slider"))
-                        {
-                            //paramSlider.Initialize(screen.paramSliderLayout);
-                            //_buttons.Add(paramSlider.button);
-                        }
-                        if (_used.Contains("thumb slider"))
-                        {
-                            //_thumbSlider.Initialize(screen.thumbSliderLayout);
-                        }
-
-                        if (_used.Contains("random process"))
-                        {
-                            _scalarData.Add(_randomProcess.Data);
-                        }
-            */
-
             _log.Initialize(_buttonData.Select(b => b.name).ToArray(), inputEvents.Select(ie => ie.name).ToArray());
             _controlValues = new int[_buttonData.Count];
 
@@ -209,9 +168,6 @@ namespace Turandot.Scripts
             {
                 ie.Reset();
             }
-            //paramSlider.ClearLog();
-            //_thumbSlider.ClearLog();
-            //for (int k = 0; k < _numButtons; k++) _buttons[k].ClearLog();
 
             _log.Clear();
             _isRunning = true;
