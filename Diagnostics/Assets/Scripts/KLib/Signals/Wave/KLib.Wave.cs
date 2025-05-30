@@ -130,7 +130,7 @@ namespace KLib.Wave
             string id;
             if (nread == 4)
             {
-                id = new string(System.Text.Encoding.UTF8.GetChars(buffer)).TrimEnd();
+                id = new string(System.Text.Encoding.UTF8.GetChars(buffer)).TrimEnd(new char[] { ' ' });
             }
             else if (s.Position == s.Length)
             {
@@ -139,14 +139,14 @@ namespace KLib.Wave
             else
                 throw new System.Exception("Truncated chunk header found - possibly not a WAV file");
 
-            uint size = FileIO.ReadUInt(s);
+            uint size = ReadUInt(s);
 
             return new WaveChunk(id, size);
         }
 
         void CheckRiffType(System.IO.Stream s, string ftype)
         {
-            string riffType = FileIO.ReadString(s, 4);
+            string riffType = ReadString(s, 4);
             if (riffType.ToLower() != ftype.ToLower())
                 throw new System.Exception("Not a WAVE file.");
         }
@@ -162,11 +162,11 @@ namespace KLib.Wave
             if (chunk.size < nbytes)
                 throw new System.Exception(errMsg);
 
-            fmt.wFormatTag = FileIO.ReadUShort(s);
-            fmt.nChannels = FileIO.ReadUShort(s);
-            fmt.nSamplesPerSec = FileIO.ReadUInt(s);
-            fmt.nAvgBytesPerSec = FileIO.ReadUInt(s);
-            fmt.nBlockAlign = FileIO.ReadUShort(s);
+            fmt.wFormatTag = ReadUShort(s);
+            fmt.nChannels = ReadUShort(s);
+            fmt.nSamplesPerSec = ReadUInt(s);
+            fmt.nAvgBytesPerSec = ReadUInt(s);
+            fmt.nBlockAlign = ReadUShort(s);
 
             if (fmt.wFormatTag == 1)
             {
@@ -193,7 +193,7 @@ namespace KLib.Wave
             if (chunk.size < nbytes + 2)
                 throw new System.Exception(err);
 
-            fmt.nBitsPerSample = FileIO.ReadUShort(s);
+            fmt.nBitsPerSample = ReadUShort(s);
             nbytes += 2;
 
             // Are there any additional fields present ?
@@ -203,7 +203,7 @@ namespace KLib.Wave
                 if (chunk.size >= nbytes + 2)
                 {
                     // we have the cbSize ushort in the file:
-                    fmt.cbSize = FileIO.ReadUShort(s);
+                    fmt.cbSize = ReadUShort(s);
                     nbytes += 2;
                 }
 
@@ -275,9 +275,9 @@ namespace KLib.Wave
 
             while (nbytes < chunk.size)
             {
-                uint nchar = FileIO.ReadUShort(s);
-                string name = FileIO.ReadString(s, (int)nchar);
-                float val = (float)FileIO.ReadDouble(s);
+                uint nchar = ReadUShort(s);
+                string name = ReadString(s, (int)nchar);
+                float val = (float)ReadDouble(s);
 
                 nbytes += 2 + nchar + 8;
 
@@ -339,6 +339,30 @@ namespace KLib.Wave
             s.Write(BitConverter.GetBytes(bytesPerSec), 0, 4);
             s.Write(BitConverter.GetBytes(nBlockAlign), 0, 2);
             s.Write(BitConverter.GetBytes(bitsPerSample), 0, 2);
+        }
+        public static string ReadString(Stream s, int len)
+        {
+            byte[] buffer = new byte[len];
+            int nread = s.Read(buffer, 0, len);
+            return new string(System.Text.Encoding.UTF8.GetChars(buffer));
+        }
+        public static uint ReadUInt(Stream s)
+        {
+            byte[] buffer = new byte[4];
+            int nread = s.Read(buffer, 0, 4);
+            return BitConverter.ToUInt32(buffer, 0);
+        }
+        public static ushort ReadUShort(Stream s)
+        {
+            byte[] buffer = new byte[2];
+            int nread = s.Read(buffer, 0, 2);
+            return BitConverter.ToUInt16(buffer, 0);
+        }
+        public static double ReadDouble(Stream s)
+        {
+            byte[] buffer = new byte[8];
+            int nread = s.Read(buffer, 0, 8);
+            return BitConverter.ToDouble(buffer, 0);
         }
 
     } // WaveFile class

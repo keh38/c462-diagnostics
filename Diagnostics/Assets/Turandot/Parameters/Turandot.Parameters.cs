@@ -171,11 +171,11 @@ namespace Turandot
                 {
                     if (string.IsNullOrEmpty(wavFolder))
                     {
-                        //f.sigMan.WavFolder = DataFileLocations.LocalResourceFolder(project, "Wav Files");
+                        f.sigMan.WavFolder = FileLocations.LocalResourceFolder(project, "Wav Files");
                     }
                     else
                     {
-                        //f.sigMan.WavFolder = System.IO.Path.Combine(DataFileLocations.UserWavFolder, wavFolder);
+                        f.sigMan.WavFolder = System.IO.Path.Combine(FileLocations.UserWavFolder, wavFolder);
                     }
                 }
             }
