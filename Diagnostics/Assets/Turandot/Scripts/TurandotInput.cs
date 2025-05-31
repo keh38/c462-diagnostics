@@ -11,7 +11,7 @@ namespace Turandot.Scripts
     public class TurandotInput : MonoBehaviour
     {
 
-        public TurandotButton button;
+        //public TurandotButton button;
         Input _input = null;
 
         virtual public string Name { get { return ""; } }

@@ -110,8 +110,8 @@ namespace Turandot.Scripts
                 else if (layout is ManikinLayout)
                 {
                     var gobj = GameObject.Instantiate(_manikinPrefab, canvasRT);
-                    var i = gobj.GetComponent<TurandotChecklist>();
-                    i.Initialize(layout as ChecklistLayout);
+                    var i = gobj.GetComponent<TurandotManikins>();
+                    i.Initialize(layout as ManikinLayout);
                     _inputObjects.Add(i);
                     gobj.SetActive(false);
                     _buttonData.Add(i.ButtonData);

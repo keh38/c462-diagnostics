@@ -384,7 +384,18 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      SAMLoudness2_0: 8392615013486363927
+      SAMLoudness2_1: -3682253938600166044
+      SAMLoudness2_10: 1749982632179569976
+      SAMLoudness2_2: 7601839498849726443
+      SAMLoudness2_3: -3740193770887552362
+      SAMLoudness2_4: -6841216451514466510
+      SAMLoudness2_5: -5231412234465437029
+      SAMLoudness2_6: -927380511730548202
+      SAMLoudness2_7: 1827617949302800073
+      SAMLoudness2_8: -2919950006709498338
+      SAMLoudness2_9: 5641530554362393122
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
