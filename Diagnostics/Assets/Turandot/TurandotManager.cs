@@ -150,7 +150,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             _camera.backgroundColor = GameManager.BackgroundColor;
             if (HardwareInterface.LED.IsInitialized)
             {
-                //HardwareInterface.LED.set
+                HardwareInterface.LED.SetColorFromString(GameManager.LEDColorString);
             }
         }
 

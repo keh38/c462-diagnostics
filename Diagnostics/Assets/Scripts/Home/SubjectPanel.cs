@@ -61,6 +61,10 @@ public class SubjectPanel : MonoBehaviour
             FillTransducerDropDown();
             transducerDropDown.SelectByText(GameManager.Transducer);
             HardwareInterface.AdapterMap.AudioTransducer = GameManager.Transducer;
+            if (HardwareInterface.LED.IsInitialized)
+            {
+                HardwareInterface.LED.SetColorFromString(GameManager.ProjectSettings.DefaultLEDColor);
+            }
 
             _ignoreEvents = false;
         }

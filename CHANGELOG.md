@@ -3,6 +3,7 @@
 ### v0.9 (unreleased)
 #### Added
 - restored manikins
+- Turandot: set LED color (if specified)
 
 ---
 

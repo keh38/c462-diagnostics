@@ -10,5 +10,6 @@ namespace Project
     {
         public string DefaultTransducer { set; get; } = "HD280";
         public List<string> ValidTransducers { set; get; } = null;
+        public string DefaultLEDColor { set; get; } = "0,0,0,0";
     }
 }
