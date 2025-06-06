@@ -4,6 +4,8 @@
 #### Added
 - restored manikins
 - Turandot: set LED color (if specified)
+#### Fixed
+- Launcher traps process errors when stopping/restarting the audio service
 
 ---
 

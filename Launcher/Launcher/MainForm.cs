@@ -20,6 +20,8 @@ using D128NET;
 using KLib;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
+using static System.Windows.Forms.DataFormats;
+using System.Runtime.InteropServices;
 
 namespace Launcher
 {
@@ -382,6 +384,8 @@ namespace Launcher
 
         private string ValidateSoundCardConfiguration(int numChannels)
         {
+            var magicKey = new PROPERTYKEY(Guid.Parse("3d6e1656-2e50-4c4c-8d85-d0acae3c6c68"), 2);
+
             statusTextBox.AppendText("Checking sound card..." + Environment.NewLine);
             Log.Information("Validating sound card");
             if (numChannels == 2) return "";
@@ -418,7 +422,10 @@ namespace Launcher
             {
                 Log.Information("Setting device format to 7.1");
                 Utilities.SetDeviceFormat(device, desiredFormat);
-                return "";
+                //Utilities.SetDeviceFormat(device, magicKey, desiredFormat);
+
+                var errMsg = RestartService();
+                return errMsg;
             }
 
             // Still no: is there another device that supports 7.1?
@@ -461,29 +468,49 @@ namespace Launcher
             try
             {
                 var processStartInfo = new ProcessStartInfo("net.exe", "stop audiosrv /y");
-                processStartInfo.UseShellExecute = true;
+                processStartInfo.UseShellExecute = false;
+                processStartInfo.RedirectStandardError = true;
                 processStartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 processStartInfo.WorkingDirectory = Environment.SystemDirectory;
 
                 Log.Information("stopping audiosrv");
                 var process = Process.Start(processStartInfo);
+
+                var stdError = process.StandardError.ReadToEnd();
                 process.WaitForExit(10000);
 
-                if (!process.HasExited)
+                if (!process.HasExited || !string.IsNullOrEmpty(stdError))
                 {
                     process.Kill();
-                    Log.Error("Timed out stopping audio service");
+                    if (!string.IsNullOrWhiteSpace(stdError))
+                    {
+                        Log.Error($"Error stopping audio service:{Environment.NewLine}{stdError}");
+                    }
+                    else
+                    {
+                        Log.Error("Timed out stopping audio service");
+                    }
                     errMsg = "Error restarting audio service";
                 }
 
                 Log.Information("starting audiosrv");
                 processStartInfo.Arguments = "start audiosrv";
                 process = Process.Start(processStartInfo);
+
+                stdError = process.StandardError.ReadToEnd();
                 process.WaitForExit(10000);
-                if (!process.HasExited)
+
+                if (!process.HasExited || !string.IsNullOrEmpty(stdError))
                 {
                     process.Kill();
-                    Log.Error("Timed out starting audio service");
+                    if (!string.IsNullOrWhiteSpace(stdError))
+                    {
+                        Log.Error($"Error starting audio service:{Environment.NewLine}{stdError}");
+                    }
+                    else
+                    {
+                        Log.Error("Timed out starting audio service");
+                    }
                     return "Error restarting audio service";
                 }
 
