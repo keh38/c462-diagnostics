@@ -66,7 +66,7 @@ CmdStruct cmdTable[NUM_CMDS] = {
   {
     .commandArgs = 2,                    // SETNUMPIXELS <N>
     .commandString = "SETNUMPIXELS",     // capitalized command for getting current colors
-    .commandFunction = &Command_GetColor // run Command_SetColor
+    .commandFunction = &Command_SetNumPixels // run Command_SetColor
   },
 
   {

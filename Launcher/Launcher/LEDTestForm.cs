@@ -127,7 +127,7 @@ namespace Launcher
 
             if (!success)
             {
-                statusTextBox.Text = "Error setting color";
+                statusTextBox.Text = "Error setting number of pixels";
                 statusTextBox.Visible = true;
             }
         }
@@ -160,7 +160,7 @@ namespace Launcher
 
             if (!success)
             {
-                statusTextBox.Text = "Error setting color";
+                statusTextBox.Text = "Error getting color";
                 statusTextBox.Visible = true;
             }
         }
