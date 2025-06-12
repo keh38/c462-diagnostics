@@ -56,6 +56,7 @@ namespace Launcher
             FillLEDComPortDropDown();
 
             _ignoreEvents = true;
+            numPixelsNumeric.IntValue = _config.NumPixels;
             gammaNumeric.FloatValue = _config.LEDGamma;
             brightnessNumeric.IntValue = _config.ScreenBrightness;
 
@@ -462,7 +463,7 @@ namespace Launcher
                 return;
             }
 
-            var dlg = new LEDTestForm(_config.LEDComPort, 9600, _config.LEDGamma);
+            var dlg = new LEDTestForm(_config.LEDComPort, 9600, _config.NumPixels, _config.LEDGamma);
             dlg.ShowDialog();
         }
 
@@ -487,6 +488,14 @@ namespace Launcher
             if (!_ignoreEvents)
             {
                 _config.ScreenHeight = heightNumeric.IntValue;
+            }
+        }
+
+        private void numPixelsNumeric_ValueChanged(object sender, EventArgs e)
+        {
+            if (!_ignoreEvents)
+            {
+                _config.NumPixels = numPixelsNumeric.IntValue;
             }
         }
     }

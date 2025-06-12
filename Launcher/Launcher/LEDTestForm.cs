@@ -23,17 +23,20 @@ namespace Launcher
 
         SerialPort _serialPort;
 
+        int _numPixels;
+
         int _red;
         int _green;
         int _blue;
         int _white;
 
-        public LEDTestForm(string comPort, int baudRate, float gamma)
+        public LEDTestForm(string comPort, int baudRate, int numPixels, float gamma)
         {
             InitializeComponent();
 
             _comPort = comPort;
             _baudRate = baudRate;
+            _numPixels = numPixels;
             _gamma = gamma;
         }
 
@@ -53,6 +56,7 @@ namespace Launcher
                 return;
             }
 
+            SetNumPixels(_numPixels);
             GetColor();
         }
         private void LEDTestForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -107,6 +111,26 @@ namespace Launcher
             catch { }
         }
 
+        private void SetNumPixels(int numPixels)
+        {
+            if (_serialPort == null) return;
+
+            bool success = false;
+
+            try
+            {
+                _serialPort.Write($"setnumpixels {numPixels}\n");
+                string response = _serialPort.ReadLine();
+                success = response.Equals("OK");
+            }
+            catch { }
+
+            if (!success)
+            {
+                statusTextBox.Text = "Error setting color";
+                statusTextBox.Visible = true;
+            }
+        }
         private void GetColor()
         {
             if (_serialPort == null) return;

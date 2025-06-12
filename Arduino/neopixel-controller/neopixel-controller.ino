@@ -11,17 +11,17 @@
 #define PIN            6
 
 // How many NeoPixels are attached to the Arduino?
-#define NUMPIXELS      64
+#define MAX_NUM_PIXELS     256
 
 // When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
 // Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
 // example for more information on possible values.
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_RGBW + NEO_KHZ800);
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(MAX_NUM_PIXELS, PIN, NEO_RGBW + NEO_KHZ800);
 
 #define BAUD_RATE 9600     // (bits/second)          serial buffer baud rate
 #define BUFF_SIZE 64       // (bytes)                maximum message size
 #define MSG_TIMEOUT 5000   // (milliseconds)         timeout from last character received
-#define NUM_CMDS 4
+#define NUM_CMDS 5
 
 uint8_t buff[BUFF_SIZE];         // message read buffer
 unsigned long lastCharTime;      // used to timeout a message that is cut off or too slow
@@ -30,6 +30,8 @@ uint8_t _red;
 uint8_t _green;
 uint8_t _blue;
 uint8_t _white;
+
+int _numPixels = 64;
 
 // custom data type that is a pointer to a command function
 typedef void (*CmdFunc)(int argc, char* argv[]);
@@ -43,6 +45,7 @@ typedef struct {
 
 void Command_Clear(int argc = 0, char* argv[] = { NULL });
 void Command_Identify(int argc = 0, char* argv[] = { NULL });
+void Command_SetNumPixels(int argc = 0, char* argv[] = { NULL });
 void Command_SetColor(int argc = 0, char* argv[] = { NULL });
 void Command_GetColor(int argc = 0, char* argv[] = { NULL });
 
@@ -61,13 +64,19 @@ CmdStruct cmdTable[NUM_CMDS] = {
   },
 
   {
-    .commandArgs = 1,                    // SET_COLOR <R> <G> <B> <W>
+    .commandArgs = 2,                    // SETNUMPIXELS <N>
+    .commandString = "SETNUMPIXELS",     // capitalized command for getting current colors
+    .commandFunction = &Command_GetColor // run Command_SetColor
+  },
+
+  {
+    .commandArgs = 1,                    // GETCOLOR <R> <G> <B> <W>
     .commandString = "GETCOLOR",        // capitalized command for getting current colors
     .commandFunction = &Command_GetColor // run Command_SetColor
   },
 
   {
-    .commandArgs = 5,                    // SET_COLOR <R> <G> <B> <W>
+    .commandArgs = 5,                    // SETCOLOR <R> <G> <B> <W>
     .commandString = "SETCOLOR",        // capitalized command for adjusting LED color
     .commandFunction = &Command_SetColor // run Command_SetColor
   }
@@ -194,7 +203,15 @@ void Command_Clear(int argc, char* argv[]) {
 // identify myself
 void Command_Identify(int argc, char* argv[])
 {
-  Serial.write("lightin' the way, big man:1.0\n");
+  Serial.write("lightin' the way, big man:2.0\n");
+}
+
+// change RGB values of LED
+void Command_SetNumPixels(int argc, char* argv[]) {
+  // ensure RGB arguments are byte sized
+  _numPixels = atoi(argv[1]);
+  
+  Serial.write("OK\n");
 }
 
 // change RGB values of LED
@@ -205,7 +222,7 @@ void Command_SetColor(int argc, char* argv[]) {
   _blue = constrain(atoi(argv[3]), 0, 255);
   _white = constrain(atoi(argv[4]), 0, 255);
 
-  for(int i=0; i<NUMPIXELS; i++){
+  for(int i=0; i<_numPixels; i++){
     // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
     pixels.setPixelColor(i, pixels.Color(_green, _red, _blue, _white));
   }

@@ -57,6 +57,8 @@
             widthNumeric = new KLib.Controls.KNumericBox();
             heightNumeric = new KLib.Controls.KNumericBox();
             label6 = new System.Windows.Forms.Label();
+            label7 = new System.Windows.Forms.Label();
+            numPixelsNumeric = new KLib.Controls.KNumericBox();
             ((System.ComponentModel.ISupportInitialize)dataGridView).BeginInit();
             SuspendLayout();
             // 
@@ -150,7 +152,7 @@
             // 
             comPortDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             comPortDropDown.FormattingEnabled = true;
-            comPortDropDown.Location = new System.Drawing.Point(447, 442);
+            comPortDropDown.Location = new System.Drawing.Point(90, 442);
             comPortDropDown.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             comPortDropDown.Name = "comPortDropDown";
             comPortDropDown.Size = new System.Drawing.Size(81, 23);
@@ -160,7 +162,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(376, 447);
+            label1.Location = new System.Drawing.Point(19, 447);
             label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(66, 15);
@@ -190,7 +192,7 @@
             // 
             // detectButton
             // 
-            detectButton.Location = new System.Drawing.Point(536, 441);
+            detectButton.Location = new System.Drawing.Point(179, 441);
             detectButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             detectButton.Name = "detectButton";
             detectButton.Size = new System.Drawing.Size(64, 27);
@@ -202,11 +204,11 @@
             // messageLabel
             // 
             messageLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            messageLabel.Location = new System.Drawing.Point(13, 442);
+            messageLabel.Location = new System.Drawing.Point(13, 592);
             messageLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             messageLabel.Name = "messageLabel";
             messageLabel.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
-            messageLabel.Size = new System.Drawing.Size(338, 198);
+            messageLabel.Size = new System.Drawing.Size(587, 48);
             messageLabel.TabIndex = 8;
             messageLabel.Text = "label3";
             messageLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -227,7 +229,7 @@
             // 
             // ledDetectButton
             // 
-            ledDetectButton.Location = new System.Drawing.Point(536, 473);
+            ledDetectButton.Location = new System.Drawing.Point(512, 445);
             ledDetectButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             ledDetectButton.Name = "ledDetectButton";
             ledDetectButton.Size = new System.Drawing.Size(64, 27);
@@ -239,7 +241,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new System.Drawing.Point(371, 479);
+            label3.Location = new System.Drawing.Point(347, 451);
             label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label3.Name = "label3";
             label3.Size = new System.Drawing.Size(68, 15);
@@ -250,7 +252,7 @@
             // 
             ledComPortDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ledComPortDropDown.FormattingEnabled = true;
-            ledComPortDropDown.Location = new System.Drawing.Point(447, 474);
+            ledComPortDropDown.Location = new System.Drawing.Point(423, 446);
             ledComPortDropDown.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             ledComPortDropDown.Name = "ledComPortDropDown";
             ledComPortDropDown.Size = new System.Drawing.Size(81, 23);
@@ -266,7 +268,7 @@
             brightnessNumeric.FloatValue = 0F;
             brightnessNumeric.IntValue = 0;
             brightnessNumeric.IsInteger = true;
-            brightnessNumeric.Location = new System.Drawing.Point(447, 546);
+            brightnessNumeric.Location = new System.Drawing.Point(90, 474);
             brightnessNumeric.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
             brightnessNumeric.MaxCoerce = true;
             brightnessNumeric.MaximumSize = new System.Drawing.Size(20000, 23);
@@ -286,7 +288,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new System.Drawing.Point(379, 549);
+            label4.Location = new System.Drawing.Point(22, 477);
             label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label4.Name = "label4";
             label4.Size = new System.Drawing.Size(62, 15);
@@ -296,12 +298,12 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(366, 511);
+            label5.Location = new System.Drawing.Point(366, 510);
             label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label5.Name = "label5";
-            label5.Size = new System.Drawing.Size(72, 15);
+            label5.Size = new System.Drawing.Size(49, 15);
             label5.TabIndex = 16;
-            label5.Text = "LED Gamma";
+            label5.Text = "Gamma";
             // 
             // gammaNumeric
             // 
@@ -312,7 +314,7 @@
             gammaNumeric.FloatValue = 1F;
             gammaNumeric.IntValue = 1;
             gammaNumeric.IsInteger = false;
-            gammaNumeric.Location = new System.Drawing.Point(447, 507);
+            gammaNumeric.Location = new System.Drawing.Point(423, 506);
             gammaNumeric.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
             gammaNumeric.MaxCoerce = false;
             gammaNumeric.MaximumSize = new System.Drawing.Size(20000, 23);
@@ -331,10 +333,10 @@
             // 
             // testButton
             // 
-            testButton.Location = new System.Drawing.Point(536, 505);
+            testButton.Location = new System.Drawing.Point(423, 548);
             testButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             testButton.Name = "testButton";
-            testButton.Size = new System.Drawing.Size(64, 27);
+            testButton.Size = new System.Drawing.Size(81, 27);
             testButton.TabIndex = 17;
             testButton.Text = "Test";
             testButton.UseVisualStyleBackColor = true;
@@ -343,7 +345,7 @@
             // windowedCheckBox
             // 
             windowedCheckBox.AutoSize = true;
-            windowedCheckBox.Location = new System.Drawing.Point(447, 592);
+            windowedCheckBox.Location = new System.Drawing.Point(90, 519);
             windowedCheckBox.Name = "windowedCheckBox";
             windowedCheckBox.Size = new System.Drawing.Size(105, 19);
             windowedCheckBox.TabIndex = 18;
@@ -360,7 +362,7 @@
             widthNumeric.FloatValue = 0F;
             widthNumeric.IntValue = 0;
             widthNumeric.IsInteger = true;
-            widthNumeric.Location = new System.Drawing.Point(447, 617);
+            widthNumeric.Location = new System.Drawing.Point(90, 544);
             widthNumeric.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
             widthNumeric.MaxCoerce = false;
             widthNumeric.MaximumSize = new System.Drawing.Size(20000, 23);
@@ -386,7 +388,7 @@
             heightNumeric.FloatValue = 0F;
             heightNumeric.IntValue = 0;
             heightNumeric.IsInteger = true;
-            heightNumeric.Location = new System.Drawing.Point(536, 617);
+            heightNumeric.Location = new System.Drawing.Point(179, 544);
             heightNumeric.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
             heightNumeric.MaxCoerce = false;
             heightNumeric.MaximumSize = new System.Drawing.Size(20000, 23);
@@ -406,17 +408,55 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new System.Drawing.Point(516, 621);
+            label6.Location = new System.Drawing.Point(159, 548);
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(14, 15);
             label6.TabIndex = 21;
             label6.Text = "X";
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new System.Drawing.Point(317, 482);
+            label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label7.Name = "label7";
+            label7.Size = new System.Drawing.Size(98, 15);
+            label7.TabIndex = 23;
+            label7.Text = "Number of pixels";
+            // 
+            // numPixelsNumeric
+            // 
+            numPixelsNumeric.AllowInf = false;
+            numPixelsNumeric.AutoSize = true;
+            numPixelsNumeric.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            numPixelsNumeric.ClearOnDisable = false;
+            numPixelsNumeric.FloatValue = 8F;
+            numPixelsNumeric.IntValue = 8;
+            numPixelsNumeric.IsInteger = true;
+            numPixelsNumeric.Location = new System.Drawing.Point(423, 477);
+            numPixelsNumeric.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+            numPixelsNumeric.MaxCoerce = false;
+            numPixelsNumeric.MaximumSize = new System.Drawing.Size(20000, 23);
+            numPixelsNumeric.MaxValue = 100D;
+            numPixelsNumeric.MinCoerce = true;
+            numPixelsNumeric.MinimumSize = new System.Drawing.Size(10, 23);
+            numPixelsNumeric.MinValue = 8D;
+            numPixelsNumeric.Name = "numPixelsNumeric";
+            numPixelsNumeric.Size = new System.Drawing.Size(82, 23);
+            numPixelsNumeric.TabIndex = 22;
+            numPixelsNumeric.TextFormat = "K4";
+            numPixelsNumeric.ToolTip = "";
+            numPixelsNumeric.Units = "";
+            numPixelsNumeric.Value = 8D;
+            numPixelsNumeric.ValueChanged += numPixelsNumeric_ValueChanged;
             // 
             // ConfigForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(613, 661);
+            Controls.Add(label7);
+            Controls.Add(numPixelsNumeric);
             Controls.Add(label6);
             Controls.Add(heightNumeric);
             Controls.Add(widthNumeric);
@@ -480,5 +520,7 @@
         private KLib.Controls.KNumericBox widthNumeric;
         private KLib.Controls.KNumericBox heightNumeric;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label7;
+        private KLib.Controls.KNumericBox numPixelsNumeric;
     }
 }

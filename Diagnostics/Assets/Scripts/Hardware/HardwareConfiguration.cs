@@ -9,6 +9,7 @@ namespace KLib
         public string SyncComPort { set; get; }
         public string LEDComPort { set; get; }
         public float LEDGamma { get; set; }
+        public int NumPixels { get; set; }
         public int ScreenBrightness { set; get; }
         public bool RunWindowed { set; get; }
         public int ScreenWidth { set; get; }
