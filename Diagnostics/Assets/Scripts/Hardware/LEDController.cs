@@ -13,7 +13,7 @@ public class LEDController : MonoBehaviour
 
     public bool IsInitialized { get; private set; }
 
-    public bool Initialize(string comPort, float gamma)
+    public bool Initialize(string comPort, int numPixels, float gamma)
     {
         bool success = false;
 
@@ -37,6 +37,8 @@ public class LEDController : MonoBehaviour
             _serialPort.Write("'sup\n");
             string response = _serialPort.ReadLine();
             Debug.Log($"[LEDController] response to greeting: '{response}'");
+
+            SetNumPixels(numPixels);
             _serialPort.Close();
 
             IsInitialized = true;
@@ -52,6 +54,24 @@ public class LEDController : MonoBehaviour
         }
 
         return success;
+    }
+
+    private void SetNumPixels(int numPixels)
+    {
+        if (_serialPort == null) return;
+
+        bool success = false;
+
+        try
+        {
+            _serialPort.Write($"setnumpixels {numPixels}\n");
+            string response = _serialPort.ReadLine();
+            success = response.Equals("OK");
+        }
+        catch (Exception ex)
+        {
+            Debug.Log($"[LEDController] error setting number of pixels: {ex.Message}");
+        }
     }
 
     public bool SetColorFromString(string colorSpec)

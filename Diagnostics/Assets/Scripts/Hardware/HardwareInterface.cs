@@ -113,7 +113,7 @@ public class HardwareInterface : MonoBehaviour
 
         if (!string.IsNullOrEmpty(_hardwareConfig.LEDComPort))
         {
-            var ledOK = _ledController.Initialize(_hardwareConfig.LEDComPort, _hardwareConfig.LEDGamma);
+            var ledOK = _ledController.Initialize(_hardwareConfig.LEDComPort, _hardwareConfig.NumPixels, _hardwareConfig.LEDGamma);
             if (ledOK)
             {
                 _ledController.Clear();

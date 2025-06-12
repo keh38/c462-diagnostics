@@ -121,6 +121,7 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
         if (_useLEDs)
         {
             HardwareInterface.LED.Close();
+            HardwareInterface.LED.SetColorFromString(GameManager.ProjectSettings.DefaultLEDColor);
         }
 
         _data.Trim();
