@@ -26,6 +26,7 @@ namespace Turandot
         public string ipcCommand = "";
         public EndAction endAction = EndAction.None;
         public string actionFamily = "";
+        public bool hideCursor = false;
 
         private float _delay;
         private float _isi;

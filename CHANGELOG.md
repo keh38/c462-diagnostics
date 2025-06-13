@@ -3,6 +3,7 @@
 ### v0.10 (unreleased)
 #### Added
 - communication of LED changes to controller
+- hide cursor option for Turandot states
 
 ---
 

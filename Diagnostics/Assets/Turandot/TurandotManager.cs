@@ -646,6 +646,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     
     void OnFlowchartFinished()
     {
+        Cursor.visible = true;
         Match p = Regex.Match(_engine.Result, "outcome=\"([\\w\\d\\s]+)\"");
         if (p.Success)
         {

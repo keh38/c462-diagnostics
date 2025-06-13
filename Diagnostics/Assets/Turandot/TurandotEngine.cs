@@ -60,6 +60,7 @@ public class TurandotEngine : MonoBehaviour
     {
         _inputMonitor.ClearScreen();
         _cueController.ClearScreen();
+        Cursor.visible = true;
     }
 
     public void Initialize(Parameters par)
@@ -206,6 +207,7 @@ public class TurandotEngine : MonoBehaviour
             _stateStartTime = Time.timeSinceLevelLoad;
 
             Debug.Log("State: " + _currentFlowElement.name);
+            Cursor.visible = !_currentFlowElement.hideCursor;
 
             var timeOut = _currentFlowElement.GetTimeout(_trialType).Value;
             var a = _audio.Find(o => o.name == _currentFlowElement.name);
