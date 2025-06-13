@@ -247,6 +247,15 @@ public class HTS_Server : MonoBehaviour
                 _listener.WriteStringAsByteArray($"{Screen.width},{Screen.height}");
                 break;
 
+            case "GetLEDColors":
+                var cstring = "none";
+                if (HardwareInterface.LED.IsInitialized)
+                {
+                    cstring = HardwareInterface.LED.GetColor();
+                }
+                _listener.WriteStringAsByteArray($"{cstring}");
+                break;
+
             case "TransferFile":
                 _listener.SendAcknowledgement();
                 ReceiveFile(data);

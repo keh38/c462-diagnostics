@@ -64,6 +64,7 @@ public class SubjectPanel : MonoBehaviour
             if (HardwareInterface.LED.IsInitialized)
             {
                 HardwareInterface.LED.SetColorFromString(GameManager.ProjectSettings.DefaultLEDColor);
+                HTS_Server.SendMessage("ChangedLEDColors", GameManager.ProjectSettings.DefaultLEDColor);
             }
 
             _ignoreEvents = false;

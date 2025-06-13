@@ -27,6 +27,7 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
     private float _endRunTime;
 
     private float _nextUpdate;
+    private float _nextColorUpdate;
 
     private string _dataPath;
     private DynamicRangeData _data;
@@ -48,6 +49,7 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
         _endRunTime = _endStimTime + _postBaseLine;
 
         _nextUpdate = 1;
+        _nextColorUpdate = 0;
 
         string fn = $"{GameManager.Subject}-PupilDR-{DateTime.Now.ToString("yyyy-MM-dd_HHmmss")}.json";
         _dataPath = Path.Combine(FileLocations.SubjectFolder, fn);
@@ -91,12 +93,17 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
         _data.Add(Time.realtimeSinceStartupAsDouble, intensity);
         SetScreenIntensity(intensity);
 
+        _curTime += Time.deltaTime;
+
         if (_useLEDs)
         {
             HardwareInterface.LED.SetColorDynamically(intensity);
+            if (_curTime > _nextColorUpdate)
+            {
+                _nextColorUpdate += 0.5f;
+                HTS_Server.SendMessage("ChangedLEDColors", $"0,0,0,{Math.Max(0.01f, intensity)}");
+            }
         }
-
-        _curTime += Time.deltaTime;
 
         if (_curTime > _nextUpdate)
         {
@@ -122,6 +129,7 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
         {
             HardwareInterface.LED.Close();
             HardwareInterface.LED.SetColorFromString(GameManager.ProjectSettings.DefaultLEDColor);
+            HTS_Server.SendMessage("ChangedLEDColors", GameManager.ProjectSettings.DefaultLEDColor);
         }
 
         _data.Trim();

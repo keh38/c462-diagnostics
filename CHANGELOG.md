@@ -1,5 +1,11 @@
 ## Changelog
 
+### v0.10 (unreleased)
+#### Added
+- communication of LED changes to controller
+
+---
+
 ### v0.9 (2025-06-12)
 #### Added
 - restored manikins

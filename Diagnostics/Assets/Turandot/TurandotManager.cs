@@ -151,6 +151,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             if (HardwareInterface.LED.IsInitialized)
             {
                 HardwareInterface.LED.SetColorFromString(GameManager.LEDColorString);
+                HTS_Server.SendMessage("ChangedLEDColors", GameManager.LEDColorString);
             }
         }
 

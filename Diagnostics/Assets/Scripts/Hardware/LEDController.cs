@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO.Ports;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Device;
 
 public class LEDController : MonoBehaviour
 {
@@ -82,12 +84,19 @@ public class LEDController : MonoBehaviour
         int b = ApplyGamma(float.Parse(parts[2]));
         int w = ApplyGamma(float.Parse(parts[3]));
 
+        HTS_Server.SendMessage("ChangedLEDColor", colorSpec);
+
         return SetColor(r, g, b, w);
     }
 
     private int ApplyGamma(float intensity)
     {
         return Mathf.RoundToInt(Mathf.Pow(intensity, _gamma) * 255);
+    }
+
+    private float ByteValueToFloat(int value, float gamma)
+    {
+        return Mathf.Pow((float)value / 255f, 1 / gamma);
     }
 
     public bool SetColor(int red, int green, int blue, int white)
@@ -112,6 +121,37 @@ public class LEDController : MonoBehaviour
 
         return success;
     }
+    public string GetColor()
+    {
+        string color = "none";
+
+        try
+        {
+            _serialPort.Open();
+            _serialPort.Write($"getcolor\n");
+            string response = _serialPort.ReadLine();
+            var success = response.StartsWith("OK");
+            if (success)
+            {
+                var parts = response.Split(' ');
+                if (parts.Length == 5)
+                {
+                    var r = ByteValueToFloat(int.Parse(parts[1]), _gamma);
+                    var g = ByteValueToFloat(int.Parse(parts[2]), _gamma);
+                    var b = ByteValueToFloat(int.Parse(parts[3]), _gamma);
+                    var w = ByteValueToFloat(int.Parse(parts[4]), _gamma);
+
+                    Debug.Log($"get color: {response} -> {r},{g},{b},{w}");
+                    color = $"{r},{g},{b},{w}";
+                }
+            }
+        }
+        catch { }
+        finally { _serialPort.Close(); }
+
+        return color;
+    }
+
 
     public bool Open()
     {

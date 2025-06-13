@@ -220,27 +220,6 @@ public class TurandotEngine : MonoBehaviour
             _inputMonitor.PollEvents();
         }
     }
-    // TURANDOT FIX 
-    private bool DoIPC(FlowElement state)
-    {
-        return false;
-        ////if (!IPC.Instance.SendCommand("State", state.name + " [" + AudioSettings.dspTime + "]")) return false;
-        //if (!IPC.Instance.SendCommand("State", state.name)) return false;
-
-        //if (string.IsNullOrEmpty(state.ipcCommand)) return true;
-
-        //if (state.ipcCommand == "{result}")
-        //{
-        //    return IPC.Instance.SendCommandAndBytes("Result:", _result);
-        //}
-
-        //if (!state.ipcCommand.StartsWith("Result:"))
-        //    return IPC.Instance.SendCommand(state.ipcCommand);
-
-        //string cmd = ExpandResult("", state.ipcCommand);
-        //return IPC.Instance.SendCommandAndBytes("Result:", cmd.Substring(7));
-    }
-
     private void DoAction(string name)
     {
         // TURANDOT FIX 
