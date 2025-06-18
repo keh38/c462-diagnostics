@@ -70,10 +70,8 @@ public class GameManager : MonoBehaviour
         get { return instance._GetBackgroundColor(); }
     }
 
-    public static string LEDColorString
-    {
-        get { return instance._GetLEDColorString(); }
-    }
+    public static string ScreenColorString { get { return instance._GetBackgroundColorString(); } }
+    public static string LEDColorString { get { return instance._GetLEDColorString(); } }
 
     public static string SerializeSubjectMetadata()
     {
@@ -188,6 +186,16 @@ public class GameManager : MonoBehaviour
             return KLib.ColorTranslator.ColorFromFloatString(screenColor);
         }
         return new Color(214f / 255, 214f / 255, 214f / 255);
+    }
+
+    private string _GetBackgroundColorString()
+    {
+        string screenColor = _subjectMetadata.metrics["ScreenColor"];
+        if (!string.IsNullOrEmpty(screenColor))
+        {
+            return screenColor;
+        }
+        return "";
     }
 
     private string _GetLEDColorString()

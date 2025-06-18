@@ -4,6 +4,10 @@
 #### Added
 - communication of LED changes to controller
 - hide cursor option for Turandot states
+- exposed pupil dynamic range parameters
+- save screen and LED colors in Turandot data files
+#### Changed
+- generalize manikin functionality
 
 ---
 

@@ -21,6 +21,8 @@ namespace Turandot
         public int audioSamplingRate = -1;
         public int audioBufferLength = -1;
         public int audioNumBuffers = -1;
+        public string screenColor = "";
+        public string ledColor = "";
 
         public FileHeader()
         {

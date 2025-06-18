@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
-
 using UnityEngine;
 
 namespace Turandot.Screen
@@ -11,29 +10,47 @@ namespace Turandot.Screen
     [Serializable]
     public class ManikinLayout : InputLayout
     {
-        [Category("Appearance")]
-        public bool ShowLoudness { get; set; }
-        private bool ShouldSerializeShowLoudness() { return false; }
+        [Category("Behavior")]
+        public bool RandomizeOrder { get; set; }
+        private bool ShouldSerializeRandomizeOrder() { return false; }
 
         [Category("Appearance")]
-        public bool ShowValence { get; set; }
-        private bool ShouldSerializeShowValence() { return false; }
+        [DisplayName("Spacing")]
+        [Description("Spacing between sliders (pixels)")]
+        public int SliderSpacing { get; set; }
+        private bool ShouldSerializeSliderSpacing() { return false; }
 
         [Category("Appearance")]
-        public bool ShowArousal { get; set; }
-        private bool ShouldSerializeShowArousal() { return false; }
+        [DisplayName("Height")]
+        [Description("Slider height (pixe3ls)")]
+        public float SliderHeight { get; set; }
+        private bool ShouldSerializeSliderHeight() { return false; }
 
         [Category("Appearance")]
-        public bool ShowDominance { get; set; }
-        private bool ShouldSerializeShowDominance() { return false; }
+        [DisplayName("Width")]
+        [Description("Slider width as fraction of image width (0-1)")]
+        public float SliderWidth { get; set; }
+        private bool ShouldSerializeSliderWidth() { return false; }
+
+        [Category("Appearance")]
+        [DisplayName("Offset")]
+        [Description("From top of slider to bottom of image (pixels)")]
+        public int SliderVerticalOffset { get; set; }
+        private bool ShouldSerializeSliderVerticalOffset() { return false; }
+
+        [Editor(typeof(ManikinCollectionEditor), typeof(System.Drawing.Design.UITypeEditor))]
+        [Category("Sliders")]
+        public ManikinCollection Manikins { get; set; }
 
         public ManikinLayout()
         {
             Name = "Manikins";
-            ShowLoudness = true;
-            ShowValence = true;
-            ShowArousal = true;
-            ShowDominance = true;
+            Manikins = new ManikinCollection();
+            RandomizeOrder = false;
+            SliderHeight = 75;
+            SliderWidth = 1;
+            SliderVerticalOffset = 0;
+            SliderSpacing = 50;
         }
 
     }

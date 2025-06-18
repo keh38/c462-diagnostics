@@ -7,21 +7,21 @@ using UnityEngine.SceneManagement;
 
 
 using Pupillometry;
+using KLib;
 
 public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 {
     [SerializeField] private Camera _camera;
 
+        private Pupillometry.DynamicRangeSettings _settings;
+
     private bool _isRunning = false;
 
     private bool _useLEDs = false;
 
-    private float _preBaseLine = 2f;
-    private float _postBaseLine = 2f;
+    private float _modRateHz;
     private float _curTime = 0;
-    private float _modRateHz = 0.05f;
     private int _curPeriod = 0;
-    private int _numReps = 4;
 
     private float _endStimTime;
     private float _endRunTime;
@@ -43,10 +43,13 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 
     void InitializeMeasurement(string data)
     {
+        _settings = FileIO.XmlDeserializeFromString<Pupillometry.DynamicRangeSettings>(data);
+        _modRateHz = 1.0f / _settings.StimulusPeriod;
+
         _stopMeasurement = false;
 
-        _endStimTime = _preBaseLine + _numReps / _modRateHz;
-        _endRunTime = _endStimTime + _postBaseLine;
+        _endStimTime = _settings.PrestimulusBaseline + _settings.NumRepetitions * _settings.StimulusPeriod;
+        _endRunTime = _endStimTime + _settings.PoststimulusBaseline;
 
         _nextUpdate = 1;
         _nextColorUpdate = 0;
@@ -78,8 +81,9 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
         if (!_isRunning) return;
 
         float intensity = 0;
+        float ledIntensity = _settings.MinLEDIntensity;
 
-        if (_curTime >= _preBaseLine && _curTime < _endStimTime)
+        if (_curTime >= _settings.PrestimulusBaseline && _curTime < _endStimTime)
         {
             int nper = Mathf.FloorToInt(_curTime * _modRateHz) + 1;
             if (nper > _curPeriod)
@@ -87,7 +91,8 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
                 _curPeriod++;
             }
 
-            intensity = 0.5f * (1 - Mathf.Cos(2 * Mathf.PI * (_curTime - _preBaseLine) * _modRateHz));
+            intensity = 0.5f * (1 - Mathf.Cos(2 * Mathf.PI * (_curTime - _settings.PrestimulusBaseline) * _modRateHz));
+            ledIntensity = intensity * (_settings.MaxLEDIntensity - _settings.MinLEDIntensity) + _settings.MinLEDIntensity;
         }
 
         _data.Add(Time.realtimeSinceStartupAsDouble, intensity);
@@ -97,11 +102,11 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 
         if (_useLEDs)
         {
-            HardwareInterface.LED.SetColorDynamically(intensity);
+            HardwareInterface.LED.SetColorDynamically(ledIntensity);
             if (_curTime > _nextColorUpdate)
             {
                 _nextColorUpdate += 0.5f;
-                HTS_Server.SendMessage("ChangedLEDColors", $"0,0,0,{Math.Max(0.01f, intensity)}");
+                HTS_Server.SendMessage("ChangedLEDColors", $"0,0,0,{Math.Max(0.01f, ledIntensity)}");
             }
         }
 

@@ -80,7 +80,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 #if HACKING
         Application.targetFrameRate = 60;
         GameManager.SetSubject("Scratch/_shit");
-        string configName = "ImageTest";
+        string configName = "TestNewManikins";
         //DiagnosticsManager.Instance.MakeExtracurricular("Turandot", "Turandot." + configName);
 #else
         string configName = GameManager.DataForNextScene;
@@ -326,14 +326,9 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         _numBlocksAdded = 0;
         _resultsByStimulus.Clear();
 
-        // What is the use case for not initializing the SCL?!?
-        //if (!(_usingServer && _waitForServer))
-        //if (!_usingServer || _waitForServer)
-        {
-            _state.SetMasterSCL(_params.schedule.CreateStimConList());
-            string localName = Path.Combine(Application.persistentDataPath, "scldump.json");
-            File.WriteAllText(localName, KLib.FileIO.JSONSerializeToString(_state.MasterSCL));
-        }
+        _state.SetMasterSCL(_params.schedule.CreateStimConList());
+        string localName = Path.Combine(Application.persistentDataPath, "scldump.json");
+        File.WriteAllText(localName, KLib.FileIO.JSONSerializeToString(_state.MasterSCL));
 
         if (_params.schedule.mode == Mode.Sequence || _params.schedule.mode == Mode.CS)
         {
@@ -562,6 +557,14 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         header.Initialize(_mainDataFile, _paramFile);
         header.audioSamplingRate = AudioSettings.outputSampleRate;
         AudioSettings.GetDSPBufferSize(out header.audioBufferLength, out header.audioNumBuffers);
+        if (_params.screen.ApplyCustomScreenColor)
+        {
+            header.screenColor = GameManager.ScreenColorString;
+            if (HardwareInterface.LED.IsInitialized)
+            {
+                header.ledColor = GameManager.LEDColorString;
+            }
+        }
 
         string json = KLib.FileIO.JSONStringAdd("", "info", KLib.FileIO.JSONSerializeToString(header));
         json = KLib.FileIO.JSONStringAdd(json, "params", KLib.FileIO.JSONSerializeToString(_params));

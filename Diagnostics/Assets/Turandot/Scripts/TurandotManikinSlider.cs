@@ -4,11 +4,18 @@ using UnityEngine.UI;
 
 using Turandot.Inputs;
 using UnityEngine.EventSystems;
+using System.IO;
+using Turandot.Cues;
+using Turandot.Screen;
+using JimmysUnityUtilities;
+//using UnityEngine.UIElements;
 
 namespace Turandot.Scripts
 {
     public class TurandotManikinSlider : MonoBehaviour
     {
+        [SerializeField] private TMPro.TMP_Text _label;
+        [SerializeField] private Image _image;
         [SerializeField] private Slider _slider;
         [SerializeField] private GameObject _thumb;
 
@@ -19,6 +26,54 @@ namespace Turandot.Scripts
         private void OnValueChanged(float value)
         {
             ValueChanged?.Invoke(value);
+        }
+
+        public RectTransform Layout(ManikinLayout layout, ManikinSpec manikinSpec, float yoffset)
+        {
+            _label.text = manikinSpec.Label;
+
+            var imageRT = _image.gameObject.GetComponent<RectTransform>();
+            var imageBottom = imageRT.anchoredPosition.y;
+            float width = 0;
+
+            if (!string.IsNullOrEmpty(manikinSpec.Image))
+            {
+                string imagePath = Path.Combine(FileLocations.LocalResourceFolder("Images"), manikinSpec.Image);
+
+                var texture = new Texture2D(10, 10);
+                texture.LoadImage(File.ReadAllBytes(imagePath));
+                _image.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
+                _image.SetNativeSize();
+
+                imageBottom -= imageRT.rect.height;
+                width = imageRT.rect.width;
+            }
+            else
+            {
+                _image.gameObject.SetActive(false);
+            }
+
+            var rt = _slider.gameObject.GetComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(0, layout.SliderHeight);
+
+            rt.anchoredPosition = new Vector2(0, imageBottom + layout.SliderVerticalOffset);
+            var anchorOffset = (1 - layout.SliderWidth) / 2;
+            rt.anchorMin = new Vector2(anchorOffset, 1);
+            rt.anchorMax = new Vector2(1 - anchorOffset, 1);
+
+            var sliderBottom = rt.anchoredPosition.y - rt.rect.height;
+
+            var myHeight = -Mathf.Min(imageBottom, sliderBottom);
+            var myRT = GetComponent<RectTransform>();
+            if (width == 0)
+            {
+                width = myRT.rect.width;
+            }
+
+            myRT.sizeDelta = new Vector2(width, myHeight);
+            myRT.anchoredPosition = new Vector2(0, -yoffset);
+
+            return myRT;
         }
 
         public void OnSliderValueChanged(float sliderValue)
@@ -45,6 +100,6 @@ namespace Turandot.Scripts
             Moved = false;
         }
 
-        public int Value { get { return (int) _slider.value; } }
+        public float Value { get { return _slider.value; } }
    }
 }

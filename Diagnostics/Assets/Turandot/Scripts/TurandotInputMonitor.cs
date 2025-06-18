@@ -110,7 +110,7 @@ namespace Turandot.Scripts
                 else if (layout is ManikinLayout)
                 {
                     var gobj = GameObject.Instantiate(_manikinPrefab, canvasRT);
-                    var i = gobj.GetComponent<TurandotManikins>();
+                    var i = gobj.GetComponent<TurandotManikinPanel>();
                     i.Initialize(layout as ManikinLayout);
                     _inputObjects.Add(i);
                     gobj.SetActive(false);
@@ -136,6 +136,11 @@ namespace Turandot.Scripts
         public void Activate(List<Input> inputs, TurandotAudio audio, float timeOut)
         {
             _currentStateInputs = inputs;
+
+            foreach (var b in _buttonData)
+            {
+                b.value = false;
+            }
 
             foreach (InputEvent ie in _inputEvents)
             {
