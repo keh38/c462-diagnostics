@@ -107,6 +107,7 @@
     <Compile Include="Assets\Turandot\Parameters\Turandot.TrialLogOption.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Channel.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\RippleNoise.cs" />
+    <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.ManikinSpec.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\ToneCloud.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Wave\KLib.Wave.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.CatchInterval.cs" />
@@ -150,6 +151,7 @@
     <Compile Include="Assets\Scripts\Home\TurandotPanel.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.Scaler.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\MovingRippleNoise.cs" />
+    <Compile Include="Assets\Pupillometry\Pupillometry.DynamicRangeSettings.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Gate.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.XboxLink.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.VarDimension.cs" />
@@ -161,7 +163,6 @@
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.VariableOrder.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Level.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotRandomProcess.cs" />
-    <Compile Include="Assets\Turandot\Scripts\TurandotManikins.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.TrialType.cs" />
     <Compile Include="Assets\Scripts\Home\SubjectPanel.cs" />
     <Compile Include="Assets\Unity UI Controls\Scripts\_Demo Scripts\DemoListBox.cs" />
@@ -302,6 +303,7 @@
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.Variable.cs" />
     <Compile Include="Assets\Turandot\Screen\Turandot.Screen.GrapherLayout.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\StyleDefinition.cs" />
+    <Compile Include="Assets\Turandot\Scripts\TurandotManikinPanel.cs" />
     <Compile Include="Assets\Turandot\Interactive\TurandotInteractive.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -821,6 +823,10 @@
     </Reference>
     <Reference Include="protobuf-net">
       <HintPath>Library\PackageCache\com.epl.klib@d67fcf7735bb\Runtime\Plugins\protobuf-net.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Design">
+      <HintPath>Assets\Plugins\System.Design.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="D128NET">

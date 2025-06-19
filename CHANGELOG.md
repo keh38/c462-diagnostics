@@ -1,6 +1,6 @@
 ## Changelog
 
-### v0.10 (unreleased)
+### v0.10 (2025-06-19)
 #### Added
 - communication of LED changes to controller
 - hide cursor option for Turandot states
@@ -8,6 +8,7 @@
 - save screen and LED colors in Turandot data files
 #### Changed
 - generalize manikin functionality
+- Turandot will run with instructions only
 
 ---
 

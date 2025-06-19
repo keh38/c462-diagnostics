@@ -196,7 +196,15 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     private void OnInstructionsFinished()
     {
         _instructionPanel.gameObject.SetActive(false);
-        StartRun();
+
+        if (_params.flowChart.Count > 0)
+        {
+            StartRun();
+        }
+        else
+        {
+            EndRun(abort: false);
+        }
     }
 
     /*

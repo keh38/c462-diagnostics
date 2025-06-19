@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 using KLib;
@@ -28,11 +29,15 @@ namespace KLib.Signals.Waveforms
             int idash = filename.IndexOf('-');
             if (idash > 0) filename = filename.Substring(0, idash);
 
-            path = Path.Combine(folder, filename + ".xml");
-            
+            var refPath = Path.Combine(folder, filename + ".xml");
+            if (!File.Exists(refPath))
+            {
+                refPath = Path.Combine(folder, Path.GetFileNameWithoutExtension(path) + ".xml");
+            }
+
             if (File.Exists(path))
             {
-                ufr = FileIO.XmlDeserialize<UserFileReferences>(path);
+                ufr = FileIO.XmlDeserialize<UserFileReferences>(refPath);
             }
             return ufr;
         }
@@ -45,7 +50,8 @@ namespace KLib.Signals.Waveforms
         {
             float value = float.NaN;
 
-            var r = entries.Find(x => x.transducer.Equals(transducer) && x.destination.Equals(destination) && x.units.Equals(units));
+            //var r = entries.Find(x => x.transducer.Equals(transducer) && x.destination.Equals(destination) && x.units.Equals(units));
+            var r = entries.Find(x => x.transducer.Equals(transducer) && x.units.Equals(units));
 
             if (r != null)
             {

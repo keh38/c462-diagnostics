@@ -602,6 +602,10 @@
       <HintPath>Library\PackageCache\com.epl.klib@d67fcf7735bb\Runtime\Plugins\protobuf-net.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Design">
+      <HintPath>Assets\Plugins\System.Design.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="D128NET">
       <HintPath>Assets\Scripts\Hardware\Plugins\D128NET.dll</HintPath>
       <Private>False</Private>

@@ -8,6 +8,8 @@ using UnityEngine.UI;
 
 using KLib;
 using KLib.MSGraph;
+using KLib.Signals;
+using KLib.Signals.Waveforms;
 
 public class HomeMenu : MonoBehaviour, IRemoteControllable
 {
