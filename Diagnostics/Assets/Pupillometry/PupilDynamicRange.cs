@@ -41,6 +41,16 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
         HTS_Server.SetCurrentScene(_mySceneName, this);
     }
 
+    private void OnDisable()
+    {
+        // Just to be sure--I feel like there are as yet untrapped errors that make it possible to leave
+        // the scene without closing the serial port, which leaves things fucked until the Arduino is reset
+        if (_useLEDs)
+        {
+            HardwareInterface.LED.Close();
+        }
+    }
+
     void InitializeMeasurement(string data)
     {
         _settings = FileIO.XmlDeserializeFromString<Pupillometry.DynamicRangeSettings>(data);

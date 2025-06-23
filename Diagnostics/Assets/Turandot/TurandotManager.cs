@@ -168,6 +168,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         {
             filename = "error";
             HandleException(ex.Message, ex.StackTrace, LogType.Exception);
+            _engine.ClearScreen();
         }
         finally
         {

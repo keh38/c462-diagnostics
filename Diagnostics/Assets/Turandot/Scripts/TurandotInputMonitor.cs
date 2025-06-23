@@ -111,8 +111,8 @@ namespace Turandot.Scripts
                 {
                     var gobj = GameObject.Instantiate(_manikinPrefab, canvasRT);
                     var i = gobj.GetComponent<TurandotManikinPanel>();
-                    i.Initialize(layout as ManikinLayout);
                     _inputObjects.Add(i);
+                    i.Initialize(layout as ManikinLayout);
                     gobj.SetActive(false);
                     _buttonData.Add(i.ButtonData);
                 }
