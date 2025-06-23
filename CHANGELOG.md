@@ -1,5 +1,12 @@
 ## Changelog
 
+### v0.11 (unreleased)
+#### Added
+- option to hide protocol entry from subject-facing outline
+- optional protocol entry instructions
+
+---
+
 ### v0.10 (2025-06-19)
 #### Added
 - communication of LED changes to controller

@@ -133,33 +133,46 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     
     private void ApplyParameters()
     {
-        _params.ApplyDefaultWavFolder(GameManager.Project);
+        string filename = "";
 
-        //try
+        try
         {
-            _engine.Initialize(_params);
-        }
-        //catch (Exception ex)
-        //{
-        //    //HandleException(ex.Message, ex.StackTrace, LogType.Exception);
-        //    return;
-        //}
+            _params.ApplyDefaultWavFolder(GameManager.Project);
 
-        if (_params.screen.ApplyCustomScreenColor)
-        {
-            _camera.backgroundColor = GameManager.BackgroundColor;
-            if (HardwareInterface.LED.IsInitialized)
+            //try
             {
-                HardwareInterface.LED.SetColorFromString(GameManager.LEDColorString);
-                HTS_Server.SendMessage("ChangedLEDColors", GameManager.LEDColorString);
+                _engine.Initialize(_params);
             }
+            //catch (Exception ex)
+            //{
+            //    //HandleException(ex.Message, ex.StackTrace, LogType.Exception);
+            //    return;
+            //}
+
+            if (_params.screen.ApplyCustomScreenColor)
+            {
+                _camera.backgroundColor = GameManager.BackgroundColor;
+                if (HardwareInterface.LED.IsInitialized)
+                {
+                    HardwareInterface.LED.SetColorFromString(GameManager.LEDColorString);
+                    HTS_Server.SendMessage("ChangedLEDColors", GameManager.LEDColorString);
+                }
+            }
+
+            _params.Initialize();
+
+            InitDataFile();
+            filename = Path.GetFileName(_mainDataFile);
         }
-
-        _params.Initialize();
-
-        InitDataFile();
-
-        HTS_Server.SendMessage("Turandot", $"File:{Path.GetFileName(_mainDataFile)}");
+        catch (Exception ex)
+        {
+            filename = "error";
+            HandleException(ex.Message, ex.StackTrace, LogType.Exception);
+        }
+        finally
+        {
+            HTS_Server.SendMessage("Turandot", $"File:{filename}");
+        }
     }
 
     private void Begin()

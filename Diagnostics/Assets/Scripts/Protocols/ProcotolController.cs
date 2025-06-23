@@ -20,6 +20,7 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
 
     private bool _isRemote;
     private int _nextTestIndex;
+    private bool _advanceAfterInstructions = false;
 
     private bool _waitingForResponse = false;
 
@@ -47,7 +48,15 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
         {
             _waitingForResponse = false;
             _outline.gameObject.SetActive(false);
-            HTS_Server.SendMessage("Protocol", "Advance");
+
+            if (!string.IsNullOrEmpty(_protocol.Tests[_nextTestIndex].Instructions))
+            {
+                ShowInstructions(_protocol.Tests[_nextTestIndex].Instructions, autoAdvance: true);
+            }
+            else
+            {
+                HTS_Server.SendMessage("Protocol", "Advance");
+            }
         }
     }
 
@@ -77,16 +86,24 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
         _waitingForResponse = true;
     }
 
-    private void ShowInstructions()
-    { 
+    private void ShowInstructions(string instructions, bool autoAdvance)
+    {
+        _advanceAfterInstructions = autoAdvance;
         _instructionPanel.gameObject.SetActive(true);
         _instructionPanel.InstructionsFinished = OnInstructionsFinished;
-        _instructionPanel.ShowInstructions(new Turandot.Instructions() { Text = _protocol.Introduction });
+        _instructionPanel.ShowInstructions(new Turandot.Instructions() { Text = instructions });
     }
     private void OnInstructionsFinished()
     {
         _instructionPanel.gameObject.SetActive(false);
-        StartCoroutine(AnimateOutline());
+        if (_advanceAfterInstructions)
+        {
+            HTS_Server.SendMessage("Protocol", "Advance");
+        }
+        else
+        {
+            StartCoroutine(AnimateOutline());
+        }
     }
 
     private IEnumerator AnimateOutline()
@@ -94,8 +111,11 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
         yield return new WaitForSeconds(0.5f);
         for (int k=0; k<_history.Data.Count; k++)
         {
-            DrawOutline(k+1, -1);
-            yield return new WaitForSeconds(1f);
+            if (!_protocol.Tests[k].HideOutline)
+            {
+                DrawOutline(k + 1, -1);
+                yield return new WaitForSeconds(1f);
+            }
         }
         DrawOutline(_history.Data.Count, _nextTestIndex);
 
@@ -106,21 +126,24 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
     private void DrawOutline(int numLines, int selected)
     {
         string text = "";
-        for (int k=0; k<numLines; k++)
+        for (int k = 0; k < numLines; k++)
         {
-            string line = _history.Data[k].Title;
-            if (k == selected)
-            {
-                line = $"<color=#00aa00><b>{line}</b></color>";
+            if (!_protocol.Tests[k].HideOutline)
+            { 
+                string line = _history.Data[k].Title;
+                if (k == selected)
+                {
+                    line = $"<color=#00aa00><b>{line}</b></color>";
+                }
+                else if (!string.IsNullOrEmpty(_history.Data[k].Date))
+                {
+                    line = $"<color=#888888><i>{line}</i></color>";
+                }
+                else
+                {
+                }
+                text += $"{line}\n";
             }
-            else if (!string.IsNullOrEmpty(_history.Data[k].Date))
-            {
-                line = $"<color=#888888><i>{line}</i></color>";
-            }
-            else
-            {
-            }
-            text += $"{line}\n";
         }
 
         _outline.text = text;
@@ -160,7 +183,7 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
         if (testIndex == 0 && !string.IsNullOrEmpty(_protocol.Introduction))
         {
             HTS_Server.SendMessage("Protocol", "Instructions");
-            ShowInstructions();
+            ShowInstructions(_protocol.Introduction, autoAdvance: false);
         }
         else
         {

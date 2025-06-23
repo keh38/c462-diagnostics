@@ -11,7 +11,15 @@ namespace Protocols
         public string Title { get; set; }
         public string Scene { get; set; }
         public string Settings { get; set; }
+        public string Instructions { get; set; }
+        public bool AutoAdvance { get; set; }
+        public bool HideOutline { get; set; }
 
-        public ProtocolEntry() { }
+        public ProtocolEntry()
+        {
+            AutoAdvance = false;
+            HideOutline = false;
+        }
+
     }
 }
