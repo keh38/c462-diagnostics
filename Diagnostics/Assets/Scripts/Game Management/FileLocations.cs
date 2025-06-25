@@ -62,6 +62,7 @@ public static class FileLocations
             "Plugins",
             "Protocols",
             "Schedules",
+            "Videos",
             "Wav Files"
         };
 

@@ -27,7 +27,7 @@ namespace Turandot.Cues
         [JsonIgnore]
         override public string Name
         {
-            get { return "Image"; }
+            get { return "Video"; }
         }
 
         [JsonIgnore]
