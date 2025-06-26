@@ -103,10 +103,10 @@ namespace Turandot.Scripts
             //}
 
 #endif
-            //if (_useKeyboard && _keyboardValue != KeyCode.None && UnityEngine.Input.GetKeyDown(_keyboardValue))
-            //{
-            //    _value = true;
-            //}
+            if (_layout.KeyCode != KeyCode.None && UnityEngine.Input.GetKeyDown(_layout.KeyCode))
+            {
+                _value = true;
+            }
 
             Data.value = _value;
 

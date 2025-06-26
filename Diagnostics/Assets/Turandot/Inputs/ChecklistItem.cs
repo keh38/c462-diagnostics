@@ -27,6 +27,11 @@ public class ChecklistItem : MonoBehaviour
         return rt.anchoredPosition.x + rt.rect.width;
     }
 
+    public void SetGroup(ToggleGroup group)
+    {
+        _toggle.group = group;
+    }
+
     public void OnToggleClick(bool isPressed)
     {
         OnToggled(isPressed);

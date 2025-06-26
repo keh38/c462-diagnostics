@@ -14,6 +14,10 @@ namespace Turandot.Screen
         public bool RandomizeOrder { get; set; }
         private bool ShouldSerializeRandomizeOrder() { return false; }
 
+        [Category("Behavior")]
+        public float StartPosition { get; set; }
+        private bool ShouldSerializeStartPosition() { return false; }
+
         [Category("Appearance")]
         [DisplayName("Spacing")]
         [Description("Spacing between sliders (pixels)")]
@@ -37,6 +41,12 @@ namespace Turandot.Screen
         [Description("From top of slider to bottom of image (pixels)")]
         public int SliderVerticalOffset { get; set; }
         private bool ShouldSerializeSliderVerticalOffset() { return false; }
+        
+        [Category("Appearance")]
+        [DisplayName("Font size")]
+        [Description("Size of label font")]
+        public float SliderFontSize { get; set; }
+        private bool ShouldSerializeSliderFontSize() { return false; }
 
         [Editor(typeof(ManikinCollectionEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [Category("Sliders")]
@@ -47,10 +57,12 @@ namespace Turandot.Screen
             Name = "Manikins";
             Manikins = new ManikinCollection();
             RandomizeOrder = false;
+            SliderFontSize = 42;
             SliderHeight = 75;
             SliderWidth = 1;
             SliderVerticalOffset = 0;
             SliderSpacing = 50;
+            StartPosition = 0;
         }
 
     }

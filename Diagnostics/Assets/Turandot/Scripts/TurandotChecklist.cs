@@ -11,12 +11,17 @@ namespace Turandot.Scripts
 {
     public class TurandotChecklist : TurandotInput
     {
-        [SerializeField] private Text _label;
+        [SerializeField] private TMPro.TMP_Text _label;
         [SerializeField] private GameObject _checklistItemPrefab;
+        [SerializeField] private GameObject _button;
         [SerializeField] private int _spacing = 50;
+
+        private ToggleGroup _toggleGroup;
 
         private ChecklistLayout _layout;
         private List<ChecklistItem> _items = new List<ChecklistItem>();
+
+        private List<string> _selectedItems = new List<string>();
 
         public override string Name { get { return _layout.Name; } }
         public ButtonData ButtonData { get; private set; }
@@ -26,7 +31,9 @@ namespace Turandot.Scripts
 
         public void Initialize(ChecklistLayout layout)
         {
+            _toggleGroup = GetComponent<ToggleGroup>();
             _layout = layout;
+
             LayoutControl();
             ButtonData = new ButtonData() { name = layout.Name };
         }
@@ -35,7 +42,7 @@ namespace Turandot.Scripts
         {
             _label.text = _layout.Label;
             var labelRT = _label.GetComponent<RectTransform>();
-            float yoffset = -labelRT.rect.height - _spacing;
+            float yoffset = - _spacing;
 
             var myRect = GetComponent<RectTransform>();
 
@@ -47,6 +54,10 @@ namespace Turandot.Scripts
                 var gobj = GameObject.Instantiate(_checklistItemPrefab, myRect);
                 var ci = gobj.GetComponent<ChecklistItem>();
                 ci.SetLabel(item);
+                if (!_layout.AllowMultiple)
+                {
+                    ci.SetGroup(_toggleGroup);
+                }
                 ci.Toggled = OnItemToggled;
                 float itemWidth = ci.GetWidth();
                 _items.Add(ci);
@@ -66,14 +77,50 @@ namespace Turandot.Scripts
 
         private void OnItemToggled(string name, bool isPressed)
         {
-            _result = name;
+            if (isPressed)
+            {
+                _selectedItems.Add(name);
+            }
+            else
+            {
+                _selectedItems.Remove(name);
+            }
+
+            if (!_layout.AllowMultiple)
+            {
+                _toggleGroup.allowSwitchOff = false;
+            }
+
+            if (_layout.AutoAdvance && !_layout.AllowMultiple)
+            {
+                _result = name;
+                ButtonData.value = true;
+            }
+
+            _button.SetActive(_selectedItems.Count > 0);
+        }
+        public void OnButtonClick()
+        {
             ButtonData.value = true;
+
+            _result = "";
+            foreach (var item in _selectedItems)
+            {
+                _result += $"{item};";
+            }
         }
 
         public override void Activate(Inputs.Input input, TurandotAudio audio)
         {
             _result = "";
+            _selectedItems.Clear();
+
+            _toggleGroup.allowSwitchOff = true;
+            _toggleGroup.SetAllTogglesOff();
+
+            _button.SetActive(false);
             ButtonData.value = false;
+
             base.Activate(input, audio);
         }
 

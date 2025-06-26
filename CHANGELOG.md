@@ -1,9 +1,17 @@
 ## Changelog
 
-### v0.11 (unreleased)
+### v0.11 (2025-06-26)
 #### Added
 - option to hide protocol entry from subject-facing outline
 - optional protocol entry instructions
+#### Changed
+- Manikins:
+  - exposed options: text size, start position
+  - made fill transparent
+- Restored key code option to Turandot buttons
+- Checklist:
+  - made "auto advance" optional
+  - made option to allow multiple selections
 
 ---
 

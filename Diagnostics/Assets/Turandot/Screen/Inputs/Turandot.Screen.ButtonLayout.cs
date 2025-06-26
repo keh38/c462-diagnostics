@@ -29,6 +29,10 @@ namespace Turandot.Screen
         public ButtonStyle Style { get; set; }
         private bool ShouldSerializeStyle() { return false; }
 
+        [Category("Behavior")]
+        public KeyCode KeyCode { get; set; }
+        private bool ShouldSerializeKeyCode() { return false; }
+
         public ButtonLayout()
         {
             Name = "Button";
