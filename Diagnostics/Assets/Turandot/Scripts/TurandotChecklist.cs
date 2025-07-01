@@ -40,7 +40,11 @@ namespace Turandot.Scripts
 
         public void LayoutControl()
         {
+            _label.fontSize = _layout.FontSize;
             _label.text = _layout.Label;
+
+            _button.GetComponentInChildren<TMPro.TMP_Text>().fontSize = _layout.FontSize;
+
             var labelRT = _label.GetComponent<RectTransform>();
             float yoffset = - _spacing;
 
@@ -53,7 +57,7 @@ namespace Turandot.Scripts
             {
                 var gobj = GameObject.Instantiate(_checklistItemPrefab, myRect);
                 var ci = gobj.GetComponent<ChecklistItem>();
-                ci.SetLabel(item);
+                ci.SetLabel(item, _layout.FontSize);
                 if (!_layout.AllowMultiple)
                 {
                     ci.SetGroup(_toggleGroup);

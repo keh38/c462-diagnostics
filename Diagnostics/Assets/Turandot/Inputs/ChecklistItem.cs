@@ -14,9 +14,10 @@ public class ChecklistItem : MonoBehaviour
     public ToggledDelegate Toggled;
     private void OnToggled(bool isPressed) { Toggled?.Invoke(_name, isPressed); }
 
-    public void SetLabel(string label)
+    public void SetLabel(string label, int fontSize)
     {
         _name = label;
+        _label.fontSize = fontSize;
         _label.text = label;
     }
 

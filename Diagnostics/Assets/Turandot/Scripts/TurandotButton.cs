@@ -44,6 +44,7 @@ namespace Turandot.Scripts
 
         private void LayoutControl()
         {
+            _label.fontSize = _layout.FontSize;
             _label.text = _layout.Label;
 
             if (_layout.Style == ButtonLayout.ButtonStyle.Circle)

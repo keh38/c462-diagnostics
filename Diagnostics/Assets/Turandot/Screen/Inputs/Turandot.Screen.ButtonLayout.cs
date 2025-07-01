@@ -29,6 +29,10 @@ namespace Turandot.Screen
         public ButtonStyle Style { get; set; }
         private bool ShouldSerializeStyle() { return false; }
 
+        [Category("Appearance")]
+        public int FontSize { get; set; }
+        private bool ShouldSerializeFontSize() { return false; }
+
         [Category("Behavior")]
         public KeyCode KeyCode { get; set; }
         private bool ShouldSerializeKeyCode() { return false; }
@@ -40,6 +44,7 @@ namespace Turandot.Screen
             Width = 300;
             Height = 200;
             Style = ButtonStyle.Rectangle;
+            FontSize = 48;
         }
 
     }

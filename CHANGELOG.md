@@ -1,5 +1,11 @@
 ## Changelog
 
+### v0.12 (unreleased)
+#### Added
+- Turandot: exposed button and checklist font size
+
+---
+
 ### v0.11 (2025-06-26)
 #### Added
 - option to hide protocol entry from subject-facing outline
