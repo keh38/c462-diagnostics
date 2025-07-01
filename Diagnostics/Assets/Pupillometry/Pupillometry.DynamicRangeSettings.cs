@@ -22,13 +22,30 @@ namespace Pupillometry
         public int NumRepetitions { get; set; }
         private bool ShouldSerializeNumRepetitions() { return false; }
 
+        [Category("LED Intensity")]
+        [DisplayName("Min")]
         [Description("Minimum intensity of LEDs if present (0-1)")]
         public float MinLEDIntensity { get; set; }
         private bool ShouldSerializeMinLEDIntensity() { return false; }
 
+        [Category("LED Intensity")]
+        [DisplayName("Max")]
         [Description("Maximum intensity of LEDs if present (0-1)")]
         public float MaxLEDIntensity { get; set; }
         private bool ShouldSerializeMaxLEDIntensity() { return false; }
+
+        [Category("Screen Intensity")]
+        [DisplayName("Min")]
+        [Description("Minimum screen intensity")]
+        public float MinScreenIntensity { get; set; }
+        private bool ShouldSerializeMinScreenIntensity() { return false; }
+
+
+        [Category("Screen Intensity")]
+        [DisplayName("Max")]
+        [Description("Maximum screen intensity")]
+        public float MaxScreenIntensity { get; set; }
+        private bool ShouldSerializeMaxScreenIntensity() { return false; }
 
 
         public DynamicRangeSettings()
@@ -39,6 +56,8 @@ namespace Pupillometry
             NumRepetitions = 4;
             MinLEDIntensity = 0;
             MaxLEDIntensity = 1;
+            MinScreenIntensity = 0;
+            MaxScreenIntensity = 1;
         }
     }
 }

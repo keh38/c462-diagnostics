@@ -92,6 +92,7 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 
         float intensity = 0;
         float ledIntensity = _settings.MinLEDIntensity;
+        float screenIntensity = _settings.MinScreenIntensity;
 
         if (_curTime >= _settings.PrestimulusBaseline && _curTime < _endStimTime)
         {
@@ -102,11 +103,12 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
             }
 
             intensity = 0.5f * (1 - Mathf.Cos(2 * Mathf.PI * (_curTime - _settings.PrestimulusBaseline) * _modRateHz));
+            screenIntensity = intensity * (_settings.MaxScreenIntensity - _settings.MinScreenIntensity) + _settings.MinScreenIntensity;
             ledIntensity = intensity * (_settings.MaxLEDIntensity - _settings.MinLEDIntensity) + _settings.MinLEDIntensity;
         }
 
         _data.Add(Time.realtimeSinceStartupAsDouble, intensity);
-        SetScreenIntensity(intensity);
+        SetScreenIntensity(screenIntensity);
 
         _curTime += Time.deltaTime;
 

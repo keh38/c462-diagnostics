@@ -3,6 +3,7 @@
 ### v0.12 (unreleased)
 #### Added
 - Turandot: exposed button and checklist font size
+- Pupil Dynamic Range: specification of min and max screen intensity
 
 ---
 
