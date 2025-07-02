@@ -1,6 +1,6 @@
 ## Changelog
 
-### v0.12 (unreleased)
+### v0.12 (2025-07-02)
 #### Added
 - Turandot: exposed button and checklist font size
 - Pupil Dynamic Range: specification of min and max screen intensity
