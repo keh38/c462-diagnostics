@@ -43,6 +43,8 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 
     private void OnDisable()
     {
+        Cursor.visible = true;
+
         // Just to be sure--I feel like there are as yet untrapped errors that make it possible to leave
         // the scene without closing the serial port, which leaves things fucked until the Arduino is reset
         if (_useLEDs)
@@ -53,6 +55,8 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 
     void InitializeMeasurement(string data)
     {
+        Cursor.visible = false;
+
         _settings = FileIO.XmlDeserializeFromString<Pupillometry.DynamicRangeSettings>(data);
         _modRateHz = 1.0f / _settings.StimulusPeriod;
 

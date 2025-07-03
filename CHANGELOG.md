@@ -1,5 +1,12 @@
 ## Changelog
 
+### v0.13 (unreleased)
+#### Changed
+- hide cursor during pupil dynamic range test
+- made slider start position manikin-specific
+
+---
+
 ### v0.12 (2025-07-02)
 #### Added
 - Turandot: exposed button and checklist font size

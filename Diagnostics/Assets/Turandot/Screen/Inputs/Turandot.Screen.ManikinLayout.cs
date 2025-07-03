@@ -14,10 +14,6 @@ namespace Turandot.Screen
         public bool RandomizeOrder { get; set; }
         private bool ShouldSerializeRandomizeOrder() { return false; }
 
-        [Category("Behavior")]
-        public float StartPosition { get; set; }
-        private bool ShouldSerializeStartPosition() { return false; }
-
         [Category("Appearance")]
         [DisplayName("Spacing")]
         [Description("Spacing between sliders (pixels)")]
@@ -62,7 +58,6 @@ namespace Turandot.Screen
             SliderWidth = 1;
             SliderVerticalOffset = 0;
             SliderSpacing = 50;
-            StartPosition = 0;
         }
 
     }

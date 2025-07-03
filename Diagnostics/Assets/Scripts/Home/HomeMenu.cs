@@ -45,6 +45,8 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 
     IEnumerator Start()
     {
+        Cursor.visible = true;
+
         Application.runInBackground = true;
 
 #if UNITY_EDITOR

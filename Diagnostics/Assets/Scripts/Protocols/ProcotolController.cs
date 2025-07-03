@@ -26,6 +26,7 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
 
     private void Start()
     {
+        Cursor.visible = true;
         HTS_Server.SetCurrentScene("Protocol", this);
 
         _title.text = "";

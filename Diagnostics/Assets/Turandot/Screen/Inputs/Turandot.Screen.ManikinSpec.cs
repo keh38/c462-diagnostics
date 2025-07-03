@@ -20,12 +20,16 @@ namespace Turandot.Screen
         private bool ShouldSerializeLabel() { return false; }
         public string Image { get; set; }
         private bool ShouldSerializeImage() { return false; }
+        public float StartPosition { get; set; }
+        private bool ShouldSerializeStartPosition() { return false; }
+
 
         public ManikinSpec()
         {
             Name = "Manikin";
             Label = "Label";
             Image = "Image";
+            StartPosition = 0.5f;
         }
     }
 

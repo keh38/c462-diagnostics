@@ -35,7 +35,7 @@ namespace Turandot.Scripts
             _label.text = manikinSpec.Label;
             _label.fontSize = layout.SliderFontSize;
 
-            _startPosition = layout.StartPosition;
+            _startPosition = manikinSpec.StartPosition;
 
             var imageRT = _image.gameObject.GetComponent<RectTransform>();
             var imageBottom = imageRT.anchoredPosition.y;
