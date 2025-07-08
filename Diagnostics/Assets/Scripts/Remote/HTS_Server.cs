@@ -181,6 +181,7 @@ public class HTS_Server : MonoBehaviour
                 _listener.SendAcknowledgement();
                 KLogger.Log.FlushLog();
                 GameManager.DataForNextScene = "";
+                Debug.Log($"changing scene to {data}...");
                 _currentScene.ChangeScene(data);
                 break;
 

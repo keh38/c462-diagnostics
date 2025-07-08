@@ -1,6 +1,6 @@
 ## Changelog
 
-### v0.13 (unreleased)
+### v0.13 (2025-07-08)
 #### Changed
 - hide cursor during pupil dynamic range test
 - made slider start position manikin-specific
