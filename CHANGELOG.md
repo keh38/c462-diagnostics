@@ -4,6 +4,8 @@
 #### Changed
 - hide cursor during pupil dynamic range test
 - made slider start position manikin-specific
+#### Fixed 
+- Turandot: now applies checklist position
 
 ---
 

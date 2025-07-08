@@ -77,6 +77,8 @@ namespace Turandot.Scripts
                 width = Mathf.Max(width, itemWidth);
             }
             myRect.sizeDelta = new Vector2(width, -yoffset);
+            myRect.anchorMin = new Vector2(_layout.X, _layout.Y);
+            myRect.anchorMax = new Vector2(_layout.X, _layout.Y);
         }
 
         private void OnItemToggled(string name, bool isPressed)
