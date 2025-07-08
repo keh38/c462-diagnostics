@@ -63,6 +63,8 @@ namespace Turandot.Scripts
 
             var myRT = GetComponent<RectTransform>();
             myRT.sizeDelta = new Vector2(myWidth, myHeight);
+            myRT.anchorMin = new Vector2(_layout.X, _layout.Y);
+            myRT.anchorMax = new Vector2(_layout.X, _layout.Y);
         }
 
         override public void Activate(Input input, TurandotAudio audio)

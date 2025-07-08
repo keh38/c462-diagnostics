@@ -100,20 +100,28 @@ namespace Turandot.Scripts
             if (_layout.AutoAdvance && !_layout.AllowMultiple)
             {
                 _result = name;
-                ButtonData.value = true;
+                OnButtonClick();
+                //ButtonData.value = true;
             }
-
-            _button.SetActive(_selectedItems.Count > 0);
+            else
+            {
+                _button.SetActive(_selectedItems.Count > 0);
+            }
         }
         public void OnButtonClick()
         {
             ButtonData.value = true;
 
-            _result = "";
-            foreach (var item in _selectedItems)
+            _result = $"{Name}=\"";
+            for (int k=0; k<_selectedItems.Count; k++)
             {
-                _result += $"{item};";
+                _result += $"{_selectedItems[k]}";
+                if (k < _selectedItems.Count - 1)
+                {
+                    _result += ",";
+                }
             }
+            _result += "\";";
         }
 
         public override void Activate(Inputs.Input input, TurandotAudio audio)

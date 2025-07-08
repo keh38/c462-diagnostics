@@ -1,5 +1,13 @@
 ## Changelog
 
+### v0.13.1 (2025-07-08)
+#### Fixed
+- apply position to manikin panel
+- correctly hide checklist's apply button when specified
+- made checklist result into valid JSON
+
+---
+
 ### v0.13 (2025-07-08)
 #### Changed
 - hide cursor during pupil dynamic range test
