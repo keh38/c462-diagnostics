@@ -94,7 +94,7 @@ namespace Turandot.Scripts
 
             if (!_layout.AllowMultiple)
             {
-                _toggleGroup.allowSwitchOff = false;
+                _toggleGroup.allowSwitchOff = _layout.AllowNone;
             }
 
             if (_layout.AutoAdvance && !_layout.AllowMultiple)
@@ -126,7 +126,8 @@ namespace Turandot.Scripts
 
         public override void Activate(Inputs.Input input, TurandotAudio audio)
         {
-            _result = "";
+            _result = $"{Name}=\"\"";
+
             _selectedItems.Clear();
 
             _toggleGroup.allowSwitchOff = true;

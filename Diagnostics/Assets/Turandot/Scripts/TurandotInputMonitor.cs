@@ -87,6 +87,7 @@ namespace Turandot.Scripts
             _buttonData = new List<ButtonData>();
             
             var canvasRT = GameObject.Find("Canvas").GetComponent<RectTransform>();
+            
             foreach (var layout in inputLayouts)
             {
                 if (layout is ButtonLayout)
@@ -126,6 +127,7 @@ namespace Turandot.Scripts
                     _buttonData.Add(i.ButtonData);
                 }
             }
+
             _log.Initialize(_buttonData.Select(b => b.name).ToArray(), inputEvents.Select(ie => ie.name).ToArray());
             _controlValues = new int[_buttonData.Count];
 

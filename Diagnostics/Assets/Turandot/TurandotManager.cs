@@ -80,7 +80,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 #if HACKING
         Application.targetFrameRate = 60;
         GameManager.SetSubject("Scratch/_shit");
-        string configName = "CheckList";
+        string configName = "TestNewManikins";
         //DiagnosticsManager.Instance.MakeExtracurricular("Turandot", "Turandot." + configName);
 #else
         string configName = GameManager.DataForNextScene;
@@ -1019,13 +1019,13 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             case "Abort":
                 RpcAbort();
                 break;
-            case "SendSyncLog":
-                var logPath = HardwareInterface.ClockSync.LogFile;
-                if (!string.IsNullOrEmpty(logPath))
-                {
-                    HTS_Server.SendMessage("Turandot", $"ReceiveData:{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
-                }
-                break;
+            //case "SendSyncLog":
+            //    var logPath = HardwareInterface.ClockSync.LogFile;
+            //    if (!string.IsNullOrEmpty(logPath))
+            //    {
+            //        HTS_Server.SendMessage("Turandot", $"ReceiveData:{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
+            //    }
+            //    break;
         }
     }
 

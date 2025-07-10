@@ -41,6 +41,7 @@ namespace Turandot.Scripts
             float myHeight = 0;
             float yoffset = 0;
             int index = 0;
+
             foreach (var item in _layout.Manikins)
             {
                 var manikinSpec = item as ManikinSpec;

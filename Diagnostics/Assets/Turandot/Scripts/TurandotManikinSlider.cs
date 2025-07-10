@@ -44,7 +44,6 @@ namespace Turandot.Scripts
             if (!string.IsNullOrEmpty(manikinSpec.Image))
             {
                 string imagePath = Path.Combine(FileLocations.LocalResourceFolder("Images"), manikinSpec.Image);
-                Debug.Log(imagePath);
 
                 var texture = new Texture2D(10, 10);
                 texture.LoadImage(File.ReadAllBytes(imagePath));

@@ -244,6 +244,18 @@ public class HTS_Server : MonoBehaviour
                 _listener.WriteStringAsByteArray($"{Path.GetFileName(KLogger.LogPath)}:{File.ReadAllText(KLogger.LogPath)}");
                 break;
 
+            case "GetSyncLog":
+                var logPath = HardwareInterface.ClockSync.LogFile;
+                if (!string.IsNullOrEmpty(logPath))
+                {
+                    _listener.WriteStringAsByteArray($"{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
+                }
+                else
+                {
+                    _listener.WriteStringAsByteArray("none");
+                }
+                break;
+
             case "GetScreenSize":
                 _listener.WriteStringAsByteArray($"{Screen.width},{Screen.height}");
                 break;

@@ -1,5 +1,12 @@
 ## Changelog
 
+### v0.14 (unreleased)
+#### Changed
+- Server sends audio sync log in response to request to avoid race condition in Turandot where scene change prevented controller from receiving it
+- Protocol: added click to continue prompt
+
+---
+
 ### v0.13.1 (2025-07-08)
 #### Fixed
 - apply position to manikin panel

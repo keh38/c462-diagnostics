@@ -147,6 +147,11 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
             }
         }
 
+        if (selected > -1)
+        {
+            text += "\n\n<i>Click to continue</i>";
+        }
+
         _outline.text = text;
         _outline.gameObject.SetActive(true);
     }

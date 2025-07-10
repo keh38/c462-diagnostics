@@ -365,7 +365,6 @@ public class TurandotEngine : MonoBehaviour
 
     string ExpandResult(string previous, string result)
     {
-        Debug.Log($"previous = {previous}, result = {result}");
         string expanded = result;
         if (!expanded.Contains("=") && !expanded.Contains("{")) expanded = "outcome=\"" + result + "\";";
 
@@ -375,7 +374,6 @@ public class TurandotEngine : MonoBehaviour
             if (_inputMonitor.Contains(match))
             {
                 expanded = expanded.Replace($"{{{match}}}", _inputMonitor.ExpandResult(match));
-                Debug.Log($"expanded = {expanded}");
             }
         }
 

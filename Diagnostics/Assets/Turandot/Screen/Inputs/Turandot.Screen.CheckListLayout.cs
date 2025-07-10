@@ -23,6 +23,12 @@ namespace Turandot.Screen
         private bool ShouldSerializeAutoAdvance() { return false; }
 
         [Category("Behavior")]
+        [Description("If true, allow no selection")]
+        [DisplayName("Allow none")]
+        public bool AllowNone { get; set; }
+        private bool ShouldSerializeAllowNone() { return false; }
+
+        [Category("Behavior")]
         [Description("If true, allow multiple selections")]
         [DisplayName("Allow multiple")]
         public bool AllowMultiple { get; set; }
@@ -42,6 +48,9 @@ namespace Turandot.Screen
             Label = "Select one";
             FontSize = 48;
             Items = new BindingList<string>();
+            AllowMultiple = false;
+            AllowNone = false;
+            AutoAdvance = false;
         }
 
     }
