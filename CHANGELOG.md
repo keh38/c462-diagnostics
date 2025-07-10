@@ -1,6 +1,6 @@
 ## Changelog
 
-### v0.14 (unreleased)
+### v0.14 (2025-07-10)
 #### Changed
 - Server sends audio sync log in response to request to avoid race condition in Turandot where scene change prevented controller from receiving it
 - Protocol: added click to continue prompt
