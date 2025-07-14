@@ -1,5 +1,11 @@
 ## Changelog
 
+### v0.14.1 (2025-07-14)
+#### Fixed
+- Intercom: play audio source when talk started, to ensure it is running
+
+---
+
 ### v0.14 (2025-07-10)
 #### Changed
 - Server sends audio sync log in response to request to avoid race condition in Turandot where scene change prevented controller from receiving it

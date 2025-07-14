@@ -153,6 +153,9 @@ public class IntercomReceiver : MonoBehaviour
 
     private void Talk()
     {
+        Debug.Log("Intercom: talk started");
+        _audioSource.Play();
+
         while (true)
         {
             try
@@ -161,7 +164,7 @@ public class IntercomReceiver : MonoBehaviour
 
                 if (data == null || data.Length == 4)
                 {
-                    Debug.Log("done");
+                    Debug.Log("Intercom: talk finished");
                     break;
                 }
 
