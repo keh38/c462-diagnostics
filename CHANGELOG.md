@@ -1,5 +1,11 @@
 ## Changelog
 
+### v0.15 (unreleased)
+#### added
+- Protocol: exposed control of list and instruction font sizes
+
+---
+
 ### v0.14.1 (2025-07-14)
 #### Fixed
 - Intercom: play audio source when talk started, to ensure it is running

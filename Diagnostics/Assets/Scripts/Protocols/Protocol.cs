@@ -7,11 +7,15 @@ namespace Protocols
     public class Protocol
     {
         public string Title { get; set; }
+        public Appearance Appearance { get; set; }
         public string Introduction { get; set; }
 
         public List<ProtocolEntry> Tests { get; set; }
 
-        public Protocol() { }
+        public Protocol()
+        {
+            Appearance = new Appearance();
+        }
 
     }
 

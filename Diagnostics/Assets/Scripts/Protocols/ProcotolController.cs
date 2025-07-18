@@ -52,7 +52,10 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
 
             if (!string.IsNullOrEmpty(_protocol.Tests[_nextTestIndex].Instructions))
             {
-                ShowInstructions(_protocol.Tests[_nextTestIndex].Instructions, autoAdvance: true);
+                ShowInstructions(
+                    _protocol.Tests[_nextTestIndex].Instructions, 
+                    fontSize: _protocol.Appearance.InstructionFontSize,
+                    autoAdvance: true);
             }
             else
             {
@@ -87,12 +90,12 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
         _waitingForResponse = true;
     }
 
-    private void ShowInstructions(string instructions, bool autoAdvance)
+    private void ShowInstructions(string instructions, int fontSize, bool autoAdvance)
     {
         _advanceAfterInstructions = autoAdvance;
         _instructionPanel.gameObject.SetActive(true);
         _instructionPanel.InstructionsFinished = OnInstructionsFinished;
-        _instructionPanel.ShowInstructions(new Turandot.Instructions() { Text = instructions });
+        _instructionPanel.ShowInstructions(new Turandot.Instructions() { Text = instructions, FontSize = fontSize });
     }
     private void OnInstructionsFinished()
     {
@@ -176,6 +179,7 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
     {
         _protocol = KLib.FileIO.XmlDeserializeFromString<Protocol>(data);
         _title.text = _protocol.Title;
+        _outline.fontSize = _protocol.Appearance.ListFontSize;
     }
 
     private void RpcSetHistory(string data)
@@ -189,7 +193,10 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
         if (testIndex == 0 && !string.IsNullOrEmpty(_protocol.Introduction))
         {
             HTS_Server.SendMessage("Protocol", "Instructions");
-            ShowInstructions(_protocol.Introduction, autoAdvance: false);
+            ShowInstructions(
+                _protocol.Introduction, 
+                fontSize: _protocol.Appearance.InstructionFontSize,
+                autoAdvance: false);
         }
         else
         {

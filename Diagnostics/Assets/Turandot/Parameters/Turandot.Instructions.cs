@@ -13,5 +13,11 @@ namespace Turandot
     public class Instructions
     {
         public string Text { get; set; }
+        public int FontSize { get; set; }
+
+        public Instructions()
+        {
+            FontSize = 48;
+        }
     }
 }
