@@ -19,7 +19,8 @@ namespace Turandot.Scripts
         [SerializeField] private Slider _slider;
         [SerializeField] private GameObject _thumb;
 
-        private float _startPosition = 0;
+        private ManikinSpec _manikinSpec;
+
 
         public bool Moved { get; private set; }
 
@@ -35,7 +36,7 @@ namespace Turandot.Scripts
             _label.text = manikinSpec.Label;
             _label.fontSize = layout.SliderFontSize;
 
-            _startPosition = manikinSpec.StartPosition;
+            _manikinSpec = manikinSpec;
 
             var imageRT = _image.gameObject.GetComponent<RectTransform>();
             var imageBottom = imageRT.anchoredPosition.y;
@@ -100,7 +101,15 @@ namespace Turandot.Scripts
 
         public void Reset()
         {
-            _slider.value = _startPosition;
+            if (_manikinSpec.RandomizeStartPosition)
+            {
+                _slider.value = Random.Range(_manikinSpec.MinStartPosition, _manikinSpec.MaxStartPosition);
+            }
+            else
+            {
+                _slider.value = _manikinSpec.StartPosition;
+            }
+
             //_thumb.SetActive(false);
             Moved = false;
         }

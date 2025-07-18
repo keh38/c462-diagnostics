@@ -15,13 +15,33 @@ namespace Turandot.Screen
     public class ManikinSpec
     {
         public string Name { get; set; }
+
+        [Category("Appearance")]
         private bool ShouldSerializeName() { return false; }
+
+        [Category("Appearance")]
         public string Label { get; set; }
         private bool ShouldSerializeLabel() { return false; }
+
+        [Category("Appearance")]
         public string Image { get; set; }
         private bool ShouldSerializeImage() { return false; }
+
+        [Category("Behavior")]
         public float StartPosition { get; set; }
         private bool ShouldSerializeStartPosition() { return false; }
+
+        [Category("Behavior")]
+        public bool RandomizeStartPosition { get; set; }
+        private bool ShouldSerializeRandomizeStartPosition() { return false; }
+
+        [Category("Behavior")]
+        public float MinStartPosition { get; set; } 
+        private bool ShouldSerializeMinStartPosition() { return false; }
+
+        [Category("Behavior")]
+        public float MaxStartPosition { get; set; }
+        private bool ShouldSerializeMaxStartPosition() { return false; }
 
 
         public ManikinSpec()
@@ -29,7 +49,11 @@ namespace Turandot.Screen
             Name = "Manikin";
             Label = "Label";
             Image = "Image";
+
             StartPosition = 0.5f;
+            RandomizeStartPosition = false;
+            MinStartPosition = 0;
+            MaxStartPosition = 1;
         }
     }
 
