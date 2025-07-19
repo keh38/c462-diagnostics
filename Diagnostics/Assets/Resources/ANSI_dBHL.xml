@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ANSI_dBHL>
+	<Freq_Hz>
+		<float>125</float>
+		<float>250</float>
+		<float>500</float>
+		<float>750</float>
+		<float>1000</float>
+		<float>1500</float>
+		<float>2000</float>
+		<float>3000</float>
+		<float>4000</float>
+		<float>5000</float>
+		<float>6000</float>
+		<float>8000</float>
+		<float>9000</float>
+		<float>10000</float>
+		<float>11200</float>
+		<float>12500</float>
+		<float>14000</float>
+		<float>16000</float> 
+	</Freq_Hz>
+	<dBSPL>
+		<float>30.5</float>
+		<float>18</float>
+		<float>11</float>
+		<float>6</float>
+		<float>5.5</float>
+		<float>5.5</float>
+		<float>4.5</float>
+		<float>2.5</float>
+		<float>9.5</float>
+		<float>14</float>
+		<float>17</float>
+		<float>17.5</float>
+		<float>19</float>
+		<float>22</float>
+		<float>23</float>
+		<float>27.5</float>
+		<float>35</float>
+		<float>56</float> 
+	</dBSPL>
+</ANSI_dBHL>

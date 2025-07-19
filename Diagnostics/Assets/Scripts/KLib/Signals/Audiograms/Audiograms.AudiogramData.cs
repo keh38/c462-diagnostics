@@ -35,6 +35,12 @@ namespace Audiograms
             audiograms.Find(a => a.ear == Ear.Right).Append(Frequency_Hz);
         }
 
+        public void Set(KLib.Signals.Laterality laterality, float Frequency_Hz, float ThresholdHL, float ThresholdSPL)
+        {
+            var ear = (laterality == Laterality.Left) ? Ear.Left : Ear.Right;
+            Set(ear, Frequency_Hz, ThresholdHL, ThresholdSPL);
+        }
+
         public void Set(Ear ear, float Frequency_Hz, float ThresholdHL, float ThresholdSPL)
         {
             audiograms.Find(a => a.ear == ear).Set(Frequency_Hz, ThresholdHL, ThresholdSPL);
@@ -147,9 +153,7 @@ namespace Audiograms
 
         public void Save()
         {
-#if FIXME
-            Save(DataFileLocations.AudiogramPath);
-#endif
+            Save(FileLocations.AudiogramPath);
         }
 
         public void Save(string path)

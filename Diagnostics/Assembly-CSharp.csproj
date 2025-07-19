@@ -61,6 +61,7 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.47f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Basic\Audiogram\Audiograms.ProcedureData.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotKeypadButton.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.ScalarData.cs" />
     <Compile Include="Assets\Turandot\Data\Turandot.HistoryEvent.cs" />
@@ -137,11 +138,13 @@
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptStepMode.cs" />
     <Compile Include="Assets\Turandot\Screen\Cues\Turandot.Screen.CueLayout.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotProgressBarCue.cs" />
+    <Compile Include="Assets\Basic\BasicMeasurementFileHeader.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.Adaptation.cs" />
     <Compile Include="Assets\Pupillometry\Pupillometry.DynamicRangeData.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotInput.cs" />
     <Compile Include="Assets\Pupillometry\GazeCalibration.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.Script.cs" />
+    <Compile Include="Assets\Templates\BasicMeasurementController.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\FilterSpec.cs" />
     <Compile Include="Assets\Scripts\Hardware\HardwareInterface.cs" />
     <Compile Include="Assets\Turandot\Screen\Turandot.Screen.Counter.cs" />
@@ -212,6 +215,7 @@
     <Compile Include="Assets\Turandot\Scripts\TurandotThumbSlider.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.Mode.cs" />
     <Compile Include="Assets\Scripts\Home\PupilPanel.cs" />
+    <Compile Include="Assets\Basic\Audiogram\Audiograms.TrackData.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.ScaleReference.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotTickMark.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptSwitchType.cs" />
@@ -230,6 +234,7 @@
     <Compile Include="Assets\Scripts\Home\HomeMenu.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptiveTrack.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.Family.cs" />
+    <Compile Include="Assets\Prefabs\QuestionBox.cs" />
     <Compile Include="Assets\Turandot\Interactive\UDPPacket.cs" />
     <Compile Include="Assets\Turandot\Cues\Turandot.Cues.FixationPointAction.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Calibration\DeviceCorrections.cs" />
@@ -279,6 +284,7 @@
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.Comparison.cs" />
     <Compile Include="Assets\Turandot\Parameters\Turandot.Timeout.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\MenuBarControl.cs" />
+    <Compile Include="Assets\Basic\Audiogram\Audiograms.MeasurementState.cs" />
     <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.CheckListLayout.cs" />
     <Compile Include="Assets\Prefabs\ParameterSlider.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.Schedule.cs" />
@@ -317,6 +323,7 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile-2-Pass.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
+    <None Include="Assets\Resources\ANSI_dBHL.xml" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\SDFFunctions.hlsl" />

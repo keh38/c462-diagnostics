@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FancyTextRendering", "FancyTextRendering.csproj", "{9E229217-E932-6A77-3737-72B06B3CC853}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaughtyAttributes.Editor", "NaughtyAttributes.Editor.csproj", "{FF32F255-2795-89A6-6BA5-F834185A2FEB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{9388186E-F6E0-BD88-752C-73FA64CC05E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaughtyAttributes.Editor", "NaughtyAttributes.Editor.csproj", "{FF32F255-2795-89A6-6BA5-F834185A2FEB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaughtyAttributes.Test", "NaughtyAttributes.Test.csproj", "{9DB34F13-5CB8-4583-C4A5-34B27589BCFC}"
 EndProject
@@ -27,14 +27,14 @@ Global
 		{9E229217-E932-6A77-3737-72B06B3CC853}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E229217-E932-6A77-3737-72B06B3CC853}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E229217-E932-6A77-3737-72B06B3CC853}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FF32F255-2795-89A6-6BA5-F834185A2FEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FF32F255-2795-89A6-6BA5-F834185A2FEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FF32F255-2795-89A6-6BA5-F834185A2FEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FF32F255-2795-89A6-6BA5-F834185A2FEB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9388186E-F6E0-BD88-752C-73FA64CC05E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9388186E-F6E0-BD88-752C-73FA64CC05E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9388186E-F6E0-BD88-752C-73FA64CC05E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9388186E-F6E0-BD88-752C-73FA64CC05E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF32F255-2795-89A6-6BA5-F834185A2FEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF32F255-2795-89A6-6BA5-F834185A2FEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF32F255-2795-89A6-6BA5-F834185A2FEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF32F255-2795-89A6-6BA5-F834185A2FEB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9DB34F13-5CB8-4583-C4A5-34B27589BCFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9DB34F13-5CB8-4583-C4A5-34B27589BCFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DB34F13-5CB8-4583-C4A5-34B27589BCFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
