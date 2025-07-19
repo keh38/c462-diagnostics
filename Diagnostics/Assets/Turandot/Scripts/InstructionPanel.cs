@@ -28,7 +28,10 @@ public class InstructionPanel : MonoBehaviour
 
         _markdownRenderer.TextMesh.fontSize = instructions.FontSize;
 
-        _pages = _instructions.Text.Split(new string[] { "[br]\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+        _pages = _instructions.Text
+            .Replace("\r", "")
+            .Split(new string[] { "[br]\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+        
         ShowPage(_pageIndex);
         UpdateContinueButtonLabel();
     }

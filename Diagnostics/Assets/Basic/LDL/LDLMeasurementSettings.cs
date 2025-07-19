@@ -34,11 +34,10 @@ namespace LDL
 
         public List<string> instructions = null;
 
-        public LDLMeasurementSettings()
+        public LDLMeasurementSettings() : base()
         {
             //Laterality = Laterality.Diotic;
             //Units = LevelUnits.dB_SL;
-            Name = "LDL";
             Merge = true;
             Ramp = 5f;
             ToneDuration = 200;

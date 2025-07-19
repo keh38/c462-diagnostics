@@ -7,6 +7,10 @@ namespace Audiograms
 
     public class AudiogramMeasurementSettings : BasicMeasurementConfiguration
     {
+        [Category("Appearance")]
+        public string Title { get; set; }
+        private bool ShouldSerializeTitle() { return false; }
+
         [Category("Sequence")]
         [Description("Minimum interval between test stimuli (s)")]
         [DisplayName("Min ISI")]
@@ -76,9 +80,10 @@ namespace Audiograms
         [Category("Sequence")]
         [Description("If false, level is tracked in dB HL")]
         public bool TrackInSPL = false;
-        public AudiogramMeasurementSettings()
+        public AudiogramMeasurementSettings() : base()
         {
-            Name = "Defaults";
+            Title = "The Softest Sound";
+
             TestEar = TestEar.Both;
             TestFrequencies = new float[] { 750, 1000, 1500, 2000, 3000, 4000, 8000, 125, 250, 500 };
     

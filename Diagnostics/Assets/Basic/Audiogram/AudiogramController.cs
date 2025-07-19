@@ -8,32 +8,39 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class AudiogramController : MonoBehaviour, IRemoteControllable
 {
+    [SerializeField] private InputActionAsset _actions;
     [SerializeField] private TMPro.TMP_Text _title;
     [SerializeField] private InstructionPanel _instructionPanel;
+    [SerializeField] private TextAsset _defaultInstructions;
     [SerializeField] private Text _finishText;
     [SerializeField] private GameObject _finishPanel;
     [SerializeField] private GameObject _quitPanel;
     [SerializeField] private GameObject _workPanel;
 
-    private Protocol _protocol;
-    private ProtocolHistory _history;
-
     private bool _isRemote;
-    private int _nextTestIndex;
-    private bool _advanceAfterInstructions = false;
 
-    private bool _waitingForResponse = false;
     private bool _stopMeasurement = false;
+    private bool _localAbort = false;
 
     private AudiogramMeasurementSettings _settings = new AudiogramMeasurementSettings();
 
     private string _dataPath;
     private string _mySceneName = "Audiogram";
+
+    private InputAction _abortAction;
+
+    private void Awake()
+    {
+        _abortAction = _actions.FindAction("Abort");
+        _abortAction.Enable();
+        _abortAction.performed += OnAbortAction;
+    }
 
     private void Start()
     {
@@ -52,15 +59,12 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
     }
     void InitializeMeasurement(string data)
     {
-        Cursor.visible = false;
-
         _settings = FileIO.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as AudiogramMeasurementSettings;
+        _title.text = _settings.Title;
 
         InitDataFile();
 
         HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
-
-        _workPanel.SetActive(false);
     }
 
     void InitDataFile()
@@ -80,15 +84,6 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         //    var header = new Turandot.FileHeader();
         //    header.Initialize(_mainDataFile, _paramFile);
         //    header.audioSamplingRate = AudioSettings.outputSampleRate;
-        //    AudioSettings.GetDSPBufferSize(out header.audioBufferLength, out header.audioNumBuffers);
-        //    if (_params.screen.ApplyCustomScreenColor)
-        //    {
-        //        header.screenColor = GameManager.ScreenColorString;
-        //        if (HardwareInterface.LED.IsInitialized)
-        //        {
-        //            header.ledColor = GameManager.LEDColorString;
-        //        }
-        //    }
 
         string json = KLib.FileIO.JSONStringAdd("", "params", KLib.FileIO.JSONSerializeToString(_settings));
         json += Environment.NewLine;
@@ -99,85 +94,87 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         //    _state.SetDataFile(_mainDataFile);
     }
 
+    private void Begin()
+    {
+        _localAbort = true;
+        _stopMeasurement = false;
+
+        if (_settings.UseDefaultInstructions || !string.IsNullOrEmpty(_settings.InstructionMarkdown))
+        {
+            if (_settings.UseDefaultInstructions)
+            {
+                _settings.InstructionMarkdown = _defaultInstructions.text;
+            }
+
+            HTS_Server.SendMessage(_mySceneName, "Status:Instructions");
+            ShowInstructions(
+                instructions: _settings.InstructionMarkdown,
+                fontSize: _settings.InstructionFontSize);
+        }
+        else
+        {
+            StartMeasurement();
+        }
+
+    }
+
+    private void StartMeasurement()
+    {
+        _instructionPanel.gameObject.SetActive(false);
+        _workPanel.SetActive(true);
+    }
+
+    void OnAbortAction(InputAction.CallbackContext context)
+    {
+        _abortAction.Disable();
+
+        _workPanel.SetActive(false);
+        _instructionPanel.gameObject.SetActive(false);
+        _quitPanel.SetActive(true);
+    }
 
     void Update()
     {
         if (_stopMeasurement)
         {
+            _abortAction.Disable();
             _stopMeasurement = false;
             EndRun(abort: true);
-        }
-
-        if (!_waitingForResponse) return;
-
-        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
-        {
-            _waitingForResponse = false;
-
-            if (!string.IsNullOrEmpty(_protocol.Tests[_nextTestIndex].Instructions))
-            {
-                ShowInstructions(
-                    _protocol.Tests[_nextTestIndex].Instructions, 
-                    fontSize: _protocol.Appearance.InstructionFontSize,
-                    autoAdvance: true);
-            }
-            else
-            {
-                HTS_Server.SendMessage("Protocol", "Advance");
-            }
-        }
-    }
-
-    void OnGUI()
-    {
-        if (!_waitingForResponse) return;
-
-        Event e = Event.current;
-        if (e.control && e.keyCode == KeyCode.A)
-        {
-            _waitingForResponse = false;
-            _quitPanel.SetActive(true);
         }
     }
 
     public void OnQuitConfirmButtonClick()
     {
-        SceneManager.LoadScene("Home");
+        _localAbort = true;
+        _stopMeasurement = true;
     }
 
     public void OnQuitCancelButtonClick()
     {
         _quitPanel.SetActive(false);
-        _waitingForResponse = true;
+        _abortAction.Enable();
     }
 
-    private void ShowInstructions(string instructions, int fontSize, bool autoAdvance)
+    private void ShowInstructions(string instructions, int fontSize)
     {
-        _advanceAfterInstructions = autoAdvance;
         _instructionPanel.gameObject.SetActive(true);
-        _instructionPanel.InstructionsFinished = OnInstructionsFinished;
+        _instructionPanel.InstructionsFinished = StartMeasurement;
         _instructionPanel.ShowInstructions(new Turandot.Instructions() { Text = instructions, FontSize = fontSize });
-    }
-    private void OnInstructionsFinished()
-    {
-        _instructionPanel.gameObject.SetActive(false);
-        if (_advanceAfterInstructions)
-        {
-            HTS_Server.SendMessage("Protocol", "Advance");
-        }
-        else
-        {
-//            StartCoroutine(AnimateOutline());
-        }
     }
 
     private void EndRun(bool abort)
     {
+        _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(false);
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
         HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
         HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+
+        if (_localAbort)
+        {
+            SceneManager.LoadScene("Home");
+        }
 
         bool finished = true;
         if (finished && !_isRemote)
@@ -202,25 +199,6 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         SceneManager.LoadScene("Home");
     }
 
-    private void RpcBegin()
-    {
-        _stopMeasurement = false;
-        _workPanel.SetActive(true);
-        return;
-
-        if (!string.IsNullOrEmpty(_protocol.Introduction))
-        {
-            HTS_Server.SendMessage("Protocol", "Instructions");
-            ShowInstructions(
-                _protocol.Introduction, 
-                fontSize: _protocol.Appearance.InstructionFontSize,
-                autoAdvance: false);
-        }
-        else
-        {
-//            StartCoroutine(AnimateOutline());
-        }
-    }
 
     void IRemoteControllable.ProcessRPC(string command, string data)
     {
@@ -236,7 +214,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
                 HardwareInterface.ClockSync.StopSynchronizing();
                 break;
             case "Begin":
-                RpcBegin();
+                Begin();
                 break;
             case "Abort":
                 _stopMeasurement = true;
