@@ -64,19 +64,18 @@ namespace Turandot.Scripts
                 }
                 ci.Toggled = OnItemToggled;
                 float itemWidth = ci.GetWidth();
+
                 _items.Add(ci);
 
                 var rt = gobj.GetComponent<RectTransform>();
                 LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
 
                 rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, yoffset);
-                rt.anchorMin = new Vector2(0, rt.anchorMin.y);
-                rt.anchorMax = new Vector2(0, rt.anchorMax.y);
 
-                yoffset -= rt.rect.height + _spacing;
+                yoffset -= ci.GetHeight() + _spacing;
                 width = Mathf.Max(width, itemWidth);
             }
-            myRect.sizeDelta = new Vector2(width, -yoffset);
+            myRect.sizeDelta = new Vector2(width+500, -yoffset);
             myRect.anchorMin = new Vector2(_layout.X, _layout.Y);
             myRect.anchorMax = new Vector2(_layout.X, _layout.Y);
         }

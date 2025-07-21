@@ -32,6 +32,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Basic/LDL/LDL.unity
     guid: 08bf91bf9266e264998861dd18513e9e
+  - enabled: 1
+    path: Assets/Basic/Questionnaires/Questionnaire.unity
+    guid: 501d3848a6a14a341b2b8961b4a15590
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 28be48df767d2434681ec999065f06dc, type: 3}
   m_UseUCBPForAssetBundles: 0

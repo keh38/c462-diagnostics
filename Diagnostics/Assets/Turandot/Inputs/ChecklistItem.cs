@@ -28,6 +28,13 @@ public class ChecklistItem : MonoBehaviour
         return rt.anchoredPosition.x + rt.rect.width;
     }
 
+    public float GetHeight()
+    {
+        var rt = _label.GetComponent<RectTransform>();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
+        return rt.anchoredPosition.y + rt.rect.height;
+    }
+
     public void SetGroup(ToggleGroup group)
     {
         _toggle.group = group;
@@ -36,6 +43,11 @@ public class ChecklistItem : MonoBehaviour
     public void OnToggleClick(bool isPressed)
     {
         OnToggled(isPressed);
+    }
+
+    public void SetValue(bool value)
+    {
+        _toggle.isOn = value;
     }
 
     public void Clear()
