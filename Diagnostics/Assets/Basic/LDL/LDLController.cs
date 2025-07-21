@@ -32,7 +32,6 @@ public class LDLController : MonoBehaviour, IRemoteControllable
 
     private bool _isRemote;
 
-    private bool _stopMeasurement = false;
     private bool _localAbort = false;
 
     private LDLMeasurementSettings _settings = new LDLMeasurementSettings();
@@ -44,7 +43,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
     private string _stateFile;
     private MeasurementState _state;
 
-    private List<int> _curGroup = new List<int>();
+    private List<TestCondition> _curGroup = new List<TestCondition>();
     private LoudnessDiscomfortData _data = new LoudnessDiscomfortData();
 
     private InputAction _abortAction;
@@ -58,6 +57,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         _abortAction.performed += OnAbortAction;
 
         _sliderPanel = _workPanel.GetComponent<LDLSliderPanel>();
+        _sliderPanel.LockInPressed += OnLockIn;
     }
 
     private void Start()
@@ -93,24 +93,23 @@ public class LDLController : MonoBehaviour, IRemoteControllable
 
     void InitializeMeasurement()
     {
+        _title.text = _settings.Title;
+
         InitDataFile();
 
         _stateFile = Path.Combine(FileLocations.SubjectFolder, $"{_mySceneName}.bin");
 
-        //AudiogramData extantData = AudiogramData.Load();
-        //if (_settings.Merge && extantData != null)
-        //{
-        //    _data.audiogramData = extantData;
-        //    _data.audiogramData.Append(_settings.TestFrequencies);
-        //}
-        //else
-        //{
-        //    _data.audiogramData.Initialize(_settings.TestFrequencies);
-        //}
+        // Need to delete the existing LDL, otherwise it will be loaded and used to constrain the 
+        // max output level, making it impossible ever to exceed the original LDL.
+        if (_settings.Merge && File.Exists(FileLocations.LDLPath))
+        {
+            _data.LDLgram = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
+            File.Delete(FileLocations.LDLPath);
+        }
 
         CreatePlan();
 
-        _progressBar.maxValue = _state.testConditions.Count;
+        _progressBar.maxValue = _state.NumConditions;
         _progressBar.value = 0;
 
         HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
@@ -146,8 +145,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
 
     private void Begin()
     {
-        _localAbort = true;
-        _stopMeasurement = false;
+        _localAbort = false;
 
         if (_settings.UseDefaultInstructions || !string.IsNullOrEmpty(_settings.InstructionMarkdown))
         {
@@ -175,18 +173,20 @@ public class LDLController : MonoBehaviour, IRemoteControllable
 
         if (File.Exists(_stateFile))
         {
+            Debug.Log("LDL: Previous state exists. Asking whether to resume");
+            HTS_Server.SendMessage(_mySceneName, "Status:Asking to resume");
+
             _questionBox.gameObject.SetActive(true);
             _questionBox.PoseQuestion("Continue previous session?", OnQuestionResponse);
         }
         else
         {
-            //_sceneState = SceneState.Testing;
-
             _instructionPanel.gameObject.SetActive(false);
 
             _workPanel.SetActive(true);
             InitializeSliderPanel();
 
+            HTS_Server.SendMessage(_mySceneName, "Status:Running measurement");
             DoNextGroup();
         }
     }
@@ -197,13 +197,24 @@ public class LDLController : MonoBehaviour, IRemoteControllable
 
         if (yes)
         {
+            Debug.Log("LDL: Resuming previous");
+            HTS_Server.SendMessage(_mySceneName, "Status:Resuming previous");
+
             _state = RestoreState();
             _progressBar.maxValue = _state.NumConditions;
             _progressBar.value = _state.NumCompleted;
+
+            _workPanel.SetActive(true);
+            InitializeSliderPanel();
+
+            HTS_Server.SendMessage(_mySceneName, "Status:Running measurement");
             DoNextGroup();
         }
         else
         {
+            Debug.Log("LDL: Starting new measurement");
+            HTS_Server.SendMessage(_mySceneName, "Status:Staring new measurement");
+
             File.Delete(_stateFile);
             StartMeasurement();
         }
@@ -218,26 +229,19 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         _quitPanel.SetActive(true);
     }
 
-    void Update()
-    {
-        if (_stopMeasurement)
-        {
-            _abortAction.Disable();
-            _stopMeasurement = false;
-            EndRun(abort: true);
-        }
-    }
-
     public void OnQuitConfirmButtonClick()
     {
         _localAbort = true;
-        _stopMeasurement = true;
+        _abortAction.Disable();
+        EndRun(abort: true);
     }
 
     public void OnQuitCancelButtonClick()
     {
         _quitPanel.SetActive(false);
+        _workPanel.SetActive(true);
         _abortAction.Enable();
+        DoNextGroup();
     }
 
     private void ShowInstructions(string instructions, int fontSize)
@@ -251,6 +255,13 @@ public class LDLController : MonoBehaviour, IRemoteControllable
     {
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(false);
+
+        FinishData();
+
+        if (File.Exists(_stateFile) && _state.IsComplete)
+        {
+            File.Delete(_stateFile);
+        }
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
         HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
@@ -276,14 +287,8 @@ public class LDLController : MonoBehaviour, IRemoteControllable
 
     public void OnFinishButtonClick()
     {
-        Return();
-    }
-
-    private void Return()
-    {
         SceneManager.LoadScene("Home");
     }
-
 
     void IRemoteControllable.ProcessRPC(string command, string data)
     {
@@ -303,7 +308,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
                 Begin();
                 break;
             case "Abort":
-                _stopMeasurement = true;
+                EndRun(abort: true);
                 break;
         }
     }
@@ -379,15 +384,11 @@ public class LDLController : MonoBehaviour, IRemoteControllable
             }
         }
 
-        for (int k = 0; k < _settings.NumRepeats; k++)
-        {
-            _state.testOrder.AddRange(KMath.Permute(_state.testConditions.Count));
-        }
+        _state.CreateRandomTestOrder(_settings.NumRepeats);
     }
 
     private void DoNextGroup()
     {
-        _progressBar.gameObject.SetActive(false);
         StartCoroutine(NextGroup());
     }
 
@@ -395,77 +396,38 @@ public class LDLController : MonoBehaviour, IRemoteControllable
     {
         _sliderPanel.HideLockInButton();
 
+#if !UNITY_EDITOR
         HardwareInterface.VolumeManager.SetMasterVolume(1, VolumeManager.VolumeUnit.Scalar);
-
-        yield return StartCoroutine(_sliderPanel.ShuffleSliderPositions());
-        yield break;
+#endif
 
         if (_curGroup.Count > 0 && !_doSimulation)
         {
             yield return StartCoroutine(_sliderPanel.ShuffleSliderPositions());
         }
 
+        _progressBar.gameObject.SetActive(false);
         _curGroup.Clear();
 
         int numToDo = Mathf.Min(_state.testOrder.Count, _sliderPanel.NumSliders);
         for (int k = 0; k < numToDo; k++)
         {
             int index = _state.testOrder[k];
-            _curGroup.Add(index);
-
-            SetOneSlider(k, _state.testConditions[index]);
+            _curGroup.Add(_state.testConditions[index]);
         }
 
-        for (int k = numToDo; k < _sliderPanel.NumSliders; k++)
-        {
-            _sliderPanel.HideSlider(k);
-        }
-
-        _sliderPanel.ResetFirstMove();
-        //commonUI.ShowPrompt("Move sliders until sound is uncomfortable");
+        _sliderPanel.ResetSliders(_curGroup);
 
         if (_doSimulation)
         {
-            Simulation();
+            DoSimulation();
+            yield return new WaitForSeconds(0.5f);
         }
     }
 
-    private void Simulation()
+    private void DoSimulation()
     {
-        for (int k = 0; k < _sliderPanel.NumSliders; k++)
-        {
-            _sliderPanel.SimulateMove(k);
-        }
-
+        _sliderPanel.SimulateMove();
         OnLockIn();
-    }
-
-    private void SetOneSlider(int sliderNum, TestCondition test)
-    {
-        SliderSettings s = new SliderSettings();
-        s.var = "Level";
-        s.ear = test.ear;
-        s.Freq_Hz = test.Freq_Hz;
-
-        if (test.discomfortLevel.Count == 0 || float.IsNaN(test.discomfortLevel[test.discomfortLevel.Count - 1]))
-        {
-            s.min = _settings.MinLevel;
-            s.max = float.PositiveInfinity;
-            s.start = s.min + UnityEngine.Random.Range(0f, 15f);
-        }
-        else
-        {
-            float lastLDL = test.discomfortLevel[test.discomfortLevel.Count - 1];
-            s.min = lastLDL - UnityEngine.Random.Range(30f, 60f);
-            s.max = lastLDL + UnityEngine.Random.Range(10f, 40f);
-            s.start = s.min + UnityEngine.Random.Range(0f, 10f);
-        }
-
-        //(_sliderPanel[sliderNum].Channel.waveform as FM).Carrier_Hz = s.Freq_Hz;
-        //_sliderPanel[sliderNum].Channel.Laterality = s.ear;
-        //s.max = Mathf.Min(s.max, _sliderPanel[sliderNum].Channel.GetMaxLevel());
-
-        //_sliderPanel.sliders[sliderNum].ApplySettings(s);
     }
 
     public void OnLockIn()
@@ -475,23 +437,23 @@ public class LDLController : MonoBehaviour, IRemoteControllable
 
     private IEnumerator LockIn()
     {
-        //commonUI.IncrementProgressBar(_curGroup.Count);
-        //commonUI.ShowPrompt("");
-        //lockinButton.enabled = false;
-        _sliderPanel.LockSliders(true);
+        _progressBar.gameObject.SetActive(true);
 
+        var sliderSettings = _sliderPanel.GetSliderSettings();
         for (int k = 0; k < _curGroup.Count; k++)
         {
-            //SliderSettings ss = _sliderPanel[k].Settings as SliderSettings;
-            //_data.sliderSettings.Add(ss);
-            //_state.testConditions[_curGroup[k]].discomfortLevel.Add(ss.isMaxed ? float.NaN : ss.end);
-            //_state.testOrder.RemoveAt(0);
+            _data.sliderSettings.Add(sliderSettings[k]);
+            _curGroup[k].discomfortLevel.Add(sliderSettings[k].isMaxed ? float.NaN : sliderSettings[k].end);
+            _state.testOrder.RemoveAt(0);
         }
         SaveState();
 
         yield return new WaitForSeconds(0.25f);
 
-        //NGUITools.SetActive(lockinButton.gameObject, false);
+        _progressBar.value = _state.NumCompleted;
+        HTS_Server.SendMessage(_mySceneName, $"Progress:{_state.PercentCompleted}");
+        _sliderPanel.HideLockInButton();
+
         yield return new WaitForSeconds(0.25f);
 
         if (_state.testOrder.Count > 0)
@@ -549,12 +511,8 @@ public class LDLController : MonoBehaviour, IRemoteControllable
                 _data.LDLgram.Set(ear, tc.Freq_Hz, float.NaN, LDL_SPL);
             }
         }
-        //_data.LDLgram.Save(DataFileLocations.LDLPath);
-
-        //// 2. Save the data
-        //_data.testConditions = new List<TestCondition>(_state.testConditions);
-        //DiagnosticsManager.Instance.CompleteTest(_data, "LDLSliders");
-
+        _data.LDLgram.Save(FileLocations.LDLPath);
+        File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
     }
 
     private void SaveState()
@@ -578,6 +536,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
             Debug.Log($"Error deserializing LDL state: {ex.Message}");
         }
         FileIO.CloseBinarySerialization();
+
         return s;
     }
 }

@@ -1,40 +1,43 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
+//using UnityEngine.UIElements;
 
 using KLib;
 using LDL;
 using KLib.Signals;
-using UnityEngine.UIElements;
+using System.Linq;
 
 public class LDLSliderPanel : MonoBehaviour 
 {
-    [SerializeField] private GameObject _lockInButton;
+    [SerializeField] private Button _lockInButton;
     [SerializeField] private TMPro.TMP_Text _prompt;
     
     private List<LDLLevelSlider> _sliders;
     
-    private bool _allSlidersMoved = false;
     private float[] _xPositions;
+
+    private TextSizeAnimator _textSizeAnimator;
+
+    public UnityAction LockInPressed;
 
     void Awake()
     {
         _sliders = new List<LDLLevelSlider>(GetComponentsInChildren<LDLLevelSlider>());
+        _textSizeAnimator = _prompt.gameObject.GetComponent<TextSizeAnimator>();
     }
 
 	void Start () 
     {
-        //foreach (ParamSlider s in sliders)
-        //{
-        //    s.NotifyOnSliderMove = OnSliderMoved;
-        //    s.DefaultState();
-        //}
 	}
 
     public void Initialize(LDLMeasurementSettings settings, Channel ch)
     {
-        _lockInButton.SetActive(false);
+        _lockInButton.gameObject.SetActive(false);
+        _prompt.gameObject.SetActive(false);
 
         _prompt.text = settings.Prompt;
         _prompt.fontSize = settings.PromptFontSize;
@@ -43,86 +46,80 @@ public class LDLSliderPanel : MonoBehaviour
 
         for (int k=0; k< _sliders.Count; k++) 
         {
-            _sliders[k].InitializeStimulusGeneration(ch.Clone());
+            _sliders[k].InitializeStimulusGeneration(ch.Clone(), settings.MinLevel);
+            _sliders[k].SliderMoved += OnSliderMoved;
 
             var rt = _sliders[k].gameObject.GetComponent<RectTransform>();
             _xPositions[k] = rt.anchoredPosition.x;
         }
     }
 
-    public void HideLockInButton()
+    public void ResetSliders(List<TestCondition> conditions)
     {
-        _lockInButton.SetActive(false);
+        for (int k=0; k<conditions.Count; k++)
+        {
+            _sliders[k].gameObject.SetActive(true);
+            _sliders[k].ResetSlider(conditions[k]);
+        }
+
+        for (int k = conditions.Count; k < _sliders.Count; k++)
+        {
+            _sliders[k].gameObject.SetActive(false);
+        }
+
+        _prompt.gameObject.SetActive(true);
+        _textSizeAnimator.Animate();
     }
 
-    public List<SliderSettings> GetSettings()
+    public void OnLockInButtonPressed()
     {
-        List<SliderSettings> lss = new List<SliderSettings>();
-        //foreach (ParamSlider s in sliders)
-        //{
-        //    if (s.IsVisible)
-        //        lss.Add(s.Settings);
-        //}
+        _prompt.gameObject.SetActive(false);
+        _lockInButton.interactable = false;
 
-        return lss;
+        foreach (var s in _sliders)
+        {
+            s.Lock(true);
+        }
+
+        LockInPressed?.Invoke();
+    }
+
+    public void HideLockInButton()
+    {
+        _lockInButton.gameObject.SetActive(false);
+    }
+
+    public List<SliderSettings> GetSliderSettings()
+    {
+        return _sliders.Select(x => x.Settings).ToList();
     }
 
     public int NumSliders
     {
-        get { return 0; }
-        //get { return sliders.Count; }
-    }
-
-    //public ParamSlider this[int index]
-    //{
-    //    get { return sliders[index]; }
-    //}
-
-    public void SimulateMove(int sliderNum)
-    {
-        //if (sliders[sliderNum].IsVisible)
-        //    sliders[sliderNum].SimulateMove();
-    }
-
-    public void HideSlider(int sliderNum)
-    {
-        //if (sliderNum >= 0 && sliderNum<sliders.Count)
-        //    sliders[sliderNum].Show(false);
-    }
-
-    public void ResetFirstMove()
-    {
-        //foreach (ParamSlider s in sliders)
-        //{
-        //    s.ResetFirstMove();
-        //}
+        get { return _sliders.Count; }
     }
 
     private void OnSliderMoved()
     {
-        //if (!_allSlidersMoved)
-        //{
-        //    _allSlidersMoved = true;
-        //    foreach (ParamSlider s in sliders)
-        //    {
-        //        _allSlidersMoved &= s.HasMoved;
-        //    }
-
-        //    //if (_allSlidersMoved && lockinEnableCallback != null)
-        //    //    lockinEnableCallback();
-        //}
-    }
-
-    public void LockSliders(bool isLocked)
-    {
-        //_allSlidersMoved = false;
-        //foreach (ParamSlider s in sliders)
-        //    s.Lock(isLocked);
+        if (!_lockInButton.gameObject.activeSelf)
+        {
+            var allSlidersMoved = _sliders.Find(x => !x.HasMoved) == null;
+            if (allSlidersMoved)
+            {
+                _lockInButton.gameObject.SetActive(true);
+                _lockInButton.interactable = true;
+            }
+        }
     }
 
     public IEnumerator ShuffleSliderPositions()
     {
         yield return new WaitForSeconds(0.5f);
+
+        foreach (var s in _sliders)
+        {
+            s.DefaultState();
+        }
 
         float speed = 1000;
 
@@ -136,22 +133,28 @@ public class LDLSliderPanel : MonoBehaviour
                 _sliders[k].Mover.MoveTo(_xPositions[k], speed);
             }
 
-            //while (true)
-            //{
-            //    bool anyMoving = false;
-            //    foreach (ParamSlider s in sliders)
-            //    {
-            //        if (s.Mover.IsMoving)
-            //        {
-            //            anyMoving = true;
-            //            break;
-            //        }
-            //    }
-            //    if (!anyMoving)
-            //        break;
+            while (true)
+            {
+                var anyMoving = _sliders.Find(x => x.Mover.IsMoving) != null;
+                if (!anyMoving)
+                {
+                    break;
+                }
 
-            //    yield return null;
-            //}
+                yield return null;
+            }
         }
+    }
+
+    public void SimulateMove()
+    {
+        foreach (var s in _sliders)
+        {
+            if (s.gameObject.activeSelf)
+            {
+                s.SimulateMove();
+            }
+        }
+
     }
 }

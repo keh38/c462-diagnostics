@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class AnimateSlider : MonoBehaviour 
+public class SliderAnimator : MonoBehaviour 
 {
     private Slider _slider;
 
@@ -32,7 +32,7 @@ public class AnimateSlider : MonoBehaviour
 
     public void MoveTo(float x, float speed)
     {
-        _curX = transform.localPosition.x;
+        _curX = _rectTransform.anchoredPosition.x;
         _targX = x;
         this._speed = speed;
         _dir = Mathf.Sign(_targX - _curX);

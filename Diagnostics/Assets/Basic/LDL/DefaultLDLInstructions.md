@@ -17,5 +17,7 @@
 - The pitch and loudness will vary from slider to slider
 - So you will probably adjust each to a different point. That's OK
 [br]
-- After you have <color=#00AA00>*adjusted all the sliders*</color> on a screen, press the "Lock In Sliders" button to enter your settings
+- After you have <color=#00AA00>*adjusted all the sliders*</color> on a screen, press the \"Lock In Sliders\" button to enter your settings
+- The levels of the remaining tests will be set based on your loudness judgments during this test.
+- For the remaining tests, we will never present a sound that meets or exceeds the level that you said was uncomfortable.
           

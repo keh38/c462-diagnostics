@@ -102,6 +102,7 @@ namespace LDL
             ModDepth_pct = 0;
             MinLevel = 10;
             LevelUnits = LevelUnits.dB_SPL;
+            NumRepeats = 3;
 
             Prompt = "Move sliders until sound is uncomfortable";
             PromptFontSize = 72;

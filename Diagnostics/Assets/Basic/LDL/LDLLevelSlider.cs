@@ -8,35 +8,36 @@ using KLib.Signals;
 using KLib.Signals.Waveforms;
 using Unity.VisualScripting;
 using UnityEngine.EventSystems;
+using UnityEngine.Events;
 
-[RequireComponent(typeof(AnimateSlider))]
+[RequireComponent(typeof(SliderAnimator))]
 public class LDLLevelSlider : MonoBehaviour
 {
+    [SerializeField] private Image _fill;
     private Slider _slider;
-    //private UIButton _thumb;
-    private AnimateSlider _mover;
+    private SliderAnimator _mover;
+
 
     private Action<float> _paramSetter;
-    private AnimationCurve _ioFunction = null;
-
-    //private UISprite _sliderFG;
-    //private KEventDelegate _notifyOnSliderMove;
 
     private SliderSettings _settings = null;
-    private float _paramRange;
 
     private bool _isActive = true;
-    private bool _isVisible = true;
     private bool _hasMoved = false;
     private bool _firstMove;
 
     private SignalManager _signalManager;
+    private Channel _myChannel;
     private bool _audioInitialized = false;
+
+    private float _minLevel;
+
+    public UnityAction SliderMoved;
 
     void Awake()
     {
         _slider = GetComponent<Slider>();
-        _mover = GetComponent<AnimateSlider>();
+        _mover = GetComponent<SliderAnimator>();
 
         //_thumb = transform.FindChild("Thumb").GetComponent<UIButton>();
         //_sliderFG = transform.FindChild("Foreground").GetComponent<UISprite>();
@@ -58,138 +59,123 @@ public class LDLLevelSlider : MonoBehaviour
     //    set { _notifyOnSliderMove = value; }
     //}
 
-    public void InitializeStimulusGeneration(Channel ch)
+    public void InitializeStimulusGeneration(Channel ch, float minLevel)
     {
+        _myChannel = ch;
+        _myChannel.Name = this.name;
+        _minLevel = minLevel;
+
         var audioConfig = AudioSettings.GetConfiguration();
         _signalManager = new SignalManager(audioConfig.sampleRate, audioConfig.dspBufferSize);
         _signalManager.AdapterMap = HardwareInterface.AdapterMap;
 
         _signalManager.AddChannel(ch);
-        _signalManager.Initialize();
 
-        _signalManager.StartPaused();
+        _paramSetter = _myChannel.GetParamSetter("Level");
 
         _audioInitialized = true;
     }
 
+    public void ResetSlider(TestCondition test)
+    {
+        _firstMove = true;
+        _isActive = true;
+        _hasMoved = false;
+
+        _settings = new SliderSettings();
+        _settings.var = "Level";
+        _settings.ear = test.ear;
+        _settings.Freq_Hz = test.Freq_Hz;
+
+        if (test.discomfortLevel.Count == 0 || float.IsNaN(test.discomfortLevel[^1]))
+        {
+            _settings.min = _minLevel;
+            _settings.max = float.PositiveInfinity;
+            _settings.start = _settings.min + UnityEngine.Random.Range(0f, 15f);
+        }
+        else
+        {
+            float lastLDL = test.discomfortLevel[^1];
+
+            _settings.min = lastLDL - UnityEngine.Random.Range(30f, 60f);
+            _settings.max = lastLDL + UnityEngine.Random.Range(10f, 40f);
+            _settings.start = _settings.min + UnityEngine.Random.Range(0f, 10f);
+        }
+
+        (_myChannel.waveform as FM).Carrier_Hz = _settings.Freq_Hz;
+        _myChannel.Laterality = _settings.ear;
+
+        _paramSetter(_settings.start);
+        _signalManager.Initialize();
+        _signalManager.StartPaused();
+
+        _settings.max = Mathf.Min(_settings.max, _myChannel.GetMaxLevel());
+        _slider.value = (_settings.start - _settings.min) / (_settings.max - _settings.min);
+        _settings.isMaxed = false;
+        _slider.enabled = true;
+
+        Lock(false);
+    }
+
     public void OnPointerDown(BaseEventData data)
     {
-        _signalManager.Unpause();
-        //_varyMin = _levelSlider.InteractWith == KRangeSlider.InteractionState.Low;
-        //UpdateStimulusLevel();
-        //_signalManager.ResetSweepables();
-        //_audioEnabled = _levelSlider.InteractWith == KRangeSlider.InteractionState.Low || _levelSlider.InteractWith == KRangeSlider.InteractionState.High;
+        if (_isActive)
+        {
+            _signalManager.Unpause();
+        }
     }
 
     public void OnPointerUp(BaseEventData data)
     {
-        _signalManager.Pause();
-        //_audioEnabled = false;
+        if (_isActive)
+        {
+            _signalManager.Pause();
+        }
     }
 
     public bool HasMoved
     {
-        get { return _hasMoved || !_isVisible; }
+        get { return _hasMoved || !_slider.gameObject.activeSelf; }
     }
 
-    public bool IsVisible
-    {
-        get { return _isVisible; }
-    }
-
-    public AnimateSlider Mover
+    public SliderAnimator Mover
     {
         get { return _mover; }
     }
 
-    //public Channel Channel
-    //{
-    //    get { return _sigGen.Channel; }
-    //}
-
-    public void Show(bool isVisible)
+    public SliderSettings Settings
     {
-        //this._isVisible = isVisible;
-        //NGUITools.SetActive(this.gameObject, isVisible);
+        get { return _settings; }
     }
-
-    //public ParamSliderSettings Settings
-    //{
-    //    get { return _settings; }
-    //}
 
     public void Lock(bool isLocked)
     {
-        //_sliderFG.color = (isLocked) ? Color.green : Color.white;
-        //_slider.enabled = !isLocked;
-        //_isActive = !isLocked;
+        _fill.gameObject.SetActive(isLocked);
+        _slider.interactable = !isLocked;
+        _isActive = !isLocked;
     }
 
     public void DefaultState()
     {
-        //_sliderFG.color = Color.white;
+        _fill.gameObject.SetActive(false);
         _slider.value = 0.5f;
         _slider.enabled = false;
         _isActive = false;
     }
 
-    public void ApplySettings(SliderSettings settings)
-    {
-        ApplySettings(settings, null);
-    }
-    public void ApplySettings(SliderSettings settings, AnimationCurve ioFunc)
-    {
-        _firstMove = true;
-        _isVisible = true;
-        _isActive = true;
-        _hasMoved = false;
-
-        Lock(false);
-        //NGUITools.SetActive(this.gameObject, true);
-
-        _settings = settings;
-
-        _paramRange = Mathf.Round(settings.max - settings.min);
-        //_slider.numberOfSteps = (int)Mathf.Round(_paramRange) + 1;
-
-        _slider.value = (settings.start - settings.min) / _paramRange;
-        _settings.isMaxed = false;
-
-        //_sigGen.Reset();
-
-        //_paramSetter = _sigGen.Channel.ParamSetter(_settings.var);
-        _paramSetter(_settings.start);
-
-        _ioFunction = ioFunc ?? DefaultInputOutputFunction();
-    }
-
-    private AnimationCurve DefaultInputOutputFunction()
-    {
-        AnimationCurve ac = new AnimationCurve();
-        ac.AddKey(new Keyframe(0, _settings.min));
-        ac.AddKey(new Keyframe(1, _settings.max));
-        //ac.MakePiecewiseLinear();
-        return ac;
-    }
-
-    public void ResetFirstMove()
-    {
-        _firstMove = true;
-    }
-
-    public void OnValueChange()
+    public void OnValueChange(float value)
     {
         if (_settings != null && !_firstMove)
         {
-            _settings.end = _ioFunction.Evaluate(_slider.value);
+            _settings.end = _slider.value * (_settings.max - _settings.min) + _settings.min;
+
             _settings.isMaxed = _slider.value > 0.99f;
             _paramSetter(_settings.end);
 
             if (!_hasMoved && _settings.end != _settings.start)
             {
                 _hasMoved = true;
-                //if (_notifyOnSliderMove != null)
-                //    _notifyOnSliderMove();
+                SliderMoved?.Invoke();
             }
         }
 
@@ -198,8 +184,8 @@ public class LDLLevelSlider : MonoBehaviour
 
     public void SimulateMove()
     {
-        _slider.value = 0.9f;
-        _settings.end = _slider.value * _paramRange + _settings.min;
+        _slider.value = UnityEngine.Random.Range(0.25f, 0.75f);
+        _settings.end = _slider.value * (_settings.max - _settings.min) + _settings.min;
     }
 
     private void OnAudioFilterRead(float[] data, int channels)
