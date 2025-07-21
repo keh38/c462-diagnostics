@@ -48,7 +48,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
     ProcedureData _data = new ProcedureData();
     SignalManager _signalManager;
 
-    private bool _doSimulation = true;
+    private bool _doSimulation = false;
 
     float airBoneGap = 15; // assumed ABG
     float interauralAtten = 35; // measured by JPW in New York
@@ -115,6 +115,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             Begin();
         }
     }
+
     void InitializeMeasurement()
     {
         _title.text = _settings.Title;
@@ -139,7 +140,8 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         _state = new MeasurementState(_settings.TestFrequencies, _settings.TestEar);
         _progressBar.maxValue = _state.NumStimulusConditions;
         _progressBar.value = 0;
-        InitializeStimulus();
+
+        InitializeStimulusGeneration();
 
         HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
     }
@@ -772,7 +774,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         yield break;
     }
 
-    void InitializeStimulus()
+    void InitializeStimulusGeneration()
     {
         var audioConfig = AudioSettings.GetConfiguration();
         _signalManager = new SignalManager();

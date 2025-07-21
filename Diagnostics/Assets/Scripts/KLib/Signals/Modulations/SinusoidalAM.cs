@@ -38,6 +38,7 @@ namespace KLib.Signals.Modulations
             Phase_cycles = 0;
         }
 
+        [ProtoIgnore]
         public float CurrentPhase { get { return _phase; } }
 
         public override List<string> GetSweepableParams()

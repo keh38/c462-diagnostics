@@ -286,6 +286,11 @@ namespace KLib.Signals
             return ch;
         }
 
+        public Channel Clone()
+        {
+            return Channel.FromProtoBuf(this.ToProtoBuf());
+        }
+
         public List<string> GetSweepableParams()
         {
             var sp = new List<string>();

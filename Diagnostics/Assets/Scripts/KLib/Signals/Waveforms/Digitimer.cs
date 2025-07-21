@@ -45,7 +45,7 @@ namespace KLib.Signals.Waveforms
         [JsonProperty]
         public DemandSource Source;
 
-        [ProtoMember(7, IsRequired = true)]
+        [ProtoMember(8, IsRequired = true)]
         [JsonProperty]
         public float Demand;
 
