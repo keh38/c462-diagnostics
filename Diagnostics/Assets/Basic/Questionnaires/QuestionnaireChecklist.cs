@@ -19,14 +19,39 @@ public class QuestionnaireChecklist : MonoBehaviour
 
     private List<ChecklistItem> _items = new List<ChecklistItem>();
 
-    private List<string> _selectedItems = new List<string>();
-    public List<string> SelectedItems { get { return _selectedItems; } }
-
     public UnityAction<bool> SelectionChanged;
 
     private void Awake()
     {
         _toggleGroup = GetComponent<ToggleGroup>();
+    }
+
+    public List<int> GetSelectionNumbers()
+    {
+        var selection = new List<int>();
+
+        for (int k=0; k<_items.Count; k++)        
+        {
+            if (_items[k].gameObject.activeSelf && _items[k].Value)
+            {
+                selection.Add(k);
+            }
+        }
+        return selection;
+    }
+
+    public List<string> GetSelectionValues()
+    {
+        var selection = new List<string>();
+
+        for (int k = 0; k < _items.Count; k++)
+        {
+            if (_items[k].gameObject.activeSelf && _items[k].Value)
+            {
+                selection.Add(_items[k].Name);
+            }
+        }
+        return selection;
     }
 
     public void LayoutChecklist(Question question, List<int> selected, int fontSize)
@@ -55,7 +80,7 @@ public class QuestionnaireChecklist : MonoBehaviour
 
             _items[k].SetLabel(question.Options[k], fontSize);
             _items[k].SetGroup(question.AllowMultipleSelections ? null: _toggleGroup);
-            _items[k].SetValue(selected.Contains(k));
+            _items[k].Value = selected.Contains(k);
 
             float itemWidth = _items[k].GetWidth();
 
@@ -78,15 +103,7 @@ public class QuestionnaireChecklist : MonoBehaviour
 
     private void OnItemToggled(string name, bool isPressed)
     {
-        if (isPressed)
-        {
-            _selectedItems.Add(name);
-        }
-        else
-        {
-            _selectedItems.Remove(name);
-        }
-        SelectionChanged?.Invoke(_selectedItems.Count > 0);
+        SelectionChanged?.Invoke(_items.Find(x => x.Value) != null);
     }
 
 

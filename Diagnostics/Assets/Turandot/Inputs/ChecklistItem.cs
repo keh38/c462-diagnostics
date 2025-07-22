@@ -8,15 +8,21 @@ public class ChecklistItem : MonoBehaviour
     [SerializeField] private Text _label;
     [SerializeField] private Toggle _toggle;
 
-    private string _name;
-
     public delegate void ToggledDelegate(string name, bool isPressed);
     public ToggledDelegate Toggled;
-    private void OnToggled(bool isPressed) { Toggled?.Invoke(_name, isPressed); }
+    private void OnToggled(bool isPressed) { Toggled?.Invoke(Name, isPressed); }
+
+    public bool Value
+    {
+        get { return _toggle.isOn; }
+        set { _toggle.isOn = value; }
+    }
+
+    public string Name { get; private set; }
 
     public void SetLabel(string label, int fontSize)
     {
-        _name = label;
+        Name = label;
         _label.fontSize = fontSize;
         _label.text = label;
     }
@@ -43,11 +49,6 @@ public class ChecklistItem : MonoBehaviour
     public void OnToggleClick(bool isPressed)
     {
         OnToggled(isPressed);
-    }
-
-    public void SetValue(bool value)
-    {
-        _toggle.isOn = value;
     }
 
     public void Clear()

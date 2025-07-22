@@ -11,6 +11,7 @@ using UnityEngine.UI;
 
 using KLib;
 using Questionnaires;
+using UnityEngine.Experimental.GlobalIllumination;
 
 public class QuestionnaireController : MonoBehaviour, IRemoteControllable
 {
@@ -21,6 +22,7 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
     [SerializeField] private GameObject _finishPanel;
     [SerializeField] private GameObject _quitPanel;
     [SerializeField] private GameObject _workPanel;
+    [SerializeField] private Slider _progressBar;
 
     [SerializeField] private QuestionnaireChecklist _checklist;
     [SerializeField] private Button _backButton;
@@ -121,7 +123,7 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
 
     private void Begin()
     {
-        _localAbort = true;
+        _localAbort = false;
         _stopMeasurement = false;
 
         if (!string.IsNullOrEmpty(_questionnaire.InstructionMarkdown))
@@ -142,6 +144,9 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
         HTS_Server.SendMessage(_mySceneName, "Status:Questions started");
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(true);
+
+        _progressBar.maxValue = _questionnaire.Questions.Count;
+        _progressBar.wholeNumbers = true;
 
         _qnum = 0;
         ShowQuestion();
@@ -187,6 +192,9 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
 
     private void ShowQuestion()
     {
+        _progressBar.value = _qnum;
+        HTS_Server.SendMessage(_mySceneName, $"Progress:{Mathf.RoundToInt(100f * _qnum / _questionnaire.Questions.Count)}");
+
         _checklist.LayoutChecklist(
             _questionnaire.Questions[_qnum],
             _data.responses[_qnum].selectionNumbers, 
@@ -198,14 +206,25 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
 
     public void OnNextClick()
     {
-        //_data.responses[_qnum].selectionValues = 
+        _data.responses[_qnum].selectionValues = _checklist.GetSelectionValues();
+        _data.responses[_qnum].selectionNumbers = _checklist.GetSelectionNumbers();
 
         _qnum++;
-        ShowQuestion();
+        if (_qnum < _questionnaire.Questions.Count)
+        {
+            ShowQuestion();
+        }
+        else
+        {
+            EndRun(abort: false);
+        }
     }
 
     public void OnBackClick()
     {
+        _data.responses[_qnum].selectionValues = _checklist.GetSelectionValues();
+        _data.responses[_qnum].selectionNumbers = _checklist.GetSelectionNumbers();
+
         _qnum--;
         ShowQuestion();
     }
@@ -219,6 +238,8 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
     {
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(false);
+
+        File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
         HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");

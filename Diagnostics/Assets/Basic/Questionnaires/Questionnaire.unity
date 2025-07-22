@@ -1883,6 +1883,7 @@ MonoBehaviour:
   _finishPanel: {fileID: 1424092117}
   _quitPanel: {fileID: 1256089261}
   _workPanel: {fileID: 661140294}
+  _progressBar: {fileID: 455153263}
   _checklist: {fileID: 1039363560470479303}
   _backButton: {fileID: 760074564}
   _nextButton: {fileID: 353482999}
