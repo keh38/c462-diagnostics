@@ -15,6 +15,7 @@ using KLib;
 using KLib.Signals;
 using KLib.Signals.Enumerations;
 using KLib.Signals.Waveforms;
+using TMPro.EditorUtilities;
 
 
 public class AudiogramController : MonoBehaviour, IRemoteControllable
@@ -439,26 +440,27 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
 
     IEnumerator TestOneEar(Laterality ear, float freq)
     {
-        float startSPL = dBHL_table.HL_To_SPL(freq) + 50;
-        startSPL = Mathf.Min(startSPL, 75);
-
-        if (_settings.TrackInSPL)
-        {
-            startSPL = 5 * Mathf.Round(startSPL / 5);
-        }
+        float startHL = _settings.Abridged ? 30 : 50;
 
         _responseAction.Enable();
 
         yield return new WaitForSeconds(_doSimulation ? 0.2f : UnityEngine.Random.Range(_settings.MinISI, _settings.MaxISI));
 
         _signalManager["Signal"].Laterality = ear;
-        (_signalManager["Signal"].waveform as Sinusoid).Frequency_Hz = freq;
+        var fm = (_signalManager["Signal"].waveform as FM);
+
+        fm.Carrier_Hz = freq;
+        fm.ModFreq_Hz = freq * _settings.ModDepth / 100f;
+        fm.ModFreq_Hz = _settings.ModRate;
+
         _signalManager.Initialize();
         _signalManager.StartPaused();
-        _signalManager.Unpause();
 
         float maxSPL = _signalManager["Signal"].GetMaxLevel();
-        startSPL = Mathf.Min(startSPL, maxSPL);
+        float maxHL = dBHL_table.SPL_To_HL(freq, maxSPL);
+        startHL = Mathf.Min(startHL, maxHL);
+
+        _signalManager.Unpause();
 
         if (_currentStimulusCondition.NumTries == 1)
         {
@@ -466,14 +468,14 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         }
 
         currentTrack = new TrackData(ear, freq, 50);
-        yield return StartCoroutine(DoMonauralTrack(startSPL, maxSPL));
+        yield return StartCoroutine(DoMonauralTrack(freq, startHL, maxHL));
 
         _responseAction.Disable();
 
         currentTrack.Trim();
         _data.tracks.Add(currentTrack);
 
-        if (_currentStimulusCondition.NumTries==0 && float.IsPositiveInfinity(currentTrack.thresholdSPL))
+        if (_currentStimulusCondition.NumTries==0 && float.IsPositiveInfinity(currentTrack.thresholdHL))
         {
             _currentStimulusCondition.NumTries++;
             _instructionPanel.InstructionsFinished = DoCurrentStimulusCondition;
@@ -490,20 +492,20 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             yield break;
         }
 
-        if (float.IsNaN(currentTrack.thresholdSPL))
+        if (float.IsNaN(currentTrack.thresholdHL))
         {
             Debug.Log("Computing alternate threshold...");
-            currentTrack.thresholdSPL = GetAlternateThreshold();
+            currentTrack.thresholdHL = GetAlternateThreshold();
             currentTrack.alternateComputation = true;
         }
 
         _data.audiogramData.Set(
-            _currentStimulusCondition.Laterality, 
-            freq, 
-            dBHL_table.SPL_To_HL(freq, currentTrack.thresholdSPL), 
-            currentTrack.thresholdSPL);
+            _currentStimulusCondition.Laterality,
+            freq,
+            currentTrack.thresholdHL,
+            currentTrack.thresholdHL + dBHL_table.HL_To_SPL(freq));
 
-        _state.SetCompleted(_currentStimulusCondition, currentTrack.thresholdSPL);
+        _state.SetCompleted(_currentStimulusCondition, currentTrack.thresholdHL);
         SaveState();
 
         AdvanceMeasurement();
@@ -527,7 +529,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         return KMath.Mean(reversals.GetRange(0, Mathf.RoundToInt(reversals.Count / 2)).ToArray());
     }
 
-    IEnumerator DoMonauralTrack(float startLevel, float maxLevel)
+    IEnumerator DoMonauralTrack(float freq, float startLevel, float maxLevel)
     {
         float[] reversalLevels = new float[6];
         for (int k = 0; k < reversalLevels.Length; k++)
@@ -537,11 +539,12 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
 
         _volumeWaitTime = 2.0f;
 
-        // Start at 50 dBHL, go up in 15-dB steps until we get a response
+        // Start, go up until we get a response
         soundDetected = false;
+        float delta = _settings.Abridged ? 5 : 15;
         while (!soundDetected && curLevel <= Mathf.Min(startLevel + 45, maxLevel))
         {
-            yield return StartCoroutine(PlayStimulusAndGetResponse(curLevel));
+            yield return StartCoroutine(PlayStimulusAndGetResponse(freq, curLevel));
             currentTrack.Add(curLevel, float.NaN, currentResponseTime, soundDetected);
             if (_stopMeasurement) yield break;
 
@@ -550,21 +553,30 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
                 if (curLevel == maxLevel)
                     break;
 
-                curLevel = Mathf.Min(curLevel + 15, maxLevel);
+                curLevel = Mathf.Min(curLevel + delta, maxLevel);
             }
         }
 
         // Couldn't get a response
         if (!soundDetected)
         {
-            currentTrack.thresholdSPL = float.PositiveInfinity;
+            currentTrack.thresholdHL = float.PositiveInfinity;
             yield break;
+        }
+
+        if (_settings.Abridged)
+        {
+            curLevel = 10;
+        }
+        else
+        {
+            curLevel -= 10;
         }
 
         // Acquire 3 reversals
         for (int k = 0; k < 3; k++)
         {
-            yield return StartCoroutine(DoReversal(curLevel, maxLevel));
+            yield return StartCoroutine(DoReversal(freq, curLevel, maxLevel));
             if (_stopMeasurement) yield break;
 
             if (float.IsNaN(currentReversal))
@@ -577,15 +589,15 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             int index = LookForNRepeats(reversalLevels, 2);
             if (index >= 0)
             {
-                currentTrack.thresholdSPL = reversalLevels[index];
+                currentTrack.thresholdHL = reversalLevels[index];
                 yield break;
             }
         }
 
-        // If no winner (and there's not, if we got this far), acquire three more reversals
-        for (int k = 0; k < 3; k++)
+        // If no winner (and there's not, if we got this far), acquire two more reversals
+        for (int k = 0; k < 2; k++)
         {
-            yield return StartCoroutine(DoReversal(curLevel, maxLevel));
+            yield return StartCoroutine(DoReversal(freq, curLevel, maxLevel));
             if (_stopMeasurement) yield break;
 
             if (float.IsNaN(currentReversal))
@@ -598,12 +610,12 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             int index = LookForNRepeats(reversalLevels, 3);
             if (index >= 0)
             {
-                currentTrack.thresholdSPL = reversalLevels[index];
+                currentTrack.thresholdHL = reversalLevels[index];
                 yield break;
             }
         }
-
     }
+
     int LookForNRepeats(float[] array, int ntarg)
     {
         for (int k = 0; k < array.Length - ntarg + 1; k++)
@@ -632,15 +644,19 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         return -1;
     }
 
-    IEnumerator DoReversal(float level, float maxLevel)
+    IEnumerator DoReversal(float freq, float level, float maxLevel)
     {
         currentReversal = float.NaN;
 
         while (soundDetected)
         {
-            level -= 10;
-            yield return StartCoroutine(PlayStimulusAndGetResponse(level));
+            yield return StartCoroutine(PlayStimulusAndGetResponse(freq,level));
             currentTrack.Add(level, float.NaN, currentResponseTime, soundDetected);
+
+            if (soundDetected )
+            {
+                level -= 10;
+            }
 
             if (_stopMeasurement) yield break;
         }
@@ -651,7 +667,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             {
                 yield break;
             }
-            yield return StartCoroutine(PlayStimulusAndGetResponse(level));
+            yield return StartCoroutine(PlayStimulusAndGetResponse(freq,level));
             currentTrack.Add(level, float.NaN, currentResponseTime, soundDetected);
 
             if (_stopMeasurement) yield break;
@@ -702,17 +718,17 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         //    currentTrack.Trim();
         //    _data.tracks.Add(currentTrack);
 
-        //    if (_stopMeasurement || currentTrack.thresholdSPL <= originalThreshold)
+        //    if (_stopMeasurement || currentTrack.thresholdHL <= originalThreshold)
         //    {
         //        yield break;
         //    }
         //    else
         //    {
-        //        maskerLevel += (currentTrack.thresholdSPL - originalThreshold);
-        //        originalThreshold = currentTrack.thresholdSPL;
+        //        maskerLevel += (currentTrack.thresholdHL - originalThreshold);
+        //        originalThreshold = currentTrack.thresholdHL;
         //        if (maskerLevel > _settings.MaxMaskerSPL || originalThreshold > maxSPL)
         //        {
-        //            currentTrack.thresholdSPL = float.NaN;
+        //            currentTrack.thresholdHL = float.NaN;
         //            yield break;
         //        }
         //    }
@@ -720,7 +736,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         yield break;
     }
 
-    IEnumerator PlayStimulusAndGetResponse(float level)
+    IEnumerator PlayStimulusAndGetResponse(float freq, float level)
     {
         if (_doSimulation)
         {
@@ -731,7 +747,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         // 500-ms steps
         float waitTime = 0.5f * Mathf.Round(UnityEngine.Random.Range(_settings.MinISI, _settings.MaxISI) * 2);
 
-        _signalManager["Signal"].level.Value = level;
+        _signalManager["Signal"].level.Value = level + dBHL_table.HL_To_SPL(freq);
 
         //float vol_dB = noiseGen.IsPlaying ? 0 : volumeControl.SetAttenuation(_signalManager.MinAtten());
         //_signalManager.SetMasterVolume(vol_dB);
@@ -785,7 +801,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             Name = "Signal",
             Modality = KLib.Signals.Enumerations.Modality.Audio,
             Laterality = Laterality.Diotic,
-            waveform = new Sinusoid(),
+            waveform = new FM(),
             level = new Level()
             {
                 Units = LevelUnits.dB_SPL

@@ -65,10 +65,10 @@ namespace KLib.Signals
 
         [ProtoMember(7, IsRequired = true)]
         [JsonProperty]
-        public Laterality Laterality { set; get; } = Laterality.None;
+        public Laterality Laterality { set; get; }
 
         [ProtoMember(9, IsRequired = true)]
-        public Modality Modality { set; get; } = Modality.Audio;
+        public Modality Modality { set; get; }
 
         [ProtoMember(10, IsRequired = true)]
         public string Location { set; get; }
@@ -166,6 +166,9 @@ namespace KLib.Signals
 
         public Channel()
 		{
+            Modality = Modality.Audio;
+            Laterality = Laterality.None;
+
             waveform = new Waveform();
             gate = new Gate();
             level = new Level();
@@ -179,7 +182,7 @@ namespace KLib.Signals
         /// <summary>
         /// 
         /// </summary>
-        public Channel(Waveform wf)
+        public Channel(Waveform wf) : this()
         {
             waveform = wf ?? new Waveform();
             gate = new Gate();

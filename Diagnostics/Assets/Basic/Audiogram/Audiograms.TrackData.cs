@@ -24,7 +24,7 @@ namespace Audiograms
         public float[] signalLevel;
         public float[] responseTime_s;
         public bool[] detected;
-        public float thresholdSPL = float.NaN;
+        public float thresholdHL = float.NaN;
         public bool alternateComputation;
         public List<float> reversals;
 
@@ -45,7 +45,7 @@ namespace Audiograms
             signalLevel = new float[lengthIncrement];
             responseTime_s = new float[lengthIncrement];
             detected = new bool[lengthIncrement];
-            thresholdSPL = float.NaN;
+            thresholdHL = float.NaN;
             alternateComputation = false;
 
             reversals = new List<float>();

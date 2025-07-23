@@ -1,8 +1,11 @@
 ## Changelog
 
 ### v0.15 (unreleased)
-#### added
+#### Added
 - Protocol: exposed control of list and instruction font sizes
+- Restored Audiogram, LDL, Questionnaires (checklists only)
+#### Fixed
+- Race conditions instantiating new signal in Turandot Interactive
 
 ---
 

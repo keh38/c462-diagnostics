@@ -31,6 +31,7 @@ public class LDLLevelSlider : MonoBehaviour
     private bool _audioInitialized = false;
 
     private float _minLevel;
+    private float _modDepth_pct;
 
     public UnityAction SliderMoved;
 
@@ -59,11 +60,12 @@ public class LDLLevelSlider : MonoBehaviour
     //    set { _notifyOnSliderMove = value; }
     //}
 
-    public void InitializeStimulusGeneration(Channel ch, float minLevel)
+    public void InitializeStimulusGeneration(Channel ch, float minLevel, float modDepth)
     {
         _myChannel = ch;
         _myChannel.Name = this.name;
         _minLevel = minLevel;
+        _modDepth_pct = modDepth;
 
         var audioConfig = AudioSettings.GetConfiguration();
         _signalManager = new SignalManager(audioConfig.sampleRate, audioConfig.dspBufferSize);
@@ -102,7 +104,10 @@ public class LDLLevelSlider : MonoBehaviour
             _settings.start = _settings.min + UnityEngine.Random.Range(0f, 10f);
         }
 
-        (_myChannel.waveform as FM).Carrier_Hz = _settings.Freq_Hz;
+        var fm = (_myChannel.waveform as FM);
+        fm.Carrier_Hz = _settings.Freq_Hz;
+        fm.Depth_Hz = _settings.Freq_Hz * _modDepth_pct / 100f;
+
         _myChannel.Laterality = _settings.ear;
 
         _paramSetter(_settings.start);

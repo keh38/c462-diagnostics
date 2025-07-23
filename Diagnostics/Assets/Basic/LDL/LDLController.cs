@@ -327,7 +327,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
             waveform = new FM()
             {
                 Carrier_Hz = 500,
-                Depth_Hz = 500 * _settings.ModDepth_pct,
+                Depth_Hz = 500 * _settings.ModDepth_pct / 100f,
                 ModFreq_Hz = 5,
                 Phase_cycles = 0
             },

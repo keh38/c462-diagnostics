@@ -3,15 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 using Audiograms;
+using Bekesy;
 using KLib;
 
-public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
+public class BekesyController : MonoBehaviour, IRemoteControllable
 {
     [SerializeField] private InputActionAsset _actions;
     [SerializeField] private TMPro.TMP_Text _title;
@@ -20,7 +22,6 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
     [SerializeField] private Text _finishText;
     [SerializeField] private GameObject _finishPanel;
     [SerializeField] private GameObject _quitPanel;
-    [SerializeField] private QuestionBox _questionBox;
     [SerializeField] private GameObject _workPanel;
     [SerializeField] private Slider _progressBar;
 
@@ -29,10 +30,10 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
     private bool _stopMeasurement = false;
     private bool _localAbort = false;
 
-    private BasicMeasurementConfiguration _settings = new BasicMeasurementConfiguration();
+    private BekesyMeasurementSettings _settings = new BekesyMeasurementSettings();
 
     private string _dataPath;
-    private string _mySceneName = "Basic Measurement";
+    private string _mySceneName = "Bekesy";
     private string _configName;
 
     private InputAction _abortAction;
@@ -90,7 +91,7 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
 
         var header = new BasicMeasurementFileHeader()
         {
-            measurementType = _mySceneName,
+            measurementType = "Audiogram",
             configName = _configName,
             subjectID = GameManager.Subject
         };
@@ -213,7 +214,7 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
         switch (command)
         {
             case "Initialize":
-                _settings = FileIO.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as AudiogramMeasurementSettings;
+                _settings = FileIO.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as BekesyMeasurementSettings;
                 InitializeMeasurement();
                 break;
             case "StartSynchronizing":

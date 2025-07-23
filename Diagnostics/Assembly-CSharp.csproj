@@ -186,6 +186,7 @@
     <Compile Include="Assets\Turandot\Cues\Turandot.Cues.Cue.cs" />
     <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.ParamSliderLayout.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\Noise.cs" />
+    <Compile Include="Assets\Basic\Bekesy\BekesyMeasurementSettings.cs" />
     <Compile Include="Assets\Scripts\Protocols\Protocol.cs" />
     <Compile Include="Assets\Turandot\Cues\Turandot.Cues.ScoreboardAction.cs" />
     <Compile Include="Assets\Prefabs\MessageBox.cs" />
@@ -330,6 +331,7 @@
     <Compile Include="Assets\Turandot\Screen\Turandot.Screen.GrapherLayout.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\StyleDefinition.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotManikinPanel.cs" />
+    <Compile Include="Assets\Basic\Bekesy\BekesyController.cs" />
     <Compile Include="Assets\Turandot\Interactive\TurandotInteractive.cs" />
   </ItemGroup>
   <ItemGroup>

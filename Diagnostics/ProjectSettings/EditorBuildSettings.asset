@@ -35,6 +35,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Basic/Questionnaires/Questionnaire.unity
     guid: 501d3848a6a14a341b2b8961b4a15590
+  - enabled: 1
+    path: Assets/Basic/Bekesy/Bekesy.unity
+    guid: 652f016030ac6f940ac3cdfb967e81c8
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 28be48df767d2434681ec999065f06dc, type: 3}
   m_UseUCBPForAssetBundles: 0

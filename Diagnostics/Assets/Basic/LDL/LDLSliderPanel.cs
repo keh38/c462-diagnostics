@@ -46,7 +46,7 @@ public class LDLSliderPanel : MonoBehaviour
 
         for (int k=0; k< _sliders.Count; k++) 
         {
-            _sliders[k].InitializeStimulusGeneration(ch.Clone(), settings.MinLevel);
+            _sliders[k].InitializeStimulusGeneration(ch.Clone(), settings.MinLevel, settings.ModDepth_pct);
             _sliders[k].SliderMoved += OnSliderMoved;
 
             var rt = _sliders[k].gameObject.GetComponent<RectTransform>();
