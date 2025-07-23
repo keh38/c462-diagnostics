@@ -59,12 +59,6 @@ namespace LDL
         private bool ShouldSerializeToneDuration() { return false; }
 
         [Category("Stimulus")]
-        [Description("Interval between pips (ms)")]
-        [DisplayName("Pip interval")]
-        public float IPI_ms { set; get; }
-        private bool ShouldSerializeIPI_ms() { return false; }
-
-        [Category("Stimulus")]
         [Description("Level units")]
         public LevelUnits LevelUnits { set; get; }
         private bool ShouldSerializeLevelUnits() { return false; }

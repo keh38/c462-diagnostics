@@ -158,6 +158,10 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
                     HTS_Server.SendMessage("ChangedLEDColors", GameManager.LEDColorString);
                 }
             }
+            if (_params.screen.ApplyParamSpecificScreenColor)
+            {
+                _camera.backgroundColor = KLib.ColorTranslator.ColorFromARGB(_params.screen.Color);
+            }
 
             _params.Initialize();
 
