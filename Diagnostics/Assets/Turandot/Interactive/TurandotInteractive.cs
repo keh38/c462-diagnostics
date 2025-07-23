@@ -322,6 +322,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
                 SetParams(data);
                 break;
             case "SetProperty":
+                Debug.Log($"property: {data}");
                 SetProperty(data);
                 break;
             case "SetActive":

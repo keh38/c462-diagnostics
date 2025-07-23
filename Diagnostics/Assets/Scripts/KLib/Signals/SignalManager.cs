@@ -517,7 +517,6 @@ namespace KLib.Signals
                     }
                 }
                 Synth = false;
-                Debug.Log("dog");
 
                 if (_pausePending && !_paused)
                 {

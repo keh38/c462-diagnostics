@@ -36,6 +36,7 @@ namespace Turandot.Inputs
         private bool ShouldSerializeStartValue() { return false; }
 
         [Category("Appearance")]
+        [Browsable(false)]
         public bool ShowDigital { set; get; }
         private bool ShouldSerializeShowDigital() { return false; }
 
