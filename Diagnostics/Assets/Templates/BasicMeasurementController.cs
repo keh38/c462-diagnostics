@@ -102,6 +102,11 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
         File.WriteAllText(_dataPath, json);
     }
 
+    private void CreatePlan()
+    {
+
+    }
+
     private void Begin()
     {
         _localAbort = false;
@@ -123,7 +128,6 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
         {
             StartMeasurement();
         }
-
     }
 
     private void StartMeasurement()

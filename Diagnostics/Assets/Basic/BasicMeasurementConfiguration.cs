@@ -4,6 +4,7 @@ using System.Drawing.Design;
 using System.Xml.Serialization;
 
 [XmlInclude(typeof(Audiograms.AudiogramMeasurementSettings))]
+[XmlInclude(typeof(Bekesy.BekesyMeasurementSettings))]
 [XmlInclude(typeof(LDL.LDLMeasurementSettings))]
 [XmlInclude(typeof(Questionnaires.Questionnaire))]
 public class BasicMeasurementConfiguration

@@ -38,6 +38,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Basic/Bekesy/Bekesy.unity
     guid: 652f016030ac6f940ac3cdfb967e81c8
+  - enabled: 1
+    path: Assets/Audiometer/Audiometer.unity
+    guid: 0eb076c8344df8d4ab811a14decb9d18
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 28be48df767d2434681ec999065f06dc, type: 3}
   m_UseUCBPForAssetBundles: 0
