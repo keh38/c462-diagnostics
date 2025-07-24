@@ -1,5 +1,11 @@
 ## Changelog
 
+### v0.16 (2025-07-24)
+#### Added
+- Bekesy-method audiogram
+
+---
+
 ### v0.15 (2025-07-23)
 #### Added
 - Protocol: exposed control of list and instruction font sizes
