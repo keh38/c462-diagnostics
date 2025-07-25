@@ -1,5 +1,11 @@
 ## Changelog
 
+### v0.16.1 (2025-07-25)
+#### Fixed
+- Digitimer library was only setting the first device (by ID) 
+
+---
+
 ### v0.16 (2025-07-24)
 #### Added
 - Bekesy-method audiogram
