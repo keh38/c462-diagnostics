@@ -152,6 +152,7 @@
     <Compile Include="Assets\Basic\BasicMeasurementFileHeader.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.Adaptation.cs" />
     <Compile Include="Assets\Pupillometry\Pupillometry.DynamicRangeData.cs" />
+    <Compile Include="Assets\Audiometer\Audiometer.UDPPacket.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotInput.cs" />
     <Compile Include="Assets\Pupillometry\GazeCalibration.cs" />
     <Compile Include="Assets\Templates\BasicMeasurementController.cs" />
@@ -195,6 +196,7 @@
     <Compile Include="Assets\Turandot\Parameters\Turandot.TermType.cs" />
     <Compile Include="Assets\Scripts\Admin Tools\HardwarePanel.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.ButtonData.cs" />
+    <Compile Include="Assets\Audiometer\AudiometerSettings.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptComputation.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.MapIndex.cs" />
     <Compile Include="Assets\Turandot\Screen\Turandot.Screen.ProgressBarLayout.cs" />
@@ -247,6 +249,7 @@
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\FM.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotCueHelp.cs" />
     <Compile Include="Assets\Scripts\Home\HomeMenu.cs" />
+    <Compile Include="Assets\Audiometer\AudiometerController.cs" />
     <Compile Include="Assets\Basic\LDL\SliderAnimator.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptiveTrack.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.Family.cs" />

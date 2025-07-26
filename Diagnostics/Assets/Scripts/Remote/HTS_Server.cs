@@ -275,7 +275,7 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             default:
-                _listener.SendAcknowledgement(false);
+                _listener.SendAcknowledgement();
                 _currentScene.ProcessRPC(command, data);
                 break;
         }
