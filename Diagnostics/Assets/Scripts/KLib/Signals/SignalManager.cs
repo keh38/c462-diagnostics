@@ -400,6 +400,10 @@ namespace KLib.Signals
                 }
                 _currentAmplitudes = new float[channels.Count];
                 _gatedChannel = channels.Find(x => x.gate.Active);
+
+                _paused = true;
+                _pausePending = false;
+                _unpausePending = true;
             }
             catch (Exception ex)
             {
@@ -481,13 +485,16 @@ namespace KLib.Signals
 
                     ch.Create();
 
-                    if (_pausePending && !_paused)
+//                    if (ch.active)
                     {
-                        Gate.RampDown(ch.Data);
-                    }
-                    if (_unpausePending && _paused)
-                    {
-                        Gate.RampUp(ch.Data);
+                        if (_pausePending && !_paused)
+                        {
+                            Gate.RampDown(ch.Data);
+                        }
+                        if (_unpausePending && _paused)
+                        {
+                            Gate.RampUp(ch.Data);
+                        }
                     }
 
                     if (ch.Laterality == Laterality.Diotic)
@@ -563,13 +570,16 @@ namespace KLib.Signals
 
                     ch.Create();
 
-                    if (_pausePending && !_paused)
+                    if (ch.active)
                     {
-                        Gate.RampDown(ch.Data);
-                    }
-                    if (_unpausePending && _paused)
-                    {
-                        Gate.RampUp(ch.Data);
+                        if (_pausePending && !_paused)
+                        {
+                            Gate.RampDown(ch.Data);
+                        }
+                        if (_unpausePending && _paused)
+                        {
+                            Gate.RampUp(ch.Data);
+                        }
                     }
 
                     if (ch.Laterality == Laterality.Diotic)

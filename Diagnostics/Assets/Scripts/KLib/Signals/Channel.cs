@@ -246,6 +246,8 @@ namespace KLib.Signals
 
         public void SetActive(bool active)
         {
+            if (active && this.active) return;
+
             this.active = active;
             if (active)
                 this.gate.Reset();
@@ -574,7 +576,7 @@ namespace KLib.Signals
                     location = "balance";
                     SetBalance();
                 }
-                _deactivated = false;
+                _deactivated = !active;
 
                 _intramuralVariables.Clear();
             }
@@ -763,6 +765,11 @@ namespace KLib.Signals
                 Data[k] = 0;
             }
 
+            if (!active && _deactivated)
+            {
+                return;
+            }
+
             if (waveform == null)
             {
                 return;
@@ -804,6 +811,7 @@ namespace KLib.Signals
                 //{
                 // //   gate.Reset();
                 //}
+
             }
             else
             {
@@ -812,6 +820,8 @@ namespace KLib.Signals
 
             _rampState = active ? _rampState : RampState.Off;
 
+            //Debug.Log($"{Name}: active = {active}, gate active = {gate.Active}, deactivated = {_deactivated}");
+
             if (active && !_deactivated)
             {
                 level.Apply(Data, references.Offset(modRefCorr));
@@ -819,18 +829,33 @@ namespace KLib.Signals
             else if (!active && !_deactivated)
             {
                 level.Apply(Data, references.Offset(modRefCorr));
-                Gate.RampDown(Data);
+                if (!gate.Active)
+                {
+                    //Debug.Log($"ramp down {Name}");
+                    Gate.RampDown(Data);
+                }
                 _deactivated = true;
             }
             else if (active && _deactivated)
             {
                 level.Apply(Data, references.Offset(modRefCorr));
-                Gate.RampUp(Data);
+                if (!gate.Active)
+                {
+                    //Debug.Log($"ramp up {Name}");
+                    Gate.RampUp(Data);
+                }
                 _deactivated = false;
             }
-            else if (!active && _deactivated)
+            //else if (!active && _deactivated)
+            //{
+            //    for (int k = 0; k < Data.Length; k++) Data[k] = 0;
+            //}
+
+            if (active && gate.ForceOneShot && gate.State == GateState.Finished)
             {
-                for (int k = 0; k < Data.Length; k++) Data[k] = 0;
+                Debug.Log($"one shot enforced {Name}");
+                active = false;
+                _deactivated = true;
             }
         }
 

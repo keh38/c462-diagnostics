@@ -69,6 +69,9 @@ namespace KLib.Signals
         [ProtoMember(8, IsRequired = true)]
         public float Period_ms { set; get; }
 
+        [ProtoMember(9, IsRequired = true)]
+        public bool ForceOneShot { set; get; }
+
         private float[] myRamp;
         private int _rampIndex;
 
@@ -128,6 +131,7 @@ namespace KLib.Signals
             Ramp_ms = 5;
             Period_ms = 100;
             Bursted = false;
+            ForceOneShot = false;
         }
 
         public Gate(float ramp_ms)
@@ -137,6 +141,7 @@ namespace KLib.Signals
             Ramp_ms = ramp_ms;
             Duration_ms = Period_ms = float.PositiveInfinity;
             Bursted = false;
+            ForceOneShot = false;
         }
 
         /// <summary>
@@ -153,6 +158,7 @@ namespace KLib.Signals
             Duration_ms = duration_ms;
             Ramp_ms = ramp_ms;
             Bursted = false;
+            ForceOneShot = false;
         }
 
         public List<string> GetSweepableParams()
@@ -437,7 +443,11 @@ namespace KLib.Signals
 
             for (int k=0; k<data.Length; k++)
             {
-                if (_gateIndex < _startPointOfRampUp)
+                if (finished)
+                {
+                    value = 0;
+                }
+                else if (_gateIndex < _startPointOfRampUp)
                 {
                     _state = GateState.Delay;
                     value = 0;
@@ -479,6 +489,10 @@ namespace KLib.Signals
                             _gateIndex = 0;
                             _wasLooped = true;
                             _currentPulse = 0;
+                            if (ForceOneShot)
+                            {
+                                finished = true;
+                            }
                         }
                         else if (_currentPulse < NumPulses - 1 && _gateIndex == _totalPoints)
                         {

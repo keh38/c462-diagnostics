@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
@@ -34,6 +35,7 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
     private UDPPacket _udpPacket = new UDPPacket();
 
     private SignalManager _signalManager;
+    private int _pulsedChannelIndex;
 
     private string _mySceneName = "Audiometer";
 
@@ -74,21 +76,21 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
     {
         _isRunning = false;
 
+        _pulsedChannelIndex = _settings.Channels.ToList().FindIndex(x => x.Pulsed);
+
         _signalManager = new SignalManager();
         _signalManager.AdapterMap = HardwareInterface.AdapterMap;
 
         for (int k=0; k<_settings.Channels.Length; k++)
         {
-            var ch = CreateChannel(k, Laterality.Left, _settings.Channels[k]);
+            var ch = CreateChannel(k + 1, Laterality.Left, _settings.Channels[k]);
             _signalManager.AddChannel(ch);
-            ch = CreateChannel(k, Laterality.Right, _settings.Channels[k]);
+            ch = CreateChannel(k + 1, Laterality.Right, _settings.Channels[k]);
             _signalManager.AddChannel(ch);
         }
 
         var audioConfig = AudioSettings.GetConfiguration();
         _signalManager.Initialize(audioConfig.sampleRate, audioConfig.dspBufferSize);
-        _signalManager.StartPaused();
-        _signalManager.Unpause();
 
         _isRunning = true;
     }
@@ -103,7 +105,7 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
             active = (channel.Continuous && (channel.Routing == "Binaural" || channel.Routing == laterality.ToString())),
             waveform = new FM()
             {
-                Carrier_Hz = 1000,
+                Carrier_Hz = number == 1 ? 500 : 1000,
                 ModFreq_Hz = 5,
                 Depth_Hz = 0
             },
@@ -114,12 +116,14 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
             },
             gate = new Gate()
             {
-                Active = !channel.Continuous,
+                Active = channel.Pulsed,
                 Duration_ms = _settings.Duration,
                 Ramp_ms = _settings.Ramp,
-                Period_ms = _settings.PipInterval,
+                Period_ms = Mathf.Max(_settings.PipInterval, _settings.Duration),
                 Bursted = true,
-                NumPulses = _settings.NumPulses
+                NumPulses = _settings.NumPulses,
+                BurstDuration_ms = _settings.NumPulses * _settings.PipInterval,
+                ForceOneShot = channel.Pulsed
             }
         };
 
@@ -135,16 +139,19 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
 
         if (prop == "Contin")
         {
-            _signalManager.channels[chNum].active = value > 0 && _settings.Channels[chNum].Routing != "Right";
-            _signalManager.channels[chNum + 1].active = value > 0 && _settings.Channels[chNum].Routing != "Left";
+            _signalManager.channels[2*chNum].active = value > 0 && _settings.Channels[chNum].Routing != "Right";
+            _signalManager.channels[2*chNum + 1].active = value > 0 && _settings.Channels[chNum].Routing != "Left";
         }
 
     }
 
     private void Pulse()
     {
-        _signalManager.channels[0].SetActive(true);
-        //_signalManager.channels[1].SetActive(true);
+        if (_pulsedChannelIndex >= 0)
+        {
+            _signalManager.channels[2 * _pulsedChannelIndex].SetActive(_settings.Channels[_pulsedChannelIndex].Routing != "Right");
+            _signalManager.channels[2 * _pulsedChannelIndex + 1].SetActive(_settings.Channels[_pulsedChannelIndex].Routing != "Left");
+        }
     }
 
     void OnAbortAction(InputAction.CallbackContext context)
