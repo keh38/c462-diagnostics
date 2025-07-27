@@ -141,6 +141,12 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
 
     }
 
+    private void Pulse()
+    {
+        _signalManager.channels[0].SetActive(true);
+        //_signalManager.channels[1].SetActive(true);
+    }
+
     void OnAbortAction(InputAction.CallbackContext context)
     {
         _abortAction.Disable();
@@ -188,6 +194,9 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
                 break;
             case "Channel":
                 UpdateChannel(data);
+                break;
+            case "Pulse":
+                Pulse();
                 break;
             case "Stop":
                 _signalManager.Pause();
