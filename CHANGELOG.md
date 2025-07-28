@@ -1,5 +1,11 @@
 ## Changelog
 
+### v0.16.2 (2025-07-28)
+#### Fixed
+- haptic/electric lateralities were defaulting to diotic, effectively producing crosstalk
+
+---
+
 ### v0.16.1 (2025-07-25)
 #### Fixed
 - Digitimer library was only setting the first device (by ID) 

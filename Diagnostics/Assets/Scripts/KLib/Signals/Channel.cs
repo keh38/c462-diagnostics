@@ -544,6 +544,11 @@ namespace KLib.Signals
                 SamplingRateHz = Fs;
                 _numPts = N;
 
+                if (Modality != Modality.Audio)
+                {
+                    Laterality = Laterality.None;
+                }
+
                 Data = new float[N];
 
                 location = "modulation";

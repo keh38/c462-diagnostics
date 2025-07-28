@@ -153,6 +153,7 @@ namespace Launcher
 #if DEBUG
                 var index = folder.IndexOf("Launcher");
                 folder = Path.Combine(folder.Substring(0, index - 1), "Diagnostics", "Build");
+                return;
 #else
                 // up one more level
                 folder = Path.GetDirectoryName(folder);
