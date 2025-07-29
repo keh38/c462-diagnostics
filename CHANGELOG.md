@@ -1,5 +1,11 @@
 ## Changelog
 
+### v0.17 (unreleased)
+#### Changed
+- modified gaze calibration to save log, allow data streaming
+#### Added 
+- manual audiometer
+
 ### v0.16.2 (2025-07-28)
 #### Fixed
 - haptic/electric lateralities were defaulting to diotic, effectively producing crosstalk
