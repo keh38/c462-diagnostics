@@ -22,10 +22,15 @@ namespace Audiograms
     {
         public float[] Freq_Hz;
         public float[] dBSPL;
-        
+
         public static ANSI_dBHL GetTable()
         {
             return FileIO.XmlDeserializeFromTextAsset<ANSI_dBHL>("ANSI_dBHL");
+        }
+
+        public static ANSI_dBHL GetTable(string transducer)
+        {
+            return FileIO.XmlDeserializeFromTextAsset<ANSI_dBHL>($"ANSI_dBHL_{transducer}");
         }
 
         public float HL_To_SPL(float freq)

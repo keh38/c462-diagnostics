@@ -1,3 +1,5 @@
+using System.Web.UI.Design.WebControls;
+
 namespace Audiometer
 {
     public class AudiometerSettings
@@ -19,6 +21,8 @@ namespace Audiometer
         public string Routing { get; set; }
         public bool Continuous { get; set; }
         public bool Pulsed { get; set; }
+        public float Level { get; set; }
+        public float Freq { get; set; }
         
         public AudiometerChannel() { }
     }

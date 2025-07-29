@@ -764,7 +764,6 @@ namespace KLib.Signals
             References references;
             float modRefCorr = 0;
 
-
             for (int k = 0; k < Data.Length; k++)
             {
                 Data[k] = 0;
@@ -858,7 +857,7 @@ namespace KLib.Signals
 
             if (active && gate.ForceOneShot && gate.State == GateState.Finished)
             {
-                Debug.Log($"one shot enforced {Name}");
+                //Debug.Log($"one shot enforced {Name}");
                 active = false;
                 _deactivated = true;
             }

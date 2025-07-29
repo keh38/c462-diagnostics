@@ -1,3 +1,4 @@
+using Audiograms;
 using Audiometer;
 using KLib;
 using KLib.Signals;
@@ -11,7 +12,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
-
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -26,7 +27,7 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
     [SerializeField] private GameObject _quitPanel;
     [SerializeField] private GameObject _workPanel;
 
-
+    List<ANSI_dBHL> dBHL_tables;
     private AudiometerSettings _settings = new AudiometerSettings();
 
     private UdpClient _udpClient;
@@ -76,6 +77,7 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
     {
         _isRunning = false;
 
+        dBHL_tables = new List<ANSI_dBHL>();
         _pulsedChannelIndex = _settings.Channels.ToList().FindIndex(x => x.Pulsed);
 
         _signalManager = new SignalManager();
@@ -83,6 +85,8 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
 
         for (int k=0; k<_settings.Channels.Length; k++)
         {
+            dBHL_tables.Add(ANSI_dBHL.GetTable(_settings.Channels[k].Transducer));
+
             var ch = CreateChannel(k + 1, Laterality.Left, _settings.Channels[k]);
             _signalManager.AddChannel(ch);
             ch = CreateChannel(k + 1, Laterality.Right, _settings.Channels[k]);
@@ -99,20 +103,20 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
     {
         var ch = new Channel()
         {
-            Name = $"Channel{number}{laterality}",
+            //Name = $"Channel{number}{laterality}",
             Modality = KLib.Signals.Enumerations.Modality.Audio,
             Laterality = laterality,
             active = (channel.Continuous && (channel.Routing == "Binaural" || channel.Routing == laterality.ToString())),
             waveform = new FM()
             {
-                Carrier_Hz = number == 1 ? 500 : 1000,
+                Carrier_Hz = channel.Freq,
                 ModFreq_Hz = 5,
                 Depth_Hz = 0
             },
             level = new Level()
             {
                 Units = LevelUnits.dB_SPL,
-                Value = 75
+                Value = channel.Level + dBHL_tables[number - 1].HL_To_SPL(channel.Freq)
             },
             gate = new Gate()
             {
@@ -132,17 +136,52 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
 
     private void UpdateChannel(string data)
     {
+        //Debug.Log($"Update channel: {data}");
+
         var parts = data.Split(':');
         int chNum = int.Parse(parts[0]) - 1;
         string prop = parts[1];
-        float value = float.Parse(parts[2]);
 
         if (prop == "Contin")
         {
-            _signalManager.channels[2*chNum].active = value > 0 && _settings.Channels[chNum].Routing != "Right";
-            _signalManager.channels[2*chNum + 1].active = value > 0 && _settings.Channels[chNum].Routing != "Left";
-        }
+            bool value = parts[2].ToLower().Equals("true");
 
+            _settings.Channels[chNum].Continuous = value;
+            _signalManager.channels[2*chNum].active = value && _settings.Channels[chNum].Routing != "Right";
+            _signalManager.channels[2*chNum + 1].active = value && _settings.Channels[chNum].Routing != "Left";
+        }
+        else if (prop == "Routing")
+        {
+            _settings.Channels[chNum].Routing = parts[2];
+            if (_settings.Channels[chNum].Continuous)
+            {
+                _signalManager.channels[2 * chNum].active = _settings.Channels[chNum].Routing != "Right";
+                _signalManager.channels[2 * chNum + 1].active = _settings.Channels[chNum].Routing != "Left";
+            }
+        }
+        else if (prop == "Freq")
+        {
+            var freq = float.Parse(parts[2]);
+            var level = float.Parse(parts[3]);
+
+            _settings.Channels[chNum].Freq = freq;
+            _settings.Channels[chNum].Level = level;
+
+            (_signalManager.channels[2 * chNum].waveform as FM).Carrier_Hz = _settings.Channels[chNum].Freq;
+            _signalManager.channels[2 * chNum].level.Value = level + dBHL_tables[chNum].HL_To_SPL(_settings.Channels[chNum].Freq);
+
+            (_signalManager.channels[2 * chNum + 1].waveform as FM).Carrier_Hz = _settings.Channels[chNum].Freq;
+            _signalManager.channels[2 * chNum + 1].level.Value = level + dBHL_tables[chNum].HL_To_SPL(_settings.Channels[chNum].Freq);
+        }
+    }
+
+    private void UpdatePulsedChannelIndex(string data)
+    {
+        _pulsedChannelIndex = int.Parse(data);
+        for (int k=0; k<_settings.Channels.Length; k++)
+        {
+            _settings.Channels[k].Pulsed = k == _pulsedChannelIndex;
+        }
     }
 
     private void Pulse()
@@ -151,6 +190,21 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
         {
             _signalManager.channels[2 * _pulsedChannelIndex].SetActive(_settings.Channels[_pulsedChannelIndex].Routing != "Right");
             _signalManager.channels[2 * _pulsedChannelIndex + 1].SetActive(_settings.Channels[_pulsedChannelIndex].Routing != "Left");
+        }
+    }
+
+    private void SetDuration(string data)
+    {
+        _settings.Duration = float.Parse(data);
+
+
+        foreach (var ch in _signalManager.channels)
+        {
+            ch.SetParameter("Gate.Duration_ms", _settings.Duration);
+            if (_settings.NumPulses == 1)
+            {
+                ch.SetParameter("Gate.Period_ms", _settings.Duration + 10);
+            }
         }
     }
 
@@ -201,6 +255,12 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
                 break;
             case "Channel":
                 UpdateChannel(data);
+                break;
+            case "Pulsed":
+                UpdatePulsedChannelIndex(data);
+                break;
+            case "SetDuration":
+                SetDuration(data);
                 break;
             case "Pulse":
                 Pulse();

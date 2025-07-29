@@ -326,6 +326,7 @@
     <Compile Include="Assets\Turandot\Parameters\Turandot.Parameters.cs" />
     <Compile Include="Assets\Turandot\Inputs\ChecklistItem.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Calibration\CalibrationData.cs" />
+    <Compile Include="Assets\Pupillometry\GazeCalibrationLog.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotCueController.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Calibration\CalibrationFactory.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotCueScoreboard.cs" />
@@ -345,6 +346,7 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile-2-Pass.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
+    <None Include="Assets\Resources\ANSI_dBHL_HD300.xml" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
     <None Include="Assets\Resources\ANSI_dBHL.xml" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
@@ -355,10 +357,12 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
+    <None Include="Assets\Resources\ANSI_dBHL_Insert.xml" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
+    <None Include="Assets\Resources\ANSI_dBHL_Inserts.xml" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />

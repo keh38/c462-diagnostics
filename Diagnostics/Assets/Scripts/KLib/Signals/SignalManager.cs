@@ -499,7 +499,6 @@ namespace KLib.Signals
 
                     if (ch.Laterality == Laterality.Diotic)
                     {
-                        Debug.Log("yo");
                         idx = 0;
                         for (int k = 0; k < Npts; k++)
                         {
@@ -512,8 +511,7 @@ namespace KLib.Signals
                     else
                     {
                         idx = ch.OutputNum;
-                        Debug.Log($"{ch.Name} = {ch.OutputNum}");
-                        Debug.Log(ch.MyEndpoint);
+                        //Debug.Log($"{ch.Name} output = {ch.OutputNum}");
                         for (int k = 0; k < Npts; k++)
                         {
                             data[idx] += ch.Data[k];

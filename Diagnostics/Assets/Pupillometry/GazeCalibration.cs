@@ -25,6 +25,9 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
     private GazeCalibrationSettings _settings;
 
     private string _mySceneName = "Gaze Calibration";
+    private string _dataPath;
+
+    private GazeCalibrationLog _data = new GazeCalibrationLog();
 
     void Start()
     {
@@ -49,12 +52,27 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
 
         GetComponent<Camera>().backgroundColor = KLib.ColorTranslator.ColorFromARGB(_settings.BackgroundColor);
 
+        string fn = $"{GameManager.Subject}-PupilDR-{DateTime.Now.ToString("yyyy-MM-dd_HHmmss")}.json";
+        _dataPath = Path.Combine(FileLocations.SubjectFolder, fn);
+
+        var header = new BasicMeasurementFileHeader()
+        {
+            measurementType = "GazeCalibration",
+            subjectID = GameManager.Subject
+        };
+
+        string json = FileIO.JSONStringAdd("", "info", KLib.FileIO.JSONSerializeToString(header));
+        File.WriteAllText(_dataPath, json);
+
+        HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
+
         _isRunning = true;
     }
 
     private void ShowTarget(int x, int y)
     {
         _target.gameObject.SetActive(true);
+        _data.Add(Time.time, x, y);
         Debug.Log($"set target to {x}, {y}");
 
         _target.rectTransform.position = new Vector2(x, Screen.height - y);
@@ -91,6 +109,12 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
         }
     }
 
+    void SendData()
+    {
+        _data.Trim();
+        HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+    }
+
     void IRemoteControllable.ChangeScene(string newScene)
     {
         SceneManager.LoadScene(newScene);
@@ -106,6 +130,9 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
             case "Abort":
                 _isRunning = false;
                 _target.gameObject.SetActive(false);
+                break;
+            case "SendData":
+                SendData();
                 break;
             case "Location":
                 var parts = data.Split(',');
