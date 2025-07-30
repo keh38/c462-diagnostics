@@ -423,8 +423,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     {
         //if (_params.schedule.mode != Mode.Adapt) StoreResults();
 
-        //_audioTimer.StopThread();
-
         _engine.ClearScreen();
 
         var audioFile = _mainDataFile.Replace(".json", ".audio.json");
@@ -433,6 +431,16 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         HTS_Server.SendMessage("Turandot", "Finished:");
         HTS_Server.SendMessage("Turandot", $"ReceiveData:{Path.GetFileName(_mainDataFile)}:{File.ReadAllText(_mainDataFile)}");
         HTS_Server.SendMessage("Turandot", $"ReceiveData:{Path.GetFileName(audioFile)}:{File.ReadAllText(audioFile)}");
+
+        if (_params.trialLogOption == TrialLogOption.Upload)
+        {
+            var trialFiles = Directory.EnumerateFiles(FileLocations.SubjectFolder, Path.GetFileName(_mainDataFile).Replace(".json", "-Block*-Trial*.json")).ToList();
+            Debug.Log($"ntrial files = {trialFiles.Count}");
+            foreach (var trialFile in trialFiles)
+            {
+                HTS_Server.SendMessage("Turandot", $"ReceiveData:{Path.GetFileName(trialFile)}:{File.ReadAllText(trialFile)}");
+            }
+        }
 
         //if (SubjectManager.Instance.UploadData) DataFileManager.UploadDataFile(_mainDataFile);
         //SubjectManager.Instance.DataFiles.Add(_mainDataFile);

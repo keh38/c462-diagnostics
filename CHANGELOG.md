@@ -5,6 +5,11 @@
 - modified gaze calibration to save log, allow data streaming
 #### Added 
 - manual audiometer
+#### Fixed
+- restored use of controller's folder when run on the same computer
+- correctly size fixation point
+
+---
 
 ### v0.16.2 (2025-07-28)
 #### Fixed

@@ -72,10 +72,10 @@ namespace Turandot.Scripts
 
        public void ClearLog()
         {
-            //led.ClearLog();
-            //message.ClearLog();
-            //fixationPoint.ClearLog();
-            //helpCue.ClearLog();
+            foreach (var control in _controls)
+            {
+                control.ClearLog();
+            }
         }
 
         public void SetFlags(List<Flag> flags)
@@ -108,10 +108,10 @@ namespace Turandot.Scripts
             get
             {
                 string json = "";
-                //if (_used.Contains("led")) json = KLib.FileIO.JSONStringAdd(json, "LED", led.LogJSONString);
-                //if (_used.Contains("message")) json = KLib.FileIO.JSONStringAdd(json, "Message", message.LogJSONString);
-                //if (_used.Contains("fixation point")) json = KLib.FileIO.JSONStringAdd(json, "Fixation", fixationPoint.LogJSONString);
-                //if (_used.Contains("help")) json = KLib.FileIO.JSONStringAdd(json, "Help", helpCue.LogJSONString);
+                foreach (var control in _controls)
+                {
+                    json = KLib.FileIO.JSONStringAdd(json, control.Name, control.LogJSONString);
+                }
 
                 return json;
             }

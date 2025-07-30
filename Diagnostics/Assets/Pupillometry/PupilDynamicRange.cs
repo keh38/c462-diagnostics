@@ -13,7 +13,7 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 {
     [SerializeField] private Camera _camera;
 
-        private Pupillometry.DynamicRangeSettings _settings;
+    private Pupillometry.DynamicRangeSettings _settings;
 
     private bool _isRunning = false;
 

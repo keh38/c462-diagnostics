@@ -20,57 +20,17 @@ namespace Turandot.Scripts
         }
 
         Cue _cue = null;
-/*        CueLog _log;
-
-        private float _maxAlpha = 1;
-
-        virtual public void Initialize()
-        {
-            _log = new CueLog(name);
-            _log.Clear();
-            widget.alpha = 0;
-        }
-
-        public void HideCue()
-        {
-            widget.alpha = 0;
-        }
-
-        public void Clear()
-        {
-            _cue = null;
-        }
+        CueLog _log = new CueLog();
 
         public void ClearLog()
         {
             _log.Clear();
         }
 
-  */      virtual public void Activate(Cue cue)
+        virtual public void Activate(Cue cue)
         {
             _cue = cue;
-
-            //if (cue.changeAppearance)
-            //{
-            //    widget.color = new Color(cue.R, cue.G, cue.B);
-            //    widget.alpha = 0;
-            //    _maxAlpha = cue.A;
-            //    widget.transform.localPosition = new Vector2(cue.X, cue.Y);
-            //}
-
-            //if (_cue.delay_ms > 0 && _cue.startVisible && _cue.numFlash == 0)
-            //{
-            //    StartCoroutine(ShowCueDelayed(_cue.delay_ms / 1000));
-            //}
-            //else
-            //{
-                ShowCue(cue.BeginVisible);
-            //}
-
-            //if (_cue.numFlash > 0)
-            //{
-            //    StartCoroutine(FlashCue());
-            //}
+            ShowCue(cue.BeginVisible);
         }
 
         public void Deactivate()
@@ -85,7 +45,7 @@ namespace Turandot.Scripts
         void ShowCue(bool visible)
         {
             gameObject.SetActive(visible);
-//            if (_log != null) _log.Add(Time.timeSinceLevelLoad, visible);
+            if (_log != null) _log.Add(Time.timeSinceLevelLoad, visible);
         }
 /*
         private IEnumerator ShowCueDelayed(float delay_s)
@@ -121,7 +81,7 @@ namespace Turandot.Scripts
             }
 
         }
-
+*/
         public string LogJSONString
         {
             get
@@ -129,7 +89,7 @@ namespace Turandot.Scripts
                 _log.Trim();
                 return KLib.FileIO.JSONSerializeToString(_log);
             }
-        }*/
+        }
 
     }
 }

@@ -205,6 +205,7 @@
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptTrialResult.cs" />
     <Compile Include="Assets\Turandot\Cues\Turandot.Cues.ImageAction.cs" />
     <Compile Include="Assets\Scripts\Admin Tools\AdminToolsMenu.cs" />
+    <Compile Include="Assets\Calibration\CalibrationController.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotCueMessage.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\UserFileReferences.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptHistory.cs" />

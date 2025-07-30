@@ -162,7 +162,7 @@ public class HTS_Server : MonoBehaviour
 
             case "SetDataRoot":
                 _listener.SendAcknowledgement();
-                //FileLocations.SetDataRoot(data);
+                FileLocations.SetDataRoot(data);
                 _currentScene.ProcessRPC("SetDataRoot");
                 break;
 

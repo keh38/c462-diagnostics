@@ -11,36 +11,19 @@ namespace Turandot.Cues
     [JsonObject(MemberSerialization.OptOut)]
     public class CueLog
     {
-        public string name;
         public float[] t;
         public int[] value;
 
-        [JsonIgnore]
-        private int _numControls;
-        [JsonIgnore]
-        private int _numEvents;
         [JsonIgnore]
         private int _index;
         [JsonIgnore]
         private int _lengthIncrement;
 
-        public CueLog() : this("cue", 10000)
-        {
-        }
+        public CueLog() : this(10000) { }
 
-        public CueLog(string name) : this(name, 10000)
+        public CueLog(int lengthIncrement)
         {
-        }
-
-        public CueLog(string name, int lengthIncrement)
-        {
-            this.name = name;
             _lengthIncrement = lengthIncrement;
-            _numControls = 0;
-        }
-
-        public void Initialize(string name)
-        {
             Clear();
         }
 
