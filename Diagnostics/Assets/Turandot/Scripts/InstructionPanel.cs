@@ -26,6 +26,8 @@ public class InstructionPanel : MonoBehaviour
         _instructions = instructions;
         _pageIndex = 0;
 
+        _backButton.GetComponentInChildren<TMPro.TMP_Text>().fontSize = instructions.FontSize;
+        _continueButton.GetComponentInChildren<TMPro.TMP_Text>().fontSize = instructions.FontSize;
         _markdownRenderer.TextMesh.fontSize = instructions.FontSize;
 
         _pages = _instructions.Text

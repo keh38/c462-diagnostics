@@ -37,34 +37,41 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
 
     void Initialize(string data)
     {
-        _settings = FileIO.XmlDeserializeFromString<GazeCalibrationSettings>(data);
-
-        _numTargets = int.Parse(_settings.CalibrationType.Substring(_settings.CalibrationType.Length - 1)) + 1;
-        _numAcquired = 0;
-
-        float size = Screen.width / _settings.TargetSizeFactor;
-        _target.rectTransform.sizeDelta = new Vector2(size, size);
-        _target.color = KLib.ColorTranslator.ColorFromARGB(_settings.TargetColor);
-
-        size = Screen.width / _settings.HoleSizeFactor;
-        _hole.rectTransform.sizeDelta = new Vector2(size, size);
-        _hole.color = KLib.ColorTranslator.ColorFromARGB(_settings.BackgroundColor);
-
-        GetComponent<Camera>().backgroundColor = KLib.ColorTranslator.ColorFromARGB(_settings.BackgroundColor);
-
-        string fn = $"{GameManager.Subject}-PupilDR-{DateTime.Now.ToString("yyyy-MM-dd_HHmmss")}.json";
-        _dataPath = Path.Combine(FileLocations.SubjectFolder, fn);
-
-        var header = new BasicMeasurementFileHeader()
+        try
         {
-            measurementType = "GazeCalibration",
-            subjectID = GameManager.Subject
-        };
+            _settings = FileIO.XmlDeserializeFromString<GazeCalibrationSettings>(data);
 
-        string json = FileIO.JSONStringAdd("", "info", KLib.FileIO.JSONSerializeToString(header));
-        File.WriteAllText(_dataPath, json);
+            _numTargets = int.Parse(_settings.CalibrationType.Substring(_settings.CalibrationType.Length - 1)) + 1;
+            _numAcquired = 0;
 
-        HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
+            float size = Screen.width / _settings.TargetSizeFactor;
+            _target.rectTransform.sizeDelta = new Vector2(size, size);
+            _target.color = KLib.ColorTranslator.ColorFromARGB(_settings.TargetColor);
+
+            size = Screen.width / _settings.HoleSizeFactor;
+            _hole.rectTransform.sizeDelta = new Vector2(size, size);
+            _hole.color = KLib.ColorTranslator.ColorFromARGB(_settings.BackgroundColor);
+
+            GetComponent<Camera>().backgroundColor = KLib.ColorTranslator.ColorFromARGB(_settings.BackgroundColor);
+
+            string fn = $"{GameManager.Subject}-GazeCalibration-{DateTime.Now.ToString("yyyy-MM-dd_HHmmss")}.json";
+            _dataPath = Path.Combine(FileLocations.SubjectFolder, fn);
+
+            var header = new BasicMeasurementFileHeader()
+            {
+                measurementType = "GazeCalibration",
+                subjectID = GameManager.Subject
+            };
+
+            string json = FileIO.JSONStringAdd("", "info", KLib.FileIO.JSONSerializeToString(header));
+            File.WriteAllText(_dataPath, json);
+
+            HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
+        }
+        catch (Exception ex)
+        {
+            Debug.Log($"Gaze calibration error: {ex.Message}");
+        }
 
         _isRunning = true;
     }
@@ -112,6 +119,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
     void SendData()
     {
         _data.Trim();
+        File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data)); 
         HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
     }
 

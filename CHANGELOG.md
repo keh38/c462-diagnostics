@@ -1,9 +1,10 @@
 ## Changelog
 
-### v0.17 (unreleased)
+### v0.17 (2025-08-01)
 #### Changed
 - modified gaze calibration to save log, allow data streaming
 - Turandot transfers trial logs to PC along with main data file (if "Upload" option selected)
+- Turandot instruction font size also applied to buttons
 #### Added 
 - manual audiometer
 #### Fixed
