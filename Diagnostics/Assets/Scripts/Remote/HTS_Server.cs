@@ -284,6 +284,7 @@ public class HTS_Server : MonoBehaviour
 
     private void ReceiveFile(string data)
     {
+        Debug.Log(data);
         var parts = data.Split(new char[] { ':' }, 3);
         if (parts.Length != 3) return;
         var folder = FileLocations.LocalResourceFolder(parts[0]);

@@ -115,7 +115,17 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
 
     void PlayTone(string data)
     {
+        var parts = data.Split(':');
+        var ear = parts[0];
+        var level = float.Parse(parts[1]);
+        var freq = float.Parse(parts[2]);
 
+
+        string chName = $"Tone{ear}";
+
+        (_signalManager[chName].waveform as Sinusoid).Frequency_Hz = freq;
+        _signalManager[chName].level.Value = level;
+        _signalManager[chName].SetActive(true);
     }
 
     void PlayNoise(string data)
@@ -143,10 +153,11 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
     {
         switch (command)
         {
-            case "Tone":
-                break;
             case "Noise":
                 PlayNoise(data);
+                break;
+            case "Tone":
+                PlayTone(data);
                 break;
             case "Stop":
                 Stop();

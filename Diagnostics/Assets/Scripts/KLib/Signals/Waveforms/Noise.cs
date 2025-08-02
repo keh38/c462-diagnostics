@@ -207,7 +207,12 @@ namespace KLib.Signals.Waveforms
             else
             {
                 _token = new float[tokenLength];
-                for (int k = 0; k < tokenLength; k++) _token[k] = Mathf.Clamp(normrnd.Next(0, _normRMS), -1, 1);
+                float ss = 0;
+                for (int k = 0; k < tokenLength; k++)
+                {
+                    _token[k] = Mathf.Clamp(normrnd.Next(0, _normRMS), -1, 1);
+                    ss += _token[k] * _token[k];
+                }
             }
 
             if (filter.brickwall && (filter.shape != FilterShape.None || (precompensate && (_channel.level.Units == LevelUnits.dB_SPL || _channel.level.Units == LevelUnits.dB_SPL_noLDL))))

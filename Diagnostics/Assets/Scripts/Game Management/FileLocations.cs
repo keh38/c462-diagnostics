@@ -104,6 +104,16 @@ public static class FileLocations
 
     public static string LocalResourceFolder(string resourceType)
     {
+        if (resourceType == "Calibration")
+        {
+            var calFolder = Path.Combine(Application.persistentDataPath, "Calibrations");
+            if (!Directory.Exists(calFolder))
+            {
+                Directory.CreateDirectory(calFolder);
+            }
+            return calFolder;
+        }
+
         return Path.Combine(ProjectFolder, "Resources", resourceType);
     }
     public static string LocalResourceFolder(string project, string resourceType)
