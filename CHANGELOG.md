@@ -1,5 +1,11 @@
 ## Changelog
 
+### v0.18 (unreleased)
+#### Added
+- sync log handling to gaze calibration
+
+---
+
 ### v0.17 (2025-08-01)
 #### Changed
 - modified gaze calibration to save log, allow data streaming
