@@ -119,8 +119,17 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
     void SendData()
     {
         _data.Trim();
-        File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data)); 
+        File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
         HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+    }
+
+    void SendSyncLog()
+    {
+        var logPath = HardwareInterface.ClockSync.LogFile;
+        if (!string.IsNullOrEmpty(logPath))
+        {
+            HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
+        }
     }
 
     void IRemoteControllable.ChangeScene(string newScene)
@@ -135,12 +144,21 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
             case "Initialize":
                 Initialize(data);
                 break;
+            case "StartSynchronizing":
+                HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
+                break;
+            case "StopSynchronizing":
+                HardwareInterface.ClockSync.StopSynchronizing();
+                break;
             case "Abort":
                 _isRunning = false;
                 _target.gameObject.SetActive(false);
                 break;
             case "SendData":
                 SendData();
+                break;
+            case "SendSyncLog":
+                SendSyncLog();
                 break;
             case "Location":
                 var parts = data.Split(',');
