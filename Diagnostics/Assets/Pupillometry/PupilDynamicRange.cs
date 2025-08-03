@@ -154,7 +154,19 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
         }
 
         _data.Trim();
-        KLib.FileIO.JSONSerialize(_data, _dataPath);
+
+        var header = new BasicMeasurementFileHeader()
+        {
+            measurementType = _mySceneName,
+            subjectID = GameManager.Subject
+        };
+
+        string json = FileIO.JSONStringAdd("", "info", KLib.FileIO.JSONSerializeToString(header));
+        json = KLib.FileIO.JSONStringAdd(json, "params", KLib.FileIO.JSONSerializeToString(_settings));
+        json = KLib.FileIO.JSONStringAdd(json, "data", KLib.FileIO.JSONSerializeToString(_data));
+        json += Environment.NewLine;
+
+        File.WriteAllText(_dataPath, json);
 
         string status = _stopMeasurement ? "Measurement aborted" : "Measurement finished";
         HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");

@@ -8,11 +8,6 @@ namespace Pupillometry
     [JsonObject(MemberSerialization.OptOut)]
     public class DynamicRangeData
     {
-        public string programName;
-        public string version;
-        public string date;
-        public string filePath;
-
         public double[] time;
         public float[] intensity;
 
@@ -24,11 +19,6 @@ namespace Pupillometry
         public DynamicRangeData() { }
         public DynamicRangeData(string filePath, int lengthIncrement)
         {
-            programName = UnityEngine.Application.productName;
-            version = UnityEngine.Application.version;
-            date = DateTime.Now.ToString();
-            this.filePath = filePath;
-
             _lengthIncrement = lengthIncrement;
             time = new double[_lengthIncrement];
             intensity = new float[_lengthIncrement];
