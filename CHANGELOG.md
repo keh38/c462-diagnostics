@@ -3,6 +3,8 @@
 ### v0.18 (unreleased)
 #### Added
 - sync log handling to gaze calibration
+- acoustic calibration interface
+- ability to read CFTS-format calibration files
 
 ---
 

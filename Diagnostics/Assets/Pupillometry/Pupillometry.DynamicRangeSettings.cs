@@ -6,6 +6,10 @@ namespace Pupillometry
 {
     public class DynamicRangeSettings
     {
+        [DisplayName("(Name)")]
+        public string Name { get; set; }
+        private bool ShouldSerializeName() { return false; }
+
         [Description("Duration of baseline period before stimulation (seconds)")]
         public float PrestimulusBaseline { get; set; }
         private bool ShouldSerializePrestimulusBaseline() { return false; }
@@ -50,6 +54,7 @@ namespace Pupillometry
 
         public DynamicRangeSettings()
         {
+            Name = "Defaults";
             PrestimulusBaseline = 2;
             PoststimulusBaseline = 2;
             StimulusPeriod = 20;

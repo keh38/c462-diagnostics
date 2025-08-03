@@ -173,7 +173,7 @@ public static class FileLocations
 
     // Speech test wav file folder
     public static readonly string BasicResourcesFolder = @"C:\Users\Public\Music\{4CF46EAB-0304-4429-9666-035ADFDB847F}\{18AE38D6-5684-4966-9047-C49547486142}";
-    public static readonly string CalibrationFolder = Path.Combine(BasicResourcesFolder, "Calibration");
+    //public static readonly string CalibrationFolder = Path.Combine(BasicResourcesFolder, "Calibration");
 
     // Speech test wav file folder
     public static readonly string SpeechWavFolder = @"C:/Users/Public/Music/{4CF46EAB-0304-4429-9666-035ADFDB847F}/{26766E8C-CF81-47D3-A998-C974848F67C0}";
