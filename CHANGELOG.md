@@ -1,6 +1,8 @@
 ## Changelog
 
 ### v0.18 (unreleased)
+#### Changed
+- save pupil dynamic range settings in data file
 #### Added
 - sync log handling to gaze calibration
 - acoustic calibration interface
