@@ -22,7 +22,7 @@ namespace KLib.Signals.Calibration
             // NEW!!!
             var calPath = Path.Combine(FileLocations.LocalResourceFolder("Calibration"),
                 $"{transducer}.{speaker}.calib");
-            Debug.Log($"local cal file = {calPath}");
+            //Debug.Log($"local cal file = {calPath}");
             if (File.Exists(calPath))
             {
                 return AcousticCalibration.ReadCFTSCalibrationFile(calPath);

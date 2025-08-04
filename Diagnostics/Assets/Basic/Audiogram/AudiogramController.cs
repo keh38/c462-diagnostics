@@ -488,6 +488,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
 
         if (_stopMeasurement)
         {
+            EndRun(abort: true);
             yield break;
         }
 

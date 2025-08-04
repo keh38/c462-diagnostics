@@ -1,12 +1,14 @@
 ## Changelog
 
-### v0.18 (unreleased)
+### v0.18 (2025-08-04)
 #### Changed
 - save pupil dynamic range settings in data file
 #### Added
 - sync log handling to gaze calibration
 - acoustic calibration interface
 - ability to read CFTS-format calibration files
+#### Fixed
+- automated audiogram stops without locking up controller
 
 ---
 

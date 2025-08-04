@@ -136,7 +136,7 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
 
     private void UpdateChannel(string data)
     {
-        //Debug.Log($"Update channel: {data}");
+        Debug.Log($"Update channel: {data}");
 
         var parts = data.Split(':');
         int chNum = int.Parse(parts[0]) - 1;
