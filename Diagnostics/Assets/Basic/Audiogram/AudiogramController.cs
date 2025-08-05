@@ -404,7 +404,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
                 "- The pitch will be different, but your job is the same.",
                 _settings.InstructionFontSize);
         }
-        else if (_currentStimulusCondition.NewEar)
+        else if (_currentStimulusCondition.NewEar && _settings.ShowOtherEarMessage)
         {
             _instructionPanel.InstructionsFinished = DoCurrentStimulusCondition;
             ShowInstructions("- Great!\n- Let's try the same thing with your right ear", _settings.InstructionFontSize);
@@ -810,6 +810,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             {
                 Active = true,
                 Duration_ms = _settings.ToneDuration,
+                Period_ms = 0,
                 Ramp_ms = _settings.Ramp
             }
         };

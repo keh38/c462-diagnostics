@@ -1,8 +1,18 @@
 ## Changelog
 
-### v0.19.1 (unreleased)
+### v0.20 (2025-08-05)
+#### Fixed
+- Basic measurements can be run from protocol
+- fixed falling gate on audiogram tones
+- made "try it in the other ear" message optional in audiogram
+
+---
+
+### v0.19.1 (2025-08-05)
 #### Fixed
 - broken display of .wav files in Turandot editor
+- don't display Apply button until Manikin slider moved
+- align Turandot checklist text to bottom
 
 ---
 

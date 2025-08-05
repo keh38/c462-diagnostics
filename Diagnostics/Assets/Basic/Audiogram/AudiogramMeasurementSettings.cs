@@ -11,6 +11,11 @@ namespace Audiograms
         public string Title { get; set; }
         private bool ShouldSerializeTitle() { return false; }
 
+        [Category("Behavior")]
+        [DisplayName("Ear message")]
+        public bool ShowOtherEarMessage { get; set; }
+        private bool ShouldSerializeShowOtherEarMessage() { return false; }
+
         [Category("Sequence")]
         [Description("Minimum interval between test stimuli (s)")]
         [DisplayName("Min ISI")]
@@ -114,6 +119,7 @@ namespace Audiograms
             MaxISI = 7;
             Abridged = false;
             ModDepth = 0;
+            ShowOtherEarMessage = true;
         }
 
     }

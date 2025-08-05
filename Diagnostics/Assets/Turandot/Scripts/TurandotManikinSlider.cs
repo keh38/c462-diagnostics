@@ -103,11 +103,11 @@ namespace Turandot.Scripts
         {
             if (_manikinSpec.RandomizeStartPosition)
             {
-                _slider.value = Random.Range(_manikinSpec.MinStartPosition, _manikinSpec.MaxStartPosition);
+                _slider.SetValueWithoutNotify(Random.Range(_manikinSpec.MinStartPosition, _manikinSpec.MaxStartPosition));
             }
             else
             {
-                _slider.value = _manikinSpec.StartPosition;
+                _slider.SetValueWithoutNotify(_manikinSpec.StartPosition);
             }
 
             //_thumb.SetActive(false);

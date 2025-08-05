@@ -393,7 +393,15 @@ namespace KLib.Signals
 
             myRamp = Sine2Ramp(Fs, nRampPts, true);
 
-            _totalPoints = Mathf.RoundToInt(Fs * Period_ms / 1000);
+            if (Period_ms > 0)
+            {
+                _totalPoints = Mathf.RoundToInt(Fs * Period_ms / 1000);
+            }
+            else
+            {
+                _totalPoints = Mathf.RoundToInt(Fs * Duration_ms / 1000);
+            }
+
             if (Bursted)
             {
                 float burstDur = BurstDuration_ms > Period_ms ? BurstDuration_ms : Period_ms;
@@ -409,6 +417,7 @@ namespace KLib.Signals
             else
             {
                 _startPointOfRampDown = _startPointOfRampUp + Mathf.RoundToInt(Fs * Duration_ms / 1000) - nRampPts;
+                Debug.Log($"start point of ramp down = {_startPointOfRampDown}");
             }
 
             _isOneShot = float.IsPositiveInfinity(Period_ms);
@@ -440,7 +449,6 @@ namespace KLib.Signals
 
             _wasLooped = false;
             _loopOffset = -1;
-
             for (int k=0; k<data.Length; k++)
             {
                 if (finished)

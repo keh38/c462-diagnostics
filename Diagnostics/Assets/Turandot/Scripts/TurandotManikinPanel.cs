@@ -106,6 +106,7 @@ namespace Turandot.Scripts
 
         public void OnSliderChanged(float value)
         {
+            Debug.Log("yo");
             _button.SetActive(_sliders.Find(x => !x.Moved) == null);
         }
 
