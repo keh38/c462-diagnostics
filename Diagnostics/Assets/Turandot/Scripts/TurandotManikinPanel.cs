@@ -66,6 +66,13 @@ namespace Turandot.Scripts
             myRT.sizeDelta = new Vector2(myWidth, myHeight);
             myRT.anchorMin = new Vector2(_layout.X, _layout.Y);
             myRT.anchorMax = new Vector2(_layout.X, _layout.Y);
+
+            var buttonText = _button.GetComponentInChildren<TMPro.TMP_Text>();
+            buttonText.fontSize = _layout.SliderFontSize;
+
+            var buttonRT = _button.GetComponent<RectTransform>();
+            buttonRT.sizeDelta = new Vector2(_layout.ButtonWidth, _layout.ButtonHeight);
+            buttonRT.anchoredPosition = new Vector2(buttonRT.anchoredPosition.x, -_layout.ButtonSpacing);
         }
 
         override public void Activate(Input input, TurandotAudio audio)

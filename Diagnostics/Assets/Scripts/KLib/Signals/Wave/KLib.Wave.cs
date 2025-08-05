@@ -69,12 +69,7 @@ namespace KLib.Wave
             _data = null;
         }
 
-        public void Read(string path)
-        {
-            Read(path, false);
-        }
-
-        public void Read(string path, bool metadataOnly)
+        public void Read(string path, bool metadataOnly=false, int npts=0)
         {
             uint skip;
             Clear();

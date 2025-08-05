@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
 using UnityEngine;
@@ -15,6 +16,11 @@ namespace Turandot.Screen
         [Category("Appearance")]
         public int FontSize { get; set; }
         private bool ShouldSerializeFontSize() { return false; }
+
+        [Category("Appearance")]
+        [Description("Spacing between prompt and checklist items in pixels")]
+        public int PromptSpacing { get; set; }
+        private bool ShouldSerializePromptSpacing() { return false; }
 
         [Category("Behavior")]
         [Description("If true, does not show Apply button if single selection")]
@@ -51,6 +57,7 @@ namespace Turandot.Screen
             AllowMultiple = false;
             AllowNone = false;
             AutoAdvance = false;
+            PromptSpacing = 50;
         }
 
     }

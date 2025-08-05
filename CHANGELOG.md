@@ -1,5 +1,12 @@
 ## Changelog
 
+### v0.19 (2025-08-05)
+#### Added
+- Manikin button appearance
+- Checklist prompt spacing
+
+---
+
 ### v0.18 (2025-08-04)
 #### Changed
 - save pupil dynamic range settings in data file

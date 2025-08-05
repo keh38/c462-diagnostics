@@ -20,6 +20,22 @@ namespace Turandot.Screen
         public int SliderSpacing { get; set; }
         private bool ShouldSerializeSliderSpacing() { return false; }
 
+        [Category("Button")]
+        [DisplayName("Spacing")]
+        [Description("Spacing between sliders and apply button (pixels)")]
+        public int ButtonSpacing { get; set; }
+        private bool ShouldSerializeButtonSpacing() { return false; }
+
+        [Category("Button")]
+        [DisplayName("Width")]
+        public int ButtonWidth { get; set; }
+        private bool ShouldSerializeButtonWidth() { return false; }
+
+        [Category("Button")]
+        [DisplayName("Height")]
+        public int ButtonHeight { get; set; }
+        private bool ShouldSerializeButtonHeight() { return false; }
+
         [Category("Appearance")]
         [DisplayName("Height")]
         [Description("Slider height (pixe3ls)")]
@@ -58,6 +74,9 @@ namespace Turandot.Screen
             SliderWidth = 1;
             SliderVerticalOffset = 0;
             SliderSpacing = 50;
+            ButtonSpacing = 50;
+            ButtonWidth = 200;
+            ButtonHeight = 100;
         }
 
     }

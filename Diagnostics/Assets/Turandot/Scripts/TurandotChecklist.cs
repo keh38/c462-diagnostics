@@ -46,7 +46,7 @@ namespace Turandot.Scripts
             _button.GetComponentInChildren<TMPro.TMP_Text>().fontSize = _layout.FontSize;
 
             var labelRT = _label.GetComponent<RectTransform>();
-            float yoffset = - _spacing;
+            float yoffset = - _layout.PromptSpacing;
 
             var myRect = GetComponent<RectTransform>();
 
