@@ -197,7 +197,7 @@ namespace KLib.Signals.Waveforms
             _samplingRate = (float)wf.SamplingRate;
             _duration = wf.Duration;
 
-//            Debug.Log(wfpath + ": " + _duration + "s @ " + _samplingRate + " Hz");
+            //Debug.Log($"{wfpath}: {_duration}s @ {_samplingRate}Hz");
 
             if (wf.NumChannels == 1 || destination.ToLower().Contains("left"))
             {

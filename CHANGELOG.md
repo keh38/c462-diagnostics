@@ -1,5 +1,11 @@
 ## Changelog
 
+### v0.19.1 (unreleased)
+#### Fixed
+- broken display of .wav files in Turandot editor
+
+---
+
 ### v0.19 (2025-08-05)
 #### Added
 - Manikin button appearance

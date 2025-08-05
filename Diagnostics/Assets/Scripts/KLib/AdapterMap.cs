@@ -61,7 +61,6 @@ namespace KLib
             }
         }
 
-
         public static AdapterMap DefaultStereoMap(string audioTransducer = "")
         {
             var map = new AdapterMap();
