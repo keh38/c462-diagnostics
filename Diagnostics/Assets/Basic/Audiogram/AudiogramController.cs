@@ -28,6 +28,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
     [SerializeField] private GameObject _quitPanel;
     [SerializeField] private GameObject _workPanel;
     [SerializeField] private QuestionBox _questionBox;
+    [SerializeField] private GameObject _button;
     [SerializeField] private Image _buttonImage;
     [SerializeField] private Slider _progressBar;
 
@@ -119,6 +120,10 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
     void InitializeMeasurement()
     {
         _title.text = _settings.Title;
+
+        _button.GetComponentInChildren<TMPro.TMP_Text>().fontSize = _settings.ButtonFontSize;
+        var rt = _button.GetComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(_settings.ButtonWidth, _settings.ButtonHeight);
 
         InitDataFile();
 

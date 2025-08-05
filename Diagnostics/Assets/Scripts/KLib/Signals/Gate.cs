@@ -417,7 +417,6 @@ namespace KLib.Signals
             else
             {
                 _startPointOfRampDown = _startPointOfRampUp + Mathf.RoundToInt(Fs * Duration_ms / 1000) - nRampPts;
-                Debug.Log($"start point of ramp down = {_startPointOfRampDown}");
             }
 
             _isOneShot = float.IsPositiveInfinity(Period_ms);

@@ -1,5 +1,17 @@
 ## Changelog
 
+### v0.21 (unreleased)
+#### Added
+- exposed audiogram button properties
+
+--
+
+### v0.20.1 (2025-08-05)
+#### Fixed
+- removed diagnostic from gate code that broke controller and Turandot editor
+
+---
+
 ### v0.20 (2025-08-05)
 #### Fixed
 - Basic measurements can be run from protocol

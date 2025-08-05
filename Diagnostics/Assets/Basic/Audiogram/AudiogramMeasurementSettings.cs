@@ -11,6 +11,21 @@ namespace Audiograms
         public string Title { get; set; }
         private bool ShouldSerializeTitle() { return false; }
 
+        [Category("Button")]
+        [DisplayName("Width")]
+        public int ButtonWidth { get; set; }
+        private bool ShouldSerializeButtonWidth() { return false; }
+
+        [Category("Button")]
+        [DisplayName("Height")]
+        public int ButtonHeight { get; set; }
+        private bool ShouldSerializeButtonHeight() { return false; }
+
+        [Category("Button")]
+        [DisplayName("Font size")]
+        public int ButtonFontSize { get; set; }
+        private bool ShouldSerializeButtonFontSize() { return false; }
+
         [Category("Behavior")]
         [DisplayName("Ear message")]
         public bool ShowOtherEarMessage { get; set; }
@@ -120,6 +135,9 @@ namespace Audiograms
             Abridged = false;
             ModDepth = 0;
             ShowOtherEarMessage = true;
+            ButtonWidth = 500;
+            ButtonHeight = 150;
+            ButtonFontSize = 60;
         }
 
     }

@@ -1429,6 +1429,7 @@ MonoBehaviour:
   _quitPanel: {fileID: 1256089261}
   _workPanel: {fileID: 661140294}
   _questionBox: {fileID: 960995876}
+  _button: {fileID: 1440433133}
   _buttonImage: {fileID: 1440433136}
   _progressBar: {fileID: 1052642562}
   _responseAction:
@@ -2192,9 +2193,9 @@ RectTransform:
   - {fileID: 1360198209}
   m_Father: {fileID: 661140295}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 91.20001}
+  m_AnchorMin: {x: 0.5, y: 0.6}
+  m_AnchorMax: {x: 0.5, y: 0.6}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 500, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1440433135
