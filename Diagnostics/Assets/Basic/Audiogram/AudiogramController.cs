@@ -382,8 +382,6 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         //}
     }
 
-    
-
     private void AdvanceMeasurement()
     {
         _progressBar.value = _state.NumCompleted;
@@ -399,20 +397,21 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
 
         HTS_Server.SendMessage(_mySceneName, $"Status:{_currentStimulusCondition.Laterality} ear, {_currentStimulusCondition.Frequency} Hz");
 
-        if (_currentStimulusCondition.NewFrequency)
+        if (_currentStimulusCondition.NewFrequency && _settings.ShowNewFrequencyMessage)
         {
             _instructionPanel.InstructionsFinished = DoCurrentStimulusCondition;
 
             ShowInstructions(
-                "- Nice work!\n" +
-                "- Let's try some more.\n" +
-                "- The pitch will be different, but your job is the same.",
+                "Nice work!\n" +
+                "Let's try some more.\n" +
+                "The pitch will be different, but your job is the same.",
                 _settings.InstructionFontSize);
         }
         else if (_currentStimulusCondition.NewEar && _settings.ShowOtherEarMessage)
         {
             _instructionPanel.InstructionsFinished = DoCurrentStimulusCondition;
-            ShowInstructions("- Great!\n- Let's try the same thing with your right ear", _settings.InstructionFontSize);
+            ShowInstructions("Great!\nLet's try the same thing with your right ear", 
+                _settings.InstructionFontSize);
         }
         else
         {

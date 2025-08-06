@@ -1,8 +1,11 @@
 ## Changelog
 
-### v0.21 (unreleased)
+### v0.21 (2025-08-05)
 #### Added
 - exposed audiogram button properties
+- made "new frequency" message optional in audiogram
+#### Changed
+- center aligned protocol outline
 
 --
 

@@ -31,6 +31,11 @@ namespace Audiograms
         public bool ShowOtherEarMessage { get; set; }
         private bool ShouldSerializeShowOtherEarMessage() { return false; }
 
+        [Category("Behavior")]
+        [DisplayName("Freq message")]
+        public bool ShowNewFrequencyMessage { get; set; }
+        private bool ShouldSerializeShowNewFrequencyMessage() { return false; }
+
         [Category("Sequence")]
         [Description("Minimum interval between test stimuli (s)")]
         [DisplayName("Min ISI")]
@@ -135,6 +140,7 @@ namespace Audiograms
             Abridged = false;
             ModDepth = 0;
             ShowOtherEarMessage = true;
+            ShowNewFrequencyMessage = true;
             ButtonWidth = 500;
             ButtonHeight = 150;
             ButtonFontSize = 60;
