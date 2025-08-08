@@ -1,5 +1,12 @@
 ## Changelog
 
+### v1.1
+#### Changed
+- Turandot parameter slider can only be changed using handle (to prevent accidental clicks on the fill)
+
+---
+
+### v1.0
 ### v0.21 (2025-08-05)
 #### Added
 - exposed audiogram button properties

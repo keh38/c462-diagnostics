@@ -107,6 +107,7 @@ namespace Turandot.Scripts
                 _action = action;
                 _sigMan = audio.SigMan;
 
+                //Debug.Log($"wtf {_action.Channel} {_action.Property}");
                 //_noise = _sigMan[_action.channel].waveform as Noise;
 
                 //_setFilters = _noise != null && _action.parameter == "Frequency";
