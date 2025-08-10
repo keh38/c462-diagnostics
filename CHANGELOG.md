@@ -2,7 +2,7 @@
 
 ### v1.1
 #### Changed
-- Turandot parameter slider can only be changed using handle (to prevent accidental clicks on the fill)
+- Turandot/LDL: parameter sliders can only be changed using handle (to prevent accidental clicks on the fill)
 
 ---
 
