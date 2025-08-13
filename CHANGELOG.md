@@ -1,6 +1,12 @@
 ## Changelog
 
-### v1.1
+### v1.2 (unreleased)
+#### Changed
+- refuses remote connection request when it is already under remote control by a different host
+
+---
+
+### v1.1 (2025-08-10)
 #### Changed
 - Turandot/LDL: parameter sliders can only be changed using handle (to prevent accidental clicks on the fill)
 

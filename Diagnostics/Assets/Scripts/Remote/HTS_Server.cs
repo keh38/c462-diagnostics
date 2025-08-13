@@ -154,10 +154,21 @@ public class HTS_Server : MonoBehaviour
         switch (command)
         {
             case "Connect":
-                _listener.SendAcknowledgement();
-                _remoteConnected = true;
-                _remoteEndPoint = ParseEndPoint(data);
-                _currentScene.ProcessRPC("Connect");
+                var remoteRequestFrom = ParseEndPoint(data);
+                bool acceptConnection = !_remoteConnected || remoteRequestFrom.Equals(_remoteEndPoint);
+
+                _listener.SendAcknowledgement(acceptConnection);
+                if (!acceptConnection)
+                {
+                    Debug.Log($"Refused incoming connection from {remoteRequestFrom}");
+                }
+                else
+                {
+                    Debug.Log($"Connection accepted from {remoteRequestFrom}");
+                    _remoteConnected = true;
+                    _remoteEndPoint = ParseEndPoint(data);
+                    _currentScene.ProcessRPC("Connect");
+                }
                 break;
 
             case "SetDataRoot":

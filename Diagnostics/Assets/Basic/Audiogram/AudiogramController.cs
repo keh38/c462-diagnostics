@@ -291,6 +291,8 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
 
     private void EndRun(bool abort)
     {
+        Debug.Log("run ended");
+
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(false);
 
@@ -765,7 +767,6 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         soundDetected = false;
         currentResponseTime = -1;
 
-        Debug.Log("playing stimulus");
         _audioSource.Play();
 
         float t = 0;

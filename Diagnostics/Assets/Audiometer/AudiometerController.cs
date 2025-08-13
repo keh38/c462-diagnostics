@@ -55,8 +55,6 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
     {
         HTS_Server.SetCurrentScene(_mySceneName, this);
 
-        //_title.text = "";
-
         _udpClient = new UdpClient();
         _udpEndPoint = new IPEndPoint(HTS_Server.RemoteAddress, _udpPort);
         Debug.Log(_udpEndPoint.ToString());
