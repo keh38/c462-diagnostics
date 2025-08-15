@@ -227,7 +227,8 @@ namespace Launcher
                     var parts = response.Split(':');
                     if (parts.Length > 1)
                     {
-                        firmwareVersion = parts[1].Substring(0, parts[1].Length - 1);
+                        firmwareVersion = parts[1].Replace("\r", "");
+                        //firmwareVersion = parts[1].Substring(0, parts[1].Length - 1);
                     }
                     else
                     {
