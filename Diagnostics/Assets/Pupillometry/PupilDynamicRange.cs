@@ -80,9 +80,15 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
         _useLEDs = HardwareInterface.LED.IsInitialized;
         if (_useLEDs)
         {
-            HardwareInterface.LED.Clear();
-            HardwareInterface.LED.Open();
+            StartCoroutine(ClearLEDsAndOpenSerialPort());
         }
+    }
+
+    IEnumerator ClearLEDsAndOpenSerialPort()
+    {
+        HardwareInterface.LED.Clear();
+        yield return new WaitForSeconds(0.5f);
+        HardwareInterface.LED.Open();
     }
 
     void Begin()

@@ -198,12 +198,14 @@ void process_message(void) {
 void Command_Clear(int argc, char* argv[]) {
   pixels.clear();
   pixels.show();
+
+  Serial.write("OK\n");
 }
 
 // identify myself
 void Command_Identify(int argc, char* argv[])
 {
-  Serial.write("lightin' the way, big man:2.0\n");
+  Serial.write("lightin' the way, big man:3.0\n");
 }
 
 // change RGB values of LED

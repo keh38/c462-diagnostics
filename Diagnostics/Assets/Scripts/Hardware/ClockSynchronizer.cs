@@ -28,6 +28,7 @@ public class ClockSynchronizer : MonoBehaviour
 
     private bool _generatePulse = false;
     private double _lastAudioDSPTime = 0;
+    private bool _stopSynchronizing;
 
     private string _logPath = "";
     private bool _serialPortOK;
@@ -78,6 +79,7 @@ public class ClockSynchronizer : MonoBehaviour
 
     public void StartSynchronizing(string logPath = "")
     {
+        _stopSynchronizing = false;
         _audioSource.Play();
         PulsesGenerated = 0;
         PulsesDetected = 0;
@@ -86,7 +88,7 @@ public class ClockSynchronizer : MonoBehaviour
 
         Debug.Log($"[ClockSynchronizer] Start synchronizing to {_logPath}");
 
-        InvokeRepeating("Synchronize", 1, pollInterval_s);
+        InvokeRepeating("Synchronize", 5, pollInterval_s);
 
         Status = SyncStatus.Recording;
     }
@@ -94,6 +96,7 @@ public class ClockSynchronizer : MonoBehaviour
     public void StopSynchronizing()
     {
         Debug.Log("[ClockSynchronizer] Stop synchronizing");
+        _stopSynchronizing = true;
         CancelInvoke("Synchronize");
 
         _audioSource.Stop();
@@ -134,6 +137,8 @@ public class ClockSynchronizer : MonoBehaviour
 
     private async void Synchronize()
     {
+        if (_stopSynchronizing) return;
+
         var systemTime = HighPrecisionClock.UtcNowIn100nsTicks;
         var unityTime = Time.realtimeSinceStartupAsDouble;
 
@@ -154,7 +159,10 @@ public class ClockSynchronizer : MonoBehaviour
 
         if (syncPulseEvent.result == SyncPulseDetector.SyncPulseEvent.Result.Detected)
         {
-            Status = SyncStatus.Recording;
+            if (!_stopSynchronizing)
+            {
+                Status = SyncStatus.Recording;
+            }
             PulsesDetected++;
             logEntry +=
                 $"{_lastAudioDSPTime,12:0.000000}\t" +

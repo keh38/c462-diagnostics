@@ -222,6 +222,12 @@ public class LEDController : MonoBehaviour
         {
             _serialPort.Open();
             _serialPort.Write("clear\n");
+            string response = _serialPort.ReadLine();
+            bool success = response.Equals("OK");
+            if (!success)
+            {
+                Debug.Log("[LEDController] negative response clearing display.");
+            }
         }
         catch (Exception ex)
         {

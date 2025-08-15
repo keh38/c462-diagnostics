@@ -78,11 +78,20 @@ public class SyncPulseDetector : MonoBehaviour
             var t1 = float.Parse(parts[2]);
             var t2 = float.Parse(parts[3]);
 
+            float tmax = (float)long.MaxValue;
+
             if (tlast > 0)
             {
                 var rtt = (double)(t3 - t0)*1e-4 - (t2 - t1) * 1e-3;
 
                 syncPulseEvent.systemTime = t3;
+
+                // handle Arduino microsecond timer rollover
+                if (tlast > tmax - 1e6 && t2 < 1e6)
+                {
+                    tmax -= float.MaxValue;
+                }
+
                 syncPulseEvent.offset = (tlast - t2) / 1000;
                 syncPulseEvent.rtt = rtt;
                 syncPulseEvent.result = SyncPulseEvent.Result.Detected;
