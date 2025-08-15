@@ -1,11 +1,12 @@
 ## Changelog
 
-### v1.2 (unreleased)
+### v1.2 (2025-08-15)
 #### Changed
 - refuses remote connection request when it is already under remote control by a different host
 - LED controller waits for acknowledgement from Arduino that it has cleared the display
 #### Fixed
 - handle Arduino microsecond timer rollover during synchronization
+- closed loophole where audiogram button could get stuck yellow
 
 ---
 

@@ -39,6 +39,8 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
     private bool _stopMeasurement = false;
     private bool _localAbort = false;
 
+    private Color _defaultButtonColor;
+
     private AudiogramMeasurementSettings _settings = new AudiogramMeasurementSettings();
 
     private string _dataPath;
@@ -91,6 +93,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         HTS_Server.SetCurrentScene(_mySceneName, this);
 
         _title.text = "";
+        _defaultButtonColor = _buttonImage.color;
 
 #if HACKING
         Application.targetFrameRate = 60;
@@ -397,7 +400,9 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             return;
         }
 
-        HTS_Server.SendMessage(_mySceneName, $"Status:{_currentStimulusCondition.Laterality} ear, {_currentStimulusCondition.Frequency} Hz");
+        string logMessage = $"Status:{_currentStimulusCondition.Laterality} ear, {_currentStimulusCondition.Frequency} Hz";
+        HTS_Server.SendMessage(_mySceneName, logMessage);
+        Debug.Log(logMessage);
 
         if (_currentStimulusCondition.NewFrequency && _settings.ShowNewFrequencyMessage)
         {
@@ -525,8 +530,10 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
     {
         // Combine reversals from current track...
         List<float> reversals = new List<float>(currentTrack.reversals);
+
         // ...and the previous one
-        reversals.AddRange(_data.tracks[_data.tracks.Count - 2].reversals);
+        // DOESN'T SEEM TO MAKE SENSE?!?
+        //reversals.AddRange(_data.tracks[_data.tracks.Count - 2].reversals);
 
         // Sort-Reverse puts the biggest ones first
         reversals.Sort();
@@ -882,10 +889,9 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
 
     IEnumerator SimulateButtonPress()
     {
-        var color = _buttonImage.color;
         _buttonImage.color = Color.yellow;
         yield return new WaitForSeconds(0.25f);
-        _buttonImage.color = color;
+        _buttonImage.color = _defaultButtonColor;
     }
 
     
