@@ -4,11 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 using Newtonsoft.Json;
-using ProtoBuf;
 
 namespace Turandot
 {
-    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     [JsonObject(MemberSerialization.OptOut)]
     [Serializable]
     public class InputCriterion

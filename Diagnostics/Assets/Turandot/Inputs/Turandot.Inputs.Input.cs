@@ -18,7 +18,7 @@ namespace Turandot.Inputs
     [XmlInclude(typeof(Keypad))]
     [XmlInclude(typeof(ParamSliderAction))]
     [XmlInclude(typeof(RandomProcess))]
-    [XmlInclude(typeof(Scaler))]
+    [XmlInclude(typeof(ScalerAction))]
     [XmlInclude(typeof(ThumbSliderAction))]
     public class Input
     {

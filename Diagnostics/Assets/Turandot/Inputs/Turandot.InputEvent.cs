@@ -7,7 +7,6 @@ using ProtoBuf;
 
 namespace Turandot
 {
-    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     [JsonObject(MemberSerialization.OptOut)]
     public class InputEvent
     {

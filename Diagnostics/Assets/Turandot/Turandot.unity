@@ -1385,6 +1385,7 @@ MonoBehaviour:
   _checklistPrefab: {fileID: 6013653752502544603, guid: e7f5a1d90baf95b47af50ab885ba34d2, type: 3}
   _sliderPrefab: {fileID: 8775027352522966648, guid: e4b75c816b9f1d745add069e2d228f92, type: 3}
   _manikinPrefab: {fileID: 6688084792611665609, guid: 7661d5865a8bfd7499d191f8a9d9f037, type: 3}
+  _scalerPrefab: {fileID: 734485508542219141, guid: 57ff1c9b7906f9f4ebef25700f062e4c, type: 3}
 --- !u!1 &1318155428
 GameObject:
   m_ObjectHideFlags: 0

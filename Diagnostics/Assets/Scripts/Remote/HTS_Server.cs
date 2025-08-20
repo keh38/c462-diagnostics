@@ -260,7 +260,15 @@ public class HTS_Server : MonoBehaviour
                 Debug.Log($"sync log path = {logPath}");
                 if (!string.IsNullOrEmpty(logPath))
                 {
-                    _listener.WriteStringAsByteArray($"{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
+                    var syncLogText = File.ReadAllText(logPath);
+                    if (string.IsNullOrEmpty(syncLogText))
+                    {
+                        _listener.WriteStringAsByteArray("none");
+                    }
+                    else
+                    {
+                        _listener.WriteStringAsByteArray($"{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
+                    }
                 }
                 else
                 {

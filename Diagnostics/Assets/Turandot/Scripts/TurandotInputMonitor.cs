@@ -15,6 +15,7 @@ namespace Turandot.Scripts
         [SerializeField] private GameObject _checklistPrefab;
         [SerializeField] private GameObject _sliderPrefab;
         [SerializeField] private GameObject _manikinPrefab;
+        [SerializeField] private GameObject _scalerPrefab;
 
         bool _isRunning = false;
         List<ButtonData> _buttonData = new List<ButtonData>();
@@ -122,6 +123,15 @@ namespace Turandot.Scripts
                     var gobj = GameObject.Instantiate(_sliderPrefab, canvasRT);
                     var i = gobj.GetComponent<TurandotParamSlider>();
                     i.Initialize(layout as ParamSliderLayout);
+                    _inputObjects.Add(i);
+                    gobj.SetActive(false);
+                    _buttonData.Add(i.ButtonData);
+                }
+                else if (layout is ScalerLayout)
+                {
+                    var gobj = GameObject.Instantiate(_scalerPrefab, canvasRT);
+                    var i = gobj.GetComponent<TurandotScaler>();
+                    i.Initialize(layout as ScalerLayout);
                     _inputObjects.Add(i);
                     gobj.SetActive(false);
                     _buttonData.Add(i.ButtonData);

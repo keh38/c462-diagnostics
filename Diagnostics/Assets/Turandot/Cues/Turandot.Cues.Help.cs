@@ -25,7 +25,6 @@ namespace Turandot.Cues
 		public Help(string text)
         {
             this.text = text;
-            this.changeAppearance = false;
         }
 
         [XmlIgnore]

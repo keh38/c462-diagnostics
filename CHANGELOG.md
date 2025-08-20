@@ -1,5 +1,13 @@
 ## Changelog
 
+### v1.3 (unreleased)
+#### Added
+- Turandot: restored scaler (e.g.: for VAS)
+#### Fixed
+- hide dummy outline on Protocol screen
+
+---
+
 ### v1.2 (2025-08-15)
 #### Changed
 - refuses remote connection request when it is already under remote control by a different host

@@ -14,6 +14,7 @@ namespace Turandot.Screen
     [XmlInclude(typeof(ChecklistLayout))]
     [XmlInclude(typeof(ManikinLayout))]
     [XmlInclude(typeof(ParamSliderLayout))]
+    [XmlInclude(typeof(ScalerLayout))]
     [JsonObject(MemberSerialization.OptOut)]
     public class InputLayout
     {

@@ -15,6 +15,7 @@ using Turandot.Schedules;
 using Turandot.Scripts;
 using Turandot.Screen;
 using UnityEngine.Video;
+using KLib;
 
 public class TurandotManager : MonoBehaviour, IRemoteControllable
 {
@@ -80,7 +81,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 #if HACKING
         Application.targetFrameRate = 60;
         GameManager.SetSubject("Scratch/_shit");
-        string configName = "checklist";
+        string configName = "Tinnitus-VAS";
         //DiagnosticsManager.Instance.MakeExtracurricular("Turandot", "Turandot." + configName);
 #else
         string configName = GameManager.DataForNextScene;
@@ -934,12 +935,13 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         //dfm.EndDataFile("Exception-" + System.DateTime.Now.ToString("yyyy-MM-dd_HHmmss"));
         //if (SubjectManager.Instance.UploadData) dfm.UploadDataFile();
 
-        HandleError(condition);
+        HandleError(condition, stackTrace);
     }
 
     void HandleError(string error, string stackTrace = "")
     {
         HTS_Server.SendMessage("Turandot", $"Error:{error}");
+        Debug.Log($"[Turandot error]: {error}{Environment.NewLine}{stackTrace}");
 
         _runAborted = true;
         _haveException = true;

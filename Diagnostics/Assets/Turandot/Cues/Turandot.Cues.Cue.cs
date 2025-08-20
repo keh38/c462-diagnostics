@@ -35,11 +35,11 @@ namespace Turandot.Cues
         public string Target { get; set; }
         //private bool ShouldSerializeTarget() { return false; }
 
-        public float delay_ms = 0f;
-        public float duration_ms = 200f;
-        public float interval_ms = 500f;
-        public int numFlash = 0;
-        public bool changeAppearance = false;
+        //public float delay_ms = 0f;
+        //public float duration_ms = 200f;
+        //public float interval_ms = 500f;
+        //public int numFlash = 0;
+        //public bool changeAppearance = false;
         public int X = 0;
         public int Y = 0;
 
