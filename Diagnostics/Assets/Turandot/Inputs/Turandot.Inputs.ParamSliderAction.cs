@@ -7,13 +7,11 @@ using System.Linq;
 using System.Xml.Serialization;
 
 using Newtonsoft.Json;
-using ProtoBuf;
 
 using KLib.Signals;
 
 namespace Turandot.Inputs
 {
-    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     [JsonObject(MemberSerialization.OptOut)]
     public class ParamSliderAction : Input
     {
@@ -31,13 +29,35 @@ namespace Turandot.Inputs
         public float startRange = 0;
         public float shrinkFactor = 0;
         public bool showButton = true;
-        public bool thumbTogglesSound = true;
-        public string leftLabel = "";
-        public string rightLabel = "";
 
-        [Category("Design")]
+        [Category("Appearance")]
         public string Label { set; get; }
         private bool ShouldSerializeLabel() { return false; }
+
+        [Category("Appearance")]
+        public string MinLabel { set; get; }
+        private bool ShouldSerializeMinLabel() { return false; }
+
+        [Category("Appearance")]
+        public string MaxLabel { set; get; }
+        private bool ShouldSerializeMaxLabel() { return false; }
+
+        [Category("Appearance")]
+        public int FontSize { set; get; }
+        private bool ShouldSerializeFontSize() { return false; }
+
+        [Category("Behavior")]
+        [Description("Hides the slider fill")]
+        public bool ThumbOnly { set; get; }
+        private bool ShouldSerializeThumbOnly() { return false; }
+
+        [Category("Behavior")]
+        public bool BarClickable { set; get; }
+        private bool ShouldSerializeBarClickable() { return false; }
+
+        [Category("Behavior")]
+        public bool ThumbTogglesSound { set; get; }
+        private bool ShouldSerializeThumbTogglesSound() { return false; }
 
         [Category("Scale")]
         public float Min { set; get; }
@@ -54,6 +74,17 @@ namespace Turandot.Inputs
         [Category("Parameter")]
         public float StartValue { get; set; }
         private bool ShouldSerializeStartValue() { return false; }
+
+        public ParamSliderAction() : base("Param Slider")
+        {
+            Label = "";
+            MinLabel = "";
+            MaxLabel = "";
+            ThumbOnly = false;
+            BarClickable = false;
+            ThumbTogglesSound = true;
+            FontSize = 48;
+        }
 
         // https://www.codeproject.com/Articles/9517/PropertyGrid-and-Drop-Down-properties
         private string _channel;
@@ -124,10 +155,6 @@ namespace Turandot.Inputs
             }
         }
         private bool ShouldSerializeProperty() { return false; }
-
-        public ParamSliderAction() : base("Param Slider")
-        {
-        }
 
         public void SetDataForContext(List<ChannelProperties> validProperties)
         {

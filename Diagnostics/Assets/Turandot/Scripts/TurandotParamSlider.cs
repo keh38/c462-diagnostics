@@ -17,8 +17,12 @@ namespace Turandot.Scripts
     public class TurandotParamSlider : TurandotInput
     {
         [SerializeField] private TMPro.TMP_Text _label;
+        [SerializeField] private TMPro.TMP_Text _leftLabel;
+        [SerializeField] private TMPro.TMP_Text _rightLabel;
         [SerializeField] private Slider _slider;
         [SerializeField] private GameObject _button;
+        [SerializeField] private Image _backgroundImage;
+        [SerializeField] private Image _fillImage;
 
         private ParamSliderLayout _layout = new ParamSliderLayout();
         private ParamSliderAction _action = null;
@@ -38,36 +42,9 @@ namespace Turandot.Scripts
         private string _result;
         public override string Result { get { return _result; } }
 
-        /*
-                private InputLog _log = new InputLog("paramslider");
-
-                private int _ncalls = 0;
-                private float _value;
-                private List<float> _values = new List<float>();
-                private float _minVal;
-                private float _maxVal;
-                private bool _started = false;
-
-                private float _xmin;
-                private float _xmax;
-
-                private Noise _noise;
-                private bool _setFilters;
-
-                private bool _ignoreEvents = false;
-
-                public void Start()
-                {
-                    slider.ThumbOnly = true;
-                    slider.OnSelectNotifier = OnSliderPress;
-                }
-                */
         public void Initialize(ParamSliderLayout layout)
         {
             _layout = layout;
-
-            //_slider.OnMove
-
             LayoutControl();
             ButtonData = new ButtonData() { name = layout.Name };
 
@@ -90,16 +67,26 @@ namespace Turandot.Scripts
         override public void Activate(Input input, TurandotAudio audio)
         {
             var action = input as ParamSliderAction;
-            _label.text = action.Label;
-            //leftLabel.text = action.leftLabel;
-            //rightLabel.text = action.rightLabel;
+            _label.fontSize = action.FontSize;
+            _leftLabel.fontSize = action.FontSize;
+            _rightLabel.fontSize = action.FontSize;
 
-            //_log.Add(Time.timeSinceLevelLoad, float.NaN);
-            //button.IsVisible = false;
-            //_started = false;
+            _label.text = action.Label;
+            _leftLabel.text = action.MinLabel;
+            _rightLabel.text = action.MaxLabel;
+
+            if (_layout.ButtonStyle == ParamSliderButtonStyle.Mobile)
+            {
+                _button.SetActive(false);
+            }
+
+            _fillImage.raycastTarget = action.BarClickable;
+            _backgroundImage.raycastTarget = action.BarClickable;
+
+            _fillImage.enabled = !action.ThumbOnly;
 
             ButtonData.value = false;
-            //_button.SetActive(false);
+
             _result = "";
 
             if (action.BeginVisible)
@@ -191,7 +178,6 @@ namespace Turandot.Scripts
             HardwareInterface.Digitimer?.EnableDevices(_sigMan.GetDigitimerChannels());
         }
 
-
         override public void Deactivate()
         {
             ButtonData.value = false;
@@ -218,12 +204,18 @@ namespace Turandot.Scripts
 
         public void OnPointerDown(BaseEventData data)
         {
-            //_button.SetActive(false);
+            if (_layout.ButtonStyle == ParamSliderButtonStyle.Mobile)
+            {
+                _button.SetActive(false);
+            }
         }
 
         public void OnPointerUp(BaseEventData data)
         {
-            //_button.SetActive(true);
+            if (_layout.ButtonStyle == ParamSliderButtonStyle.Mobile)
+            {
+                _button.SetActive(true);
+            }
         }
 
         public void OnButtonClick()
@@ -231,65 +223,5 @@ namespace Turandot.Scripts
             ButtonData.value = true;
             _result = _value.ToString();
         }
-/*
-                public string Value
-                {
-                    get
-                    {
-                        string s = "[";
-                        foreach (float v in _values) s += v.ToString() + " ";
-                        s += "]";
-                        return s;
-                    }
-                }
-
-                void OnSliderPress(bool state)
-                {
-                    _started = true;
-
-                    if (_action != null && _action.thumbTogglesSound)
-                    {
-                        if (state)
-                            _sigMan.Unpause();
-                        else
-                            _sigMan.Pause();
-                    }
-
-                    button.IsVisible = !state && _action!=null && _action.showButton;
-                    if (!state)
-                    {
-                        float x = Mathf.Max(_xmin, slider.thumb.localPosition.x);
-                        button.SetX(Mathf.Min(_xmax, x));
-                    }
-                }
-
-                public void SliderMoved()
-                {
-                    if (_ignoreEvents) return;
-
-                    //button.IsVisible = _started && _action.showButton;
-
-                    if ((_paramSetter != null || _setFilters) && _action != null)
-                    {
-                        if (_action.isLog)
-                        {
-                            _value = Mathf.Exp(slider.value * _range) * _minVal;
-                        }
-                        else
-                        {
-                            _value = slider.value * _range + _minVal;
-
-                        }
-                        //Debug.Log("SLIDER: " + _value);
-                        ApplyValue();
-                        _values[_ncalls - 1] = _value;
-                    }
-                }
-
-                private void ApplyValue()
-                {
-                    _paramSetter.Invoke(_value);
-                }
-                */
     }
 }

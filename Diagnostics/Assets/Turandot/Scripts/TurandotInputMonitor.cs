@@ -13,7 +13,8 @@ namespace Turandot.Scripts
     {
         [SerializeField] private GameObject _buttonPrefab;
         [SerializeField] private GameObject _checklistPrefab;
-        [SerializeField] private GameObject _sliderPrefab;
+        [SerializeField] private GameObject _fixedSliderPrefab;
+        [SerializeField] private GameObject _mobileSliderPrefab;
         [SerializeField] private GameObject _manikinPrefab;
         [SerializeField] private GameObject _scalerPrefab;
 
@@ -120,7 +121,9 @@ namespace Turandot.Scripts
                 }
                 else if (layout is ParamSliderLayout)
                 {
-                    var gobj = GameObject.Instantiate(_sliderPrefab, canvasRT);
+                    var paramSliderLayout = (ParamSliderLayout)layout;
+                    GameObject prefab = (paramSliderLayout.ButtonStyle == ParamSliderButtonStyle.Fixed) ? _fixedSliderPrefab : _mobileSliderPrefab;
+                    var gobj = GameObject.Instantiate(prefab, canvasRT);
                     var i = gobj.GetComponent<TurandotParamSlider>();
                     i.Initialize(layout as ParamSliderLayout);
                     _inputObjects.Add(i);

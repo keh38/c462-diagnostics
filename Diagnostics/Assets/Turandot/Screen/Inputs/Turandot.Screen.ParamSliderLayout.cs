@@ -5,11 +5,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 
 using Newtonsoft.Json;
-using ProtoBuf;
 
 namespace Turandot.Screen
 {
-    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public enum ParamSliderButtonStyle { Fixed, Mobile }
+
     [JsonObject(MemberSerialization.OptOut)]
     public class ParamSliderLayout : InputLayout
     {
@@ -21,11 +21,17 @@ namespace Turandot.Screen
         public int Height { get; set; }
         private bool ShouldSerializeHeight() { return false; }
 
+        [Category("Appearance")]
+        public ParamSliderButtonStyle ButtonStyle { set; get; }
+        private bool ShouldSerializeButtonStyle() { return false; }
+
+
         public ParamSliderLayout()
         {
             Name = "Param Slider";
             Width = 1000;
             Height = 50;
+            ButtonStyle = ParamSliderButtonStyle.Fixed;
         }
     }
 }
