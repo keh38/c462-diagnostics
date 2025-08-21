@@ -153,9 +153,8 @@ namespace Turandot.Scripts
                     _slider.SetValueWithoutNotify((_value - _minVal) / _range);
                 }
 
-                //_action.thumbTogglesSound = false;
-                //if (_action.thumbTogglesSound) _sigMan.StartPaused();
-                //ApplyValue();
+                if (_action.ThumbTogglesSound) _sigMan.StartPaused();
+
                 _paramSetter?.Invoke(_value);
                 _log.Add(Time.timeSinceLevelLoad, _value);
 
@@ -208,6 +207,10 @@ namespace Turandot.Scripts
             {
                 _button.SetActive(false);
             }
+            if (_action.ThumbTogglesSound)
+            {
+                _sigMan.Unpause();
+            }
         }
 
         public void OnPointerUp(BaseEventData data)
@@ -216,12 +219,16 @@ namespace Turandot.Scripts
             {
                 _button.SetActive(true);
             }
+            if (_action.ThumbTogglesSound)
+            {
+                _sigMan.Pause();
+            }
         }
 
         public void OnButtonClick()
         {
             ButtonData.value = true;
-            _result = _value.ToString();
+            _result = $"{_action.Property}={_value};";
         }
     }
 }

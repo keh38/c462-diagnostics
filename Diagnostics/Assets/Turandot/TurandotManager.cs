@@ -81,7 +81,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 #if HACKING
         Application.targetFrameRate = 60;
         GameManager.SetSubject("Scratch/_shit");
-        string configName = "Tinnitus-VAS";
+        string configName = "Tinnitus-BestMasker";
         //DiagnosticsManager.Instance.MakeExtracurricular("Turandot", "Turandot." + configName);
 #else
         string configName = GameManager.DataForNextScene;
@@ -422,7 +422,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
     private void EndRun(bool abort)
     {
-        //if (_params.schedule.mode != Mode.Adapt) StoreResults();
+        if (_params.schedule.mode != Mode.Adapt) StoreResults();
 
         _engine.ClearScreen();
 
@@ -436,7 +436,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         if (_params.trialLogOption == TrialLogOption.Upload)
         {
             var trialFiles = Directory.EnumerateFiles(FileLocations.SubjectFolder, Path.GetFileName(_mainDataFile).Replace(".json", "-Block*-Trial*.json")).ToList();
-            Debug.Log($"ntrial files = {trialFiles.Count}");
             foreach (var trialFile in trialFiles)
             {
                 HTS_Server.SendMessage("Turandot", $"ReceiveData:{Path.GetFileName(trialFile)}:{File.ReadAllText(trialFile)}");
@@ -952,10 +951,10 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         }
     }
 
-    /*
+    
     private void StoreResults()
     {
-        var data = KLib.FileIO.ReadTextFile(_mainDataFile);
+        var data = File.ReadAllText(_mainDataFile);
 
         string trialIndicator = "{\"block\":";
         int splitAt = data.IndexOf(trialIndicator);
@@ -999,13 +998,10 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
             string resultExpr = f.resultExpression.Replace("{" + operand + "}", expr);
             float v = KLib.Expressions.EvaluateToFloatScalar(resultExpr);
-            SubjectManager.Instance.AddMetric(f.storeResultAs, v);
-            ipcString += f.storeResultAs + "=" + v.ToString() + ";";
+            GameManager.AddMetric(f.storeResultAs, v.ToString());
         }
-
-        if (!string.IsNullOrEmpty(ipcString) && _usingServer && IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Store", ipcString);
     }
-    */
+
     void IRemoteControllable.ChangeScene(string newScene)
     {
         if (!newScene.Equals("Turandot"))

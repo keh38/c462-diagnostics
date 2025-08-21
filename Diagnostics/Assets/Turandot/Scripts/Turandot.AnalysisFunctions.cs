@@ -9,7 +9,6 @@ namespace Turandot
         public static string Evaluate(string fcn, List<string> trialData)
         {
             string result = "";
-            
             switch (fcn)
             {
                 case "BestTinnitusMasker":
@@ -27,7 +26,7 @@ namespace Turandot
 
             foreach (string t in trialData)
             {
-                var r = Regex.Match(t, "\"param\":\\[([-\\d\\.\\s]+)\\]");
+                var r = Regex.Match(t, "\"Level\":([-\\d\\.\\s]+)");
                 if (r.Success)
                 {
                     float level = float.Parse(r.Groups[1].Value);

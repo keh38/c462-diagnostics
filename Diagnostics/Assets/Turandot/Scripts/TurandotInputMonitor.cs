@@ -222,19 +222,6 @@ namespace Turandot.Scripts
                     }
                 }
 
-                //if (_used.Contains("categorizer")) json = KLib.FileIO.JSONStringAdd(json, "Category", _categorizer.LogJSONString);
-                //if (_used.Contains("grapher")) json = KLib.FileIO.JSONStringAdd(json, "Grapher", grapher.LogJSONString);
-                //if (_used.Contains("keypad")) json = KLib.FileIO.JSONStringAdd(json, "Keypad", _keypad.LogJSONString);
-                //if (_used.Contains("param slider")) json = KLib.FileIO.JSONStringAdd(json, "ParamSlider", paramSlider.LogJSONString);
-                //if (_used.Contains("sam")) json = KLib.FileIO.JSONStringAdd(json, "SAM", SAM.LogJSONString);
-                //if (_used.Contains("scaler")) json = KLib.FileIO.JSONStringAdd(json, "Scaler", _scaleSlider.LogJSONString);
-                //if (_used.Contains("thumb slider")) json = KLib.FileIO.JSONStringAdd(json, "ThumbSlider", _thumbSlider.LogJSONString);
-
-                // SAVED WITH EVENTS???
-
-                //for (int k = 0; k < _numButtons; k++)
-                //    if (_buttons[k].HaveLog) json = KLib.FileIO.JSONStringAdd(json, _buttons[k].name, _buttons[k].LogJSONString);
-
                 return json;
             }
         }
@@ -252,29 +239,11 @@ namespace Turandot.Scripts
             return i.Result;
         }
 
-        public string Category
-        {
-            get { return ":"; }
-            //get { return "category=" + _categorizer.Result.ToString() + ";"; }
-        }
-
-        public string SliderResult
-        {
-            get { return ":"; }
-
-            //get { return "slider=" + _scaleSlider.slider.value.ToString("F4") + ";"; }
-        }
-
         public string SliderSubstitution
         {
             get { return ":"; }
             //get { return _scaleSlider.slider.value.ToString("F4"); }
         }
-
-        //public string SAMResult
-        //{
-        //    get { return SAM.Result; }
-        //}
 
         public string KeypadResult
         {

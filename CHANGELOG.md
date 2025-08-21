@@ -2,7 +2,10 @@
 
 ### v1.3 (unreleased)
 #### Added
-- Turandot: restored scaler (e.g.: for VAS)
+- Turandot
+  - restored scaler (e.g.: for VAS)
+  - more completely restored parameter slider
+  - restored saving results as metrics
 #### Fixed
 - hide dummy outline on Protocol screen
 

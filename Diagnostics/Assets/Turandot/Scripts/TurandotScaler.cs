@@ -31,8 +31,6 @@ namespace Turandot.Scripts
         {
             _layout = layout;
 
-            //_slider.OnMove
-
             LayoutControl();
             ButtonData = new ButtonData() { name = layout.Name };
 

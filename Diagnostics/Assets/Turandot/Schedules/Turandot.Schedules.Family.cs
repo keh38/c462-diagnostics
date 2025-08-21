@@ -27,9 +27,7 @@ namespace Turandot.Schedules
         [JsonIgnore]
         int _ntotal = -1;
 
-        public Family()
-        {
-        }
+        public Family() { }
 
         public Family(string name)
         {

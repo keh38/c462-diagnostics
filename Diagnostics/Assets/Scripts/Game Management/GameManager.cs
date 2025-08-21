@@ -64,6 +64,11 @@ public class GameManager : MonoBehaviour
     }
 
     public static SerializeableDictionary<string> Metrics { get { return instance._subjectMetadata.metrics; } }
+    public static void AddMetric(string key, string value)
+    {
+        instance._subjectMetadata.metrics[key] = value;
+        instance._SaveSubjectMetadata();
+    }
 
     public static Color BackgroundColor
     {
