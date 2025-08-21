@@ -1,9 +1,8 @@
-﻿using UnityEngine;
+﻿using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
-
-using Newtonsoft.Json;
-using ProtoBuf;
+using UnityEngine;
+using static Unity.IO.LowLevel.Unsafe.AsyncReadManagerMetrics;
 
 namespace Turandot
 {
@@ -18,9 +17,7 @@ namespace Turandot
         [JsonIgnore]
         bool _lastvalue;
 
-        public InputEvent()
-        {
-        }
+        public InputEvent() { }
 
         public InputEvent(string name)
         {
@@ -76,6 +73,7 @@ namespace Turandot
                     if (flag != null)
                     {
                         result = MakeComparison(flag.value, c.comparison, c.time_ms);
+                        //Debug.Log($"{flag} {c.comparison} {c.time_ms} ==> {result} ({flag.value - c.time_ms})");
                     }
                 }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using LogicUI.FancyTextRendering;
+using TMPro.EditorUtilities;
 
 public class InstructionPanel : MonoBehaviour
 {
@@ -30,12 +31,45 @@ public class InstructionPanel : MonoBehaviour
         _continueButton.GetComponentInChildren<TMPro.TMP_Text>().fontSize = instructions.FontSize;
         _markdownRenderer.TextMesh.fontSize = instructions.FontSize;
 
+        _markdownRenderer.TextMesh.alignment = ConvertAlignmentEnum(instructions.HorizontalAlignment);
+        ApplyVerticalAlignment(instructions.VerticalAlignment);
+
         _pages = _instructions.Text
             .Replace("\r", "")
             .Split(new string[] { "[br]\n" }, System.StringSplitOptions.RemoveEmptyEntries);
         
         ShowPage(_pageIndex);
         UpdateContinueButtonLabel();
+    }
+
+    private TMPro.TextAlignmentOptions ConvertAlignmentEnum(Turandot.Instructions.HorizontalTextAlignment horizontalAlignment)
+    {
+        switch (horizontalAlignment)
+        {
+            case Turandot.Instructions.HorizontalTextAlignment.Left:
+                return TMPro.TextAlignmentOptions.Left;
+            case Turandot.Instructions.HorizontalTextAlignment.Center:
+                return TMPro.TextAlignmentOptions.Center;
+            case Turandot.Instructions.HorizontalTextAlignment.Right:
+                return TMPro.TextAlignmentOptions.Right;
+        }
+
+        return TMPro.TextAlignmentOptions.Left;
+    }
+
+    private void ApplyVerticalAlignment(Turandot.Instructions.VerticalTextAlignment verticalAlignment)
+    {
+        var rectTransform = _markdownRenderer.GetComponent<RectTransform>();
+
+        float yval = 1;
+        if (verticalAlignment == Turandot.Instructions.VerticalTextAlignment.Top) { yval = 1; }
+        else if (verticalAlignment == Turandot.Instructions.VerticalTextAlignment.Middle) { yval = 0.5f; }
+        else if (verticalAlignment == Turandot.Instructions.VerticalTextAlignment.Bottom) { yval = 0; }
+
+        rectTransform.anchorMin = new Vector2(0, yval);
+        rectTransform.anchorMax = new Vector2(1, yval); ;
+        rectTransform.pivot = new Vector2(0.5f, yval);
+
     }
 
     private void ShowPage(int index)

@@ -10,7 +10,7 @@ namespace Turandot.Scripts
 {
     public class TurandotCueMessage : TurandotCue
     {
-        [SerializeField] private Text _label;
+        [SerializeField] private TMPro.TMP_Text _label;
 
         private MessageLayout _layout = new MessageLayout();
 

@@ -371,7 +371,6 @@ public class TurandotEngine : MonoBehaviour
         var regex = new Regex(@"{([a-zA-Z0-9\.\s]+)}");
         foreach (var match in regex.Matches(result).Cast<Match>().Select(x => x.Groups[1].Value))
         {
-            Debug.Log(match);
             if (_inputMonitor.Contains(match))
             {
                 expanded = expanded.Replace($"{{{match}}}", _inputMonitor.ExpandResult(match));
@@ -385,15 +384,14 @@ public class TurandotEngine : MonoBehaviour
     {
         string expanded = result;
 
-        if (result.ToLower().Contains("{scale}"))
+        var regex = new Regex(@"{([a-zA-Z0-9\.\s]+)}");
+        foreach (var match in regex.Matches(result).Cast<Match>().Select(x => x.Groups[1].Value))
         {
-            expanded = expanded.Replace("{scale}", _inputMonitor.SliderSubstitution);
+            if (_inputMonitor.Contains(match))
+            {
+                expanded = expanded.Replace($"{{{match}}}", _inputMonitor.GetValue(match).ToString());
+            }
         }
-        if (result.ToLower().Contains("{param}"))
-        {
-            expanded = expanded.Replace("{param}", _inputMonitor.ParamSubstitution);
-        }
-        expanded = ExpandSignalExpression(expanded);
 
         return expanded;
     }
@@ -439,11 +437,12 @@ public class TurandotEngine : MonoBehaviour
                     {
                         lh = m.Groups[0].Value;
                         lh = lh.Substring(2, lh.Length - 3);
-                        // TURANDOT FIX 
-                        //SubjectManager.Instance.AddMetric(lh, KLib.Expressions.EvaluateToFloatScalar(rh));
+                        GameManager.AddMetric(lh, rh);
                     }
                     else
+                    {
                         _params.SetFlag(exprParts[0].Trim(), KLib.Expressions.EvaluateToIntScalar(rh));
+                    }
                 }
                 else if (e.Substring(e.Length - 2, 2) == "++")
                 {

@@ -81,7 +81,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 #if HACKING
         Application.targetFrameRate = 60;
         GameManager.SetSubject("Scratch/_shit");
-        string configName = "Tinnitus-BestMasker";
+        string configName = "Tinnitus-MML";
         //DiagnosticsManager.Instance.MakeExtracurricular("Turandot", "Turandot." + configName);
 #else
         string configName = GameManager.DataForNextScene;

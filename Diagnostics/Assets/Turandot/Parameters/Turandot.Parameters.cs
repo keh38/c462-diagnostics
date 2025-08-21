@@ -1,13 +1,9 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Serialization;
 
 using Newtonsoft.Json;
 using ProtoBuf;
 
-using Turandot.Cues;
 using Turandot.Screen;
 
 namespace Turandot
@@ -185,24 +181,31 @@ namespace Turandot
         {
             var f = flags.Find(o => o.name.Equals(flag));
             if (f != null)
+            {
                 f.value |= value;
-
-            Debug.Log(flag + " = " + f.value);
+            }
         }
 
         public void SetFlag(string flag, int value)
         {
-            Debug.Log(flag + " = " + value);
             var f = flags.Find(o => o.name.Equals(flag));
             if (f != null)
+            {
                 f.value = value;
+            }
+
+            //Debug.Log($"{flag} = {value}");
         }
 
         public void IncrementFlag(string flag)
         {
             var f = flags.Find(o => o.name.Equals(flag));
             if (f != null)
+            {
                 f.value++;
+                //Debug.Log($"{flag} = {f.value}");
+            }
+
         }
 
     }

@@ -16,6 +16,7 @@ namespace Turandot.Scripts
 
         virtual public string Name { get { return ""; } }
         virtual public string Result { get { return ""; } }
+        virtual public float Value { get { return float.NaN; } }
 
         protected InputLog _log = null;
         public InputLog Log { get { return _log; } }

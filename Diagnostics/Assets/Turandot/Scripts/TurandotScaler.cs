@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-
+﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using Turandot.Inputs;
+using Turandot.Screen;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-
-using Turandot.Inputs;
-using Turandot.Screen;
 using Input = Turandot.Inputs.Input;
 
 namespace Turandot.Scripts
@@ -26,6 +25,7 @@ namespace Turandot.Scripts
 
         private string _result;
         public override string Result { get { return _result; } }
+        public override float Value { get { return _slider.value; } }
 
         public void Initialize(ScalerLayout layout)
         {
@@ -97,7 +97,7 @@ namespace Turandot.Scripts
         public void OnButtonClick()
         {
             ButtonData.value = true;
-            _result = _slider.value.ToString();
+            _result = $"{_layout.Name}={_slider.value};";
         }
     }
 }

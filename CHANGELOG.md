@@ -6,6 +6,7 @@
   - restored scaler (e.g.: for VAS)
   - more completely restored parameter slider
   - restored saving results as metrics
+  - more instruction formatting options
 #### Fixed
 - hide dummy outline on Protocol screen
 

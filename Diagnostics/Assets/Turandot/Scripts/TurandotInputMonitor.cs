@@ -239,35 +239,13 @@ namespace Turandot.Scripts
             return i.Result;
         }
 
-        public string SliderSubstitution
+        public float GetValue(string item)
         {
-            get { return ":"; }
-            //get { return _scaleSlider.slider.value.ToString("F4"); }
+            var i = _inputObjects.Find(x => x.Name.Equals(item));
+            if (i == null) return float.NaN;
+
+            return i.Value;
         }
 
-        public string KeypadResult
-        {
-            get { return ":"; }
-            //get { return "keypad=" + _keypad.Value + ";"; }
-        }
-
-        public string ParamResult
-        {
-            get { return ":"; }
-            //get { return "param=" + paramSlider.Value + ";"; }
-        }
-
-        public string ParamSubstitution
-        {
-            get { return ":"; }
-            //get { return paramSlider.Value.ToString(); }
-        }
-
-        public string TraceResult
-        {
-            get { return ":"; }
-            //get { return "trace=" + grapher.Result; }
-        }
-        
     }
 } 
