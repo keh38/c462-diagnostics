@@ -7,6 +7,7 @@
   - more completely restored parameter slider
   - restored saving results as metrics
   - more instruction formatting options
+- added "full auto" protocol option to bypass outline screen altogether
 #### Fixed
 - hide dummy outline on Protocol screen
 

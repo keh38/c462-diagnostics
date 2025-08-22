@@ -169,7 +169,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8228716641639139672}
-  m_Father: {fileID: 8438942426096313293}
+  m_Father: {fileID: 8438942426066391180}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: -1}
   m_AnchorMax: {x: 0.5, y: -1}
@@ -1106,8 +1106,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 220737014922608625}
+  m_Children: []
   m_Father: {fileID: 8438942425356969154}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1758,6 +1757,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8438942426644436468}
+  - {fileID: 220737014922608625}
   - {fileID: 8438942426414603972}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1820,6 +1820,7 @@ MonoBehaviour:
   _leftLabel: {fileID: 5606024892530415674}
   _rightLabel: {fileID: 2717114403520792131}
   _slider: {fileID: 8438942426644436469}
+  _thumbRectTransform: {fileID: 8438942426096313293}
   _button: {fileID: 4278910112594081539}
   _backgroundImage: {fileID: 8438942425842186961}
   _fillImage: {fileID: 8438942425776977211}

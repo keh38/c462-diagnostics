@@ -20,9 +20,12 @@ namespace Turandot.Scripts
         [SerializeField] private TMPro.TMP_Text _leftLabel;
         [SerializeField] private TMPro.TMP_Text _rightLabel;
         [SerializeField] private Slider _slider;
+        [SerializeField] private RectTransform _thumbRectTransform;
         [SerializeField] private GameObject _button;
         [SerializeField] private Image _backgroundImage;
         [SerializeField] private Image _fillImage;
+
+        private RectTransform _buttonRectTransform;
 
         private ParamSliderLayout _layout = new ParamSliderLayout();
         private ParamSliderAction _action = null;
@@ -41,6 +44,11 @@ namespace Turandot.Scripts
 
         private string _result;
         public override string Result { get { return _result; } }
+
+        private void Awake()
+        {
+            _buttonRectTransform = _button.GetComponent<RectTransform>();
+        }
 
         public void Initialize(ParamSliderLayout layout)
         {
@@ -217,6 +225,8 @@ namespace Turandot.Scripts
         {
             if (_layout.ButtonStyle == ParamSliderButtonStyle.Mobile)
             {
+                _buttonRectTransform.anchorMin = new Vector2(_thumbRectTransform.anchorMin.x, -1);
+                _buttonRectTransform.anchorMax = new Vector2(_thumbRectTransform.anchorMin.x, -1);
                 _button.SetActive(true);
             }
             if (_action.ThumbTogglesSound)

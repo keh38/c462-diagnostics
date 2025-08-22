@@ -377,6 +377,8 @@ public class TurandotEngine : MonoBehaviour
             }
         }
 
+        expanded = ExpandSignalExpression(expanded);
+
         return previous + expanded;
     }
 
@@ -392,6 +394,7 @@ public class TurandotEngine : MonoBehaviour
                 expanded = expanded.Replace($"{{{match}}}", _inputMonitor.GetValue(match).ToString());
             }
         }
+        expanded = ExpandSignalExpression(expanded);
 
         return expanded;
     }
@@ -405,7 +408,10 @@ public class TurandotEngine : MonoBehaviour
         {
             var state = (m.Groups[1].Value == "sigMan") ? _currentFlowElement : _params[m.Groups[1].Value];
             if (state != null)
+            {
+                Debug.Log($"{m.Groups[0].Value} = {state.sigMan.GetParameter(m.Groups[2].Value, m.Groups[3].Value)}");
                 expression = expression.Replace(m.Groups[0].Value, state.sigMan.GetParameter(m.Groups[2].Value, m.Groups[3].Value).ToString());
+            }
         }
 
         return expression;

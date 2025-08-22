@@ -304,6 +304,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4788426584245122045}
+  - {fileID: 3907321182822655080}
   - {fileID: 4635414127050113112}
   - {fileID: 6261045962922747510}
   m_Father: {fileID: 0}
@@ -367,6 +368,7 @@ MonoBehaviour:
   _leftLabel: {fileID: 3483839322346633140}
   _rightLabel: {fileID: 3404654060885656979}
   _slider: {fileID: 6241426377109991902}
+  _thumbRectTransform: {fileID: 5474396070030416305}
   _button: {fileID: 8177441835233403663}
 --- !u!1 &1359413084592434083
 GameObject:
@@ -603,8 +605,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 3907321182822655080}
+  m_Children: []
   m_Father: {fileID: 9131996128086147535}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1143,7 +1144,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3038928937178618357}
-  m_Father: {fileID: 5474396070030416305}
+  m_Father: {fileID: 2143741292771033391}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: -1}
   m_AnchorMax: {x: 0.5, y: -1}

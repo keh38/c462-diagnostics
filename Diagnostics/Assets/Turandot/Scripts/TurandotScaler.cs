@@ -15,7 +15,10 @@ namespace Turandot.Scripts
         [SerializeField] private TMPro.TMP_Text _leftLabel;
         [SerializeField] private TMPro.TMP_Text _rightLabel;
         [SerializeField] private Slider _slider;
+        [SerializeField] private RectTransform _thumbRectTransform;
         [SerializeField] private GameObject _button;
+
+        private RectTransform _buttonRectTransform;
 
         private ScalerLayout _layout = new ScalerLayout();
         private ScalerAction _action = null;
@@ -26,6 +29,11 @@ namespace Turandot.Scripts
         private string _result;
         public override string Result { get { return _result; } }
         public override float Value { get { return _slider.value; } }
+
+        private void Awake()
+        {
+            _buttonRectTransform = _button.GetComponent<RectTransform>();
+        }
 
         public void Initialize(ScalerLayout layout)
         {
@@ -91,6 +99,9 @@ namespace Turandot.Scripts
 
         public void OnPointerUp(BaseEventData data)
         {
+            _buttonRectTransform.anchorMin = new Vector2(_thumbRectTransform.anchorMin.x, -1);
+            _buttonRectTransform.anchorMax = new Vector2(_thumbRectTransform.anchorMin.x, -1);
+
             _button.SetActive(true);
         }
 
