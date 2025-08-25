@@ -255,24 +255,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         diagnosticsUI.ShowInstructions(new List<string>() { instructions }, EndBreak, "resume");
     }
 
-    void ShowMoreAdaptationInstructions()
-    {
-        diagnosticsUI.transform.position = new Vector2(0, 0);
-        diagnosticsUI.SetHelpBalloonSize(1750, 800);
-        diagnosticsUI.SetHelpBalloonPosition(new Vector3(0, 100, 0));
-        diagnosticsUI.SetHelpBalloonAlpha(0.85f);
-        diagnosticsUI.ShowInstructions(new List<string>() { "Let's do a little more." }, MoreAdaptation);
-    }
-
-    void ShowMoreBlocksInstructions()
-    {
-        diagnosticsUI.transform.position = new Vector2(0, 0);
-        diagnosticsUI.SetHelpBalloonSize(1750, 800);
-        diagnosticsUI.SetHelpBalloonPosition(new Vector3(0, 100, 0));
-        diagnosticsUI.SetHelpBalloonAlpha(0.85f);
-        diagnosticsUI.ShowInstructions(new List<string>() { "Good work! Let's do a little more." }, MorePractice);
-    }
-
     IEnumerator AskToResume()
     {
         yield return StartCoroutine(diagnosticsUI.AskYesNoQuestion("Continue previous work?"));
@@ -287,22 +269,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         else
         {
             StartRun();
-        }
-    }
-
-    public void OnTap()
-    {
-        if (_waitingForTap)
-        {
-            _waitingForTap = false;
-
-            if (_waitingForResponse)
-                Return();
-            else
-            {
-                prompt.Deactivate();
-                StartRun();
-            }
         }
     }
 
@@ -364,13 +330,13 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
             StartCoroutine(NextBlock());
         }
-        //else if (_params.schedule.mode == Mode.Adapt) // Adaptation
-        //{
-        //    _engine.OnFinished = OnAdaptFlowchartFinished;
-        //    _params.adapt.Initialize();
-        //    InitializeProgressBar(_params.adapt.MaxNumberOfBlocks);
-        //    NextBlockOfTracks();
-        //}
+        else if (_params.schedule.mode == Mode.Adapt) // Adaptation
+        {
+            _engine.FlowchartFinished = OnAdaptFlowchartFinished;
+            _params.adapt.Initialize();
+            InitializeProgressBar(_params.adapt.MaxNumberOfBlocks);
+            NextBlockOfTracks();
+        }
         yield break;
     }
     
@@ -545,10 +511,9 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
                 StartCoroutine(NextBlock());
             }
         }
-
+*/
         void MoreAdaptation()
         {
-            diagnosticsUI.transform.position = new Vector2(-2200, 0);
             NextBlockOfTracks();
         }
 
@@ -564,7 +529,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             AdvanceAdaptation();
             yield break;
         }
-    */
+    
     void InitDataFile()
     {
         var fileStemStart = GameManager.Subject;
@@ -738,156 +703,159 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             }
         }
     }
+      
+    void AdvanceAdaptation()
+    {
+        SCLElement sc = _params.adapt.InitTrial();
 
-      /*
-        void AdvanceAdaptation()
+        _data.NewTrial(sc.block, sc.track, sc.trial, sc.group);
+        _data.type = sc.trialType;
+
+        foreach (FlowElement fe in _params.flowChart)
         {
-            SCLElement sc = _params.adapt.InitTrial();
+            fe.Initialize();
+        }
 
-            _data.NewTrial(sc.block, sc.track, sc.trial, sc.group);
-            _data.type = sc.trialType;
-
-            foreach (FlowElement fe in _params.flowChart)
-            {
-                fe.Initialize();
-            }
-
-            string error = "";
-            foreach (PropValPair pv in sc.propValPairs)
-            {
-                //Debug.Log(pv.property + "=" + pv.value);
-                _data.properties.Add(pv.property + "=" + pv.value);
-                error = _params.SetParameter(pv.property, pv.value);
-
-                if (!string.IsNullOrEmpty(error))
-                {
-                    break;
-                }
-            }
+        string error = "";
+        var stringBuilder = new StringBuilder(100);
+        stringBuilder.AppendLine($"Block = {_data.block}");
+        stringBuilder.AppendLine($"Trial = {_data.trial}");
+        stringBuilder.AppendLine("----------------------");
+        foreach (PropValPair pv in sc.propValPairs)
+        {
+            stringBuilder.AppendLine($"{pv.property}={pv.value}");
+            _data.properties.Add(pv.property + "=" + pv.value);
+            error = _params.SetParameter(pv.property, pv.value);
 
             if (!string.IsNullOrEmpty(error))
             {
-                HandleError(error);
-            }
-            else
-            {
-                string logPath = _fileStem + "-Block" + _data.block + "-Track" + _data.track + "-Trial" + _data.trial + ".json";
-                if (IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Trial", _data.trial.ToString());
-
-    #if !KDEBUG
-                StartCoroutine(_engine.ExecuteFlowchart(sc.trialType, _params.flags, logPath));
-    #else
-                StartCoroutine(_engine.SimulateFlowchart(sc.trialType, _params.flags, logPath, _params.adapt.SimulatedResult(sc.trialType, 11.1f)));
-    #endif
+                break;
             }
         }
 
-        void OnAdaptFlowchartFinished()
+        if (!string.IsNullOrEmpty(error))
         {
-            if (IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("TrialEnd", _data.trial.ToString());
-            Debug.Log("Trial #" + _data.trial + " finished");
-
-            _data.result = _engine.Result;
-            _data.reactionTime = _engine.ReactionTime;
-            _data.properties.AddRange(_params.GetPostTrialProperties(_data.properties));
-            KLib.FileIO.AppendTextFile(_mainDataFile, _data.ToJSONString());
-
-            _params.adapt.Process(_data.result);
-
-            if (_params.adapt.IsBlockFinished)
-            {
-                progressBar.value += _progressBarStep;
-
-                string json = "";
-                foreach (AdaptiveTrack at in _params.adapt.tracks)
-                {
-                    json += KLib.FileIO.JSONStringAdd(json, at.name, KLib.FileIO.JSONSerializeToString(at.History));
-                }
-                string blockDataFile = _mainDataFile.Replace(".json", "-Block" + _params.adapt.BlockNumber + ".json");
-                KLib.FileIO.WriteTextFile(blockDataFile, json);
-                if (SubjectManager.Instance.UploadData) DataFileManager.UploadDataFile(blockDataFile);
-
-                string logFile = _mainDataFile.Replace(".json", "-Block" + _params.adapt.BlockNumber + ".log");
-                KLib.FileIO.WriteTextFile(logFile, _params.adapt.Log);
-    //            DataFileManager.UploadDataFile(logFile);
-
-                if (_params.adapt.AllBlocksFinished)
-                {
-                    FinishAdaptation();
-                }
-                else
-                {
-                    if (_params.schedule.offerBreakAfter > 0 && ++_numSinceLastBreak == _params.schedule.offerBreakAfter)
-                    {
-                        _numSinceLastBreak = 0;
-                        ShowBreakInstructions(_params.schedule.breakInstructions);
-                    }
-                    else
-                    {
-                        NextBlockOfTracks();
-                    }
-                }
-            }
-            else
-            {
-                AdvanceAdaptation();
-            }
+            HandleError(error);
         }
-
-        void FinishAdaptation()
+        else
         {
-            if (_params.adapt.CheckTrackConsistency())
+            string logPath = _fileStem + "-Block" + _data.block + "-Track" + _data.track + "-Trial" + _data.trial + ".json";
+            HTS_Server.SendMessage("Turandot", $"Trial:{stringBuilder.ToString()}");
+
+#if !KDEBUG
+            StartCoroutine(_engine.ExecuteFlowchart(sc.trialType, _params.flags, logPath));
+#else
+            StartCoroutine(_engine.SimulateFlowchart(sc.trialType, _params.flags, logPath, _params.adapt.SimulatedResult(sc.trialType, 11.1f)));
+#endif
+        }
+    }
+
+    void OnAdaptFlowchartFinished()
+    {
+        _data.result = _engine.Result;
+        _data.reactionTime = _engine.ReactionTime;
+        _data.properties.AddRange(_params.GetPostTrialProperties(_data.properties));
+        KLib.FileIO.AppendTextFile(_mainDataFile, _data.ToJSONString(_engine.GetEventsAsJSON()));
+        
+        HTS_Server.SendMessage("Turandot", "State:Finished");
+
+        _params.adapt.Process(_data.result);
+
+        if (_params.adapt.IsBlockFinished)
+        {
+            _progress += _progressBarStep;
+            HTS_Server.SendMessage("Turandot", $"Progress:{Mathf.RoundToInt(_progress * 100)}");
+
+            string json = "";
+            foreach (AdaptiveTrack at in _params.adapt.tracks)
             {
-                List<TrackResult> final = _params.adapt.ComputeFinalThresholds();
-                foreach (AdaptiveTrack at in _params.adapt.tracks.FindAll(t => !string.IsNullOrEmpty(t.storeThresholdAs)))
-                {
-                    if (at.storeThresholdAs == "THR")
-                    {
-                        StoreResultInAudiogram(at.state, at.chan, final.Find(f => f.name == at.name).threshold);
-                    }
-                    else
-                    {
-                        SubjectManager.Instance.AddMetric(at.storeThresholdAs, final.Find(f => f.name == at.name).threshold);
-                    }
-                }
-                string json = KLib.FileIO.JSONStringAdd("", "trackResults", KLib.FileIO.JSONSerializeToString(_params.adapt.Results));
-                KLib.FileIO.AppendTextFile(_mainDataFile, json);
+                json += KLib.FileIO.JSONStringAdd(json, at.name, KLib.FileIO.JSONSerializeToString(at.History));
+            }
+            string blockDataFile = _mainDataFile.Replace(".json", "-Block" + _params.adapt.BlockNumber + ".json");
+            File.WriteAllText(blockDataFile, json);
 
-                json = KLib.FileIO.JSONStringAdd("", "finalResults", KLib.FileIO.JSONSerializeToString(final));
-                KLib.FileIO.AppendTextFile(_mainDataFile, json);
+//            if (SubjectManager.Instance.UploadData) DataFileManager.UploadDataFile(blockDataFile);
 
-                StopIPCRecording();
+            string logFile = _mainDataFile.Replace(".json", "-Block" + _params.adapt.BlockNumber + ".log");
+            File.WriteAllText(logFile, _params.adapt.Log);
+//            DataFileManager.UploadDataFile(logFile);
 
-                _isRunning = false;
-
-                _engine.ClearScreen();
-
-                if (SubjectManager.Instance.UploadData) DataFileManager.UploadDataFile(_mainDataFile);
-                SubjectManager.Instance.DataFiles.Add(_mainDataFile);
-
-                if (!string.IsNullOrEmpty(_params.linkTo))
-                {
-                    if (DiagnosticsManager.Instance.IsExtraCurricular)
-                        DiagnosticsManager.Instance.MakeExtracurricular("Turandot", System.IO.Path.GetFileNameWithoutExtension(_params.linkTo).Replace("Turandot.", ""), DiagnosticsManager.Instance.ReturnToScene);
-                    else
-                        DiagnosticsManager.Instance.SettingsFile = System.IO.Path.GetFileNameWithoutExtension(_params.linkTo).Replace("Turandot.", "");
-                    Application.LoadLevel("Turandot");
-                }
-                else
-                {
-                    DiagnosticsManager.Instance.AdvanceProtocol();
-                    _message.text = "Finished! Press ENTER to return.";
-                    prompt.Activate(_message);
-
-                    _waitingForResponse = true;
-                }
+            if (_params.adapt.AllBlocksFinished)
+            {
+                FinishAdaptation();
             }
             else
             {
-                ShowMoreAdaptationInstructions();
+                //if (_params.schedule.offerBreakAfter > 0 && ++_numSinceLastBreak == _params.schedule.offerBreakAfter)
+                //{
+                //    _numSinceLastBreak = 0;
+                //    ShowBreakInstructions(_params.schedule.breakInstructions);
+                //}
+                //else
+                {
+                    NextBlockOfTracks();
+                }
             }
         }
-        */
+        else
+        {
+            AdvanceAdaptation();
+        }
+    }
+
+    void FinishAdaptation()
+    {
+        if (_params.adapt.CheckTrackConsistency())
+        {
+            List<TrackResult> final = _params.adapt.ComputeFinalThresholds();
+            foreach (AdaptiveTrack at in _params.adapt.tracks.FindAll(t => !string.IsNullOrEmpty(t.storeThresholdAs)))
+            {
+                //if (at.storeThresholdAs == "THR")
+                //{
+                //    StoreResultInAudiogram(at.state, at.chan, final.Find(f => f.name == at.name).threshold);
+                //}
+                //else
+                {
+                    GameManager.AddMetric(at.storeThresholdAs, final.Find(f => f.name == at.name).threshold.ToString());
+                }
+            }
+            string json = KLib.FileIO.JSONStringAdd("", "trackResults", KLib.FileIO.JSONSerializeToString(_params.adapt.Results));
+            File.AppendAllText(_mainDataFile, json);
+
+            json = KLib.FileIO.JSONStringAdd("", "finalResults", KLib.FileIO.JSONSerializeToString(final));
+            File.AppendAllText(_mainDataFile, json);
+
+            _isRunning = false;
+
+            EndRun(abort: false);
+            //_engine.ClearScreen();
+
+            //if (SubjectManager.Instance.UploadData) DataFileManager.UploadDataFile(_mainDataFile);
+            //SubjectManager.Instance.DataFiles.Add(_mainDataFile);
+
+            //if (!string.IsNullOrEmpty(_params.linkTo))
+            //{
+            //    if (DiagnosticsManager.Instance.IsExtraCurricular)
+            //        DiagnosticsManager.Instance.MakeExtracurricular("Turandot", System.IO.Path.GetFileNameWithoutExtension(_params.linkTo).Replace("Turandot.", ""), DiagnosticsManager.Instance.ReturnToScene);
+            //    else
+            //        DiagnosticsManager.Instance.SettingsFile = System.IO.Path.GetFileNameWithoutExtension(_params.linkTo).Replace("Turandot.", "");
+            //    Application.LoadLevel("Turandot");
+            //}
+            //else
+            //{
+            //    DiagnosticsManager.Instance.AdvanceProtocol();
+            //    _message.text = "Finished! Press ENTER to return.";
+            //    prompt.Activate(_message);
+
+            //    _waitingForResponse = true;
+            //}
+        }
+        else
+        {
+            //ShowMoreAdaptationInstructions();
+        }
+    }
+        
     public void OnFinishButtonClick()
     {
         Return();

@@ -333,10 +333,10 @@ namespace Turandot.Schedules
                     Debug.Log(_state.value);
                 }
 
-                if (_state.value < minVal) _state.value = minVal;
-                if (_state.value > maxVal) _state.value = maxVal;
+                //if (_state.value < minVal) _state.value = minVal;
+                //if (_state.value > maxVal) _state.value = maxVal;
 
-                result.outOfRange = _state.value <= minVal || _state.value >= maxVal;
+                result.outOfRange = _state.value < minVal || _state.value > maxVal;
                 if (result.outOfRange)
                 {
                     result.log += "\nTest value out of range.";
