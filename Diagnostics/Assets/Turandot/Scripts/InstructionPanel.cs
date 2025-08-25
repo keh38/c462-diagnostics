@@ -47,11 +47,11 @@ public class InstructionPanel : MonoBehaviour
         switch (horizontalAlignment)
         {
             case Turandot.Instructions.HorizontalTextAlignment.Left:
-                return TMPro.TextAlignmentOptions.Left;
+                return TMPro.TextAlignmentOptions.TopLeft;
             case Turandot.Instructions.HorizontalTextAlignment.Center:
-                return TMPro.TextAlignmentOptions.Center;
+                return TMPro.TextAlignmentOptions.Top;
             case Turandot.Instructions.HorizontalTextAlignment.Right:
-                return TMPro.TextAlignmentOptions.Right;
+                return TMPro.TextAlignmentOptions.TopRight;
         }
 
         return TMPro.TextAlignmentOptions.Left;
