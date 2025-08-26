@@ -522,8 +522,7 @@ namespace KLib.Signals
 
             waveform.ResetSweepables();
     
-            if (modulation != null)
-                modulation.ResetSweepables();
+            modulation?.ResetSweepables();
 
             level.ResetSweepables();
             gate.Reset();
@@ -551,15 +550,15 @@ namespace KLib.Signals
 
                 Data = new float[N];
 
-                location = "modulation";
-                modulation.Initialize(Fs, N);
-
                 location = "gate";
                 gate.Initialize(Fs, N);
                 _gateClosed = false;
 
                 _nptsDelay = Mathf.RoundToInt(Fs * gate.Delay_ms / 1000);
                 _nptsPerInterval = gate.Active ? Mathf.RoundToInt(Fs * gate.Period_ms / 1000) : -1;
+
+                location = "modulation";
+                modulation.Initialize(Fs, N, gate.Active ? gate.Delay_ms : 0);
 
                 location = "level";
                 var digitimer = waveform as Digitimer;
@@ -804,6 +803,10 @@ namespace KLib.Signals
                 //    //_gateClosed = true;
                 //}
                 _rampState = (gate.Running) ? RampState.On : RampState.Off;
+                if (gate.SwitchedOffThisBuffer)
+                {
+                    modulation.ResetPhase(gate.Delay_ms);
+                }
 
 
                 //if (_intramuralVariables.Count > 0 && gate.Looped)

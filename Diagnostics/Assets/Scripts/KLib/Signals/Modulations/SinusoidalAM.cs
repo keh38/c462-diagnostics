@@ -23,6 +23,7 @@ namespace KLib.Signals.Modulations
 		private float _lastDepth;
 		private float _lastPhase;
         private float _phase;
+        private float _delayPhase;
 
         public SinusoidalAM() : this(40, 1)
         {
@@ -135,16 +136,30 @@ namespace KLib.Signals.Modulations
         }
 
 
-        public override bool Initialize(float Fs, int N)
+        public override bool Initialize(float Fs, int N, float delay_ms)
         {
-            base.Initialize(Fs, N);
+            base.Initialize(Fs, N, delay_ms);
 
             _lastFreq = Frequency_Hz;
 			_lastDepth = Depth;
+
+            float cyclePeriod_ms = 1000 / Frequency_Hz;
+            _delayPhase = (delay_ms % cyclePeriod_ms) / cyclePeriod_ms;
+
             _lastPhase = Phase_cycles;
-            _phase = 2 * Mathf.PI * (0.75f + Phase_cycles);
+            _phase = 2 * Mathf.PI * (0.75f + _lastPhase - _delayPhase);
 
             return true;
+        }
+
+        public override void ResetPhase(float delay_ms)
+        {
+            float cyclePeriod_ms = 1000 / Frequency_Hz;
+            float newDelayPhase = (delay_ms % cyclePeriod_ms) / cyclePeriod_ms;
+            float deltaPhase = newDelayPhase - _delayPhase;
+            _delayPhase = newDelayPhase;
+
+            _lastPhase -= deltaPhase;
         }
 
         public override float Apply(float[] data)

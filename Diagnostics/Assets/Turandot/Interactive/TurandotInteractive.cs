@@ -51,7 +51,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
 #if HACKING
         GameManager.SetSubject("Scratch/_Ken");
-        GameManager.DataForNextScene = "Audio-Only";
+        GameManager.DataForNextScene = "GateTest";
 #endif
 
         if (!string.IsNullOrEmpty(GameManager.DataForNextScene))

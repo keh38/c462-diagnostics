@@ -73,11 +73,10 @@ namespace KLib.Signals.Modulations
             return float.NaN;
         }
 
-        public virtual void ResetSweepables()
-        {
-        }
+        public virtual void ResetSweepables() { }
+        public virtual void ResetPhase(float delay_ms) { }
 
-        public virtual bool Initialize(float Fs, int N)
+        public virtual bool Initialize(float Fs, int N, float delay_ms)
         {
 			_dt = 1.0f / Fs;
 			_samplingRate_Hz = Fs;

@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using ProtoBuf;
 
 using KLib.Signals.Enumerations;
+using System.Xml.Serialization;
 
 namespace KLib.Signals
 {
@@ -119,6 +120,11 @@ namespace KLib.Signals
         [JsonIgnore]
         [ProtoIgnore]
         public int TotalSamples { get { return _totalPoints; } }
+
+        [JsonIgnore]
+        [ProtoIgnore]
+        [XmlIgnore]
+        public bool SwitchedOffThisBuffer { get; private set; }
 
         /// <summary>
         /// Construct default Gate object.
@@ -446,8 +452,12 @@ namespace KLib.Signals
             bool finished = false;
             float value = 0;
 
+            SwitchedOffThisBuffer = false;
+            var gateStateAtStartOfBuffer = _state;
+
             _wasLooped = false;
             _loopOffset = -1;
+
             for (int k=0; k<data.Length; k++)
             {
                 if (finished)
@@ -476,6 +486,8 @@ namespace KLib.Signals
                 }
                 else
                 {
+                    SwitchedOffThisBuffer = gateStateAtStartOfBuffer != GateState.Off;
+
                     _state = GateState.Off;
                     value = 0;
                 }
