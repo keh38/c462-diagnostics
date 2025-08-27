@@ -803,11 +803,6 @@ namespace KLib.Signals
                 //    //_gateClosed = true;
                 //}
                 _rampState = (gate.Running) ? RampState.On : RampState.Off;
-                if (gate.SwitchedOffThisBuffer)
-                {
-                    modulation.ResetPhase(gate.Delay_ms);
-                }
-
 
                 //if (_intramuralVariables.Count > 0 && gate.Looped)
                 //{

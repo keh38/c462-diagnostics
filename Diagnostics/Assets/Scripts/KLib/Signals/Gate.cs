@@ -121,11 +121,6 @@ namespace KLib.Signals
         [ProtoIgnore]
         public int TotalSamples { get { return _totalPoints; } }
 
-        [JsonIgnore]
-        [ProtoIgnore]
-        [XmlIgnore]
-        public bool SwitchedOffThisBuffer { get; private set; }
-
         /// <summary>
         /// Construct default Gate object.
         /// </summary>
@@ -452,7 +447,6 @@ namespace KLib.Signals
             bool finished = false;
             float value = 0;
 
-            SwitchedOffThisBuffer = false;
             var gateStateAtStartOfBuffer = _state;
 
             _wasLooped = false;
@@ -486,8 +480,6 @@ namespace KLib.Signals
                 }
                 else
                 {
-                    SwitchedOffThisBuffer = gateStateAtStartOfBuffer != GateState.Off;
-
                     _state = GateState.Off;
                     value = 0;
                 }
