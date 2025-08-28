@@ -788,10 +788,12 @@ namespace KLib.Signals
                 return;
             }
 
+            int numSamplesUntilNextGate = gate.GetNumSamplesUntilNextGate();
+
             references = waveform.Create(Data);
             if (!waveform.HandlesModulation)
             {
-                modRefCorr = modulation.Apply(Data);
+                modRefCorr = modulation.Apply(Data, numSamplesUntilNextGate);
             }                    
 
             if (gate.Active)

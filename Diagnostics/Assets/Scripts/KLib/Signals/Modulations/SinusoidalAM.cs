@@ -23,7 +23,6 @@ namespace KLib.Signals.Modulations
 		private float _lastDepth;
 		private float _lastPhase;
         private float _phase;
-        private float _delayPhase;
 
         public SinusoidalAM() : this(40, 1)
         {
@@ -143,26 +142,13 @@ namespace KLib.Signals.Modulations
             _lastFreq = Frequency_Hz;
 			_lastDepth = Depth;
 
-            float cyclePeriod_ms = 1000 / Frequency_Hz;
-            _delayPhase = (delay_ms % cyclePeriod_ms) / cyclePeriod_ms;
-
             _lastPhase = Phase_cycles;
-            _phase = 2 * Mathf.PI * (0.75f + _lastPhase - _delayPhase);
+            _phase = 2 * Mathf.PI * (0.75f + _lastPhase);
 
             return true;
         }
 
-        public override void ResetPhase(float delay_ms)
-        {
-            float cyclePeriod_ms = 1000 / Frequency_Hz;
-            float newDelayPhase = (delay_ms % cyclePeriod_ms) / cyclePeriod_ms;
-            float deltaPhase = newDelayPhase - _delayPhase;
-            _delayPhase = newDelayPhase;
-
-            _lastPhase -= deltaPhase;
-        }
-
-        public override float Apply(float[] data)
+        public override float Apply(float[] data, int numSamplesUntilNextGate)
         {
             float df = Frequency_Hz - _lastFreq;
             float t = 0;
@@ -181,6 +167,21 @@ namespace KLib.Signals.Modulations
             float phaseOffset = 0;
             for (int k = 0; k < _npts; k++)
             {
+                if (numSamplesUntilNextGate == 0)
+                {
+                    t = 0;
+                    df = 0;
+                    deltaDepth = 0;
+                    deltaPhase = 0;
+
+                    _lastFreq = Frequency_Hz;
+                    _lastDepth = Depth;
+
+                    _lastPhase = Phase_cycles;
+                    _phase = 2 * Mathf.PI * (0.75f + _lastPhase);
+                }
+                numSamplesUntilNextGate--;
+
                 if (df!=0 || _lastFreq>0)
                 {
                     //float sf = (_lastDepth * Mathf.Sin(Theta + _phase + (2 * Mathf.PI * Phase_cycles)) + 1) / (_lastDepth + 1);

@@ -182,7 +182,7 @@ namespace KLib.Signals.Waveforms
         {
 
             for (int k = 0; k < _amBuffer.Length; k++) _amBuffer[k] = 1;
-            _channel.modulation.Apply(_amBuffer);
+            _channel.modulation.Apply(_amBuffer, -1);
 
             for (int k = 0; k < data.Length; k++)
             {

@@ -74,7 +74,6 @@ namespace KLib.Signals.Modulations
         }
 
         public virtual void ResetSweepables() { }
-        public virtual void ResetPhase(float delay_ms) { }
 
         public virtual bool Initialize(float Fs, int N, float delay_ms)
         {
@@ -85,7 +84,7 @@ namespace KLib.Signals.Modulations
             return true;
         }
 
-        public virtual float Apply(float[] data)
+        public virtual float Apply(float[] data, int numSamplesUntilNextGate)
         {
             return 0;
         }

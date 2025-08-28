@@ -442,12 +442,26 @@ namespace KLib.Signals
             _startPointOfRampDown = _startPointOfRampUp + Mathf.RoundToInt(_fs * Duration_ms / 1000) - nRampPts;
         }
 
+        public int GetNumSamplesUntilNextGate()
+        {
+            int numSamples = -1;
+
+            if (this.Active)
+            {
+                numSamples = _startPointOfRampUp - _gateIndex;
+                if (numSamples < 0)
+                {
+                    numSamples = _totalPoints - _gateIndex + _startPointOfRampUp;
+                }
+            }
+
+            return numSamples;
+        }
+
         public void Apply(float[] data)
         {
             bool finished = false;
             float value = 0;
-
-            var gateStateAtStartOfBuffer = _state;
 
             _wasLooped = false;
             _loopOffset = -1;
