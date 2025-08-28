@@ -114,7 +114,8 @@ namespace Turandot.Schedules
                     {
                         // more trials in each block than sequence elements (X, Y):
                         // randomize the whole mess, no balance applied
-                        finalOrder = KLib.KMath.Permute(nx * ny, ntotal);
+                        finalOrder = PermuteNoRepeats(nx * ny, ntotal);
+                        //finalOrder = KLib.KMath.Permute(nx * ny, ntotal);
                     }
                     else
                     {
@@ -250,6 +251,38 @@ namespace Turandot.Schedules
                 v.EvaluateExpression(number);
             }
 
+        }
+
+        public static int[] PermuteNoRepeats(int N, int numElements)
+        {
+            int nrepeats = Mathf.CeilToInt((float)numElements / N);
+            int[] list = new int[nrepeats * N];
+            int idx = 0;
+            int last = -1;
+            int[] values = KLib.KMath.Permute(N);
+            for (int k = 0; k < nrepeats; k++)
+            {
+                if (N > 2 && k > 0)
+                {
+                    int ntries = 0;
+                    while (ntries < 10)
+                    {
+                        values = KLib.KMath.Permute(N);
+                        if (values[0] != last)
+                        {
+                            break;
+                        }
+                        ntries++;
+                    }
+                }
+                foreach (int i in values) list[idx++] = i;
+                last = values[N-1];
+            }
+
+            int[] trimmed = new int[numElements];
+            for (int k = 0; k < numElements; k++) trimmed[k] = list[k];
+
+            return trimmed;
         }
 
     }
