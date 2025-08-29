@@ -9,6 +9,8 @@
   - more instruction formatting options
   - restored adaptive tracking
 - added "full auto" protocol option to bypass outline screen altogether
+#### Changed
+- disallow repeats of sequence variable
 #### Fixed
 - hide dummy outline on Protocol screen
 
