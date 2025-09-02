@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using LogicUI.FancyTextRendering;
-using TMPro.EditorUtilities;
 
 public class InstructionPanel : MonoBehaviour
 {

@@ -1,6 +1,6 @@
 ## Changelog
 
-### v1.3 (unreleased)
+### v1.3 (2025-09-02)
 #### Added
 - Turandot
   - restored scaler (e.g.: for VAS)

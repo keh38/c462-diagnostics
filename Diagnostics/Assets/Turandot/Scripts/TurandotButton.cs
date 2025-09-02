@@ -87,7 +87,7 @@ namespace Turandot.Scripts
             _lastvalue = _value;
 
             //_value = !_isHidden && UnityEngine.Input.GetMouseButton(0) && rect.Contains(UnityEngine.Input.mousePosition);
-            _value = UnityEngine.Input.GetMouseButton(0) && _myRect.Contains(UnityEngine.Input.mousePosition);
+            _value = UnityEngine.Input.GetMouseButtonDown(0) && _myRect.Contains(UnityEngine.Input.mousePosition);
 
             //if (_useXbox)
             //{
@@ -97,7 +97,7 @@ namespace Turandot.Scripts
 #else
 
             _lastvalue = _value;
-            _value = UnityEngine.Input.GetMouseButton(0) && _myRect.Contains(UnityEngine.Input.mousePosition);
+            _value = UnityEngine.Input.GetMouseButtonDown(0) && _myRect.Contains(UnityEngine.Input.mousePosition);
             //if (_useXbox)
             //{
             //    _value |= UnityEngine.Input.GetButtonDown(_xboxControl);
