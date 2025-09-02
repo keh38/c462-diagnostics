@@ -22,7 +22,6 @@ namespace Turandot
         public Schedules.Schedule schedule = new Schedules.Schedule();
         public Schedules.Adaptation adapt = new Schedules.Adaptation();
         public string tag = "";
-        public string linkTo = "";
         public string wavFolder = "";
         public TrialLogOption trialLogOption = TrialLogOption.Upload;
         public bool allowExpertOptions = false;

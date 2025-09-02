@@ -77,9 +77,6 @@ namespace KLib.Signals
         [JsonProperty]
         public BinauralProperties binaural = new BinauralProperties();
 
-        [JsonProperty]
-        public string intramural = "";
-
         [ProtoIgnore]
         [XmlIgnore]
         public float Vmax = 1;
@@ -88,26 +85,6 @@ namespace KLib.Signals
         private bool _deactivated;
         private int _nptsPerInterval;
         private int _nptsDelay;
-
-        internal class IntramuralVariable
-        {
-            public string parameter;
-            public float[] values;
-            public int index;
-            public IntramuralVariable(string parameter, float[] values)
-            {
-                this.parameter = parameter;
-                this.values = values;
-                index = 0;
-            }
-            public float GetNext()
-            {
-                float val = values[index++];
-                if (index == values.Length) index = 0;
-                return val;
-            }
-        }
-        private List<IntramuralVariable> _intramuralVariables = new List<IntramuralVariable>();
 
         [ProtoIgnore]
         [XmlIgnore]
@@ -581,8 +558,6 @@ namespace KLib.Signals
                     SetBalance();
                 }
                 _deactivated = !active;
-
-                _intramuralVariables.Clear();
             }
             catch (Exception ex)
             {
@@ -806,11 +781,6 @@ namespace KLib.Signals
                 //}
                 _rampState = (gate.Running) ? RampState.On : RampState.Off;
 
-                //if (_intramuralVariables.Count > 0 && gate.Looped)
-                //{
-                //    UpdateIntramurals();
-                //}
-
                 //if (!active && _rampState == RampState.Off)
                 //{
                 // //   gate.Reset();
@@ -865,50 +835,8 @@ namespace KLib.Signals
 
         public void ClearExpertOptions()
         {
-            intramural = "";
             if (level.Units == LevelUnits.dB_SPL_noLDL) level.Units = LevelUnits.dB_SPL;
         }
 
-#if FIXME
-        public void InitializeIntramural(List<Turandot.Flag> flags)
-        {
-            _intramuralVariables.Clear();
-
-            if (string.IsNullOrEmpty(intramural)) return;
-            if (!gate.Active || float.IsPositiveInfinity(gate.Period_ms)) return;
-
-            string[] subExpr = intramural.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var e in subExpr)
-            {
-                string[] exprParts = e.Split(new char[] { '=' });
-                string expression = exprParts[1];
-                foreach (var f in flags)
-                {
-                    expression = expression.Replace("{" + f.name + "}", f.value.ToString());
-                }
-
-                Debug.Log("IM: " + expression);
-                _intramuralVariables.Add(new IntramuralVariable(exprParts[0], Expressions.Evaluate(expression)));
-            }
-            UpdateIntramurals();
-        }
-#endif
-        public float MaxIntramuralTime
-        {
-            get
-            {
-                int maxNum = 0;
-                foreach (var iv in _intramuralVariables) maxNum = Mathf.Max(maxNum, iv.values.Length);
-                return maxNum * gate.Period_ms / 1000;
-            }
-        }
-
-        private void UpdateIntramurals()
-        {
-            foreach (var iv in _intramuralVariables)
-            {
-                SetParameter(iv.parameter, iv.GetNext());
-            }
-        }
     }
 }

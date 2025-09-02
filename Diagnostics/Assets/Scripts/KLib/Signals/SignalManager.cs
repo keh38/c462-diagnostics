@@ -174,7 +174,6 @@ namespace KLib.Signals
             foreach (var ch in channels)
             {
                 if (ch.waveform is UserFile) tmax = Mathf.Max(tmax, (ch.waveform as UserFile).Duration);
-                if (!string.IsNullOrEmpty(ch.intramural)) tmax = Mathf.Max(tmax, ch.MaxIntramuralTime);
             }
 
             return tmax > 0 ? tmax : defaultValue;
@@ -191,7 +190,6 @@ namespace KLib.Signals
                     var dur = uf.Duration * uf.SamplingRate / SamplingRate_Hz;
                     tmin = Mathf.Min(tmin, dur);
                 }
-                if (!string.IsNullOrEmpty(ch.intramural)) tmin = Mathf.Min(tmin, ch.MaxIntramuralTime);
             }
 
             return (!float.IsPositiveInfinity(tmin)) ? tmin : defaultValue;

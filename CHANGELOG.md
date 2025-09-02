@@ -1,5 +1,12 @@
 ## Changelog
 
+### v1.4 (unreleased)
+#### Removed
+- Turandot: link to option (better handled through protocol)
+- Turandot: advanced channel options (intramural variables)
+
+---
+
 ### v1.3 (2025-09-02)
 #### Added
 - Turandot
