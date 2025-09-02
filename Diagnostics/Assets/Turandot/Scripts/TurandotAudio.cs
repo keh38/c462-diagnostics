@@ -115,7 +115,7 @@ namespace Turandot.Scripts
             }
         }
 
-        public void Activate(float timeOut, List<Turandot.Flag> flags)
+        public void Activate(float timeOut, List<Turandot.Flag> flags, bool start)
         {
             //Reset();
 
@@ -141,7 +141,10 @@ namespace Turandot.Scripts
 
                 _sigMan.SetTimeout(_timeOut);
                 _sigMan.ResetSweepables();
-                _sigMan.Unpause();
+                if (start)
+                {
+                    _sigMan.Unpause();
+                }
                 _isRunning = true;
                 _name = name; // for debugging purposes: can't access 'name' from OnAudioFilterRead() 
             }

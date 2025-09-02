@@ -211,7 +211,16 @@ public class TurandotEngine : MonoBehaviour
 
             var timeOut = _currentFlowElement.GetTimeout(_trialType).Value;
             var a = _audio.Find(o => o.name == _currentFlowElement.name);
-            a.Activate(timeOut, _params.flags);
+
+            bool startAudio = true;
+            
+            var paramSlider = _currentFlowElement.inputs.Find(x => x is Turandot.Inputs.ParamSliderAction);
+            if (paramSlider != null)
+            {
+                startAudio = !(paramSlider as Turandot.Inputs.ParamSliderAction).ThumbTogglesSound;
+            }
+
+            a.Activate(timeOut, _params.flags, startAudio);
 
             HTS_Server.SendMessage("Turandot", $"State:{_currentFlowElement.name}");
 
@@ -234,7 +243,7 @@ public class TurandotEngine : MonoBehaviour
         _inputMonitor.Activate(actionState.inputs, a, 0);
 
         _audio.Find(x => x.name == _currentFlowElement.name).PauseAudio(true);
-        a.Activate(a.SigMan.GetMaxInterval(1) / 1000f, null);
+        a.Activate(a.SigMan.GetMaxInterval(1) / 1000f, null, start: true);
         _log.Add(Time.timeSinceLevelLoad, HistoryEvent.StartAction, name);
         //_log.Add(Time.realtimeSinceStartup, HistoryEvent.StartAction, name);
     }
