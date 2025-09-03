@@ -131,7 +131,7 @@ public class TurandotEngine : MonoBehaviour
         yield return null; // the shit above takes time, first state time stamp will not be accurate without this
 
         _log.Clear();
-        _log.Add(Time.timeSinceLevelLoad, HistoryEvent.StartTrial);
+        _log.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, HistoryEvent.StartTrial);
 
         NextState(_params.firstState);
 
@@ -187,7 +187,7 @@ public class TurandotEngine : MonoBehaviour
     {
         if (string.IsNullOrEmpty(nextState))
         {
-            _log.Add(Time.timeSinceLevelLoad, HistoryEvent.EndTrial);
+            _log.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, HistoryEvent.EndTrial);
 
             _inputMonitor.StopMonitor();
             if (_params.trialLogOption != TrialLogOption.None) WriteLogFile();
@@ -224,7 +224,7 @@ public class TurandotEngine : MonoBehaviour
 
             HTS_Server.SendMessage("Turandot", $"State:{_currentFlowElement.name}");
 
-            _log.Add(Time.timeSinceLevelLoad, HistoryEvent.StartState, _currentFlowElement.name);
+            _log.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, HistoryEvent.StartState, _currentFlowElement.name);
 
             _cueController.Activate(_currentFlowElement.cues);
             _inputMonitor.Activate(_currentFlowElement.inputs, a, timeOut);
@@ -244,14 +244,14 @@ public class TurandotEngine : MonoBehaviour
 
         _audio.Find(x => x.name == _currentFlowElement.name).PauseAudio(true);
         a.Activate(a.SigMan.GetMaxInterval(1) / 1000f, null, start: true);
-        _log.Add(Time.timeSinceLevelLoad, HistoryEvent.StartAction, name);
+        _log.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, HistoryEvent.StartAction, name);
         //_log.Add(Time.realtimeSinceStartup, HistoryEvent.StartAction, name);
     }
 
     private void EndActionAudio(string name)
     {
         _audio.Find(x => x.name == _currentFlowElement.name).PauseAudio(false);
-        _log.Add(Time.timeSinceLevelLoad, HistoryEvent.EndAction, name);
+        _log.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, HistoryEvent.EndAction, name);
 
         _actionInProgress = false;
 
@@ -306,7 +306,7 @@ public class TurandotEngine : MonoBehaviour
                 linkTo = _deferredLinkTo;
             }
 
-            _log.Add(Time.timeSinceLevelLoad, HistoryEvent.EndState, _stateEndReason);
+            _log.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, HistoryEvent.EndState, _stateEndReason);
 
             _cueController.Deactivate();
             _inputMonitor.Deactivate();
@@ -327,7 +327,7 @@ public class TurandotEngine : MonoBehaviour
 
             if (!nextIsAction) _stateEndReason = whichEvent;
 
-            _log.Add(Time.timeSinceLevelLoad, HistoryEvent.TermCond, whichEvent);
+            _log.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, HistoryEvent.TermCond, whichEvent);
             Debug.Log(whichEvent + ": " + term.action);
 
             if (!string.IsNullOrEmpty(term.result))
@@ -351,7 +351,7 @@ public class TurandotEngine : MonoBehaviour
                 _cueController.Deactivate();
                 _inputMonitor.Deactivate();
                 _audio.Find(a => a.name == _currentFlowElement.name).KillAudio();
-                _log.Add(Time.timeSinceLevelLoad, HistoryEvent.EndState, _stateEndReason);
+                _log.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, HistoryEvent.EndState, _stateEndReason);
                 NextState(term.linkTo);
             }
             else

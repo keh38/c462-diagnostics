@@ -12,6 +12,7 @@ namespace Turandot
     public class History
     {
         public float[] t;
+        public float[] tunity;
         public string[] type;
         public string[] message;
 
@@ -43,21 +44,23 @@ namespace Turandot
             return _index;
         }
 
-        public void Add(float t, HistoryEvent type)
+        public void Add(float t, float tunity, HistoryEvent type)
         {
-            Add(t, type, "");
+            Add(t, tunity, type, "");
         }
 
-        public void Add(float t, HistoryEvent type, string message)
+        public void Add(float t, float tunity, HistoryEvent type, string message)
         {
             if (_index == this.t.Length)
             {
                 int newLen = this.t.Length + _lengthIncrement;
                 System.Array.Resize(ref this.t, newLen);
+                System.Array.Resize(ref this.tunity, newLen);
                 System.Array.Resize(ref this.type, newLen);
                 System.Array.Resize(ref this.message, newLen);
             }
             this.t[_index] = t;
+            this.tunity[_index] = tunity;
             this.type[_index] = type.ToString();
             this.message[_index] = message;
             ++_index;
@@ -66,6 +69,7 @@ namespace Turandot
         public void Trim()
         {
             System.Array.Resize(ref this.t, _index);
+            System.Array.Resize(ref this.tunity, _index);
             System.Array.Resize(ref this.type, _index);
             System.Array.Resize(ref this.message, _index);
         }

@@ -1,5 +1,11 @@
 ## Changelog
 
+### v1.4 (unreleased)
+#### Changed
+- added Unity time (realTimeSinceStartup) to trial history logs (to better sync states with data streams)
+
+---
+
 ### v1.3 (2025-09-02)
 #### Added
 - Turandot
