@@ -240,6 +240,7 @@ public class HTS_Server : MonoBehaviour
             case "SetSubjectMetrics":
                 _listener.SendAcknowledgement();
                 GameManager.DeserializeSubjectMetrics(data);
+                _currentScene.ProcessRPC("SubjectMetricsChanged");
                 break;
 
             case "GetTransducers":

@@ -34,6 +34,7 @@ namespace Turandot
         public void Clear()
         {
             t = new float[_lengthIncrement];
+            tunity = new float[_lengthIncrement];
             type = new string[_lengthIncrement];
             message = new string[_lengthIncrement];
             _index = 0;

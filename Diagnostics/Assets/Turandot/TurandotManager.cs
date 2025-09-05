@@ -997,6 +997,11 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             case "Abort":
                 RpcAbort();
                 break;
+            case "SubjectChanged":
+            case "SubjectMetadataChanged":
+            case "SubjectMetricsChanged":
+                RpcUpdateSubject();
+                break;
             //case "SendSyncLog":
             //    var logPath = HardwareInterface.ClockSync.LogFile;
             //    if (!string.IsNullOrEmpty(logPath))
@@ -1030,6 +1035,15 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             _engine.Abort();
             EndRun(abort: true);
         }
+    }
+
+    public void RpcUpdateSubject()
+    {
+        KLib.Expressions.Metrics = GameManager.Metrics;
+        KLib.Expressions.Audiogram = Audiograms.AudiogramData.Load();
+        var ldl = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
+        if (ldl != null) ldl.ReplaceNaNWithMax(GameManager.Transducer);
+        KLib.Expressions.LDL = ldl;
     }
 
 }
