@@ -1,6 +1,6 @@
 ## Changelog
 
-### v1.4 (unreleased)
+### v1.4 (2025-09-15)
 #### Changed
 - added Unity time (realTimeSinceStartup) to trial history logs (to better sync states with data streams)
 - Turandot: respond to change in subject, metrics, metadata without return to home scene.
