@@ -73,7 +73,7 @@ namespace LDL
         [Description("FM depth (percent)")]
         [DisplayName("FM depth")]
         public float ModDepth_pct {  set; get; }
-        private bool ShouldSerializeModDepth_pct() { return false; }
+        private bool ShouldSerializeModDepth_pct() { return false; } 
 
         [Category("Stimulus")]
         [Description("Minimum level")]

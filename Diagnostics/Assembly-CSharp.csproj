@@ -117,6 +117,7 @@
     <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.ManikinSpec.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\ToneCloud.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Wave\KLib.Wave.cs" />
+    <Compile Include="Assets\Basic\LDL\LDL.HapticStimulus.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.CatchInterval.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\MenuBarStyle.cs" />
     <Compile Include="Assets\Scripts\Hardware\SyncPulseDetector.cs" />
