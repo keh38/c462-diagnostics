@@ -8,8 +8,13 @@ using KLib;
 using KLib.Signals;
 using KLib.Signals.Enumerations;
 
+using BasicMeasurements;
+using OrderedPropertyGrid;
+using KLib.TypeConverters;
+
 namespace LDL
 {
+    [TypeConverter(typeof(SortableTypeConverter))]
     public class LDLMeasurementSettings : BasicMeasurementConfiguration
     {
         [Category("Appearance")]
@@ -49,38 +54,49 @@ namespace LDL
         private bool ShouldSerializeMerge() { return false; }
 
         [Category("Stimulus")]
-        [Description("Ramp applied to tones (ms)")]
-        public float Ramp { set; get; }
-        private bool ShouldSerializeRamp() { return false; }
-
-        [Category("Stimulus")]
         [Description("Duration of tone (ms)")]
+        [PropertyOrder(0)]
         public float ToneDuration { set; get; }
         private bool ShouldSerializeToneDuration() { return false; }
 
         [Category("Stimulus")]
-        [Description("Level units")]
-        public LevelUnits LevelUnits { set; get; }
-        private bool ShouldSerializeLevelUnits() { return false; }
-
-        [Category("Stimulus")]
         [Description("Pip interval (ms)")]
         [DisplayName("Pip interval")]
+        [PropertyOrder(1)]
         public float ISI_ms { set; get; }
         private bool ShouldSerializeISI_ms() { return false; }
 
         [Category("Stimulus")]
-        [Description("FM depth (percent)")]
-        [DisplayName("FM depth")]
-        public float ModDepth_pct {  set; get; }
-        private bool ShouldSerializeModDepth_pct() { return false; } 
+        [Description("Ramp applied to tones (ms)")]
+        [PropertyOrder(2)]
+        public float Ramp { set; get; }
+        private bool ShouldSerializeRamp() { return false; }
 
         [Category("Stimulus")]
         [Description("Minimum level")]
         [DisplayName("Min level")]
-        public float MinLevel {  set; get; }
+        [PropertyOrder(3)]
+        public float MinLevel { set; get; }
+        private bool ShouldSerializeMinLevel() { return false; }
 
-        public List<string> instructions = null;
+        [Category("Stimulus")]
+        [Description("Level units")]
+        [PropertyOrder(4)]
+        public LevelUnits LevelUnits { set; get; }
+        private bool ShouldSerializeLevelUnits() { return false; }
+
+        [Category("Stimulus")]
+        [Description("FM depth (percent)")]
+        [DisplayName("FM depth")]
+        [PropertyOrder(5)]
+        public float ModDepth_pct {  set; get; }
+        private bool ShouldSerializeModDepth_pct() { return false; } 
+
+        [Category("Stimulus")]
+        [DisplayName("Haptic")]
+        [PropertyOrder(10)]
+        public HapticStimulus HapticStimulus { set; get; }
+        private bool ShouldSerializeHapticStimulus() { return false; }
 
         public LDLMeasurementSettings() : base()
         {
@@ -100,6 +116,8 @@ namespace LDL
 
             Prompt = "Move sliders until sound is uncomfortable";
             PromptFontSize = 72;
+
+            HapticStimulus = new HapticStimulus();
         }
 
     }

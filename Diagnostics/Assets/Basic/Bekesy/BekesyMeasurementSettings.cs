@@ -1,6 +1,8 @@
 using System;
 using System.ComponentModel;
 
+using BasicMeasurements;
+
 namespace Bekesy
 {
     public class BekesyMeasurementSettings : BasicMeasurementConfiguration

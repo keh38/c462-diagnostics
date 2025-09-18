@@ -17,7 +17,7 @@ using LDL;
 
 using BasicMeasurements;
 
-public class LDLController : MonoBehaviour, IRemoteControllable
+public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 {
     [SerializeField] private InputActionAsset _actions;
     [SerializeField] private TMPro.TMP_Text _title;

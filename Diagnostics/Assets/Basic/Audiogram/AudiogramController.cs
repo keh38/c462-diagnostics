@@ -16,6 +16,7 @@ using KLib.Signals;
 using KLib.Signals.Enumerations;
 using KLib.Signals.Waveforms;
 
+using BasicMeasurements;
 
 public class AudiogramController : MonoBehaviour, IRemoteControllable
 {

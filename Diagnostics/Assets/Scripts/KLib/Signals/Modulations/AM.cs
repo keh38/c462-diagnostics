@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Xml.Serialization;
 
 using Newtonsoft.Json;
@@ -14,6 +15,7 @@ namespace KLib.Signals.Modulations
 	[JsonObject(MemberSerialization.OptOut)]
     [XmlInclude(typeof(SinusoidalAM))]
     [ProtoInclude(500, typeof(SinusoidalAM))]
+    [TypeConverter(typeof(AMConverter))]
     public class AM
     {
         [ProtoMember(1, IsRequired = true)]
@@ -26,6 +28,7 @@ namespace KLib.Signals.Modulations
 
         protected AMShape _shape = AMShape.None;
         [ProtoIgnore]
+        [Browsable(false)]
         public AMShape Shape
         {
             get { return _shape; }
@@ -33,11 +36,13 @@ namespace KLib.Signals.Modulations
 
         protected string _shortName = "None";
         [ProtoIgnore]
+        [Browsable(false)]
         public string ShortName
         {
             get { return _shortName; }
         }
         [ProtoIgnore]
+        [Browsable(false)]
         public string LongName
         {
             get { return _shape.ToString().Replace('_', ' '); }
@@ -90,6 +95,7 @@ namespace KLib.Signals.Modulations
         }
 
         [ProtoIgnore]
+        [Browsable(false)]
         public virtual float LevelCorrection
         {
             get

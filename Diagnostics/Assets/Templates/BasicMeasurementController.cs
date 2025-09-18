@@ -11,6 +11,8 @@ using UnityEngine.UI;
 using Audiograms;
 using KLib;
 
+using BasicMeasurements;
+
 public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
 {
     [SerializeField] private InputActionAsset _actions;

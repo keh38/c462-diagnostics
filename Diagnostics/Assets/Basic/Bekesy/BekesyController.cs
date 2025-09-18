@@ -16,6 +16,8 @@ using KLib.Signals;
 using KLib.Signals.Waveforms;
 using UnityEngine.EventSystems;
 
+using BasicMeasurements;
+
 public class BekesyController : MonoBehaviour, IRemoteControllable
 {
     [SerializeField] private InputActionAsset _actions;

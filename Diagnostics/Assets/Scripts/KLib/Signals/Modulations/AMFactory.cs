@@ -34,5 +34,18 @@ namespace KLib.Signals.Modulations
             return am;
         }
 
+        public static AM Create(string shape)
+        {
+            AM am = new AM();
+            switch (shape)
+            {
+                case "Sinusoidal":
+                case "SAM":
+                    am = new SinusoidalAM();
+                    break;
+            }
+            return am;
+        }
+
     }
 }

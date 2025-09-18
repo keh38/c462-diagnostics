@@ -7,6 +7,8 @@ using System.Xml.Serialization;
 using Turandot.Screen;
 using UnityEngine;
 
+using BasicMeasurements;
+
 namespace Questionnaires
 {
     [System.Serializable]

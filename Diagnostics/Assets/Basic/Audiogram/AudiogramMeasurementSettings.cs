@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
 
+using BasicMeasurements;
+
 namespace Audiograms
 {
     public enum TestEar { Left, Right, Both }
