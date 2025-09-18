@@ -73,6 +73,8 @@ public class DigitimerControl : MonoBehaviour
         _d128[deviceNum].Demand = (int)(digitimer.Demand * 10);
         _d128[deviceNum].Enable = EnableState.Enabled;
 
+        //Debug.Log($"device {deviceNum} width = {digitimer.Width}");
+
         var result = _d128.SetState();
         if (result != ErrorCode.Success)
         {

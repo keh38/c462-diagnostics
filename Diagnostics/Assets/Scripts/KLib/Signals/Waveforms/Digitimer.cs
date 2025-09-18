@@ -109,11 +109,15 @@ namespace KLib.Signals.Waveforms
 
         override public string SetParameter(string paramName, float value)
         {
+            //Debug.Log($"{paramName} = {value}");
             switch (paramName)
             {
                 case "PulseRate_Hz":
                     this.PulseRate_Hz = value;
-                    _nptsPeriod = Mathf.RoundToInt(1 / (dt*PulseRate_Hz));
+                    _nptsPeriod = Mathf.RoundToInt(1 / (dt * PulseRate_Hz));
+                    break;
+                case "PulseWidth_us":
+                    this.Width = value;
                     break;
                 case "Demand_mA":
                     Demand = value;
@@ -129,6 +133,8 @@ namespace KLib.Signals.Waveforms
             {
                 case "PulseRate_Hz":
                     return PulseRate_Hz;
+                case "PulseWidth_us":
+                    return Width;
                 case "Demand_mA":
                     return Demand;
             }
@@ -140,6 +146,7 @@ namespace KLib.Signals.Waveforms
         {
             List<string> plist = new List<string>();
             plist.Add("PulseRate_Hz");
+            plist.Add("PulseWidth_us");
             if (Source == DemandSource.Internal)
             {
                 plist.Add("Demand_mA");

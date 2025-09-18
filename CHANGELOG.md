@@ -1,5 +1,11 @@
 ## Changelog
 
+### v1.4.1 (2025-09-16)
+#### Added
+- exposed Digitimer pulse width as sequence variable
+
+---
+
 ### v1.4 (2025-09-15)
 #### Changed
 - added Unity time (realTimeSinceStartup) to trial history logs (to better sync states with data streams)
