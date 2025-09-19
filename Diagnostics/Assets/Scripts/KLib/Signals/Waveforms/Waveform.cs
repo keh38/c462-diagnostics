@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Xml.Serialization;
 
 using Newtonsoft.Json;
@@ -38,6 +39,7 @@ namespace KLib.Signals.Waveforms
         [JsonProperty]
         protected Waveshape shape;
 
+        [Browsable(false)]
         public Waveshape Shape
         {
             get { return shape; }
@@ -46,15 +48,18 @@ namespace KLib.Signals.Waveforms
         protected string _shortName = "None";
         //[ProtoMember(2)]
         //[JsonProperty]
+        [Browsable(false)]
         public string ShortName
         {
             get { return _shortName; }
         }
+        [Browsable(false)]
         public string LongName
         {
             get { return shape.ToString().Replace('_', ' '); }
         }
 
+        [Browsable(false)]
         public bool HandlesModulation { get; set; } = false;
 
         /// <summary>
@@ -89,6 +94,7 @@ namespace KLib.Signals.Waveforms
 
         [ProtoIgnore]
         [JsonIgnore]
+        [Browsable(false)]
         public string ChannelName
         {
             get { return _name; }

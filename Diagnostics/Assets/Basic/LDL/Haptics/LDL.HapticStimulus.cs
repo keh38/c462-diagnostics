@@ -13,7 +13,8 @@ namespace LDL
     [TypeConverter(typeof(HapticStimulusConverter))]
     public class HapticStimulus
     {
-        [PropertyOrder(0)]
+        //        [PropertyOrder(0)]
+        [Browsable(false)]
         public HapticSource Source { get; set; }
         private bool ShouldSerializeSource() { return false; }
 
@@ -26,10 +27,12 @@ namespace LDL
         private bool ShouldSerializeVibration() { return false; }
 
         [PropertyOrder(2)]
+        [Description("Amplitude in volts")]
         public float Level { get; set; }
         private bool ShouldSerializeLevel() { return false; }
 
-        [PropertyOrder(3)]
+        //[PropertyOrder(3)]
+        [Browsable(false)]
         public float Delay_ms { get; set; }
         private bool ShouldSerializeDelay_ms() { return false; }
 

@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 using Newtonsoft.Json;
 using ProtoBuf;
@@ -10,18 +11,25 @@ using KLib.Signals.Enumerations;
 
 namespace KLib.Signals.Waveforms
 {
-    [System.Serializable]
+    [Serializable]
 	[ProtoContract]
 	[JsonObject(MemberSerialization.OptIn)]
+    [TypeConverter(typeof(SinusoidConverter))]
 	public class Sinusoid : Waveform
     {
         [ProtoMember(1, IsRequired = true)]
         [JsonProperty]
-        public float Frequency_Hz;
+        [DisplayName("Frequency")]
+        [Description("Frequency in Hz")]
+        public float Frequency_Hz { get; set; }
+        private bool ShouldSerializeFrequency_Hz() { return false; }
 
         [ProtoMember(2, IsRequired = true)]
         [JsonProperty]
-        public float Phase_cycles;
+        [DisplayName("Phase")]
+        [Description("Phase in cycles")]
+        public float Phase_cycles { get; set; }
+        private bool ShouldSerializePhase_cycles() { return false; }
 
         private float lastFreq;
         private float phase_radians;
