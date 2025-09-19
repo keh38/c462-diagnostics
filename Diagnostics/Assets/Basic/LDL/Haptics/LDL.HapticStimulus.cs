@@ -13,40 +13,40 @@ namespace LDL
     [TypeConverter(typeof(HapticStimulusConverter))]
     public class HapticStimulus
     {
-        [Browsable(false)]
+        [PropertyOrder(0)]
         public HapticSource Source { get; set; }
         private bool ShouldSerializeSource() { return false; }
 
-        [PropertyOrder(0)]
+        [PropertyOrder(1)]
         public Digitimer TENS { get; set; }
         private bool ShouldSerializeTENS() { return false; }
 
-        [PropertyOrder(0)]
+        [PropertyOrder(1)]
         public Sinusoid Vibration { get; set; }
         private bool ShouldSerializeVibration() { return false; }
 
-        [PropertyOrder(1)]
+        [PropertyOrder(2)]
         public float Level { get; set; }
         private bool ShouldSerializeLevel() { return false; }
 
-        [PropertyOrder(2)]
+        [PropertyOrder(3)]
         public float Delay_ms { get; set; }
         private bool ShouldSerializeDelay_ms() { return false; }
 
-        [PropertyOrder(3)]
+        [PropertyOrder(4)]
         public float Duration_ms { get; set; }
         private bool ShouldSerializeDuration_ms() { return false; }
 
-        [PropertyOrder(4)]
+        [PropertyOrder(5)]
         public AM Envelope { get; set; }
         private bool ShouldSerializeEnvelope() { return false; }
 
         [ReadOnly(true)]
-        [PropertyOrder(5)]
+        [PropertyOrder(6)]
         public string Variable { get; set; }
         private bool ShouldSerializeVariable() { return false; }
 
-        [PropertyOrder(6)]
+        [PropertyOrder(7)]
         public string Expression { get; set; }
         private bool ShouldSerializeExpression() { return false; }
 

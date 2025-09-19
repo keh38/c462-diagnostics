@@ -25,7 +25,7 @@ namespace LDL
                     else if (stim.Source == HapticSource.NONE) { }
                     else if (stim.Source == HapticSource.TENS && prop.Name == "Vibration") { }
                     else if (stim.Source == HapticSource.Vibration && prop.Name == "TENS") { }
-                    else 
+                    else
                     {
                         filteredProperties.Add(prop);
                     }
