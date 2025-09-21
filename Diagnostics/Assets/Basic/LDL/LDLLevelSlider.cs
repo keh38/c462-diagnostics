@@ -1,14 +1,14 @@
-using LDL;
-using System.Diagnostics.Tracing;
 using System;
+
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 using KLib.Signals;
 using KLib.Signals.Waveforms;
-using Unity.VisualScripting;
-using UnityEngine.EventSystems;
-using UnityEngine.Events;
+
+using LDL;
 
 [RequireComponent(typeof(SliderAnimator))]
 public class LDLLevelSlider : MonoBehaviour
@@ -40,25 +40,11 @@ public class LDLLevelSlider : MonoBehaviour
         _slider = GetComponent<Slider>();
         _mover = GetComponent<SliderAnimator>();
 
-        //_thumb = transform.FindChild("Thumb").GetComponent<UIButton>();
-        //_sliderFG = transform.FindChild("Foreground").GetComponent<UISprite>();
-
-        //_sigGen = transform.FindChild("Signal Generator").GetComponent<SliderSignalGenerator>();
-
         _isActive = false;
     }
     void Start()
     {
-        //_slider.ThumbOnly = true;
-
-        //UIEventListener fgl = UIEventListener.Get(_thumb.gameObject);
-        //fgl.onPress += OnPressThumb;
     }
-
-    //public KEventDelegate NotifyOnSliderMove
-    //{
-    //    set { _notifyOnSliderMove = value; }
-    //}
 
     public void InitializeStimulusGeneration(Channel ch, float minLevel, float modDepth)
     {

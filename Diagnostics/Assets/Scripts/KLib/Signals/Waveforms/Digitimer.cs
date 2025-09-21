@@ -9,46 +9,120 @@ using ProtoBuf;
 using KLib.Signals.Calibration;
 using KLib.Signals.Enumerations;
 
+using OrderedPropertyGrid;
+
 namespace KLib.Signals.Waveforms
 {
     [Serializable]
     [ProtoContract]
     [JsonObject(MemberSerialization.OptIn)]
+    [TypeConverter(typeof(DigitimerConverter))]
     public class Digitimer : Waveform
     {
         public enum DemandSource { Internal, External};
 
         [ProtoMember(1, IsRequired = true)]
         [JsonProperty]
-        public float PulseRate_Hz;
+        [PropertyOrder(1)]
+        [DisplayName("Pulse rate")]
+        [Description("Pulse rate in pulse per second (pps)")]
+        public float PulseRate_Hz { get; set; }
+        private bool ShouldSerializePulseRate_Hz() { return false; }
 
         [ProtoMember(2, IsRequired = true)]
         [JsonProperty]
-        public float PulseMode;
+        [PropertyOrder(2)]
+        [DisplayName("Mode")]
+        [Description("")]
+        [TypeConverter(typeof(DigitimerModeConverter))]
+        public float PulseMode { get; set; }
+        private bool ShouldSerializePulseMode() { return false; }
 
         [ProtoMember(3, IsRequired = true)]
         [JsonProperty]
-        public float PulsePolarity;
+        [PropertyOrder(3)]
+        [DisplayName("Polarity")]
+        [TypeConverter(typeof(DigitimerPolarityConverter))]
+        public float PulsePolarity { get; set; }
+        private bool ShouldSerializePulsePolarity() { return false; }
 
+        private float _width;
         [ProtoMember(4, IsRequired = true)]
         [JsonProperty]
-        public float Width;
+        [PropertyOrder(4)]
+        [Description("Pulse width in us (50-2000)")]
+        public float Width
+        {
+            get { return _width; }
+            set
+            {
+                _width = value;
+                if (_width < 50) _width = 50;
+                if (_width > 2000) _width = 2000;
 
+                _width = Mathf.Round(_width / 10f) * 10f;
+            }
+        }
+        private bool ShouldSerializeWidth() { return false; }
+
+        private float _recovery;
         [ProtoMember(5, IsRequired = true)]
         [JsonProperty]
-        public float Recovery;
+        [PropertyOrder(5)]
+        [Description("Duration of recovery phase as % of pulse width (10-100)")]
+        public float Recovery
+        {
+            get { return _recovery; }
+            set
+            {
+                _recovery = value;
+                if (_recovery < 10) _recovery = 10;
+                if (_recovery > 100) _recovery = 100;
 
+                _recovery = Mathf.Round(_recovery);
+            }
+        }
+        private bool ShouldSerializeRecovery() { return false; }
+
+        private float _dwell;
         [ProtoMember(6, IsRequired = true)]
         [JsonProperty]
-        public float Dwell;
+        [PropertyOrder(6)]
+        [Description("Interphase gap in us (1 to 990 in steps of 10)")]
+        public float Dwell
+        {
+            get { return _dwell; }
+            set
+            {
+                _dwell = value;
+                if (_dwell < 1) _dwell = 1;
+                if (_dwell > 990) _dwell = 990;
+            }
+        }
+        private bool ShouldSerializeDwell() { return false; }
 
         [ProtoMember(7, IsRequired = true)]
         [JsonProperty]
-        public DemandSource Source;
+        [PropertyOrder(7)]
+        public DemandSource Source { get; set; }
+        private bool ShouldSerializeSource() { return false; }
 
+        private float _demand;
         [ProtoMember(8, IsRequired = true)]
         [JsonProperty]
-        public float Demand;
+        [PropertyOrder(8)]
+        [Description("Pulse amplitude (0-1000 mA)")]
+        public float Demand
+        {
+            get { return _demand; }
+            set
+            {
+                _demand = value;
+                if (_demand < 0) _demand = 0;
+                if (_dwell > 1000) _demand = 1000;
+            }
+        }
+        private bool ShouldSerializeDemand() { return false; }
 
         private float _pulseCarrierFreq = 1000;
         private float[] _pulse;

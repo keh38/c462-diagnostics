@@ -40,7 +40,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 
     private string _configName;
     private string _dataPath;
-    private string _mySceneName = "LDL";
+    private string _mySceneName = "LDL_Haptics";
 
     private string _stateFile;
     private MeasurementState _state;
@@ -100,14 +100,6 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
         InitDataFile();
 
         _stateFile = Path.Combine(FileLocations.SubjectFolder, $"{_mySceneName}.bin");
-
-        // Need to delete the existing LDL, otherwise it will be loaded and used to constrain the 
-        // max output level, making it impossible ever to exceed the original LDL.
-        if (_settings.Merge && File.Exists(FileLocations.LDLPath))
-        {
-            _data.LDLgram = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
-            File.Delete(FileLocations.LDLPath);
-        }
 
         CreatePlan();
 
