@@ -266,8 +266,8 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         }
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
-        HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
         HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+        HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
 
         if (_localAbort)
         {

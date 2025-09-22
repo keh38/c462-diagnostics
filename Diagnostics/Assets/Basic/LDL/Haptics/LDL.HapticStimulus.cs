@@ -1,12 +1,11 @@
 using System.ComponentModel;
 
-using KLib.Signals;
 using KLib.Signals.Modulations;
 using KLib.Signals.Waveforms;
-using KLib.TypeConverters;
+
 using OrderedPropertyGrid;
 
-namespace LDL
+namespace LDL.Haptics
 {
     public enum HapticSource { NONE, Vibration, TENS}
 
@@ -27,6 +26,10 @@ namespace LDL
         private bool ShouldSerializeVibration() { return false; }
 
         [PropertyOrder(2)]
+        public string Location { get; set; }
+        private bool ShouldSerializeLocation() { return false; }
+
+        [PropertyOrder(3)]
         [Description("Amplitude in volts")]
         public float Level { get; set; }
         private bool ShouldSerializeLevel() { return false; }

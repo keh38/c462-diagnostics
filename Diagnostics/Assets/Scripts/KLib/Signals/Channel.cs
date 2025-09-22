@@ -270,7 +270,8 @@ namespace KLib.Signals
 
         public Channel Clone()
         {
-            return Channel.FromProtoBuf(this.ToProtoBuf());
+            return FileIO.XmlDeserializeFromString<Channel>(FileIO.XmlSerializeToString(this));
+//            return Channel.FromProtoBuf(this.ToProtoBuf());
         }
 
         public List<string> GetSweepableParams()

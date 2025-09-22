@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using KLib.TypeConverters;
 
-namespace LDL
+namespace LDL.Haptics
 {
     public class HapticStimulusConverter : SortableExpandableObjectConverter
     {

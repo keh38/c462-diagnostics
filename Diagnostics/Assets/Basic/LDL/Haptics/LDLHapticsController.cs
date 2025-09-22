@@ -13,9 +13,12 @@ using UnityEngine.UI;
 using KLib;
 using KLib.Signals.Waveforms;
 using KLib.Signals;
+
 using LDL;
+using LDL.Haptics;
 
 using BasicMeasurements;
+using System.Linq;
 
 public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 {
@@ -30,7 +33,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
     [SerializeField] private Slider _progressBar;
     [SerializeField] private QuestionBox _questionBox;
 
-    private LDLSliderPanel _sliderPanel;
+    private LDLHapticsSliderPanel _sliderPanel;
 
     private bool _isRemote;
 
@@ -43,9 +46,9 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
     private string _mySceneName = "LDL_Haptics";
 
     private string _stateFile;
-    private MeasurementState _state;
+    private HapticsMeasurementState _state;
 
-    private List<TestCondition> _curGroup = new List<TestCondition>();
+    private List<HapticsTestCondition> _curGroup = new List<HapticsTestCondition>();
     private LoudnessDiscomfortData _data = new LoudnessDiscomfortData();
 
     private InputAction _abortAction;
@@ -58,7 +61,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
         _abortAction.Enable();
         _abortAction.performed += OnAbortAction;
 
-        _sliderPanel = _workPanel.GetComponent<LDLSliderPanel>();
+        _sliderPanel = _workPanel.GetComponent<LDLHapticsSliderPanel>();
         _sliderPanel.LockInPressed += OnLockIn;
     }
 
@@ -71,7 +74,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 #if HACKING
         Application.targetFrameRate = 60;
         GameManager.SetSubject("Scratch/_shit");
-        _configName = "Test";
+        _configName = "Haptic";
 #else
         _configName = GameManager.DataForNextScene;
 #endif
@@ -258,8 +261,8 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
         }
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
-        HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
         HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+        HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
 
         if (_localAbort)
         {
@@ -314,6 +317,10 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 
     private void InitializeSliderPanel()
     {
+        float[] hapticValues = KLib.Expressions.Evaluate(_settings.HapticStimulus.Expression);
+        float minDelay = hapticValues.Min();
+        float toneDelay = minDelay < 0 ? -minDelay : 0;
+
         var ch = new Channel()
         {
             Modality = KLib.Signals.Enumerations.Modality.Audio,
@@ -333,25 +340,82 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
             gate = new Gate()
             {
                 Active = true,
-                Delay_ms = 0,
+                Delay_ms = toneDelay,
                 Duration_ms = _settings.ToneDuration,
                 Period_ms = _settings.ISI_ms
             }
         };
 
-        _sliderPanel.Initialize(_settings, ch);
+        Channel haptic = null;
+        if (_settings.HapticStimulus.Source == HapticSource.Vibration)
+        {
+            haptic = new Channel()
+            {
+                Modality = KLib.Signals.Enumerations.Modality.Haptic,
+                Location = _settings.HapticStimulus.Location,
+                waveform = new Sinusoid()
+                {
+                    Frequency_Hz = _settings.HapticStimulus.Vibration.Frequency_Hz
+                },
+                level = new Level()
+                {
+                    Units = LevelUnits.Volts,
+                    Value = _settings.HapticStimulus.Level
+                },
+                gate = new Gate()
+                {
+                    Active = true,
+                    Delay_ms = _settings.HapticStimulus.Delay_ms,
+                    Duration_ms = _settings.HapticStimulus.Duration_ms,
+                    Period_ms = _settings.ISI_ms
+                }
+            };
+        }
+        else
+        {
+            haptic = new Channel()
+            {
+                Modality = KLib.Signals.Enumerations.Modality.Electric,
+                Location = _settings.HapticStimulus.Location,
+                waveform = new Digitimer()
+                {
+                    PulseRate_Hz = _settings.HapticStimulus.TENS.PulseRate_Hz,
+                    PulseMode = _settings.HapticStimulus.TENS.PulseMode,
+                    PulsePolarity = _settings.HapticStimulus.TENS.PulsePolarity,
+                    Width = _settings.HapticStimulus.TENS.Width,
+                    Recovery = _settings.HapticStimulus.TENS.Recovery,
+                    Dwell = _settings.HapticStimulus.TENS.Dwell,
+                    Source = Digitimer.DemandSource.Internal,
+                    Demand = _settings.HapticStimulus.TENS.Demand
+                },
+                gate = new Gate()
+                {
+                    Active = true,
+                    Ramp_ms = 0,
+                    Delay_ms = _settings.HapticStimulus.Delay_ms,
+                    Duration_ms = _settings.HapticStimulus.Duration_ms,
+                    Period_ms = _settings.ISI_ms
+                }
+            };
+        }
+
+        _sliderPanel.Initialize(_settings, ch, haptic);
     }
 
     private void CreatePlan()
     {
-        _state = new MeasurementState();
+        _state = new HapticsMeasurementState();
+
+        float[] hapticValues = KLib.Expressions.Evaluate(_settings.HapticStimulus.Expression);
+        float minDelay = hapticValues.Min();
+        if (minDelay > 0) minDelay = 0;
+        string hapticVariable = $"Gate.{_settings.HapticStimulus.Variable}";
 
         if (_settings.LevelUnits == LevelUnits.dB_SL)
         {
             Audiograms.AudiogramData audiogram = Audiograms.AudiogramData.Load();
             Audiograms.Audiogram agramLeft = audiogram.Get(Audiograms.Ear.Left);
             Audiograms.Audiogram agramRight = audiogram.Get(Audiograms.Ear.Right);
-
 
             List<float> agramFreqs = new List<float>(audiogram.Get_Frequency_Hz());
 
@@ -361,11 +425,29 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 
                 if (!float.IsNaN(agramLeft.Threshold_dBSPL[ifreq]) && !float.IsInfinity(agramLeft.Threshold_dBSPL[ifreq]) && _settings.TestEar != Audiograms.TestEar.Right)
                 {
-                    _state.testConditions.Add(new TestCondition(Laterality.Left, _settings.TestFrequencies[k]));
+                    for (int j = 0; j < hapticValues.Length; j++)
+                    {
+                        _state.testConditions.Add(new HapticsTestCondition()
+                        {
+                            ear = Laterality.Left,
+                            Freq_Hz = _settings.TestFrequencies[k],
+                            hapticVariable = hapticVariable,
+                            hapticValue = hapticValues[j] - minDelay
+                        });
+                    }
                 }
                 if (!float.IsNaN(agramRight.Threshold_dBSPL[ifreq]) && !float.IsInfinity(agramRight.Threshold_dBSPL[ifreq]) && _settings.TestEar != Audiograms.TestEar.Left)
                 {
-                    _state.testConditions.Add(new TestCondition(Laterality.Right, _settings.TestFrequencies[k]));
+                    for (int j = 0; j < hapticValues.Length; j++)
+                    {
+                        _state.testConditions.Add(new HapticsTestCondition()
+                        {
+                            ear = Laterality.Right,
+                            Freq_Hz = _settings.TestFrequencies[k],
+                            hapticVariable = hapticVariable,
+                            hapticValue = hapticValues[j] - minDelay
+                        });
+                    }
                 }
             }
         }
@@ -373,8 +455,32 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
         {
             for (int k = 0; k < _settings.TestFrequencies.Length; k++)
             {
-                if (_settings.TestEar != Audiograms.TestEar.Right) _state.testConditions.Add(new TestCondition(Laterality.Left, _settings.TestFrequencies[k]));
-                if (_settings.TestEar != Audiograms.TestEar.Left) _state.testConditions.Add(new TestCondition(Laterality.Right, _settings.TestFrequencies[k]));
+                if (_settings.TestEar != Audiograms.TestEar.Right)
+                {
+                    for (int j = 0; j < hapticValues.Length; j++)
+                    {
+                        _state.testConditions.Add(new HapticsTestCondition()
+                        {
+                            ear = Laterality.Left,
+                            Freq_Hz = _settings.TestFrequencies[k],
+                            hapticVariable = hapticVariable,
+                            hapticValue = hapticValues[j] - minDelay
+                        });
+                    }
+                }
+                if (_settings.TestEar != Audiograms.TestEar.Left)
+                {
+                    for (int j = 0; j < hapticValues.Length; j++)
+                    {
+                        _state.testConditions.Add(new HapticsTestCondition()
+                        {
+                            ear = Laterality.Right,
+                            Freq_Hz = _settings.TestFrequencies[k],
+                            hapticVariable = hapticVariable,
+                            hapticValue = hapticValues[j] - minDelay
+                        });
+                    }
+                }
             }
         }
 
@@ -478,7 +584,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
                 _data.LDLgram.Initialize(_settings.TestFrequencies);
         }
 
-        foreach (TestCondition tc in _state.testConditions)
+        foreach (HapticsTestCondition tc in _state.testConditions)
         {
             float sum = 0;
             float n = 0;
@@ -505,7 +611,6 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
                 _data.LDLgram.Set(ear, tc.Freq_Hz, float.NaN, LDL_SPL);
             }
         }
-        _data.LDLgram.Save(FileLocations.LDLPath);
         File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
     }
 
@@ -516,14 +621,14 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
         FileIO.CloseBinarySerialization();
     }
 
-    private MeasurementState RestoreState()
+    private HapticsMeasurementState RestoreState()
     {
-        MeasurementState s = null;
+        HapticsMeasurementState s = null;
 
         FileIO.OpenBinarySerialization(_stateFile);
         try
         {
-            s = FileIO.DeserializeFromBinary<MeasurementState>();
+            s = FileIO.DeserializeFromBinary<HapticsMeasurementState>();
         }
         catch (System.Exception ex)
         {

@@ -4,13 +4,13 @@ using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Drawing.Design;
 
-using KLib;
 using KLib.Signals;
-using KLib.Signals.Enumerations;
+using KLib.TypeConverters;
 
 using BasicMeasurements;
+using LDL.Haptics;
+
 using OrderedPropertyGrid;
-using KLib.TypeConverters;
 
 namespace LDL
 {

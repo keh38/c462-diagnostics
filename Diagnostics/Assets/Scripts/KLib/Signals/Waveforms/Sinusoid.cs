@@ -15,13 +15,13 @@ namespace KLib.Signals.Waveforms
 	[ProtoContract]
 	[JsonObject(MemberSerialization.OptIn)]
     [TypeConverter(typeof(SinusoidConverter))]
-	public class Sinusoid : Waveform
+    public class Sinusoid : Waveform
     {
         [ProtoMember(1, IsRequired = true)]
         [JsonProperty]
-        [DisplayName("Frequency")]
-        [Description("Frequency in Hz")]
-        public float Frequency_Hz { get; set; }
+        //[DisplayName("Frequency")]
+        //[Description("Frequency in Hz")]
+        public float Frequency_Hz;// { get; set; }
         private bool ShouldSerializeFrequency_Hz() { return false; }
 
         [ProtoMember(2, IsRequired = true)]
