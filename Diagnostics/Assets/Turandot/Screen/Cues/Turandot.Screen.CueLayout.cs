@@ -14,6 +14,7 @@ namespace Turandot.Screen
     [XmlInclude(typeof(FixationPointLayout))]
     [XmlInclude(typeof(ImageLayout))]
     [XmlInclude(typeof(MessageLayout))]
+    [XmlInclude(typeof(TextBoxLayout))]
     [XmlInclude(typeof(VideoLayout))]
     public class CueLayout
     {

@@ -17,6 +17,9 @@ namespace Turandot.Scripts
         [SerializeField] private Slider _slider;
         [SerializeField] private RectTransform _thumbRectTransform;
         [SerializeField] private GameObject _button;
+        [SerializeField] private Image _backgroundImage;
+        [SerializeField] private Image _fillImage;
+        [SerializeField] private Image _thumbImage;
 
         private RectTransform _buttonRectTransform;
 
@@ -59,6 +62,15 @@ namespace Turandot.Scripts
 
             _rightLabel.fontSize = _layout.FontSize;
             _rightLabel.text = _layout.MaxLabel;
+
+            _fillImage.raycastTarget = _layout.BarClickable;
+            _backgroundImage.raycastTarget = _layout.BarClickable;
+
+            _fillImage.enabled = _layout.ShowFill;
+            if (!_layout.ShowThumb)
+            {
+                _thumbImage.color = new Color(1, 1, 1, 0);
+            }
         }
 
         public void ClearLog()

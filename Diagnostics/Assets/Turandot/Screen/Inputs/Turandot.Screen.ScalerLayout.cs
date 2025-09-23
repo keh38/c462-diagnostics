@@ -25,6 +25,20 @@ namespace Turandot.Screen
         public int FontSize { get; set; }
         private bool ShouldSerializeFontSize() { return false; }
 
+        [Category("Behavior")]
+        [Description("Shows the thumb")]
+        public bool ShowThumb { set; get; }
+        private bool ShouldSerializeShowThumb() { return false; }
+
+        [Category("Behavior")]
+        [Description("Shows the slider fill")]
+        public bool ShowFill { set; get; }
+        private bool ShouldSerializeShowFill() { return false; }
+
+        [Category("Behavior")]
+        public bool BarClickable { set; get; }
+        private bool ShouldSerializeBarClickable() { return false; }
+
         [Category("Labels")]
         [DisplayName("Min")]
         public string MinLabel { get; set; }
@@ -44,6 +58,9 @@ namespace Turandot.Screen
             FontSize = 48;
             MinLabel = "";
             MaxLabel = "";
+            ShowFill = true;
+            ShowThumb = true;
+            BarClickable = false;
         }
     }
 }

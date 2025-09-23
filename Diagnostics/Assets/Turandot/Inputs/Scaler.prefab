@@ -370,6 +370,9 @@ MonoBehaviour:
   _slider: {fileID: 6241426377109991902}
   _thumbRectTransform: {fileID: 5474396070030416305}
   _button: {fileID: 8177441835233403663}
+  _backgroundImage: {fileID: 3660075027456940406}
+  _fillImage: {fileID: 2198675106906946652}
+  _thumbImage: {fileID: 5493003961670738264}
 --- !u!1 &1359413084592434083
 GameObject:
   m_ObjectHideFlags: 0

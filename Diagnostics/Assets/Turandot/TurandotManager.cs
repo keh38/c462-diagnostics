@@ -395,9 +395,9 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         var audioFile = _mainDataFile.Replace(".json", ".audio.json");
         _engine.WriteAudioLogFile(audioFile);
 
-        HTS_Server.SendMessage("Turandot", "Finished:");
         HTS_Server.SendMessage("Turandot", $"ReceiveData:{Path.GetFileName(_mainDataFile)}:{File.ReadAllText(_mainDataFile)}");
         HTS_Server.SendMessage("Turandot", $"ReceiveData:{Path.GetFileName(audioFile)}:{File.ReadAllText(audioFile)}");
+        HTS_Server.SendMessage("Turandot", "Finished:");
 
         if (_params.trialLogOption == TrialLogOption.Upload)
         {

@@ -70,8 +70,8 @@
     <Compile Include="Assets\Scripts\Remote\IntercomReceiver.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\StyleControl.cs" />
     <Compile Include="Assets\Basic\LDL\LDL.State.cs" />
-    <Compile Include="Assets\Scripts\Hardware\ClockNetworkInterface.cs" />
     <Compile Include="Assets\Basic\LDL\Haptics\LDL.HapticsState.cs" />
+    <Compile Include="Assets\Scripts\Hardware\ClockNetworkInterface.cs" />
     <Compile Include="Assets\Turandot\Interactive\InteractiveSettings.cs" />
     <Compile Include="Assets\Basic\LDL\LDL.SliderSettings.cs" />
     <Compile Include="Assets\Scripts\Remote\HTS_Server.cs" />
@@ -220,6 +220,7 @@
     <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.ManikinLayout.cs" />
     <Compile Include="Assets\Scripts\Home\PlayPanel.cs" />
     <Compile Include="Assets\Turandot\Parameters\Turandot.FlowElement.cs" />
+    <Compile Include="Assets\Turandot\Screen\Cues\Turandot.Screen.TextBoxLayout.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.Input.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotScripter.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\SignalManager.cs" />
