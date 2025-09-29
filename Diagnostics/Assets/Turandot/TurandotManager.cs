@@ -27,8 +27,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     [SerializeField] private GameObject _finishPanel;
     [SerializeField] private GameObject _quitPanel;
 
-    [SerializeField] private VideoPlayer _videoPlayer;
-
     Parameters _params = new Parameters();
 
     TurandotState _state = null;

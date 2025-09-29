@@ -1121,7 +1121,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1068, y: -50}
+  m_AnchoredPosition: {x: 1018, y: -50}
   m_SizeDelta: {x: 500, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &600791528
@@ -1300,7 +1300,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!114 &886566273
 MonoBehaviour:
@@ -1321,7 +1321,6 @@ MonoBehaviour:
   _finishText: {fileID: 132329803}
   _finishPanel: {fileID: 1424092117}
   _quitPanel: {fileID: 1699298678}
-  _videoPlayer: {fileID: 0}
 --- !u!4 &886566274
 Transform:
   m_ObjectHideFlags: 0
@@ -1368,6 +1367,7 @@ MonoBehaviour:
   _fixationPrefab: {fileID: 6740508835576663551, guid: 66230e210e138e149aa403e056caa696, type: 3}
   _imagePrefab: {fileID: 3250324672790255597, guid: b77b7ea458dd2724390cf0f9f32330c4, type: 3}
   _messagePrefab: {fileID: 3018359816832450523, guid: 13e767f2c0f50824795356ebf09fdb82, type: 3}
+  _textBoxPrefab: {fileID: 1810737833793063880, guid: 7af11e4f0610d9b4a92002c6542163ac, type: 3}
   _videoPrefab: {fileID: 5370318812726528228, guid: f4558795d013bd04b972a198166e6e02, type: 3}
 --- !u!114 &886566277
 MonoBehaviour:
@@ -2254,7 +2254,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1768, y: -50}
+  m_AnchoredPosition: {x: 1718, y: -50}
   m_SizeDelta: {x: 500, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1935541038

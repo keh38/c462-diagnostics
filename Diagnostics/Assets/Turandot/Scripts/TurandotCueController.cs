@@ -13,6 +13,7 @@ namespace Turandot.Scripts
         [SerializeField] private GameObject _fixationPrefab;
         [SerializeField] private GameObject _imagePrefab;
         [SerializeField] private GameObject _messagePrefab;
+        [SerializeField] private GameObject _textBoxPrefab;
         [SerializeField] private GameObject _videoPrefab;
 
         private List<string> _used = new List<string>();
