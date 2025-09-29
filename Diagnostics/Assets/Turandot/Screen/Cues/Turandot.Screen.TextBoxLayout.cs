@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using ProtoBuf;
 
 using Turandot.Cues;
+using static Turandot.Instructions;
 
 namespace Turandot.Screen
 {
@@ -31,26 +32,31 @@ namespace Turandot.Screen
             set { Color = value.ToArgb(); }
         }
         private bool ShouldSerializeWindowsColor() { return false; }
-        
+
+        [Category("Alignment")]
+        [DisplayName("Text horizontal")]
+        public HorizontalTextAlignment HorizontalAlignment { get; set; }
+        private bool ShouldSerializeHorizontalAlignment() { return false; }
+
+        [Category("Alignment")]
+        [DisplayName("Box vertical")]
+        public VerticalTextAlignment BoxVerticalAlignment { get; set; }
+        private bool ShouldSerializeBoxVerticalAlignment() { return false; }
+
         [Browsable(false)]
         public int Color { set; get; }
 
-        public string DefaultText { get; set; }
-        private bool ShouldSerializeDefaultText() { return false; }
-
         public TextBoxLayout() : base()
         {
-            Name = "Message";
+            Name = "TextBox";
             FontSize = 72;
             Color = KLib.ColorTranslator.ColorInt(0, 0, 0, 1);
-            DefaultText = "message goes here";
         }
 
-        public Message GetDefaultCue()
+        public TextBoxAction GetDefaultCue()
         {
-            return new Message()
+            return new TextBoxAction()
             {
-                Text = DefaultText,
                 BeginVisible = true
             };
         }

@@ -1,5 +1,13 @@
 ## Changelog
 
+### v1.5 (unreleased)
+#### Added
+- Turandot:
+  - text box
+  - ability to show state or instructions from editor
+  
+---
+
 ### v1.4.1 (2025-09-16)
 #### Added
 - exposed Digitimer pulse width as sequence variable

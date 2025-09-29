@@ -53,6 +53,14 @@ namespace Turandot.Scripts
                     _controls.Add(c);
                     gobj.SetActive(false);
                 }
+                else if (layout is TextBoxLayout)
+                {
+                    var gobj = GameObject.Instantiate(_textBoxPrefab, canvasRT);
+                    var c = gobj.GetComponent<TurandotCueTextBox>();
+                    c.Initialize(layout as TextBoxLayout);
+                    _controls.Add(c);
+                    gobj.SetActive(false);
+                }
                 else if (layout is VideoLayout)
                 {
                     var gobj = GameObject.Instantiate(_videoPrefab, canvasRT);

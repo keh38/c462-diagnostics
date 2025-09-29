@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7702521224707860776}
   - component: {fileID: 1219820035480728770}
   - component: {fileID: 5531172138828389464}
+  - component: {fileID: 3107104781230969277}
   m_Layer: 5
   m_Name: TextBox
   m_TagString: Untagged
@@ -78,6 +79,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 2
   m_VerticalFit: 2
+--- !u!114 &3107104781230969277
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1810737833793063880}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb0bab6283d56043b8b5fbfbe72803d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _markdownRenderer: {fileID: 6204740155442444162}
 --- !u!1 &4839578508385124864
 GameObject:
   m_ObjectHideFlags: 0
@@ -235,8 +249,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 221.32, y: -50}
-  m_SizeDelta: {x: 342.64, y: 0}
+  m_AnchoredPosition: {x: 210.73, y: -50}
+  m_SizeDelta: {x: 321.46, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &6931169533545770336
 CanvasRenderer:
@@ -266,9 +280,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<line-height=0%><width=100><align=right>\u2022</width></align>\n</line-height><indent=120>this</indent>\n<size=0.76em>\u200B</size>\r\nis
-    \r\n<size=0.76em>\u200B</size>\n<line-height=0%><width=100><align=right>\u2022</width></align>\n</line-height><indent=120>some
-    text</indent>\n<size=0.76em>\u200B</size>\r\n<b><size=1.5em>got it?</size></b>\r\n"
+  m_text: "<line-height=0%><width=100><align=right>\u2022</width></align>\n</line-height><indent=120>message</indent>\r\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a38843dbb13c23940ae5adfe0936b68e, type: 2}
   m_sharedMaterial: {fileID: 6588039389402685758, guid: a38843dbb13c23940ae5adfe0936b68e, type: 2}
@@ -351,7 +363,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcb87846e43a704469d9be7ef4faa09a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _Source: "- this\nis \n- some text\n### got it?"
+  _Source: '- message'
   RenderSettings:
     Bold:
       RenderBold: 1

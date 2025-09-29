@@ -16,6 +16,8 @@ using Turandot.Scripts;
 using Turandot.Screen;
 using UnityEngine.Video;
 using KLib;
+using NUnit.Framework;
+using System.Xml.Linq;
 
 public class TurandotManager : MonoBehaviour, IRemoteControllable
 {
@@ -78,8 +80,9 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
 #if HACKING
         Application.targetFrameRate = 60;
-        GameManager.SetSubject("Scratch/_shit");
-        string configName = "Tinnitus-MML";
+        GameManager.SetSubject("Joanne/_Test");
+        FileLocations.SetDataRoot(@"C:\Users\hancock\OneDrive - Mass General Brigham\HTS");
+        string configName = "CMMStart";
         //DiagnosticsManager.Instance.MakeExtracurricular("Turandot", "Turandot." + configName);
 #else
         string configName = GameManager.DataForNextScene;
@@ -1000,13 +1003,19 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             case "SubjectMetricsChanged":
                 RpcUpdateSubject();
                 break;
-            //case "SendSyncLog":
-            //    var logPath = HardwareInterface.ClockSync.LogFile;
-            //    if (!string.IsNullOrEmpty(logPath))
-            //    {
-            //        HTS_Server.SendMessage("Turandot", $"ReceiveData:{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
-            //    }
-            //    break;
+            case "ShowInstructions":
+                RpcShowInstructions(data);
+                break;
+            case "ShowState":
+                RpcShowState(data);
+                break;
+                //case "SendSyncLog":
+                //    var logPath = HardwareInterface.ClockSync.LogFile;
+                //    if (!string.IsNullOrEmpty(logPath))
+                //    {
+                //        HTS_Server.SendMessage("Turandot", $"ReceiveData:{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
+                //    }
+                //    break;
         }
     }
 
@@ -1019,7 +1028,29 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         ApplyParameters();
     }
-    
+
+    private void RpcShowInstructions(string stateName)
+    {
+        if (!string.IsNullOrEmpty(_params.instructions.Text))
+        {
+            _titleBar.SetActive(false);
+            _instructionPanel.gameObject.SetActive(true);
+            _instructionPanel.InstructionsFinished = OnTestInstructionsFinished;
+            _instructionPanel.ShowInstructions(_params.instructions);
+        }
+    }
+
+    private void OnTestInstructionsFinished()
+    {
+        _instructionPanel.gameObject.SetActive(false);
+    }
+
+    private void RpcShowState(string stateName)
+    {
+        _titleBar.SetActive(false);
+        _engine.ShowState(_params[stateName]);
+    }
+
     public void RpcAbort()
     {
         _isRunning = false;

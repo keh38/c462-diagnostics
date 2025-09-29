@@ -138,15 +138,15 @@ public class TurandotEngine : MonoBehaviour
         yield break;
     }
 
-    public void ShowState(Parameters par, string state)
+    public void ShowState(FlowElement state)
     {
         ClearScreen();
 
 //        _cueController.Initialize(par.screen.Cues);
         //inputMonitor.Initialize(par.screen, par.buttons, par.inputEvents, par.InputsUsed);
 
-        _inputMonitor.Activate(par[state].inputs, null, 0);
-        _cueController.Activate(par[state].cues);
+        _inputMonitor.Activate(state.inputs, null, 0);
+        _cueController.Activate(state.cues);
     }
 
 #if KDEBUG
