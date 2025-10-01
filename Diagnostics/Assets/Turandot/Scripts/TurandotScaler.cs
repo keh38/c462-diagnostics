@@ -86,7 +86,7 @@ namespace Turandot.Scripts
             ButtonData.value = false;
             _button.SetActive(false);
 
-            if (!action.enabled)
+            if (action.Enabled != EnabledState.Enabled)
             {
                 _fillImage.raycastTarget = false;
                 _backgroundImage.raycastTarget = false;

@@ -140,6 +140,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
             //try
             {
+                _engine.DestroyObjects();
                 _engine.Initialize(_params);
             }
             //catch (Exception ex)

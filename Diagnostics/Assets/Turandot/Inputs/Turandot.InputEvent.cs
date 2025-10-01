@@ -44,11 +44,6 @@ namespace Turandot
 
         public bool Update(List<ButtonData> data, List<Flag> flags, List<ScalarData> scalars, float elapsedTime_s)
         {
-            if (name.Contains("AFC"))
-            {
-                return UpdateAFC(data, (int) flags.Find(o => o.name == "TestInterval").value);
-            }
-
             _subResults.Clear();
 
             bool value = true;
@@ -128,26 +123,6 @@ namespace Turandot
                     break;
             }
             return result;
-        }
-
-        private bool UpdateAFC(List<ButtonData> data, int testInterval)
-        {
-            bool value = false;
-
-            foreach (ButtonData d in data.FindAll(o => o.name.StartsWith("Button")))
-            {
-                if (d.value)
-                {
-                    int buttonNum = int.Parse(d.name.Substring(6));
-                    if (name == "AFC Correct") value = buttonNum == testInterval;
-                    else value = buttonNum != testInterval;
-                }
-            }
-
-            bool isChanged = value && !_lastvalue;
-            _lastvalue = value;
-
-            return isChanged;
         }
 
     }

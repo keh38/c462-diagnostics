@@ -63,6 +63,11 @@ public class TurandotEngine : MonoBehaviour
         Cursor.visible = true;
     }
 
+    public void DestroyObjects()
+    {
+        _inputMonitor.DestroyObjects();
+    }
+
     public void Initialize(Parameters par)
     {
         _log = new History();
@@ -141,9 +146,6 @@ public class TurandotEngine : MonoBehaviour
     public void ShowState(FlowElement state)
     {
         ClearScreen();
-
-//        _cueController.Initialize(par.screen.Cues);
-        //inputMonitor.Initialize(par.screen, par.buttons, par.inputEvents, par.InputsUsed);
 
         _inputMonitor.Activate(state.inputs, null, 0);
         _cueController.Activate(state.cues);
@@ -233,9 +235,6 @@ public class TurandotEngine : MonoBehaviour
     }
     private void DoAction(string name)
     {
-        // TURANDOT FIX 
-//        if (IPC.Instance.Use && !_params.bypassIPC) IPC.Instance.SendCommand("Action", name);
-
         FlowElement actionState = _params.flowChart.Find(fe => fe.name == name);
         _cueController.Activate(actionState.cues);
 

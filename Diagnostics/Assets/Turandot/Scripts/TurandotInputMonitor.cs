@@ -79,6 +79,13 @@ namespace Turandot.Scripts
             foreach (var i in _inputObjects) i.gameObject.SetActive(false);
         }
 
+        public void DestroyObjects()
+        {
+            if (_inputObjects == null) return;
+            foreach (var i in _inputObjects) GameObject.Destroy(i.gameObject);
+            _inputObjects = null;
+        }
+
         public void Initialize(List<InputLayout> inputLayouts, List<InputEvent> inputEvents)
         {
             _isRunning = false;

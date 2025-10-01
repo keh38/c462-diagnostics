@@ -5,16 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 
-using ProtoBuf;
 using Newtonsoft.Json;
 
 namespace Turandot.Inputs
 {
-    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public enum EnabledState { Enabled, Disabled, Grayed}
+
     [JsonObject(MemberSerialization.OptOut)]
     [XmlInclude(typeof(Button))]
     [XmlInclude(typeof(Categorizer))]
-    [XmlInclude(typeof(Keypad))]
     [XmlInclude(typeof(ParamSliderAction))]
     [XmlInclude(typeof(ScalerAction))]
     public class Input
@@ -28,32 +27,24 @@ namespace Turandot.Inputs
         public bool EndVisible { get; set; }
         private bool ShouldSerializeEndVisible() { return false; }
 
-        public bool enabled = true;
-
-        public int X = 0;
-        public int Y = 0;
-        public float value;
-        public string name;
+        [Category("Appearance")]
+        public EnabledState Enabled { get; set; }
+        private bool ShouldSerializeEnabled() { return false; }
 
         [ReadOnly(true)]
         public string Target { get; set; }
+
+        public string name;
 
         public Input()
         {
             BeginVisible = true;
             EndVisible = false;
+            Enabled = EnabledState.Enabled;
         }
-        public Input(string name) : this()
+        public Input(string name) : base()
         {
             this.name = name;
         }
-
-        //[XmlIgnore]
-        //[ProtoIgnore]
-        //[JsonIgnore]
-        //virtual public string Name
-        //{
-        //    get { return name; }
-        //}
     }
 }

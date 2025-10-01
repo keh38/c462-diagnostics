@@ -85,9 +85,6 @@ namespace Turandot
                 {
                     if (chanName == "---")
                     {
-                        if (remainder == "TestInterval")
-                            flags.Find(f => f.name == remainder).value = (int)value;
-
                         fe.SetParameter(remainder, value);
                     }
                     else if (chanName == "Cues")
@@ -140,7 +137,6 @@ namespace Turandot
 
         public void Initialize()
         {
-            foreach (var fe in flowChart.FindAll(x => x.nI_mAFC)) fe.SetISI();
             foreach (var fe in flowChart.FindAll(x => x.isAction && !string.IsNullOrEmpty(x.actionFamily)))
             {
                 var fam = schedule.families.Find(x => x.name == fe.actionFamily);

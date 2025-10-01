@@ -16,7 +16,6 @@ namespace Turandot
     public class FlowElement
     {
         public string name = "";
-        public bool nI_mAFC = false;
         public bool isAction = false;
         public SignalManager sigMan = null;
         public List<Cues.Cue> cues = new List<Cues.Cue>();
@@ -92,31 +91,6 @@ namespace Turandot
                     {
                         to.Value = value;
                     }
-                    break;
-
-                case "TestInterval":
-                    if (sigMan["Test"] == null) return "";
-
-                    sigMan["Test"].gate.Delay_ms = _delay + (value - 1) * _isi;
-                    //Debug.Log("TestInterval=" + value);
-                    //Debug.Log("Test: " + sigMan["Test"].gate.Delay_ms);
-
-                    int k = 1;
-                    int intNum = 1;
-                    while (true)
-                    {
-                        Channel ch = sigMan["Ref" + k];
-                        if (ch == null) break;
-
-                        if (intNum == Mathf.RoundToInt(value)) intNum++;
-
-                        ch.gate.Delay_ms = _delay + (intNum - 1) * _isi;
-                        //Debug.Log(ch.Name + ": " + ch.gate.Delay_ms);
-
-                        ++intNum;
-                        k = k + 1;
-                    }
-
                     break;
 
                 default:

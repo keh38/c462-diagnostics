@@ -14,7 +14,7 @@ namespace Turandot.Inputs
     {
         public int backgroundColor = 0xAAAAAA;
 
-        public Keypad() : base("Keypad")
+        public Keypad() : base()
         {
         }
 
