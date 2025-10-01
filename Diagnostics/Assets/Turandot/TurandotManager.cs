@@ -12,7 +12,6 @@ using System.Text;
 using KLib.Signals.Waveforms;
 using Turandot;
 using Turandot.Schedules;
-using Turandot.Scripts;
 using Turandot.Screen;
 using UnityEngine.Video;
 using KLib;
@@ -42,7 +41,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     bool _waitingForTap = false;
     bool _isRunning = false;
     bool _haveException = false;
-    bool _isScripted = false;
     bool _isRemote = false;
 
     string _paramFile = "";
@@ -96,10 +94,12 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
                 ShowFinishPanel("Nothing to do");
             }
         }
+        else
+        {
+            _titleBar.SetActive(false);
+        }
 
         _engine.ClearScreen();
-
-        _isScripted = (GameObject.Find("TurandotScripter") != null);
 
         KLib.Expressions.Metrics = GameManager.Metrics;
         KLib.Expressions.Audiogram = Audiograms.AudiogramData.Load();
@@ -108,24 +108,21 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         KLib.Expressions.LDL = ldl;
 
         string localName = "";
-        //if (!_isScripted && configName.Contains("TScript."))
-        //{
-        //    TurandotScripter.Instance.Initialize(DataFileLocations.ConfigFile(configName));
-        //    _isScripted = true;
-        //}
-
-        //if (_isScripted)
-        //{
-        //    _params = TurandotScripter.Instance.Next();
-        //    localName = TurandotScripter.Instance.ParamFile;
-        //}
-        //else
         if (!_isRemote)
         {
+            var parts = configName.Split(':', 2);
+
+            configName = parts[0];
             localName = FileLocations.ConfigFile("Turandot", configName);
             _params = KLib.FileIO.XmlDeserialize<Parameters>(localName);
             _paramFile = Path.GetFileName(localName);
             _state = new TurandotState(GameManager.Project, GameManager.Subject, configName);
+
+            if (parts.Length > 1)
+            {
+                var args = FileIO.JSONDeserializeFromString<ScriptArguments>(parts[1]);
+                ApplyScriptArguments(args);
+            }
 
             ApplyParameters();
             Begin();
@@ -179,6 +176,29 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         finally
         {
             HTS_Server.SendMessage("Turandot", $"File:{filename}");
+        }
+    }
+
+    private void ApplyScriptArguments(ScriptArguments args)
+    {
+        if (_params.schedule.families.Count == 0) return;
+
+        if (args.laterality != KLib.Signals.Laterality.None)
+        {
+            var earVar = _params.schedule.families[0].variables.Find(x => x.property == "Ear");
+            if (earVar != null)
+            {
+                earVar.expression = $"{(int)args.laterality}";
+            }
+        }
+
+        if (!string.IsNullOrEmpty(args.expression))
+        {
+            var seqVar = _params.schedule.families[0].variables.Find(x => x.dim == args.dimension);
+            if (seqVar != null)
+            {
+                seqVar.expression = args.expression;
+            }
         }
     }
 
@@ -415,55 +435,16 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         _state.Finish();
 
         bool finished = true;
-        //if (_isScripted)
-        //{
-        //    TurandotScripter.Instance.Advance();
-        //    finished = TurandotScripter.Instance.IsFinished;
-
-        //    if (finished)
-        //    {
-        //        string linkTo = TurandotScripter.Instance.LinkTo;
-
-        //        GameObject.Destroy(GameObject.Find("TurandotScripter"));
-        //        if (!string.IsNullOrEmpty(linkTo))
-        //        {
-        //            finished = false;
-        //            if (DiagnosticsManager.Instance.IsExtraCurricular)
-        //                DiagnosticsManager.Instance.MakeExtracurricular("Turandot", System.IO.Path.GetFileNameWithoutExtension(linkTo).Replace("Turandot.", ""));
-        //            else
-        //                DiagnosticsManager.Instance.SettingsFile = System.IO.Path.GetFileNameWithoutExtension(linkTo).Replace("Turandot.", "");
-
-        //            Application.LoadLevel("Turandot");
-        //        }
-        //    }
-        //    else
-        //    {
-        //        Application.LoadLevel("Turandot");
-        //    }
-        //}
-        //else if (!string.IsNullOrEmpty(_params.linkTo) && !abort)
-        //{
-        //    finished = false;
-        //    if (_params.linkTo.Equals("return"))
-        //    {
-        //        DiagnosticsManager.Instance.AdvanceProtocol();
-        //        Return();
-        //    }
-        //    else
-        //    {
-        //        if (DiagnosticsManager.Instance.IsExtraCurricular)
-        //            DiagnosticsManager.Instance.MakeExtracurricular("Turandot", System.IO.Path.GetFileNameWithoutExtension(_params.linkTo).Replace("Turandot.", ""), DiagnosticsManager.Instance.ReturnToScene);
-        //        else
-        //            DiagnosticsManager.Instance.SettingsFile = System.IO.Path.GetFileNameWithoutExtension(_params.linkTo).Replace("Turandot.", "");
-        //        Application.LoadLevel("Turandot");
-        //    }
-        //}
-
         if (finished && !_isRemote)
         {
-            //DiagnosticsManager.Instance.AdvanceProtocol();
-
-            ShowFinishPanel();
+            if (ProtocolManager.IsActive)
+            {
+                ProtocolManager.FinishTest(_mainDataFile);
+            }
+            else
+            {
+                ShowFinishPanel();
+            }
         }
     }
 
@@ -829,20 +810,10 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             _isRunning = false;
 
             EndRun(abort: false);
-            //_engine.ClearScreen();
 
             //if (SubjectManager.Instance.UploadData) DataFileManager.UploadDataFile(_mainDataFile);
             //SubjectManager.Instance.DataFiles.Add(_mainDataFile);
 
-            //if (!string.IsNullOrEmpty(_params.linkTo))
-            //{
-            //    if (DiagnosticsManager.Instance.IsExtraCurricular)
-            //        DiagnosticsManager.Instance.MakeExtracurricular("Turandot", System.IO.Path.GetFileNameWithoutExtension(_params.linkTo).Replace("Turandot.", ""), DiagnosticsManager.Instance.ReturnToScene);
-            //    else
-            //        DiagnosticsManager.Instance.SettingsFile = System.IO.Path.GetFileNameWithoutExtension(_params.linkTo).Replace("Turandot.", "");
-            //    Application.LoadLevel("Turandot");
-            //}
-            //else
             //{
             //    DiagnosticsManager.Instance.AdvanceProtocol();
             //    _message.text = "Finished! Press ENTER to return.";
@@ -864,14 +835,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
     void Return()
     {
-        //if (IPC.Instance.Use && !_params.bypassIPC && !_usingServer)
-        //{
-        //    IPC.Instance.StopRecording();
-        //    IPC.Instance.Disconnect();
-        //}
-
-        //GameObject.Destroy(GameObject.Find("TurandotScripter"));
-
         //string returnTo = DiagnosticsManager.Instance.ReturnToScene;
         //if (_runAborted && DiagnosticsManager.Instance.CurrentAutoRun)
         //{

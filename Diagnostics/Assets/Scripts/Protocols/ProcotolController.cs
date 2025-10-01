@@ -31,14 +31,32 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
 
         _title.text = "";
 
-        if (string.IsNullOrEmpty(GameManager.DataForNextScene))
+        _isRemote = HTS_Server.RemoteConnected;
+        if (!_isRemote)
         {
-            _isRemote = HTS_Server.RemoteConnected;
-            if (!_isRemote)
+            if (ProtocolManager.IsActive)
+            {
+                _protocol = ProtocolManager.Protocol;
+                _history = ProtocolManager.History;
+                _nextTestIndex = ProtocolManager.NextTestIndex;
+
+                if (_nextTestIndex == 0 && !string.IsNullOrEmpty(_protocol.Introduction))
+                {
+                    ShowInstructions(
+                        _protocol.Introduction,
+                        fontSize: _protocol.Appearance.InstructionFontSize,
+                        autoAdvance: false);
+                }
+                else
+                {
+                    StartCoroutine(AnimateOutline());
+                }
+            }
+            else
             {
                 ShowFinishPanel("Nothing to do");
             }
-        }     
+        }
     }
 
     void Update()
@@ -59,7 +77,14 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
             }
             else
             {
-                HTS_Server.SendMessage("Protocol", "Advance");
+                if (ProtocolManager.IsActive)
+                {
+                    ProtocolManager.Advance();
+                }
+                else
+                {
+                    HTS_Server.SendMessage("Protocol", "Advance");
+                }
             }
         }
     }
@@ -177,6 +202,8 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
 
     private void RpcSetProtocol(string data)
     {
+        ProtocolManager.Clear();
+
         _protocol = KLib.FileIO.XmlDeserializeFromString<Protocol>(data);
         _title.text = _protocol.Title;
         _outline.fontSize = _protocol.Appearance.ListFontSize;

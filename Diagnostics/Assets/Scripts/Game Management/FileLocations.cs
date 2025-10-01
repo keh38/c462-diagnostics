@@ -144,6 +144,8 @@ public static class FileLocations
         return Path.Combine(ProjectFolder, "Resources", "Config Files", type + "." + name + ".xml");
     }
 
+    public static string ProtocolFolder { get { return Path.Combine(ProjectFolder, "Resources", "Protocols"); } }
+
     public static string StateFile
     {
         get { return Path.Combine(Application.persistentDataPath, "state.xml"); }

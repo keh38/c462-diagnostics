@@ -14,12 +14,9 @@ namespace Turandot.Inputs
     [JsonObject(MemberSerialization.OptOut)]
     [XmlInclude(typeof(Button))]
     [XmlInclude(typeof(Categorizer))]
-    [XmlInclude(typeof(GrapherAction))]
     [XmlInclude(typeof(Keypad))]
     [XmlInclude(typeof(ParamSliderAction))]
-    [XmlInclude(typeof(RandomProcess))]
     [XmlInclude(typeof(ScalerAction))]
-    [XmlInclude(typeof(ThumbSliderAction))]
     public class Input
     {
         public string label = "";

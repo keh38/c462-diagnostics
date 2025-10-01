@@ -82,9 +82,17 @@ namespace Turandot.Scripts
         {
             var action = input as ScalerAction;
 
-            _slider.value = 0.5f;
+            _slider.value = action.StartValue;
             ButtonData.value = false;
             _button.SetActive(false);
+
+            if (!action.enabled)
+            {
+                _fillImage.raycastTarget = false;
+                _backgroundImage.raycastTarget = false;
+                _thumbImage.raycastTarget= false;
+            }
+
             _result = "";
 
             base.Activate(input, audio);

@@ -17,6 +17,7 @@ namespace Protocols
         {
             Appearance = new Appearance();
             FullAuto = false;
+            Tests = new List<ProtocolEntry>();
         }
 
     }

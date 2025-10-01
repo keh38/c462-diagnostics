@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using KLib;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -40,10 +41,20 @@ public class TurandotPanel : MonoBehaviour
         {
             SceneManager.LoadScene("Turandot Interactive");
         }
-        else
+        else if (fileType == "Turandot")
         {
             SceneManager.LoadScene("Turandot");
         }
+        else if (fileType == "TScript")
+        {
+            ApplyScript(_listBox.SelectedText);
+        }
+    }
+
+    private void ApplyScript(string name)
+    {
+        var script = FileIO.XmlDeserialize<Turandot.Schedules.Script>(FileLocations.ConfigFile("TScript", name));
+        script.Apply(FileLocations.ProtocolFolder);
     }
 
     private void FillListBox(string fileType)

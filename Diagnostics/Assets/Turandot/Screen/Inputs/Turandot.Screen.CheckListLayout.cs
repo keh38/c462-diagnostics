@@ -46,7 +46,7 @@ namespace Turandot.Screen
 
         [Category("Content")]
         public BindingList<string> Items { set; get; }
-        private bool ShouldSerializeOptions() { return false; }
+        private bool ShouldSerializeItems() { return false; }
 
         public ChecklistLayout()
         {

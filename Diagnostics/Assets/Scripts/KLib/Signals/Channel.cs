@@ -381,6 +381,7 @@ namespace KLib.Signals
             switch (s[0])
             {
                 case "Ear":
+                    Laterality = (Laterality)value;
                     //Destination = (Laterality)(value + 2);
                     break;
 
