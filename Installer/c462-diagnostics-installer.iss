@@ -39,6 +39,7 @@ Name: "{commondesktop}\Hearing Test Suite"; Filename: "{app}\Launcher\HTSLaunche
 
 [Run]
 ;Filename: "{tmp}\{code:GetODIInstaller}"; Parameters: "/VERYSILENT"; StatusMsg: "Installing OneDrive interface";
+Filename: "{app}\Launcher\HTSLauncher.exe"; Parameters: "-nodelay"; 
 
 [Code]
 function GetODIInstaller(Dummy: String): String;

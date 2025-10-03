@@ -8,7 +8,7 @@ using UnityEngine.UI;
 using KLib;
 using KLib.MSGraph;
 
-public class AdminToolsMenu : MonoBehaviour
+public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
 {
     [SerializeField] private SyncPanel _syncPanel;
     [SerializeField] private UpdatePanel _updatePanel;
@@ -20,6 +20,7 @@ public class AdminToolsMenu : MonoBehaviour
     [SerializeField] private Button _oneDriveMenuButton;
     [SerializeField] private Button _hardwareMenuButton;
 
+    [SerializeField] private TMPro.TMP_Text _message;
     [SerializeField] private Image _cloudIcon;
 
     private GameObject _activePanel = null;
@@ -36,6 +37,8 @@ public class AdminToolsMenu : MonoBehaviour
             yield return StartCoroutine(SelectHardwarePanel());
             _hardwarePanel.ShowHardwareErrorMessage();
         }
+
+        HTS_Server.SetCurrentScene("Admin Tools", this);
     }
 
     //void EnableMenu(bool enabled)
@@ -66,14 +69,14 @@ public class AdminToolsMenu : MonoBehaviour
 
     public void OnOneDriveClick()
     {
-//        if (_activePanel != _oneDrivePanel.gameObject)
-//        {
-//            SelectItem(_oneDriveMenuButton, _oneDrivePanel.gameObject);
-//        }
-////        else
-//        {
-//            StartCoroutine(_oneDrivePanel.ConnectToOneDrive());
-//        }
+        //        if (_activePanel != _oneDrivePanel.gameObject)
+        //        {
+        //            SelectItem(_oneDriveMenuButton, _oneDrivePanel.gameObject);
+        //        }
+        ////        else
+        //        {
+        //            StartCoroutine(_oneDrivePanel.ConnectToOneDrive());
+        //        }
         StartCoroutine(SelectOneDrivePanel());
     }
     private IEnumerator SelectOneDrivePanel()
@@ -120,4 +123,63 @@ public class AdminToolsMenu : MonoBehaviour
 
         yield return null;
     }
+
+    private List<string> EnumerateResources()
+    {
+        var resourceFolders = new List<string>()
+            {
+                "Config Files",
+                "Images",
+                "MATLAB",
+                "Plugins",
+                "Protocols",
+                "Schedules",
+                "Videos",
+                "Wav Files"
+            };
+
+        List<string> resources = new List<string>();
+
+        string rootResourceFolder = Path.Combine(FileLocations.ProjectFolder, "Resources");
+        foreach (var resourceFolder in resourceFolders)
+        {
+            string folder = Path.Combine(Path.Combine(rootResourceFolder, resourceFolder));
+            var files = Directory.GetFiles(folder);
+            foreach (var file in files)
+            {
+                resources.Add(file.Remove(0, rootResourceFolder.Length+1));
+            }
+        }
+
+        return resources;
+    }
+
+
+    void IRemoteControllable.ProcessRPC(string command, string data = "")
+    {
+        switch (command)
+        {
+            case "StartResourceSync":
+                FileLocations.SetDataRoot();
+                _message.text = "Syncing resources";
+                break;
+            case "EndResourceSync":
+                _message.text = "";
+                break;
+            case "SendResourceList":
+                var fileList = EnumerateResources();
+                HTS_Server.SendMessage("FileSync", $"ReceiveFileList:{FileIO.JSONSerializeToString(fileList)}");
+                break;
+            case "DeleteFile":
+                var fullpath = Path.Combine(FileLocations.ProjectFolder, "Resources", data);
+                File.Delete(fullpath);
+                break;
+        }
+    }
+
+    void IRemoteControllable.ChangeScene(string newScene)
+    {
+        SceneManager.LoadScene(newScene);
+    }
+
 }

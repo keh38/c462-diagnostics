@@ -17,6 +17,7 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
     [SerializeField] private TMPro.TMP_Text _message;
 
     [SerializeField] private Button _subjectMenuButton;
+    [SerializeField] private Button _basicMenuButton;
     [SerializeField] private Button _turandotMenuButton;
     [SerializeField] private Button _protocolMenuButton;
     [SerializeField] private Button _configMenuButton;
@@ -24,6 +25,7 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 
     [SerializeField] private PlayPanel _playPanel;
     [SerializeField] private SubjectPanel _subjectPanel;
+    [SerializeField] private BasicPanel _basicPanel;
     [SerializeField] private TurandotPanel _turandotPanel;
     [SerializeField] private ProtocolPanel _protocolPanel;
     [SerializeField] private GameObject _quitPanel;
@@ -144,6 +146,16 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
     {
         yield return StartCoroutine(SelectItem(_subjectMenuButton, _subjectPanel.gameObject));
         _subjectPanel.ShowPanel();
+    }
+
+    public void OnBasicButtonClick()
+    {
+        StartCoroutine(SelectBasicPanel());
+    }
+    private IEnumerator SelectBasicPanel()
+    {
+        yield return StartCoroutine(SelectItem(_basicMenuButton, _basicPanel.gameObject));
+        _basicPanel.ShowPanel();
     }
 
     public void OnTurandotButtonClick()

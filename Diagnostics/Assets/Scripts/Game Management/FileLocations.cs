@@ -18,10 +18,13 @@ public static class FileLocations
     public static string ProjectFolder { get; private set; } = "";
     public static string DataRoot { get; private set; } = Path.Combine(Application.persistentDataPath, "Projects");
 
-    public static void SetDataRoot(string folder)
+    public static void SetDataRoot(string folder = null)
     {
+        if (string.IsNullOrEmpty(folder))
+        {
+            folder = Path.Combine(Application.persistentDataPath, "Projects");
+        }
         DataRoot = folder;
-
         ProjectFolder = Path.Combine(DataRoot, _currentProject);
     }
 

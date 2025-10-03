@@ -45,15 +45,22 @@ namespace Launcher
             versionLabel.Text = GetVersion();
             statusTextBox.Text = "Starting..." + Environment.NewLine;
 
-            _timer = new Timer();
-            _timer.Interval = _delayTime;
-            _timer.Tick += Timer_Tick;
-            _timer.Enabled = true;
-
             if (!Directory.Exists(FileLocations.RootFolder))
             {
                 Directory.CreateDirectory(FileLocations.RootFolder);
             }
+
+            var commandLineArgs = Environment.GetCommandLineArgs().ToList();
+            if (commandLineArgs.Contains("-nodelay"))
+            {
+                LaunchUnityApp();
+                return;
+            }
+            
+            _timer = new Timer();
+            _timer.Interval = _delayTime;
+            _timer.Tick += Timer_Tick;
+            _timer.Enabled = true;
         }
 
         private async void MainForm_Shown(object sender, EventArgs e)

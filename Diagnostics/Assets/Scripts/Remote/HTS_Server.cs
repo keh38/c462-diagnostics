@@ -295,6 +295,28 @@ public class HTS_Server : MonoBehaviour
                 ReceiveFile(data);
                 break;
 
+            case "RunInstaller":
+                _listener.SendAcknowledgement();
+                RunInstaller(data);
+                break;
+
+            case "FileExists":
+                var fullpath = Path.Combine(FileLocations.ProjectFolder, "Resources", data);
+                if (File.Exists(fullpath))
+                {
+                    var dt = File.GetLastAccessTime(fullpath);
+                    _listener.WriteStringAsByteArray(FileIO.JSONSerializeToString(dt));
+                }
+                else
+                {
+                    _listener.WriteStringAsByteArray("404");
+                }
+                break;
+
+            case "ReceiveBufferedFile":
+                ReceiveBufferedFile(data);
+                break;
+                
             default:
                 _listener.SendAcknowledgement();
                 _currentScene.ProcessRPC(command, data);
@@ -305,7 +327,6 @@ public class HTS_Server : MonoBehaviour
 
     private void ReceiveFile(string data)
     {
-        Debug.Log(data);
         var parts = data.Split(new char[] { ':' }, 3);
         if (parts.Length != 3) return;
         var folder = FileLocations.LocalResourceFolder(parts[0]);
@@ -317,6 +338,60 @@ public class HTS_Server : MonoBehaviour
         File.WriteAllText(filePath, parts[2]);
     }
 
+    private void ReceiveBufferedFile(string data)
+    {
+        var parts = data.Split(new char[] { ':' }, 3);
+        if (parts.Length != 3)
+        {
+            _listener.SendAcknowledgement(false);
+            return;
+        }
+ 
+        int bufferSize = int.Parse(parts[1]);
+        int numBuffers = int.Parse(parts[2]);
+
+        var filePath = Path.Combine(FileLocations.ProjectFolder, "Resources", parts[0]);
+        if (parts[0].StartsWith("Downloads"))
+        {
+            filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), parts[0]);
+        }
+        var tempPath = Path.GetTempFileName();
+
+        _listener.SendAcknowledgement();
+
+        using (FileStream fs = new FileStream(tempPath, FileMode.Create, FileAccess.Write))
+        using (BinaryWriter bw = new BinaryWriter(fs))
+        {
+            for (int k = 0; k < numBuffers; k++)
+            {
+                var bytes = _listener.ReadByteArray();
+                bw.Write(bytes);
+
+                _listener.SendAcknowledgement();
+            }
+
+            bw.Close();
+            fs.Close();
+        }
+
+        if (File.Exists(filePath))
+        {
+            File.Delete(filePath);
+        }
+        File.Move(tempPath, filePath); 
+    }
+
+    private void RunInstaller(string data)
+    {
+        string exePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", data);
+        System.Diagnostics.Process.Start(exePath);
+
+#if !UNITY_EDITOR
+        if (!Application.isEditor) System.Diagnostics.Process.GetCurrentProcess().Kill();
+#endif
+
+    }
+
     private IPEndPoint ParseEndPoint(string address)
     {
         var parts = address.Split('/');
@@ -325,5 +400,5 @@ public class HTS_Server : MonoBehaviour
         return new IPEndPoint(IPAddress.Parse(parts[0]), port);
     }
 
-    #endregion
+#endregion
 }

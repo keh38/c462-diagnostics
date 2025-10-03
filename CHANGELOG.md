@@ -2,9 +2,15 @@
 
 ### v1.5 (unreleased)
 #### Added
+- Protocol page
+- Basic measurement page
 - Turandot:
   - text box
   - ability to show state or instructions from editor
+  - restored modified script functionality
+- Admin:
+  - sync resources
+  - update app
   
 ---
 
