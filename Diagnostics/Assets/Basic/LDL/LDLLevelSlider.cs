@@ -90,11 +90,20 @@ public class LDLLevelSlider : MonoBehaviour
             _settings.start = _settings.min + UnityEngine.Random.Range(0f, 10f);
         }
 
-        var fm = (_myChannel.waveform as FM);
-        fm.Carrier_Hz = _settings.Freq_Hz;
-        fm.Depth_Hz = _settings.Freq_Hz * _modDepth_pct / 100f;
 
-        _myChannel.Laterality = _settings.ear;
+        if (_settings.Freq_Hz > 0f)
+        {
+            var fm = new FM();
+            fm.Carrier_Hz = _settings.Freq_Hz;
+            fm.Depth_Hz = _settings.Freq_Hz * _modDepth_pct / 100f;
+            _myChannel.waveform = fm;
+        }
+        else
+        {
+            _myChannel.waveform = new Noise();
+        }
+
+            _myChannel.Laterality = _settings.ear;
 
         _paramSetter(_settings.start);
         _signalManager.Initialize();

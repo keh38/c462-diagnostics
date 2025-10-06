@@ -25,6 +25,7 @@ namespace Audiograms
         public float[] Frequency_Hz;
         public float[] Threshold_dBHL;
         public float[] Threshold_dBSPL;
+        //public float 
 
         public Audiogram()
         {

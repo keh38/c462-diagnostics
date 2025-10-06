@@ -313,8 +313,8 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         _sceneState = SceneState.Done;
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
-        HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
         HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+        HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
 
         if (_localAbort)
         {
@@ -458,11 +458,20 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         yield return new WaitForSeconds(_doSimulation ? 0.2f : UnityEngine.Random.Range(_settings.MinISI, _settings.MaxISI));
 
         _signalManager["Signal"].Laterality = ear;
-        var fm = (_signalManager["Signal"].waveform as FM);
 
-        fm.Carrier_Hz = freq;
-        fm.ModFreq_Hz = freq * _settings.ModDepth / 100f;
-        fm.ModFreq_Hz = _settings.ModRate;
+        if (freq > 0)
+        {
+            var fm = new FM();
+
+            fm.Carrier_Hz = freq;
+            fm.ModFreq_Hz = freq * _settings.ModDepth / 100f;
+            fm.ModFreq_Hz = _settings.ModRate;
+            _signalManager["Signal"].waveform = fm;
+        }
+        else
+        {
+            _signalManager["Signal"].waveform = new Noise();
+        }
 
         _signalManager.Initialize();
         _signalManager.StartPaused();

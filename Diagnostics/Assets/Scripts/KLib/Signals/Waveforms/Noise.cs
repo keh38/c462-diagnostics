@@ -364,7 +364,6 @@ namespace KLib.Signals.Waveforms
             }
             else
             {
-                //Debug.Log($"{ChannelName}: {_curIndex} {_token[_curIndex]}");
                 for (int k = 0; k < Npts; k++)
                 {
                     data[k] = _token[_curIndex];
@@ -372,7 +371,6 @@ namespace KLib.Signals.Waveforms
                 }
             }
 
-            //            Debug.Log("create(" + _channel.level.Units + "): Ref = " + _ref_dB.ToString("F1") + ", Max = " + _maxLevel.ToString("F1"));
             return new References(_ref_dB, _maxLevel);
         }
     }

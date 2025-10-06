@@ -188,21 +188,5 @@ namespace Audiograms
             }
             return null;
         }
-
-        public static AudiogramData LoadPC(string folder, string file)
-        {
-            string path = Path.Combine(folder, file);
-            if (File.Exists(path))
-            {
-                return FileIO.XmlDeserialize<AudiogramData>(path);
-            }
-            return null;
-        }
-
-        public static AudiogramData LoadFromAsset(string assetName)
-        {
-            return FileIO.XmlDeserializeFromTextAsset<AudiogramData>(assetName);
-        }
-
     }
 }

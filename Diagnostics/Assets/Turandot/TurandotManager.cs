@@ -127,7 +127,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             ApplyParameters();
             Begin();
         }
-
     }
     
     private void ApplyParameters()
@@ -138,16 +137,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         {
             _params.ApplyDefaultWavFolder(GameManager.Project);
 
-            //try
-            {
-                _engine.DestroyObjects();
-                _engine.Initialize(_params);
-            }
-            //catch (Exception ex)
-            //{
-            //    //HandleException(ex.Message, ex.StackTrace, LogType.Exception);
-            //    return;
-            //}
+            _engine.DestroyObjects();
+            _engine.Initialize(_params);
 
             if (_params.screen.ApplyCustomScreenColor)
             {
@@ -884,7 +875,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         }
     }
 
-    
     private void StoreResults()
     {
         var data = File.ReadAllText(_mainDataFile);

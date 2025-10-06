@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 using Audiograms;
@@ -54,14 +55,20 @@ namespace KLib.Signals.Calibration
             if ((refMode == LevelUnits.dB_SL || refMode == LevelUnits.PercentDR) && acal!=null)
             {
                 Audiogram a = null;
-
                 AudiogramData audiograms = null;
-#if FIXME
+
                 if (!string.IsNullOrEmpty(AudiogramFolder))
-                    audiograms = AudiogramData.LoadPC(AudiogramFolder, "agram.xml");
-                else if (File.Exists(DataFileLocations.AudiogramPath))
-                    audiograms = AudiogramData.Load(DataFileLocations.AudiogramPath);
-#endif
+                {
+                    audiograms = AudiogramData.Load(Path.Combine(AudiogramFolder, "agram.xml"));
+                }
+                else if (File.Exists(FileLocations.AudiogramPath))
+                {
+                    audiograms = AudiogramData.Load(FileLocations.AudiogramPath);
+                }
+                else
+                {
+                    throw new Exception("could not find audiogram data");
+                }
 
                 if (audiograms != null)
                 {
@@ -70,20 +77,26 @@ namespace KLib.Signals.Calibration
                 }
                 else
                 {
-                    result = CalibrationData.Create_dBHL(acal);
+                    throw new Exception("no audiogram data");
+                    //result = CalibrationData.Create_dBHL(acal);
                 }
             }
+
             if (result != null && acal != null && refMode != LevelUnits.dB_SPL_noLDL)
             {
+                Audiogram a = null;
                 Audiograms.Audiogram ldl = null;
-
                 AudiogramData LDLs = null;
-                if (!string.IsNullOrEmpty(DefaultFolder))
-                    LDLs = AudiogramData.LoadPC(DefaultFolder, "ldlgram.xml");
-#if FIXME
-                else if (File.Exists(DataFileLocations.LDLPath))
-                    LDLs = AudiogramData.Load(DataFileLocations.LDLPath);
-#endif
+
+                if (!string.IsNullOrEmpty(AudiogramFolder))
+                {
+                    LDLs = AudiogramData.Load(Path.Combine(AudiogramFolder, "ldlgram.xml"));
+                }
+                else if (File.Exists(FileLocations.LDLPath))
+                {
+                    LDLs = AudiogramData.Load(FileLocations.LDLPath);
+                }
+
                 if (LDLs != null)
                 {
                     if (refMode == LevelUnits.PercentDR || refMode == LevelUnits.dB_SPL) LDLs.ReplaceNaNWithMax(transducer);
@@ -95,15 +108,19 @@ namespace KLib.Signals.Calibration
                     result.SetUpperBounds(acal, ldl, maxLevelMargin);
                     if (refMode == LevelUnits.PercentDR)
                     {
-                        Audiograms.Audiogram a = null;
-
                         AudiogramData audiograms = null;
                         if (!string.IsNullOrEmpty(AudiogramFolder))
-                            audiograms = AudiogramData.LoadPC(AudiogramFolder, "agram.xml");
-#if FIXME
-                        else if (File.Exists(DataFileLocations.AudiogramPath))
-                            audiograms = AudiogramData.Load(DataFileLocations.AudiogramPath);
-#endif
+                        {
+                            audiograms = AudiogramData.Load(Path.Combine(AudiogramFolder, "agram.xml"));
+                        }
+                        else if (File.Exists(FileLocations.AudiogramPath))
+                        {
+                            audiograms = AudiogramData.Load(FileLocations.AudiogramPath);
+                        }
+                        else
+                        {
+                            throw new Exception("could not find audiogram data");
+                        }
                         a = audiograms.Get(destination);
                         result.ComputeDynamicRange(a, ldl);
                     }

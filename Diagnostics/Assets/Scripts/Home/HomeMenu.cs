@@ -240,7 +240,7 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
                 break;
 
             case "SetDataRoot":
-                //StartCoroutine(SelectSubjectPanel());
+                StartCoroutine(SelectSubjectPanel());
                 break;
 
             case "SetProject":
