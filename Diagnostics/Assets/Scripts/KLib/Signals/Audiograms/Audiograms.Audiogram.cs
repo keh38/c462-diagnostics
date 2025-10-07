@@ -25,11 +25,9 @@ namespace Audiograms
         public float[] Frequency_Hz;
         public float[] Threshold_dBHL;
         public float[] Threshold_dBSPL;
-        //public float 
+        public SerializeableDictionary<float> StimulusSpecificThresholds = new SerializeableDictionary<float>();
 
-        public Audiogram()
-        {
-        }
+        public Audiogram() { }
 
         public Audiogram(Ear ear)
         {
@@ -40,6 +38,7 @@ namespace Audiograms
         {
             List<float> freq = new List<float>(Frequency_Hz);
             freq.Sort();
+            freq.Remove(0);
 
             this.Frequency_Hz = (float[])freq.ToArray().Clone();
             Threshold_dBHL = new float[Frequency_Hz.Length];
@@ -53,6 +52,12 @@ namespace Audiograms
 
         public void Insert(float Frequency_Hz, float ThresholdSPL)
         {
+            if (Frequency_Hz == 0)
+            {
+                StimulusSpecificThresholds["BBN"] = ThresholdSPL;
+                return;
+            }
+
             float dBHL = ANSI_dBHL.GetTable().SPL_To_HL(Frequency_Hz, ThresholdSPL);
                 
             List<float> freq = new List<float>(this.Frequency_Hz);
@@ -89,7 +94,7 @@ namespace Audiograms
 
             foreach (float fnew in Frequency_Hz)
             {
-                if (freq.Find(f => f==fnew) == 0)
+                if (fnew > 0 && freq.Find(f => f==fnew) == 0)
                 {
                     int idx = freq.FindLastIndex(f => f<fnew);
                     freq.Insert(idx+1, fnew);
@@ -120,11 +125,19 @@ namespace Audiograms
 
         public float GetThreshold(float Freq_Hz)
         {
+            if (Freq_Hz == 0)
+            {
+                return StimulusSpecificThresholds["BBN"];
+            }
             return KMath.Interp1(Frequency_Hz, Threshold_dBSPL, Freq_Hz);
         }
         
         public float GetHL(float Freq_Hz)
         {
+            if (Freq_Hz == 0)
+            {
+                return StimulusSpecificThresholds["BBN"];
+            }
             return KMath.Interp1(Frequency_Hz, Threshold_dBHL, Freq_Hz);
         }
         
@@ -145,10 +158,21 @@ namespace Audiograms
 
         public void Set(float Frequency_Hz, float ThresholdHL, float ThresholdSPL)
         {
+            if (Frequency_Hz == 0)
+            {
+                StimulusSpecificThresholds["BBN"] = ThresholdSPL;
+                return;
+            }
+
             int idx = Array.IndexOf(this.Frequency_Hz, Frequency_Hz);
             Threshold_dBHL[idx] = ThresholdHL;
             Threshold_dBSPL[idx] = ThresholdSPL;
         }
+
+        //public void Set(string stimulusType, float thresholdSPL)
+        //{
+        //    StimulusSpecificThresholds[stimulusType] = thresholdSPL;
+        //}
 
         public bool IsEmpty()
         {

@@ -35,6 +35,11 @@ namespace Audiograms
 
         public float HL_To_SPL(float freq)
         {
+            if (freq == 0)
+            {
+                return 0;
+            }
+
             return KMath.Interp1(Freq_Hz, dBSPL, freq);
 //            int idx = Array.IndexOf(Freq_Hz, freq);
 //            return dBSPL[idx];
@@ -42,6 +47,11 @@ namespace Audiograms
 
         public float SPL_To_HL(float freq, float SPL)
         {
+            if (freq == 0)
+            {
+                return SPL;
+            }
+
             float spl_of_hl_eq_0 = 0;;
             int idx = Array.IndexOf(Freq_Hz, freq);
             if (idx >= 0)

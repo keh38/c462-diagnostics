@@ -16,17 +16,6 @@ public class SubjectMetadata
 
     public SerializeableDictionary<int> runCounter = new SerializeableDictionary<int>();
     public SerializeableDictionary<string> metrics = new SerializeableDictionary<string>();
-    //public Dictionary<string, MetricData> metrics = new Dictionary<string, MetricData>();
-    //public System.Guid lastMsgID;
-
-    //public Laterality laterality;
-
-    //public string project = "";
-
-    //public System.DateTime lastActivity;
-
-    //public System.DateTime lastMessageTime = System.DateTime.MinValue;
-
 
     public SubjectMetadata()
     {

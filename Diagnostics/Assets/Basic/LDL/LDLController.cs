@@ -103,7 +103,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
 
         // Need to delete the existing LDL, otherwise it will be loaded and used to constrain the 
         // max output level, making it impossible ever to exceed the original LDL.
-        if (_settings.Merge && File.Exists(FileLocations.LDLPath))
+        if (File.Exists(FileLocations.LDLPath))
         {
             _data.LDLgram = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
             File.Delete(FileLocations.LDLPath);
@@ -165,7 +165,6 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         {
             StartMeasurement();
         }
-
     }
 
     private void StartMeasurement()
@@ -473,9 +472,16 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         Audiograms.AudiogramData audiograms = Audiograms.AudiogramData.Load();
 
         // 1. Create "LDL Audiogram"
-        if (_settings.Merge && _data.LDLgram != null)
+        if (_data.LDLgram != null)
         {
-            _data.LDLgram.Append(_settings.TestFrequencies);
+            if (_settings.Merge)
+            {
+                _data.LDLgram.Append(_settings.TestFrequencies);
+            }
+            else
+            {
+                _data.LDLgram.Clear(_settings.TestFrequencies);
+            }
         }
         else
         {

@@ -568,49 +568,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 
     void FinishData()
     {
-        Audiograms.AudiogramData audiograms = Audiograms.AudiogramData.Load();
-
-        // 1. Create "LDL Audiogram"
-        if (_settings.Merge && _data.LDLgram != null)
-        {
-            _data.LDLgram.Append(_settings.TestFrequencies);
-        }
-        else
-        {
-            _data.LDLgram = new Audiograms.AudiogramData();
-            if (_settings.LevelUnits == LevelUnits.dB_SL)
-                _data.LDLgram.Initialize(audiograms.Get_Frequency_Hz());
-            else
-                _data.LDLgram.Initialize(_settings.TestFrequencies);
-        }
-
-        foreach (HapticsTestCondition tc in _state.testConditions)
-        {
-            float sum = 0;
-            float n = 0;
-            foreach (float level in tc.discomfortLevel)
-            {
-                if (!float.IsNaN(level))
-                {
-                    sum += level;
-                    ++n;
-                }
-            }
-
-            Audiograms.Ear ear = tc.ear == Laterality.Left ? Audiograms.Ear.Left : Audiograms.Ear.Right;
-            if (_settings.LevelUnits == LevelUnits.dB_SL)
-            {
-                float thresh_SPL = audiograms.Get(ear).GetThreshold(tc.Freq_Hz);
-
-                float LDL_SL = (n > 1) ? (sum / n) : float.NaN;
-                _data.LDLgram.Set(ear, tc.Freq_Hz, LDL_SL, LDL_SL + thresh_SPL);
-            }
-            else
-            {
-                float LDL_SPL = (n > 1) ? (sum / n) : float.NaN;
-                _data.LDLgram.Set(ear, tc.Freq_Hz, float.NaN, LDL_SPL);
-            }
-        }
+        _data.LDLgram = null;
         File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
     }
 

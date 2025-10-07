@@ -7,7 +7,6 @@ using ProtoBuf;
 
 namespace LDL
 {
-    [ProtoContract(ImplicitFields=ImplicitFields.AllPublic)]
     [JsonObject(MemberSerialization.OptOut)]
     public class LoudnessDiscomfortData
     {

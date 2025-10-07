@@ -137,15 +137,22 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         SetReactionTimeLimits();
 
         AudiogramData extantData = AudiogramData.Load();
-        if (_settings.Merge && extantData != null)
-        {
+        if (extantData != null ) {
             _data.audiogramData = extantData;
-            _data.audiogramData.Append(_settings.TestFrequencies);
+            if (_settings.Merge)
+            {
+                _data.audiogramData.Append(_settings.TestFrequencies);
+            }
+            else
+            {
+                _data.audiogramData.Clear(_settings.TestFrequencies);
+            }
         }
         else
         {
             _data.audiogramData.Initialize(_settings.TestFrequencies);
         }
+
         _state = new MeasurementState(_settings.TestFrequencies, _settings.TestEar);
         _progressBar.maxValue = _state.NumStimulusConditions;
         _progressBar.value = 0;
@@ -525,7 +532,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             freq,
             currentTrack.thresholdHL,
             currentTrack.thresholdHL + dBHL_table.HL_To_SPL(freq));
-
+      
         _state.SetCompleted(_currentStimulusCondition, currentTrack.thresholdHL);
         SaveState();
 

@@ -35,11 +35,28 @@ namespace Audiograms
             audiograms.Find(a => a.ear == Ear.Right).Append(Frequency_Hz);
         }
 
+        public void Clear(float[] Frequency_Hz)
+        {
+            audiograms.Find(a => a.ear == Ear.Left).Initialize(Frequency_Hz);
+            audiograms.Find(a => a.ear == Ear.Right).Initialize(Frequency_Hz);
+        }
+
         public void Set(KLib.Signals.Laterality laterality, float Frequency_Hz, float ThresholdHL, float ThresholdSPL)
         {
             var ear = (laterality == Laterality.Left) ? Ear.Left : Ear.Right;
             Set(ear, Frequency_Hz, ThresholdHL, ThresholdSPL);
         }
+
+        //public void Set(KLib.Signals.Laterality laterality, string stimulusType, float ThresholdSPL)
+        //{
+        //    var ear = (laterality == Laterality.Left) ? Ear.Left : Ear.Right;
+        //    Set(ear, stimulusType, ThresholdSPL);
+        //}
+
+        //public void Set(Ear ear, string stimulusType, float ThresholdSPL)
+        //{
+        //    audiograms.Find(a => a.ear == ear).Set(stimulusType, ThresholdSPL);
+        //}
 
         public void Set(Ear ear, float Frequency_Hz, float ThresholdHL, float ThresholdSPL)
         {

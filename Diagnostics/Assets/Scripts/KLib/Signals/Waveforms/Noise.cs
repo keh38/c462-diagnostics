@@ -233,7 +233,9 @@ namespace KLib.Signals.Waveforms
             if (level.Units == LevelUnits.dB_SPL || level.Units == LevelUnits.dB_HL || level.Units == LevelUnits.dB_SL || level.Units == LevelUnits.dB_SPL_noLDL)
             {
                 if (level.Cal == null)
+                {
                     throw new ApplicationException("Null calibration.");
+                }
 
                 int n = Mathf.RoundToInt(tokenLength_s * Fs);
                 float df = Fs / (float)n;

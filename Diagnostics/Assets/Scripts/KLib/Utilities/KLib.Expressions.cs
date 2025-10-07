@@ -207,6 +207,7 @@ namespace KLib
             expression = SubstitutePropVals(expression, propVals);
             expression = SubstituteAudiogram(expression);
             expression = SubstituteLDL(expression);
+            expression = SubstituteDR(expression);
             expression = SubstituteFunctions(expression);
             expression = ExpandRepeats(expression);
             expression = ParenthesizeVectorSpecs(expression);
@@ -387,6 +388,45 @@ namespace KLib
 
                     case "B":
                         metricVal = 0.5f * (LDL.Get(Audiograms.Ear.Right).GetThreshold(freq) + LDL.Get(Audiograms.Ear.Right).GetThreshold(freq));
+                        break;
+                }
+
+                expression = expression.Replace(m.Groups[1].Value, metricVal.ToString());
+
+                m = m.NextMatch();
+            }
+
+            return expression;
+        }
+
+        private string SubstituteDR(string expression)
+        {
+            if (Audiogram ==null || LDL == null) return expression;
+
+            string pattern = @"(DR\(([LlRrBb])\s*,\s*([0-9.]+)\))";
+            Match m = Regex.Match(expression, pattern);
+
+            while (m.Success)
+            {
+                string laterality = m.Groups[2].Value;
+                float freq = float.Parse(m.Groups[3].Value);
+                float metricVal = float.NaN;
+
+                switch (laterality.ToUpper())
+                {
+                    case "L":
+                        metricVal = LDL.Get(Audiograms.Ear.Left).GetThreshold(freq)
+                            -Audiogram.Get(Audiograms.Ear.Left).GetThreshold(freq);
+                        break;
+
+                    case "R":
+                        metricVal = LDL.Get(Audiograms.Ear.Right).GetThreshold(freq)
+                            - Audiogram.Get(Audiograms.Ear.Right).GetThreshold(freq);
+                        break;
+
+                    case "B":
+                        metricVal = 0.5f * (LDL.Get(Audiograms.Ear.Right).GetThreshold(freq) + LDL.Get(Audiograms.Ear.Right).GetThreshold(freq))
+                            - (0.5f * (LDL.Get(Audiograms.Ear.Right).GetThreshold(freq) + LDL.Get(Audiograms.Ear.Right).GetThreshold(freq)));
                         break;
                 }
 
