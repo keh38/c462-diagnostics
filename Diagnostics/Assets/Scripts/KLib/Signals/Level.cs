@@ -241,8 +241,8 @@ namespace KLib.Signals
                 }
                 else
                 {
-                    //Debug.Log("Ref = " + r.refVal.ToString("F1") + ", Max = " + r.maxVal.ToString("F1") +
-                    //          " => Value = " + Value.ToString("F1") + " " + Units);
+                    Debug.Log("Ref = " + r.refVal.ToString("F1") + ", Max = " + r.maxVal.ToString("F1") +
+                              " => Value = " + Value.ToString("F1") + " " + Units);
 
                     if (Units == LevelUnits.PercentDR) Value = tmpValue;
 

@@ -574,25 +574,21 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 
     private void SaveState()
     {
-        FileIO.CreateBinarySerialization(_stateFile);
-        FileIO.SerializeToBinary(_state);
-        FileIO.CloseBinarySerialization();
+        FileIO.JSONSerialize(_state, _stateFile);
     }
 
     private HapticsMeasurementState RestoreState()
     {
         HapticsMeasurementState s = null;
 
-        FileIO.OpenBinarySerialization(_stateFile);
         try
         {
-            s = FileIO.DeserializeFromBinary<HapticsMeasurementState>();
+            s = FileIO.JSONDeserialize<HapticsMeasurementState>(_stateFile);
         }
         catch (System.Exception ex)
         {
             Debug.Log($"Error deserializing LDL state: {ex.Message}");
         }
-        FileIO.CloseBinarySerialization();
 
         return s;
     }

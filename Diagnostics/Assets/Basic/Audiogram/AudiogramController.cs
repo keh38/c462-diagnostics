@@ -17,6 +17,7 @@ using KLib.Signals.Enumerations;
 using KLib.Signals.Waveforms;
 
 using BasicMeasurements;
+using Newtonsoft.Json;
 
 public class AudiogramController : MonoBehaviour, IRemoteControllable
 {
@@ -873,26 +874,26 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
 
     private void SaveState()
     {
-        FileIO.CreateBinarySerialization(_stateFile);
-        FileIO.SerializeToBinary(_state);
-        FileIO.SerializeToBinary(_data);
-        FileIO.CloseBinarySerialization();
+        var state = new { State = _state, Data = _data };
+        FileIO.JSONSerialize(state, _stateFile);
     }
 
     private ProcedureData RestoreState(bool discard)
     {
         ProcedureData d = null;
-        MeasurementState s;
 
-        FileIO.OpenBinarySerialization(_stateFile);
         try
         {
-            s = FileIO.DeserializeFromBinary<MeasurementState>();
-            d = FileIO.DeserializeFromBinary<ProcedureData>();
+            var anonymousTypeDefinition = new { State = _state, Data = _data };
+
+            string jsonString = File.ReadAllText(_stateFile);
+            var result = JsonConvert.DeserializeAnonymousType(jsonString, anonymousTypeDefinition);
+
+            d = result.Data;
 
             if (!discard)
             {
-                _state = s;
+                _state = result.State;
                 _data = d;
             }
         }

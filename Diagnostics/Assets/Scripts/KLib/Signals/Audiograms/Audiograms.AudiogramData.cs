@@ -180,10 +180,7 @@ namespace Audiograms
 
         public static AudiogramData Load()
         {
-            return null;
-#if false
-            return Load(DataFileLocations.AudiogramPath);
-#endif
+            return Load(FileLocations.AudiogramPath);
         }
 
         public float MaxAudibleFrequency(float nominalMax)

@@ -426,7 +426,7 @@ namespace KLib
 
                     case "B":
                         metricVal = 0.5f * (LDL.Get(Audiograms.Ear.Right).GetThreshold(freq) + LDL.Get(Audiograms.Ear.Right).GetThreshold(freq))
-                            - (0.5f * (LDL.Get(Audiograms.Ear.Right).GetThreshold(freq) + LDL.Get(Audiograms.Ear.Right).GetThreshold(freq)));
+                            - (0.5f * (Audiogram.Get(Audiograms.Ear.Right).GetThreshold(freq) + Audiogram.Get(Audiograms.Ear.Right).GetThreshold(freq)));
                         break;
                 }
 
