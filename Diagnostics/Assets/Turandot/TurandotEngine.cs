@@ -500,18 +500,24 @@ public class TurandotEngine : MonoBehaviour
 
     public string GetEventsAsJSON()
     {
-        var names = new StringBuilder(1000);
-        var times = new StringBuilder(1000);
+        string names = "";
+        string times = "";
         foreach (var fe in _params.flowChart)
         {
             var a = _audio.Find(x => x.name.Equals(fe.name));
+
             for (int k=0; k < a.NumEvents; k++)
             {
-                names.Append($"\"{fe.name}\", ");
-                times.Append($"{a.EventTimes[k]:0.000000}, ");
+                if (!string.IsNullOrEmpty(names))
+                {
+                    names += ", ";
+                    times += ", ";
+                }
+                names += $"\"{fe.name}\"";
+                times += $"{a.EventTimes[k]:0.000000}";
             }
         }
-        return names.Length > 0 ? $"\"Events\" : {{\"name\" : [{names.ToString()}], \"time\" : [{times.ToString()}]}}" : "";
+        return names.Length > 0 ? $"\"Events\" : {{\"name\" : [{names}], \"time\" : [{times}]}}" : "";
     }
 
     public void WriteAudioLogFile(string path)

@@ -100,6 +100,10 @@ namespace Turandot.Scripts
             {
                 StartCoroutine(DelayCue());
             }
+            else
+            {
+                ShowButton(_buttonAction.BeginVisible);
+            }
         }
 
         public override void Deactivate()

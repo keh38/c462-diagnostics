@@ -4,10 +4,14 @@
 #### Added
 - Protocol page
 - Basic measurement page
+  - added LDL with haptics
+  - audiogram/LDL use broadband noise when frequency = 0
 - Turandot:
   - text box
+  - restored button flashing
   - ability to show state or instructions from editor
   - restored modified script functionality
+  - data files now proper JSON format
 - Admin:
   - sync resources
   - update app

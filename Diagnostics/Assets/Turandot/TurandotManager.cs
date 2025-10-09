@@ -541,7 +541,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         string json = KLib.FileIO.JSONStringAdd("", "info", KLib.FileIO.JSONSerializeToString(header));
         json = KLib.FileIO.JSONStringAdd(json, "params", KLib.FileIO.JSONSerializeToString(_params));
-        json += Environment.NewLine;
+        json = KLib.FileIO.JSONStringAdd(json, "data", $"[{Environment.NewLine}]");
+        //json += Environment.NewLine;
 
         File.WriteAllText(_mainDataFile, json);
 
@@ -639,7 +640,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         _data.reactionTime = _engine.ReactionTime;
         _data.properties.AddRange(_params.GetPostTrialProperties(_data.properties));
 
-        File.AppendAllText(_mainDataFile, _data.ToJSONString(_engine.GetEventsAsJSON()));
+        //File.AppendAllText(_mainDataFile, _data.ToJSONString(_engine.GetEventsAsJSON()));
+        AppendDataToMainFile(_mainDataFile, _data.ToJSONString(_engine.GetEventsAsJSON()));
 
         HTS_Server.SendMessage("Turandot", "State:Finished");
 
@@ -677,7 +679,20 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             }
         }
     }
-      
+
+    void AppendDataToMainFile(string dataPath, string jsonString)
+    {
+        var text = File.ReadAllText(dataPath);
+        // file ends '}cf/lf]cf/lf}'
+        text = text.Substring(0, text.Length - 6);
+        if (text.EndsWith("}"))
+        {
+            text += ",";
+        }
+        text += Environment.NewLine + jsonString + $"]" + Environment.NewLine + "}";
+        File.WriteAllText(dataPath, text);
+    }
+
     void AdvanceAdaptation()
     {
         SCLElement sc = _params.adapt.InitTrial();
