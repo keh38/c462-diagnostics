@@ -330,10 +330,13 @@ namespace KLib
 
         private string SubstituteAudiogram(string expression)
         {
-            if (Audiogram == null) return expression;
-
             string pattern = @"(THR\(([LlRrBb])\s*,\s*([0-9.]+)\))";
             Match m = Regex.Match(expression, pattern);
+
+            if (m.Success && Audiogram == null)
+            {
+                throw new Exception($"Cannot evaluate '{m.Groups[0]}': no audiogram specified");
+            }
 
             while (m.Success)
             {
@@ -365,10 +368,13 @@ namespace KLib
 
         private string SubstituteLDL(string expression)
         {
-            if (LDL == null) return expression;
-
             string pattern = @"(LDL\(([LlRrBb])\s*,\s*([0-9.]+)\))";
             Match m = Regex.Match(expression, pattern);
+
+            if (m.Success && Audiogram == null)
+            {
+                throw new Exception($"Cannot evaluate '{m.Groups[0]}': no LDLs specified");
+            }
 
             while (m.Success)
             {
@@ -405,6 +411,18 @@ namespace KLib
 
             string pattern = @"(DR\(([LlRrBb])\s*,\s*([0-9.]+)\))";
             Match m = Regex.Match(expression, pattern);
+
+            if (m.Success)
+            {
+                if (Audiogram == null)
+                {
+                    throw new Exception($"Cannot evaluate '{m.Groups[0]}': no audiogram specified");
+                }
+                if (LDL == null)
+                {
+                    throw new Exception($"Cannot evaluate '{m.Groups[0]}': no LDLs specified");
+                }
+            }
 
             while (m.Success)
             {
