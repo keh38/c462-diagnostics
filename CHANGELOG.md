@@ -1,6 +1,6 @@
 ## Changelog
 
-### v1.5 (unreleased)
+### v1.5 (2025-10-14)
 #### Added
 - Protocol page
 - Basic measurement page
