@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using Newtonsoft.Json;
+using JimmysUnityUtilities;
 
 namespace Protocols
 {
@@ -58,8 +59,8 @@ namespace Protocols
             bool matches = true;
             for (int k=0; k<protocol.Tests.Count; k++)
             {
-                var testParts = protocol.Tests[k].Settings.Split(':', 2);
-                var historyParts = Data[k].Settings.Split(':', 2);
+                var testParts = protocol.Tests[k].Settings.Split(new char[] { ':' }, 2);
+                var historyParts = Data[k].Settings.Split(new char[] { ':' }, 2);
 
                 if (protocol.Tests[k].Scene != Data[k].Scene || testParts[0] != historyParts[0])
                 {

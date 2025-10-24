@@ -61,6 +61,12 @@ public class HardwareInterface : MonoBehaviour
     public static void CleanUp() => instance._CleanUp();
     #endregion
 
+    private void OnApplicationQuit()
+    {
+        Debug.Log("OnApplicationQuit");
+        _CleanUp();
+    }
+
     #region PRIVATE METHODS
 
     private bool _Init()
@@ -149,7 +155,6 @@ public class HardwareInterface : MonoBehaviour
         _digitimer.CleanUp();
         _ledController.CleanUp();
     }
-
 
 #endregion
 }

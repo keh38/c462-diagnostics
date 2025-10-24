@@ -1,5 +1,11 @@
 ## Changelog
 
+### unreleased
+#### Changed
+- restore volume setting when app is X'ed out
+
+---
+
 ### v1.5 (2025-10-14)
 #### Added
 - Protocol page
