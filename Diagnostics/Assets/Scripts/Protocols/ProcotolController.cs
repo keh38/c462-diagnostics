@@ -236,12 +236,20 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
         DrawOutline(_history.Data.Count, -1);
     }
 
+    private void RpcAbort()
+    {
+        _outline.gameObject.SetActive(false);
+    }
+
     void IRemoteControllable.ProcessRPC(string command, string data)
     {
         var parts = data.Split(':');
 
         switch (command)
         {
+            case "Abort":
+                RpcAbort();
+                break;
             case "SetProtocol":
                 RpcSetProtocol(data);
                 break;
