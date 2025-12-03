@@ -231,11 +231,11 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             HTS_Server.SendMessage("Turandot", "Status:Resuming previous");
 
             _state.RestoreProgress();
+            // **must** be a new file name, because previous sync logs, .edf's, .bdf's etc must stand as is
+            _state.SetDataFile(_mainDataFile); 
             _state.Save();
 
             _blockNum = _state.LastBlockCompleted + 1;
-            _mainDataFile = _state.DataFile;
-            _fileStem = _mainDataFile.Remove(_mainDataFile.Length - 5); // remove .json
             HTS_Server.SendMessage("Turandot", $"Progress:{Mathf.RoundToInt(_state.Progress * 100)}");
 
             _params.Initialize();
