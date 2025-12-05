@@ -15,9 +15,7 @@ namespace Turandot.Cues
         public float angle = 0f;
         public string label = "";
 
-        public FixationPointAction()
-        {
-        }
+        public FixationPointAction() { }
 
         [XmlIgnore]
         [ProtoIgnore]

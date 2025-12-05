@@ -12,9 +12,7 @@ namespace Turandot.Cues
     [JsonObject(MemberSerialization.OptOut)]
     public class ProgressBarAction : Cue
     {
-        public ProgressBarAction()
-        {
-        }
+        public ProgressBarAction() { }
 
         [XmlIgnore]
         [ProtoIgnore]

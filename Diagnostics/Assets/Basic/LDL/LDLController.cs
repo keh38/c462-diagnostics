@@ -214,7 +214,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         else
         {
             Debug.Log("LDL: Starting new measurement");
-            HTS_Server.SendMessage(_mySceneName, "Status:Staring new measurement");
+            HTS_Server.SendMessage(_mySceneName, "Status:Starting new measurement");
 
             File.Delete(_stateFile);
             StartMeasurement();

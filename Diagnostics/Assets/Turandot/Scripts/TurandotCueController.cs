@@ -13,6 +13,7 @@ namespace Turandot.Scripts
         [SerializeField] private GameObject _fixationPrefab;
         [SerializeField] private GameObject _imagePrefab;
         [SerializeField] private GameObject _messagePrefab;
+        [SerializeField] private GameObject _progressBarPrefab;
         [SerializeField] private GameObject _textBoxPrefab;
         [SerializeField] private GameObject _videoPrefab;
 
@@ -53,6 +54,14 @@ namespace Turandot.Scripts
                     _controls.Add(c);
                     gobj.SetActive(false);
                 }
+                else if (layout is ProgressBarLayout)
+                {
+                    var gobj = GameObject.Instantiate(_progressBarPrefab, canvasRT);
+                    var c = gobj.GetComponent<TurandotProgressBar>();
+                    c.Initialize(layout as ProgressBarLayout);
+                    _controls.Add(c);
+                    gobj.SetActive(false);
+                }
                 else if (layout is TextBoxLayout)
                 {
                     var gobj = GameObject.Instantiate(_textBoxPrefab, canvasRT);
@@ -70,6 +79,11 @@ namespace Turandot.Scripts
                     gobj.SetActive(false);
                 }
             }
+        }
+
+        public TurandotProgressBar FindProgressBar()
+        {
+            return _controls.Find(x => x is TurandotProgressBar) as TurandotProgressBar;
         }
 
         public void ClearScreen()

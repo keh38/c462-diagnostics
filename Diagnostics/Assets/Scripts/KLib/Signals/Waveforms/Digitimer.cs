@@ -155,7 +155,8 @@ namespace KLib.Signals.Waveforms
         {
             var items = new List<string>()
             {
-                "PulseRate_Hz"
+                "Width",
+                "PulseWidth_us"
             };
 
             if (Source == DemandSource.Internal)
@@ -176,6 +177,9 @@ namespace KLib.Signals.Waveforms
                     break;
                 case "Demand_mA":
                     setter = x => this.Demand = x;
+                    break;
+                case "PulseWidth_us":
+                    setter = x => this.Width = x;
                     break;
             }
 

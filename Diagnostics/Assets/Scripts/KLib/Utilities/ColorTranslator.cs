@@ -16,11 +16,21 @@ namespace KLib
             return System.Drawing.Color.FromArgb(ColorInt(unityColor));
         }
 
+        public static int ColorInt(int r, int g, int b, int a)
+        {
+            int val = (b);
+            val += (g << 8);
+            val += (r << 16);
+            val += (a << 24);
+
+            return val;
+        }
+
         public static int ColorInt(float r, float g, float b, float a)
         {
             int val = ((int)(b * 255));
             val += ((int)(g * 255) << 8);
-            val += ((int)(b * 255) << 16);
+            val += ((int)(r * 255) << 16);
             val += ((int)(a * 255) << 24);
 
             return val;

@@ -12,7 +12,7 @@ using System.Text;
 using KLib.Signals.Waveforms;
 using Turandot;
 using Turandot.Schedules;
-using Turandot.Screen;
+using Turandot.Scripts;
 using UnityEngine.Video;
 using KLib;
 using NUnit.Framework;
@@ -27,12 +27,14 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     [SerializeField] private Text _finishText;
     [SerializeField] private GameObject _finishPanel;
     [SerializeField] private GameObject _quitPanel;
+    [SerializeField] private QuestionBox _questionBox;
 
     Parameters _params = new Parameters();
 
     TurandotState _state = null;
-    List<SCLElement> _SCL = new List<SCLElement>();
     TrialData _data = new TrialData();
+
+    TurandotProgressBar _progressBar;
 
     string _fileStem = "";
     string _mainDataFile = "";
@@ -50,7 +52,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     int _numSinceLastBreak;
 
     float _progressBarStep = 1f;
-    float _progress = 0;
 
     bool _runAborted = false;
 
@@ -139,6 +140,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
             _engine.DestroyObjects();
             _engine.Initialize(_params);
+            _progressBar = _engine.FindProgressBar();
+            _progressBar = _engine.FindProgressBar();
 
             if (_params.screen.ApplyCustomScreenColor)
             {
@@ -196,12 +199,22 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
     private void Begin()
     {
-        //if (_state.IsRunInProgress())
-        //{
-        ////    StartCoroutine(AskToResume());
-        //}
+        if (_state.IsRunInProgress())
+        {
+            if (_isRemote)
+            {
+                OnQuestionResponse(true);
+            }
+            else 
+            { 
+                Debug.Log("Turandot: Previous state exists. Asking whether to resume");
+                HTS_Server.SendMessage("Turandot", "Status:Asking to resume");
 
-        if (!string.IsNullOrEmpty(_params.instructions.Text))
+                _questionBox.gameObject.SetActive(true);
+                _questionBox.PoseQuestion("Continue previous session?", OnQuestionResponse);
+            }
+        }
+        else if (!string.IsNullOrEmpty(_params.instructions.Text))
         {
             StartCoroutine(ShowInstructions());
         }
@@ -209,6 +222,58 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         {
             _titleBar.SetActive(false);
             StartRun();
+        }
+    }
+
+    private void OnQuestionResponse(bool yes)
+    {
+        _questionBox.gameObject.SetActive(false);
+
+        if (yes)
+        {
+            Debug.Log("Turandot: Resuming previous");
+            HTS_Server.SendMessage("Turandot", "Status:Resuming previous");
+
+            _state.RestoreProgress();
+            // **must** be a new file name, because previous sync logs, .edf's, .bdf's etc must stand as is
+            _state.SetDataFile(_mainDataFile); 
+            _state.Save();
+
+            _blockNum = _state.LastBlockCompleted + 1;
+            HTS_Server.SendMessage("Turandot", $"Progress:{Mathf.RoundToInt(_state.Progress * 100)}");
+
+            _params.Initialize();
+
+            int blockLength = _state.MasterSCL.FindAll(o => o.block == _blockNum + 1).Count;
+            _progressBarStep = 1f / (_params.schedule.numBlocks * blockLength);
+
+            if (_params.schedule.mode == Mode.Sequence || _params.schedule.mode == Mode.CS)
+            {
+                _engine.FlowchartFinished = OnFlowchartFinished;
+                AdvanceSequence();
+            }
+            else // Adaptation
+            {
+                //_engine.OnFinished = OnAdaptFlowchartFinished;
+                //_params.adapt.Initialize();
+                //InitializeProgressBar(_params.adapt.MaxNumberOfBlocks);
+                //NextBlockOfTracks();
+            }
+        }
+        else
+        {
+            Debug.Log("Turandot: Starting new measurement");
+            HTS_Server.SendMessage("Turandot", "Status:Starting new measurement");
+
+            if (!string.IsNullOrEmpty(_params.instructions.Text))
+            {
+                StartCoroutine(ShowInstructions());
+            }
+            else
+            {
+                _titleBar.SetActive(false);
+                StartRun();
+            }
         }
     }
 
@@ -267,60 +332,10 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         diagnosticsUI.SetHelpBalloonAlpha(0.85f);
         diagnosticsUI.ShowInstructions(new List<string>() { instructions }, EndBreak, "resume");
     }
-
-    IEnumerator AskToResume()
-    {
-        yield return StartCoroutine(diagnosticsUI.AskYesNoQuestion("Continue previous work?"));
-        if (diagnosticsUI.YesNoResult)
-        {
-            ResumeRun();
-        }
-        else if (_params.instructions.pages.Count > 0)
-        {
-            StartCoroutine(ShowInstructions());
-        }
-        else
-        {
-            StartRun();
-        }
-    }
-
-    void ResumeRun()
-    {
-        _state.RestoreProgress();
-        _state.CanResume = false;
-        _state.Save();
-
-        _blockNum = _state.LastBlockCompleted + 1;
-        _mainDataFile = _state.DataFile;
-        _fileStem = _mainDataFile.Remove(_mainDataFile.Length - 5); // remove .json
-
-        _params.Initialize();
-        diagnosticsUI.transform.position = new Vector2(-2200, 0);
-
-        if (_params.schedule.mode == Mode.Sequence || _params.schedule.mode == Mode.CS)
-        {
-//            _results.Clear();
-            _engine.OnFinished = OnFlowchartFinished;
-            StartCoroutine(NextBlock());
-        }
-        else // Adaptation
-        {
-            _engine.OnFinished = OnAdaptFlowchartFinished;
-            _params.adapt.Initialize();
-            InitializeProgressBar(_params.adapt.MaxNumberOfBlocks);
-            NextBlockOfTracks();
-        }
-        NextBlock();
-    }
     */
+
     void StartRun()
     {
-        //if (IPC.Instance.Use && !_params.bypassIPC && _params.instructions.pages.Count > 0) IPC.Instance.SendCommand("Instructions", "finished");
-
-        //if (_params.flowChart.Count == 0) 
-        //    Return();
-        //else
         StartCoroutine(StartRunAsync());
     }
 
@@ -333,6 +348,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         _resultsByStimulus.Clear();
 
         _state.SetMasterSCL(_params.schedule.CreateStimConList());
+        _state.Save();
+
         string localName = Path.Combine(Application.persistentDataPath, "scldump.json");
         File.WriteAllText(localName, KLib.FileIO.JSONSerializeToString(_state.MasterSCL));
 
@@ -356,7 +373,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     public void InitializeProgressBar(int numSteps)
     {
         _progressBarStep = 1f / numSteps;
-        _progress = 0;
+        _state.Progress = 0;
     }
     
     IEnumerator NextBlock()
@@ -383,13 +400,13 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         if (_blockNum < _params.schedule.numBlocks)
         {
-            _SCL = _state.MasterSCL.FindAll(o => o.block == _blockNum + 1);
+            _state.CurrentBlockSCL = _state.MasterSCL.FindAll(o => o.block == _blockNum + 1);
             string localName = Path.Combine(Application.persistentDataPath, "scldump.json");
-            File.WriteAllText(localName, KLib.FileIO.JSONSerializeToString(_SCL));
+            File.WriteAllText(localName, KLib.FileIO.JSONSerializeToString(_state.CurrentBlockSCL));
 
             if (_blockNum == 0)
             {
-                InitializeProgressBar(_params.schedule.numBlocks * _SCL.Count);
+                InitializeProgressBar(_params.schedule.numBlocks * _state.CurrentBlockSCL.Count);
             }
 
             _isRunning = true;
@@ -424,7 +441,10 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         //if (SubjectManager.Instance.UploadData) DataFileManager.UploadDataFile(_mainDataFile);
         //SubjectManager.Instance.DataFiles.Add(_mainDataFile);
 
-        _state.Finish();
+        if (!abort)
+        {
+            _state.Finish();
+        }
 
         bool finished = true;
         if (finished && !_isRemote)
@@ -576,8 +596,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
     void AdvanceSequence()
     {
-        _data.NewTrial(_blockNum+1, _SCL[0].trial, _SCL[0].group);
-        _data.type = _SCL[0].trialType;
+        _data.NewTrial(_blockNum+1, _state.CurrentBlockSCL[0].trial, _state.CurrentBlockSCL[0].group);
+        _data.type = _state.CurrentBlockSCL[0].trialType;
 
         foreach (FlowElement fe in _params.flowChart)
         {
@@ -589,7 +609,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         stringBuilder.AppendLine($"Block = {_data.block}");
         stringBuilder.AppendLine($"Trial = {_data.trial}");
         stringBuilder.AppendLine("----------------------");
-        foreach (PropValPair pv in _SCL[0].propValPairs)
+        foreach (PropValPair pv in _state.CurrentBlockSCL[0].propValPairs)
         {
             stringBuilder.AppendLine($"{pv.property}={pv.value}");
             _data.properties.Add($"{pv.property}={pv.value}");
@@ -614,9 +634,9 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             HTS_Server.SendMessage("Turandot", $"Trial:{stringBuilder.ToString()}");
 
 #if !KDEBUG
-            StartCoroutine(_engine.ExecuteFlowchart(_SCL[0].trialType, _params.flags, logPath));
+            StartCoroutine(_engine.ExecuteFlowchart(_state.CurrentBlockSCL[0].trialType, _params.flags, logPath));
 #else
-            StartCoroutine(_engine.SimulateFlowchart(_SCL[0].trialType, _params.flags, logPath, "Go"));
+            StartCoroutine(_engine.SimulateFlowchart(_state.CurrentBlockSCL[0].trialType, _params.flags, logPath, "Go"));
 #endif
         }
     }
@@ -634,7 +654,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             _results.Add(_engine.Result);
         }
 
-        _resultsByStimulus.Add(_SCL[0].group, _SCL[0].ix, _SCL[0].iy, _engine.Result);
+        _resultsByStimulus.Add(_state.CurrentBlockSCL[0].group, _state.CurrentBlockSCL[0].ix, _state.CurrentBlockSCL[0].iy, _engine.Result);
 
         _data.result = _engine.Result;
         _data.reactionTime = _engine.ReactionTime;
@@ -651,12 +671,15 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             return;
         }
 
-        _SCL.RemoveAt(0);
+        _state.CurrentBlockSCL.RemoveAt(0);
+        _state.CanResume = true;
+        _state.Progress += _progressBarStep;
+        _state.Save();
 
-        _progress += _progressBarStep;
-        HTS_Server.SendMessage("Turandot", $"Progress:{Mathf.RoundToInt(_progress * 100)}");
+        _progressBar?.SetValue(_state.Progress);
+        HTS_Server.SendMessage("Turandot", $"Progress:{Mathf.RoundToInt(_state.Progress * 100)}");
 
-        if (_SCL.Count > 0)
+        if (_state.CurrentBlockSCL.Count > 0)
         {
             AdvanceSequence();
         }
@@ -752,8 +775,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         if (_params.adapt.IsBlockFinished)
         {
-            _progress += _progressBarStep;
-            HTS_Server.SendMessage("Turandot", $"Progress:{Mathf.RoundToInt(_progress * 100)}");
+            _state.Progress += _progressBarStep;
+            HTS_Server.SendMessage("Turandot", $"Progress:{Mathf.RoundToInt(_state.Progress * 100)}");
 
             string json = "";
             foreach (AdaptiveTrack at in _params.adapt.tracks)
@@ -992,8 +1015,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     {
         _params = KLib.FileIO.XmlDeserializeFromString<Parameters>(xml);
         _paramFile = "remote";
-        _state = new TurandotState(GameManager.Project, GameManager.Subject, "remote");
-        _state.Save();
+        _state = new TurandotState(GameManager.Project, GameManager.Subject, _params.tag);
 
         ApplyParameters();
     }
@@ -1030,6 +1052,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         }
         else
         {
+            _questionBox.gameObject.SetActive(false);
+
             _engine.Abort();
             EndRun(abort: true);
         }

@@ -1,9 +1,8 @@
-﻿using UnityEngine;
-#if UNITY_METRO && !UNITY_EDITOR
-using LegacySystem.IO;
-#else
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
-#endif
+
+using UnityEngine;
 
 using Turandot.Schedules;
 
@@ -17,6 +16,8 @@ public class TurandotState
     public bool Finished = false;
     public StimConList MasterSCL = null;
     public bool CanResume = false;
+    public float Progress = 0;
+    public List<SCLElement> CurrentBlockSCL = null;
 
     public TurandotState() { }
 
@@ -35,7 +36,13 @@ public class TurandotState
         if (File.Exists(StateFile))
         {
             TurandotState savedState = KLib.FileIO.JSONDeserialize<TurandotState>(StateFile);
-            result = savedState.Project == Project && savedState.Subject == Subject && savedState.ConfigFile == ConfigFile && !savedState.Finished && savedState.CanResume;
+            Debug.Log(savedState.ToString());
+
+            result = savedState.Project == Project && 
+                savedState.Subject == Subject && 
+                savedState.ConfigFile == ConfigFile && 
+                !savedState.Finished && 
+                savedState.CanResume;
         }
 
         return result;
@@ -47,6 +54,10 @@ public class TurandotState
         DataFile = savedState.DataFile;
         LastBlockCompleted = savedState.LastBlockCompleted;
         MasterSCL = savedState.MasterSCL;
+        CurrentBlockSCL = savedState.CurrentBlockSCL;
+        Progress = savedState.Progress;
+        Finished = savedState.Finished;
+        CanResume = savedState.CanResume;
     }
 
     public void SetMasterSCL(StimConList scl)
@@ -58,7 +69,7 @@ public class TurandotState
     public void SetDataFile(string name)
     {
         DataFile = name;
-        Save();
+        //Save();
     }
 
     public void SetLastBlock(int block)
@@ -83,4 +94,14 @@ public class TurandotState
         get { return Path.Combine(Application.persistentDataPath, "TurandotState.json"); }
     }
 
+    public override string ToString()
+    {
+        string result = $"{Project}/{Subject}{Environment.NewLine}" +
+            $"Config file = {ConfigFile}{Environment.NewLine}" +
+            $"Data path = {DataFile}{Environment.NewLine}" +
+            $"Last block = {LastBlockCompleted}{Environment.NewLine}" +
+            $"Finished = {Finished}{Environment.NewLine}" +
+            $"Can resume = {CanResume}{Environment.NewLine}";
+        return result;
+    }
 }

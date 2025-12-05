@@ -83,6 +83,11 @@ public class TurandotEngine : MonoBehaviour
         _cueController.Initialize(_params.screen.Cues);
     }
 
+    public TurandotProgressBar FindProgressBar()
+    {
+        return _cueController.FindProgressBar();
+    }
+
     void CreateAudioPlayers()
     {
         foreach (TurandotAudio a in _audio)

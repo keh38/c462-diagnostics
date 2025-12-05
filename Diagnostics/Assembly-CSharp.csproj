@@ -67,6 +67,7 @@
     <Compile Include="Assets\Turandot\Data\Turandot.HistoryEvent.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.TickSpex.cs" />
     <Compile Include="Assets\Turandot\Screen\Cues\Turandot.Screen.ImageLayout.cs" />
+    <Compile Include="Assets\Turandot\Scripts\TurandotProgressBar.cs" />
     <Compile Include="Assets\Scripts\Remote\IntercomReceiver.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\StyleControl.cs" />
     <Compile Include="Assets\Basic\LDL\LDL.State.cs" />
@@ -207,6 +208,7 @@
     <Compile Include="Assets\Calibration\CalibrationController.cs" />
     <Compile Include="Assets\Scripts\Admin Tools\AdminToolsMenu.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotCueMessage.cs" />
+    <Compile Include="Assets\Turandot\Screen\Cues\Turandot.Screen.ProgressBarLayout.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\UserFileReferences.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptHistory.cs" />
     <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.ManikinLayout.cs" />

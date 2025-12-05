@@ -1,5 +1,14 @@
 ## Changelog
 
+### v1.6 (unreleased)
+#### Changed
+- restore volume setting when app is X'ed out
+#### Added
+- Turandot: ability to resume last measurement
+- Turandot: progress bar
+
+---
+
 ### v1.5 (2025-10-14)
 #### Added
 - Protocol page

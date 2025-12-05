@@ -14,6 +14,7 @@ namespace Turandot.Cues
     [XmlInclude(typeof(FixationPointAction))]
     [XmlInclude(typeof(ImageAction))]
     [XmlInclude(typeof(Message))]
+    [XmlInclude(typeof(ProgressBarAction))]
     [XmlInclude(typeof(TextBoxAction))]
     [XmlInclude(typeof(VideoAction))]
     public class Cue

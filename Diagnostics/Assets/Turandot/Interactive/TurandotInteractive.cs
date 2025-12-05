@@ -203,7 +203,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
             slider.Setter = _sigMan.GetParamSetter(prop.FullParameterName);
             slider.Setter?.Invoke(prop.StartValue);
 
-            if (prop.Property.Contains("Digitimer.Demand"))
+            if (prop.Property.Contains("Digitimer.Demand") || prop.Property.Contains("Digitimer.PulseWidth"))
             {
                 slider.Setter += x => this.UpdateDigitimer(x);
             }
@@ -268,7 +268,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
             _sliders.Find(x => x.FullParameterName.Equals(parts[0]))?.SetValue(value);
 
-            if (param.StartsWith("Digitimer.Demand"))
+            if (param.StartsWith("Digitimer.Demand") || param.StartsWith("Digitimer.PulseWidth"))
             {
                 HardwareInterface.Digitimer?.EnableDevices(_sigMan.GetDigitimerChannels());
             }
