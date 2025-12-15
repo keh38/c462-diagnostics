@@ -1,11 +1,12 @@
 ## Changelog
 
-### v1.6 (unreleased)
+### v1.6 (2025-12-15)
 #### Changed
 - restore volume setting when app is X'ed out
 #### Added
 - Turandot: ability to resume last measurement
 - Turandot: progress bar
+- Interactive: Digitimer pulse width control
 
 ---
 

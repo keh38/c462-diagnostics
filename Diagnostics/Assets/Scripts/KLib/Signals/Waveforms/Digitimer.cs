@@ -155,7 +155,6 @@ namespace KLib.Signals.Waveforms
         {
             var items = new List<string>()
             {
-                "Width",
                 "PulseWidth_us"
             };
 
