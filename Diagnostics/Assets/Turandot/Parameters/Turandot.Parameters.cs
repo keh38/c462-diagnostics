@@ -137,17 +137,6 @@ namespace Turandot
 
         public void Initialize()
         {
-            foreach (var fe in flowChart.FindAll(x => x.isAction && !string.IsNullOrEmpty(x.actionFamily)))
-            {
-                var fam = schedule.families.Find(x => x.name == fe.actionFamily);
-                if (fam == null)
-                    throw new System.Exception("Action '" + fe.name + "': Action family '" + fe.actionFamily + "' not found");
-
-                fe.InitializeSCL(fam, schedule.numBlocks);
-                fe.AdvanceSequence();
-                schedule.families.Remove(fam);
-            }
-
             if (schedule.families.Count == 0)
             {
                 //schedule.numBlocks = 1;

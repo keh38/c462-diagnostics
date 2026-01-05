@@ -24,8 +24,8 @@ namespace Turandot
         public List<Termination> term = new List<Termination>();
         public string ipcCommand = "";
         public EndAction endAction = EndAction.None;
-        public string actionFamily = "";
         public bool hideCursor = false;
+        public TurandotAction action = null;
 
         private float _delay;
         private float _isi;
@@ -127,7 +127,7 @@ namespace Turandot
 
         public bool HasSequence
         {
-            get { return isAction && !string.IsNullOrEmpty(actionFamily) && _scl != null && _scl.Count > 0; }
+            get { return isAction && _scl != null && _scl.Count > 0; }
         }
 
         public void InitializeSCL(Family fam, int numBlocks)

@@ -10,6 +10,7 @@ using Turandot;
 using Turandot.Schedules;
 using Turandot.Screen;
 using Turandot.Scripts;
+using System.Xml;
 
 public class TurandotEngine : MonoBehaviour
 {
@@ -243,40 +244,20 @@ public class TurandotEngine : MonoBehaviour
         FlowElement actionState = _params.flowChart.Find(fe => fe.name == name);
         _cueController.Activate(actionState.cues);
 
-        var a = _audio.Find(o => o.name == actionState.name);
-        _inputMonitor.Activate(actionState.inputs, a, 0);
+        var targetAudio = _audio.Find(fe => fe.name == actionState.action.State); 
+        if (targetAudio != null)
+        {
+            actionState.action.ApplyAction(targetAudio.SigMan);
+        }
 
-        _audio.Find(x => x.name == _currentFlowElement.name).PauseAudio(true);
-        a.Activate(a.SigMan.GetMaxInterval(1) / 1000f, null, start: true);
+        //var a = _audio.Find(o => o.name == actionState.name);
+        //_inputMonitor.Activate(actionState.inputs, a, 0);
+
+        //_audio.Find(x => x.name == _currentFlowElement.name).PauseAudio(true);
+        //a.Activate(a.SigMan.GetMaxInterval(1) / 1000f, null, start: true);
         _log.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, HistoryEvent.StartAction, name);
         //_log.Add(Time.realtimeSinceStartup, HistoryEvent.StartAction, name);
-    }
-
-    private void EndActionAudio(string name)
-    {
-        _audio.Find(x => x.name == _currentFlowElement.name).PauseAudio(false);
-        _log.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, HistoryEvent.EndAction, name);
-
         _actionInProgress = false;
-
-        var actionState = _params.flowChart.Find(fe => fe.name == name);
-        if (actionState.HasSequence)
-        {
-            if (actionState.AdvanceSequence())
-            {
-                var a = _audio.Find(o => o.name == actionState.name);
-                a.Reset();
-            }
-            else
-            {
-                OnStateTimeout(_currentFlowElement.name);
-            }
-        }
-        else
-        {
-            var a = _audio.Find(o => o.name == actionState.name);
-            a.Reset();
-        }
     }
 
     public void Abort()
@@ -486,11 +467,6 @@ public class TurandotEngine : MonoBehaviour
         if (!string.IsNullOrEmpty(inputJson))
         {
             json = KLib.FileIO.JSONStringAdd(json, "inputs", inputJson);
-        }
-
-        foreach (var fe in _params.flowChart.FindAll(x => x.HasSequence))
-        {
-            json = KLib.FileIO.JSONStringAdd(json, fe.name, fe.ActionSequenceJSONString);
         }
 
         foreach (var fe in _params.flowChart)
