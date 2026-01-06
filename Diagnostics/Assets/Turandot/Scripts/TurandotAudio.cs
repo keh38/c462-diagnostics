@@ -117,16 +117,12 @@ namespace Turandot.Scripts
 
         public void Activate(float timeOut, List<Turandot.Flag> flags, bool start)
         {
-            //Reset();
-
             _timeOut = timeOut;
             _startTime = Time.timeSinceLevelLoad;
             _killAudio = false;
 
             if (_sigMan != null)
             {
-                //_sigMan.Activate(flags);
-
                 if (timeOut == 0)
                 {
                     _timeOut = _sigMan.GetMinTime(1f);
@@ -143,6 +139,7 @@ namespace Turandot.Scripts
                 _sigMan.ResetSweepables();
                 if (start)
                 {
+                    Debug.Log($"test level = {_sigMan["Test"].level.Value}");
                     _sigMan.Unpause();
                 }
                 _isRunning = true;

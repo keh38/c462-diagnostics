@@ -147,6 +147,7 @@ namespace KLib.Signals
 
         public void ResetSweepables()
         {
+            Debug.Log($"level = {Value}");
             _lastAtten = float.NaN;
             if (Units == LevelUnits.mA)
             {
