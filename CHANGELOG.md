@@ -1,5 +1,12 @@
 ## Changelog
 
+### v1.7 (unreleased)
+#### Added
+- Protocol: "Investigator" scene option to display prompt/instructions to investigator before proceeding
+- Turandot: reformulated "action" to allow setting stimulus properties in another state
+
+---
+
 ### v1.6 (2025-12-15)
 #### Changed
 - restore volume setting when app is X'ed out

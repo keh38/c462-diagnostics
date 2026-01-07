@@ -59,13 +59,26 @@ namespace Protocols
             bool matches = true;
             for (int k=0; k<protocol.Tests.Count; k++)
             {
-                var testParts = protocol.Tests[k].Settings.Split(new char[] { ':' }, 2);
-                var historyParts = Data[k].Settings.Split(new char[] { ':' }, 2);
-
-                if (protocol.Tests[k].Scene != Data[k].Scene || testParts[0] != historyParts[0])
+                if (string.IsNullOrEmpty(protocol.Tests[k].Settings))
                 {
-                    matches = false;
+                    matches = string.IsNullOrEmpty(Data[k].Settings);
                     break;
+                }
+                else if (string.IsNullOrEmpty(Data[k].Settings))
+                {
+                    matches = string.IsNullOrEmpty(protocol.Tests[k].Settings);
+                    break;
+                }
+                else
+                {
+                    var testParts = protocol.Tests[k].Settings.Split(new char[] { ':' }, 2);
+                    var historyParts = Data[k].Settings.Split(new char[] { ':' }, 2);
+
+                    if (protocol.Tests[k].Scene != Data[k].Scene || testParts[0] != historyParts[0])
+                    {
+                        matches = false;
+                        break;
+                    }
                 }
             }
 
