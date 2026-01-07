@@ -47,6 +47,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Basic/LDL/Haptics/LDL_Haptics.unity
     guid: 06b4b4edf934dbc4591a9873618707bf
+  - enabled: 1
+    path: Assets/Speech/Digits/Digits.unity
+    guid: e6e2eb4f008c6e04396f568e18380ccf
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 28be48df767d2434681ec999065f06dc, type: 3}
   m_UseUCBPForAssetBundles: 0
