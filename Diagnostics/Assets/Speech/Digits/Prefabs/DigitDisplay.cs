@@ -166,7 +166,7 @@ public class DigitDisplay : MonoBehaviour
             int digit = -1;
             for (int k=0; k<10; k++)
             {
-                if ((Input.GetKeyDown(KeyCode.Alpha0+k) || Input.GetKeyDown(KeyCode.Keypad0+k)) && _keypad[k].State == KeypadButtonState.Enabled)
+                if ((Input.GetKeyDown(KeyCode.Alpha0+k) || Input.GetKeyDown(KeyCode.Keypad0+k)) && _keypad[k]!=null && _keypad[k].State == KeypadButtonState.Enabled)
                 {
                     digit = k;
                     break;
@@ -191,11 +191,10 @@ public class DigitDisplay : MonoBehaviour
         for (int k=0; k<_numDigits; k++)
         {
             _digits[k] = _digitDisplays[k].Value;
-            allSet &= _digits[k]>-1;
+            allSet &= _digits[k] > -1;
         }
         _lockInButton.gameObject.SetActive(allSet);
     }
-
 
     public IEnumerator Feedback(int[] correctAnswer)
     {

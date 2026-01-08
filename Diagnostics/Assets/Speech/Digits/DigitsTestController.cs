@@ -65,6 +65,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
 #endif
 
         _digitDisplay.OnFirstPress = OnFirstDigitPressCallback;
+        _digitDisplay.OnEnter = OnEnterCallback;
         _digitDisplay.SetButtonStates(KeypadButtonState.DisabledAndGrayed, 7);
         _digitDisplay.Hide();
 
@@ -81,7 +82,8 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         else
         {
             var fn = FileLocations.ConfigFile("Digits", _configName);
-            _settings = FileIO.XmlDeserialize<BasicMeasurementConfiguration>(fn) as DigitsTestSettings;
+//            _settings = FileIO.XmlDeserialize<BasicMeasurementConfiguration>(fn) as DigitsTestSettings;
+            _settings = new DigitsTestSettings();
             InitializeMeasurement();
             Begin();
         }
@@ -198,6 +200,11 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
     private void OnFirstDigitPressCallback()
     {
         Debug.Log("First Press!!!");
+    }
+
+    private void OnEnterCallback()
+    {
+        Debug.Log("Enter!");
     }
 
     private void ShowInstructions(string instructions, int fontSize)
