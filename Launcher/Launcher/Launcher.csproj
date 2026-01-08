@@ -5,9 +5,9 @@
     <AssemblyName>HTSLauncher</AssemblyName>
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <FileVersion>1.6</FileVersion>
-    <AssemblyVersion>1.6</AssemblyVersion>
-    <Version>1.6</Version>
+    <FileVersion>1.7</FileVersion>
+    <AssemblyVersion>1.7</AssemblyVersion>
+    <Version>1.7</Version>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">

@@ -1,6 +1,6 @@
 ## Changelog
 
-### v1.7 (unreleased)
+### v1.7 (2026-01-08)
 #### Added
 - Protocol: "Investigator" scene option to display prompt/instructions to investigator before proceeding
 - Turandot: reformulated "action" to allow setting stimulus properties in another state
