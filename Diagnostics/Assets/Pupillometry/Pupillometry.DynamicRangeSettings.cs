@@ -38,6 +38,11 @@ namespace Pupillometry
         public float MaxLEDIntensity { get; set; }
         private bool ShouldSerializeMaxLEDIntensity() { return false; }
 
+        [DisplayName("Fixation size")]
+        [Description("Fixation point size in pixels")]
+        public int FixationPointSize { get; set; }
+        private bool ShouldSerializeFixationPointSize() { return false; }
+
         [Category("Screen Intensity")]
         [DisplayName("Min")]
         [Description("Minimum screen intensity")]
@@ -63,6 +68,7 @@ namespace Pupillometry
             MaxLEDIntensity = 1;
             MinScreenIntensity = 0;
             MaxScreenIntensity = 1;
+            FixationPointSize = 50;
         }
     }
 }

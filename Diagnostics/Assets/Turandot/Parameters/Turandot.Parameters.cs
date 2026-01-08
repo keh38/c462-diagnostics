@@ -178,7 +178,7 @@ namespace Turandot
                 f.value = value;
             }
 
-            //Debug.Log($"{flag} = {value}");
+            Debug.Log($"SETFLAG: {flag} = {value}");
         }
 
         public void IncrementFlag(string flag)

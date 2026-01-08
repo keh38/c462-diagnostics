@@ -11,6 +11,7 @@ using Turandot.Schedules;
 using Turandot.Screen;
 using Turandot.Scripts;
 using System.Xml;
+using UnityEngine.Rendering;
 
 public class TurandotEngine : MonoBehaviour
 {
@@ -321,7 +322,7 @@ public class TurandotEngine : MonoBehaviour
                 _result = ExpandResult(_result, term.result);
             }
 
-            if (!string.IsNullOrEmpty(term.flagExpr) && (!nextIsAction || !_actionInProgress))
+            if (!string.IsNullOrEmpty(term.flagExpr))// WHY?: && (!nextIsAction || !_actionInProgress))
             {
                 EvaluateFlagExpression(term.flagExpr);
             }
@@ -373,6 +374,16 @@ public class TurandotEngine : MonoBehaviour
 
         expanded = ExpandSignalExpression(expanded);
 
+        var parts = expanded.Split('=');
+        if (parts.Length == 2)
+        {
+            var rhs = parts[1].Replace(";", "");
+            if (KLib.Expressions.TryEvaluateScalar(rhs, out float value))
+            {
+                expanded = expanded.Replace(rhs, $"{value}");
+            }
+        }
+
         return previous + expanded;
     }
 
@@ -396,14 +407,15 @@ public class TurandotEngine : MonoBehaviour
     string ExpandSignalExpression(string expression)
     {
         string pattern = @"{([a-zA-Z0-9]+)\.([a-zA-Z0-9]+)\.([a-zA-Z0-9\.]+)}";
-        Match m = Regex.Match(expression, pattern);
+        var regex = new Regex(pattern);
+        var matches = regex.Matches(expression).Cast<Match>();
 
-        if (m.Success)
-        {
+        foreach (var m in matches)
+        { 
             var state = (m.Groups[1].Value == "sigMan") ? _currentFlowElement : _params[m.Groups[1].Value];
             if (state != null)
             {
-                Debug.Log($"{m.Groups[0].Value} = {state.sigMan.GetParameter(m.Groups[2].Value, m.Groups[3].Value)}");
+//                Debug.Log($"{m.Groups[0].Value} = {state.sigMan.GetParameter(m.Groups[2].Value, m.Groups[3].Value)}");
                 expression = expression.Replace(m.Groups[0].Value, state.sigMan.GetParameter(m.Groups[2].Value, m.Groups[3].Value).ToString());
             }
         }
@@ -441,7 +453,7 @@ public class TurandotEngine : MonoBehaviour
                     }
                     else
                     {
-                        _params.SetFlag(exprParts[0].Trim(), KLib.Expressions.EvaluateToIntScalar(rh));
+                        _params.SetFlag(exprParts[0].Trim(), KLib.Expressions.EvaluateToIntScalar(ExpandSignalExpression(rh)));
                     }
                 }
                 else if (e.Substring(e.Length - 2, 2) == "++")

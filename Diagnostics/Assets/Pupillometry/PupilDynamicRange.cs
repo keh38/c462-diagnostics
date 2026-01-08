@@ -12,6 +12,7 @@ using KLib;
 public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 {
     [SerializeField] private Camera _camera;
+    [SerializeField] private RectTransform _fixationPoint;
 
     private Pupillometry.DynamicRangeSettings _settings;
 
@@ -67,6 +68,8 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 
         _nextUpdate = 1;
         _nextColorUpdate = 0;
+
+        _fixationPoint.sizeDelta = new Vector2(_settings.FixationPointSize, _settings.FixationPointSize);
 
         string fn = $"{GameManager.Subject}-PupilDR-{DateTime.Now.ToString("yyyy-MM-dd_HHmmss")}.json";
         _dataPath = Path.Combine(FileLocations.SubjectFolder, fn);

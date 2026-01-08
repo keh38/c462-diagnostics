@@ -1,5 +1,15 @@
 ## Changelog
 
+### v1.7.1
+#### Fixed
+- Pupil Dynamic Range: fixation point now scales appropriately with screen size
+#### Added
+- Pupil Dynamic Range: explicit control of fixation point size 
+#### Changed
+- Turandot: can now evaluate mathematical combinations of stimulus expressions when setting result
+
+---
+
 ### v1.7 (2026-01-08)
 #### Added
 - Protocol: "Investigator" scene option to display prompt/instructions to investigator before proceeding

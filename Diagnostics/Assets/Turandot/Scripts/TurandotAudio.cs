@@ -139,7 +139,6 @@ namespace Turandot.Scripts
                 _sigMan.ResetSweepables();
                 if (start)
                 {
-                    Debug.Log($"test level = {_sigMan["Test"].level.Value}");
                     _sigMan.Unpause();
                 }
                 _isRunning = true;
