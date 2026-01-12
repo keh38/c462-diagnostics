@@ -1,12 +1,12 @@
 ## Changelog
 
-### v1.7.1
+### v1.7.1 (2026-01-09)
 #### Fixed
 - Pupil Dynamic Range: fixation point now scales appropriately with screen size
 #### Added
 - Pupil Dynamic Range: explicit control of fixation point size 
 #### Changed
-- Turandot: can now evaluate mathematical combinations of stimulus expressions when setting result
+- Turandot: can now evaluate mathematical combinations of stimulus expressions when setting result or flag
 
 ---
 

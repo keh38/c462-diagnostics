@@ -231,6 +231,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         if (yes)
         {
+            _titleBar.SetActive(false);
+
             Debug.Log("Turandot: Resuming previous");
             HTS_Server.SendMessage("Turandot", "Status:Resuming previous");
 
