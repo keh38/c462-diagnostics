@@ -100,7 +100,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
 #if HACKING
         Application.targetFrameRate = 60;
         GameManager.SetSubject("Scratch/_shit");
-        _configName = "Hello";
+        _configName = "Test";
 #else
         _configName = GameManager.DataForNextScene;
 #endif
@@ -486,8 +486,9 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
 
         float maxSPL = _signalManager["Signal"].GetMaxLevel();
         float maxHL = dBHL_table.SPL_To_HL(freq, maxSPL);
-        startHL = Mathf.Min(startHL, maxHL);
 
+        startHL = Mathf.Min(startHL, maxHL);
+ 
         _signalManager.Unpause();
 
         if (_currentStimulusCondition.NumTries == 1)
@@ -602,6 +603,12 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         else
         {
             curLevel -= 10;
+        }
+
+        if (curLevel > maxLevel)
+        {
+            currentTrack.thresholdHL = float.PositiveInfinity;
+            yield break;
         }
 
         // Acquire 3 reversals

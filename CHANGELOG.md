@@ -1,5 +1,11 @@
 ## Changelog
 
+### v1.7.2 
+#### Fixed
+- Audiogram: handle level-over-range edge case
+
+---
+
 ### v1.7.1 (2026-01-09)
 #### Fixed
 - Pupil Dynamic Range: fixation point now scales appropriately with screen size

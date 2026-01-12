@@ -32,11 +32,11 @@ public class TurandotState
     public bool IsRunInProgress()
     {
         bool result = false;
-        Debug.Log(StateFile);
+        //Debug.Log(StateFile);
         if (File.Exists(StateFile))
         {
             TurandotState savedState = KLib.FileIO.JSONDeserialize<TurandotState>(StateFile);
-            Debug.Log(savedState.ToString());
+            //Debug.Log(savedState.ToString());
 
             result = savedState.Project == Project && 
                 savedState.Subject == Subject && 
