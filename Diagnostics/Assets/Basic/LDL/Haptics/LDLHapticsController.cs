@@ -63,6 +63,13 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 
         _sliderPanel = _workPanel.GetComponent<LDLHapticsSliderPanel>();
         _sliderPanel.LockInPressed += OnLockIn;
+
+        Application.logMessageReceived += HandleException;
+    }
+
+    private void OnDestroy()
+    {
+        Application.logMessageReceived -= HandleException;
     }
 
     private void Start()
@@ -592,4 +599,38 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 
         return s;
     }
+
+    public void HandleException(string condition, string stackTrace, LogType type)
+    {
+        if (type == LogType.Log || type == LogType.Warning)
+        {
+            return;
+        }
+
+        try
+        {
+            _workPanel.SetActive(false);
+        }
+        catch { }
+
+        HandleError(condition, stackTrace);
+    }
+
+    void HandleError(string error, string stackTrace = "")
+    {
+        if (error.Equals("Exception"))
+        {
+            error = "An exception occurred";
+        }
+
+        HTS_Server.SendMessage(_mySceneName, $"Error:{error}");
+        Debug.Log($"[{_mySceneName} error]: {error}{Environment.NewLine}{stackTrace}");
+
+        if (!_isRemote)
+        {
+            ShowFinishPanel("The run was stopped because of an error");
+        }
+    }
 }
+
+

@@ -54,47 +54,53 @@ namespace LDL
         private bool ShouldSerializeMerge() { return false; }
 
         [Category("Stimulus")]
-        [Description("Duration of tone (ms)")]
+        [Description("Bandwidth (octaves)")]
         [PropertyOrder(0)]
+        public float Bandwidth { set; get; }
+        private bool ShouldSerializeBandwidth() { return false; }
+
+        [Category("Stimulus")]
+        [Description("Duration of tone (ms)")]
+        [PropertyOrder(1)]
         public float ToneDuration { set; get; }
         private bool ShouldSerializeToneDuration() { return false; }
 
         [Category("Stimulus")]
         [Description("Pip interval (ms)")]
         [DisplayName("Pip interval")]
-        [PropertyOrder(1)]
+        [PropertyOrder(2)]
         public float ISI_ms { set; get; }
         private bool ShouldSerializeISI_ms() { return false; }
 
         [Category("Stimulus")]
         [Description("Ramp applied to tones (ms)")]
-        [PropertyOrder(2)]
+        [PropertyOrder(3)]
         public float Ramp { set; get; }
         private bool ShouldSerializeRamp() { return false; }
 
         [Category("Stimulus")]
         [Description("Minimum level")]
         [DisplayName("Min level")]
-        [PropertyOrder(3)]
+        [PropertyOrder(4)]
         public float MinLevel { set; get; }
         private bool ShouldSerializeMinLevel() { return false; }
 
         [Category("Stimulus")]
         [Description("Level units")]
-        [PropertyOrder(4)]
+        [PropertyOrder(5)]
         public LevelUnits LevelUnits { set; get; }
         private bool ShouldSerializeLevelUnits() { return false; }
 
         [Category("Stimulus")]
         [Description("FM depth (percent)")]
         [DisplayName("FM depth")]
-        [PropertyOrder(5)]
+        [PropertyOrder(6)]
         public float ModDepth_pct {  set; get; }
         private bool ShouldSerializeModDepth_pct() { return false; } 
 
         [Category("Stimulus")]
         [DisplayName("Haptic")]
-        [PropertyOrder(10)]
+        [PropertyOrder(11)]
         public HapticStimulus HapticStimulus { set; get; }
         private bool ShouldSerializeHapticStimulus() { return false; }
 
@@ -108,6 +114,7 @@ namespace LDL
             Merge = true;
             Ramp = 5f;
             ToneDuration = 200;
+            Bandwidth = 0;
             ISI_ms = 400;
             ModDepth_pct = 0;
             MinLevel = 10;

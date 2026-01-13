@@ -30,6 +30,7 @@ public class LDLLevelSlider : MonoBehaviour
     private Channel _myChannel;
     private bool _audioInitialized = false;
 
+    private float _bandWidth;
     private float _minLevel;
     private float _modDepth_pct;
 
@@ -42,14 +43,12 @@ public class LDLLevelSlider : MonoBehaviour
 
         _isActive = false;
     }
-    void Start()
-    {
-    }
 
-    public void InitializeStimulusGeneration(Channel ch, float minLevel, float modDepth)
+    public void InitializeStimulusGeneration(Channel ch, float bandWidth, float minLevel, float modDepth)
     {
         _myChannel = ch;
         _myChannel.Name = this.name;
+        _bandWidth = bandWidth;
         _minLevel = minLevel;
         _modDepth_pct = modDepth;
 
@@ -90,20 +89,36 @@ public class LDLLevelSlider : MonoBehaviour
             _settings.start = _settings.min + UnityEngine.Random.Range(0f, 10f);
         }
 
-
         if (_settings.Freq_Hz > 0f)
         {
-            var fm = new FM();
-            fm.Carrier_Hz = _settings.Freq_Hz;
-            fm.Depth_Hz = _settings.Freq_Hz * _modDepth_pct / 100f;
-            _myChannel.waveform = fm;
+            if (_bandWidth == 0)
+            {
+                var fm = new FM();
+                fm.Carrier_Hz = _settings.Freq_Hz;
+                fm.Depth_Hz = _settings.Freq_Hz * _modDepth_pct / 100f;
+                _myChannel.waveform = fm;
+            }
+            else
+            {
+                var wf = new Noise()
+                {
+                    filter = new FilterSpec()
+                    {
+                        shape = KLib.Signals.Enumerations.FilterShape.Band_pass,
+                        CF = _settings.Freq_Hz,
+                        BW = _bandWidth,
+                        bandwidthMethod = KLib.Signals.Enumerations.BandwidthMethod.Octaves
+                    }
+                };
+                _myChannel.waveform = wf;
+            }
         }
         else
         {
             _myChannel.waveform = new Noise();
         }
 
-            _myChannel.Laterality = _settings.ear;
+        _myChannel.Laterality = _settings.ear;
 
         _paramSetter(_settings.start);
         _signalManager.Initialize();

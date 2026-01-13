@@ -377,10 +377,19 @@ public class TurandotEngine : MonoBehaviour
         var parts = expanded.Split('=');
         if (parts.Length == 2)
         {
+            var lhs = parts[0].Trim();
+
             var rhs = parts[1].Replace(";", "");
             if (KLib.Expressions.TryEvaluateScalar(rhs, out float value))
             {
-                expanded = expanded.Replace(rhs, $"{value}");
+                var rx = new Regex(lhs + @"=\[([\d\.,]+)\]");
+                var m = rx.Match(previous);
+                if (m.Success)
+                {
+                    return previous.Replace(m.Groups[1].Value, $"{m.Groups[1].Value},{value}");
+                }
+
+                expanded = expanded.Replace(rhs, $"[{value}]");
             }
         }
 

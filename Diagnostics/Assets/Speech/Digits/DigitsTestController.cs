@@ -48,6 +48,13 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         _abortAction = _actions.FindAction("Abort");
         _abortAction.Enable();
         _abortAction.performed += OnAbortAction;
+
+        Application.logMessageReceived += HandleException;
+    }
+
+    private void OnDestroy()
+    {
+        Application.logMessageReceived -= HandleException;
     }
 
     private void Start()
@@ -277,5 +284,37 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
     void IRemoteControllable.ChangeScene(string newScene)
     {
         SceneManager.LoadScene(newScene);
+    }
+
+    public void HandleException(string condition, string stackTrace, LogType type)
+    {
+        if (type == LogType.Log || type == LogType.Warning)
+        {
+            return;
+        }
+
+        try
+        {
+            _workPanel.SetActive(false);
+        }
+        catch { }
+
+        HandleError(condition, stackTrace);
+    }
+
+    void HandleError(string error, string stackTrace = "")
+    {
+        if (error.Equals("Exception"))
+        {
+            error = "An exception occurred";
+        }
+
+        HTS_Server.SendMessage(_mySceneName, $"Error:{error}");
+        Debug.Log($"[{_mySceneName} error]: {error}{Environment.NewLine}{stackTrace}");
+
+        if (!_isRemote)
+        {
+            ShowFinishPanel("The run was stopped because of an error");
+        }
     }
 }

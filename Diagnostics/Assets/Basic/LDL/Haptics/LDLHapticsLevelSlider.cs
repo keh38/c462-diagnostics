@@ -32,6 +32,7 @@ public class LDLHapticsLevelSlider : MonoBehaviour
     private Channel _myHaptic;
     private bool _audioInitialized = false;
 
+    private float _bandWidth;
     private float _minLevel;
     private float _modDepth_pct;
 
@@ -48,10 +49,11 @@ public class LDLHapticsLevelSlider : MonoBehaviour
     {
     }
 
-    public void InitializeStimulusGeneration(Channel ch, float minLevel, float modDepth, Channel haptic)
+    public void InitializeStimulusGeneration(Channel ch, float bandWidth, float minLevel, float modDepth, Channel haptic)
     {
         _myChannel = ch;
         _myChannel.Name = this.name;
+        _bandWidth = bandWidth;
         _minLevel = minLevel;
         _modDepth_pct = modDepth;
 
@@ -96,9 +98,34 @@ public class LDLHapticsLevelSlider : MonoBehaviour
             _settings.start = _settings.min + UnityEngine.Random.Range(0f, 10f);
         }
 
-        var fm = (_myChannel.waveform as FM);
-        fm.Carrier_Hz = _settings.Freq_Hz;
-        fm.Depth_Hz = _settings.Freq_Hz * _modDepth_pct / 100f;
+        if (_settings.Freq_Hz > 0f)
+        {
+            if (_bandWidth == 0)
+            {
+                var fm = new FM();
+                fm.Carrier_Hz = _settings.Freq_Hz;
+                fm.Depth_Hz = _settings.Freq_Hz * _modDepth_pct / 100f;
+                _myChannel.waveform = fm;
+            }
+            else
+            {
+                var wf = new Noise()
+                {
+                    filter = new FilterSpec()
+                    {
+                        shape = KLib.Signals.Enumerations.FilterShape.Band_pass,
+                        CF = _settings.Freq_Hz,
+                        BW = _bandWidth,
+                        bandwidthMethod = KLib.Signals.Enumerations.BandwidthMethod.Octaves
+                    }
+                };
+                _myChannel.waveform = wf;
+            }
+        }
+        else
+        {
+            _myChannel.waveform = new Noise();
+        }
 
         _myChannel.Laterality = _settings.ear;
 

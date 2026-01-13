@@ -40,6 +40,30 @@ namespace Turandot.Screen
         public bool AllowMultiple { get; set; }
         private bool ShouldSerializeAllowMultiple() { return false; }
 
+        [Category("Behavior")]
+        [Description("If true, never show the apply button")]
+        [DisplayName("Disable apply")]
+        public bool DisableApply { get; set; }
+        private bool ShouldSerializeDisableApply() { return false; }
+
+        [Category("Button")]
+        [DisplayName("Font size")]
+        public int ButtonFontSize { get; set; }
+        private bool ShouldSerializeButtonFontSize() { return false; }
+
+        [Category("Button")]
+        [Description("Button width in pixels")]
+        [DisplayName("Width")]
+        public int ButtonWidth { get; set; }
+        private bool ShouldSerializeButtonWidth() { return false; }
+
+        [Category("Button")]
+        [Description("Button height in pixels")]
+        [DisplayName("Height")]
+        public int ButtonHeight { get; set; }
+        private bool ShouldSerializeButtonHeight() { return false; }
+
+
         [Category("Design")]
         public string Label { set; get; }
         private bool ShouldSerializeLabel() { return false; }
@@ -58,6 +82,10 @@ namespace Turandot.Screen
             AllowNone = false;
             AutoAdvance = false;
             PromptSpacing = 50;
+
+            ButtonFontSize = 0;
+            ButtonWidth = 200;
+            ButtonHeight = 100;
         }
 
     }

@@ -1,6 +1,17 @@
 ## Changelog
 
-### v1.7.2 
+### v1.8 (2026-01-13)
+#### Changed
+- Basic measurements: added exception handling
+- LDL: added bandwidth option to allow stimulation with bandpass noise
+- Turandot
+  - always prompt to resume measurement
+  - automatically vectorizes result when necessary
+  - added checklist button properties
+
+---
+
+### v1.7.2 (2026-01-12)
 #### Fixed
 - Audiogram: handle level-over-range edge case
 

@@ -201,11 +201,11 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     {
         if (_state.IsRunInProgress())
         {
-            if (_isRemote)
-            {
-                OnQuestionResponse(true);
-            }
-            else 
+            //if (_isRemote)
+            //{
+            //    OnQuestionResponse(true);
+            //}
+            //else 
             { 
                 Debug.Log("Turandot: Previous state exists. Asking whether to resume");
                 HTS_Server.SendMessage("Turandot", "Status:Asking to resume");
@@ -576,7 +576,11 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         Event e = Event.current;
         if (e.control && e.keyCode == KeyCode.A && !_waitingForResponse)
         {
-            if (_isRunning) _engine.Abort();
+            if (_isRunning)
+            {
+                _engine.Abort();
+                _engine.ClearScreen();
+            }
             _isRunning = false;
             _waitingForResponse = true;
             _quitPanel.SetActive(true);
@@ -593,6 +597,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     {
         _quitPanel.SetActive(false);
         _waitingForResponse = false;
+        _isRunning = true;
         AdvanceSequence();
     }
 
@@ -889,14 +894,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             _engine.ClearScreen();
         }
         catch { }
-
-        //ExceptionLog log = new ExceptionLog(condition, stackTrace, type);
-
-        //DataFileManager dfm = new DataFileManager();
-        //dfm.StartDataFile(DataFileType.ExceptionLog);
-        //dfm.AddToDataJson(log, "Exception");
-        //dfm.EndDataFile("Exception-" + System.DateTime.Now.ToString("yyyy-MM-dd_HHmmss"));
-        //if (SubjectManager.Instance.UploadData) dfm.UploadDataFile();
 
         HandleError(condition, stackTrace);
     }

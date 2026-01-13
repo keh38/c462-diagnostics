@@ -43,7 +43,10 @@ namespace Turandot.Scripts
             _label.fontSize = _layout.FontSize;
             _label.text = _layout.Label;
 
-            _button.GetComponentInChildren<TMPro.TMP_Text>().fontSize = _layout.FontSize;
+            Debug.Log($"Checklist Button Font Size: {_layout.ButtonFontSize}");
+            _button.GetComponentInChildren<TMPro.TMP_Text>().fontSize = _layout.ButtonFontSize > 0 ? _layout.ButtonFontSize : _layout.FontSize;
+            var buttonRT = _button.GetComponent<RectTransform>();
+            buttonRT.sizeDelta = new Vector2(_layout.ButtonWidth, _layout.ButtonHeight);
 
             var labelRT = _label.GetComponent<RectTransform>();
             float yoffset = - _layout.PromptSpacing;
@@ -90,6 +93,7 @@ namespace Turandot.Scripts
             {
                 _selectedItems.Remove(name);
             }
+            UpdateResult();
 
             if (!_layout.AllowMultiple)
             {
@@ -100,19 +104,23 @@ namespace Turandot.Scripts
             {
                 _result = name;
                 OnButtonClick();
-                //ButtonData.value = true;
             }
             else
             {
-                _button.SetActive(_selectedItems.Count > 0);
+                Debug.Log($"DisableApply = {_layout.DisableApply}");
+                _button.SetActive(_selectedItems.Count > 0 && !_layout.DisableApply);
             }
         }
         public void OnButtonClick()
         {
             ButtonData.value = true;
+            UpdateResult();
+        }
 
+        private void UpdateResult()
+        {
             _result = $"{Name}=\"";
-            for (int k=0; k<_selectedItems.Count; k++)
+            for (int k = 0; k < _selectedItems.Count; k++)
             {
                 _result += $"{_selectedItems[k]}";
                 if (k < _selectedItems.Count - 1)

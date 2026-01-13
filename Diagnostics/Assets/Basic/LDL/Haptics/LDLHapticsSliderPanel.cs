@@ -43,13 +43,9 @@ public class LDLHapticsSliderPanel : MonoBehaviour
 
         _xPositions = new float[_sliders.Count];
 
-        var fuck = haptic.Clone();
-        Debug.Log((haptic.waveform as KLib.Signals.Waveforms.Sinusoid).Frequency_Hz);
-        Debug.Log((fuck.waveform as KLib.Signals.Waveforms.Sinusoid).Frequency_Hz);
-
         for (int k=0; k< _sliders.Count; k++) 
         {
-            _sliders[k].InitializeStimulusGeneration(ch.Clone(), settings.MinLevel, settings.ModDepth_pct, haptic.Clone());
+            _sliders[k].InitializeStimulusGeneration(ch.Clone(), settings.Bandwidth, settings.MinLevel, settings.ModDepth_pct, haptic.Clone());
             _sliders[k].SliderMoved += OnSliderMoved;
 
             var rt = _sliders[k].gameObject.GetComponent<RectTransform>();

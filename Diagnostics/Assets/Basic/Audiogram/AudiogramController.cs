@@ -88,6 +88,13 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         _responseAction.Disable();
 
         _audioSource = GetComponent<AudioSource>();
+
+        Application.logMessageReceived += HandleException;
+    }
+
+    private void OnDestroy()
+    {
+        Application.logMessageReceived -= HandleException;
     }
 
     private void Start()
@@ -138,7 +145,8 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         SetReactionTimeLimits();
 
         AudiogramData extantData = AudiogramData.Load();
-        if (extantData != null ) {
+        if (extantData != null)
+        {
             _data.audiogramData = extantData;
             if (_settings.Merge)
             {
@@ -290,7 +298,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         else if (_sceneState == SceneState.Testing)
         {
             _stopMeasurement = false;
-            DoCurrentStimulusCondition();  
+            DoCurrentStimulusCondition();
         }
     }
 
@@ -381,7 +389,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
     {
         SceneManager.LoadScene(newScene);
     }
-    
+
     private void SetReactionTimeLimits()
     {
         //float subjMeanResponseTime_s = SubjectManager.Instance.GetMetric("ResponseTime_s", _settings.MaxValidResponseTime);
@@ -426,7 +434,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         else if (_currentStimulusCondition.NewEar && _settings.ShowOtherEarMessage)
         {
             _instructionPanel.InstructionsFinished = DoCurrentStimulusCondition;
-            ShowInstructions("Great!\nLet's try the same thing with your right ear", 
+            ShowInstructions("Great!\nLet's try the same thing with your right ear",
                 _settings.InstructionFontSize);
         }
         else
@@ -484,11 +492,13 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         _signalManager.Initialize();
         _signalManager.StartPaused();
 
+        throw new Exception("testing");
+
         float maxSPL = _signalManager["Signal"].GetMaxLevel();
         float maxHL = dBHL_table.SPL_To_HL(freq, maxSPL);
 
         startHL = Mathf.Min(startHL, maxHL);
- 
+
         _signalManager.Unpause();
 
         if (_currentStimulusCondition.NumTries == 1)
@@ -504,7 +514,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         currentTrack.Trim();
         _data.tracks.Add(currentTrack);
 
-        if (_currentStimulusCondition.NumTries==0 && float.IsPositiveInfinity(currentTrack.thresholdHL))
+        if (_currentStimulusCondition.NumTries == 0 && float.IsPositiveInfinity(currentTrack.thresholdHL))
         {
             _currentStimulusCondition.NumTries++;
             _instructionPanel.InstructionsFinished = DoCurrentStimulusCondition;
@@ -534,7 +544,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             freq,
             currentTrack.thresholdHL,
             currentTrack.thresholdHL + dBHL_table.HL_To_SPL(freq));
-      
+
         _state.SetCompleted(_currentStimulusCondition, currentTrack.thresholdHL);
         SaveState();
 
@@ -688,10 +698,10 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
 
         while (soundDetected)
         {
-            yield return StartCoroutine(PlayStimulusAndGetResponse(freq,level));
+            yield return StartCoroutine(PlayStimulusAndGetResponse(freq, level));
             currentTrack.Add(level, float.NaN, currentResponseTime, soundDetected);
 
-            if (soundDetected )
+            if (soundDetected)
             {
                 level -= 10;
             }
@@ -705,7 +715,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             {
                 yield break;
             }
-            yield return StartCoroutine(PlayStimulusAndGetResponse(freq,level));
+            yield return StartCoroutine(PlayStimulusAndGetResponse(freq, level));
             currentTrack.Add(level, float.NaN, currentResponseTime, soundDetected);
 
             if (_stopMeasurement) yield break;
@@ -919,5 +929,36 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         _buttonImage.color = _defaultButtonColor;
     }
 
-    
+    public void HandleException(string condition, string stackTrace, LogType type)
+    {
+        if (type == LogType.Log || type == LogType.Warning)
+        {
+            return;
+        }
+
+        try
+        {
+            _workPanel.SetActive(false);
+        }
+        catch { }
+
+        HandleError(condition, stackTrace);
+    }
+
+    void HandleError(string error, string stackTrace)
+    {
+        if (error.Equals("Exception"))
+        {
+            error = "An exception occurred";
+        }
+
+        HTS_Server.SendMessage(_mySceneName, $"Error:{error}");
+        Debug.Log($"[{_mySceneName} error]: {error}{Environment.NewLine}{stackTrace}");
+
+        if (!_isRemote)
+        {
+            ShowFinishPanel("The run was stopped because of an error");
+        }
+    }
 }
+
