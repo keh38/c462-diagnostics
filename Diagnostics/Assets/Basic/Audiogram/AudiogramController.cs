@@ -492,8 +492,6 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         _signalManager.Initialize();
         _signalManager.StartPaused();
 
-        throw new Exception("testing");
-
         float maxSPL = _signalManager["Signal"].GetMaxLevel();
         float maxHL = dBHL_table.SPL_To_HL(freq, maxSPL);
 
