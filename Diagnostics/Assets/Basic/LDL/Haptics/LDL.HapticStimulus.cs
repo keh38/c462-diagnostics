@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel;
 
 using KLib.Signals.Modulations;
@@ -17,47 +18,52 @@ namespace LDL.Haptics
         public HapticSource Source { get; set; }
         private bool ShouldSerializeSource() { return false; }
 
+        [PropertyOrder(0)]
+        public bool SaveLDLGram { get; set; }
+        private bool ShouldSerializeSaveLDLGram() { return false; }
+
         [PropertyOrder(1)]
+        public bool DoAudioOnly { get; set; }
+        private bool ShouldSerializeDoAudioOnly() { return false; }
+
+        [PropertyOrder(2)]
         public Digitimer TENS { get; set; }
         private bool ShouldSerializeTENS() { return false; }
 
-        [PropertyOrder(1)]
+        [PropertyOrder(2)]
         public Sinusoid Vibration { get; set; }
         private bool ShouldSerializeVibration() { return false; }
 
-        [PropertyOrder(2)]
+        [PropertyOrder(3)]
         public string Location { get; set; }
         private bool ShouldSerializeLocation() { return false; }
 
-        [PropertyOrder(3)]
+        [PropertyOrder(4)]
         [Description("Amplitude in volts")]
         public float Level { get; set; }
         private bool ShouldSerializeLevel() { return false; }
 
-        //[PropertyOrder(3)]
-        [Browsable(false)]
+        [PropertyOrder(5)]
         public float Delay_ms { get; set; }
         private bool ShouldSerializeDelay_ms() { return false; }
 
-        [PropertyOrder(4)]
+        [PropertyOrder(6)]
         public float Duration_ms { get; set; }
         private bool ShouldSerializeDuration_ms() { return false; }
 
-        [PropertyOrder(5)]
+        [PropertyOrder(7)]
         public AM Envelope { get; set; }
         private bool ShouldSerializeEnvelope() { return false; }
 
-        [ReadOnly(true)]
-        [PropertyOrder(6)]
-        public string Variable { get; set; }
-        private bool ShouldSerializeVariable() { return false; }
-
-        [PropertyOrder(7)]
-        public string Expression { get; set; }
-        private bool ShouldSerializeExpression() { return false; }
+        [PropertyOrder(8)]
+        [TypeConverter(typeof(HapticSeqVarCollectionConverter))]
+        public List<HapticSeqVar> SeqVars { get; set; }
+        private bool ShouldSerializeSeqVars() { return false; }
 
         public HapticStimulus()
         {
+            SaveLDLGram = false;
+            DoAudioOnly = true;
             Source = HapticSource.NONE;
             TENS = new Digitimer();
             Vibration = new Sinusoid()
@@ -68,9 +74,8 @@ namespace LDL.Haptics
             Delay_ms = 0;
             Duration_ms = 200;
             Envelope = new AM();
+            SeqVars = new List<HapticSeqVar>();
 
-            Variable = "Delay_ms";
-            Expression = "-100:20:100";
         }
     }
 }

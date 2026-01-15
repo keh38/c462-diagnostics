@@ -667,7 +667,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         _data.reactionTime = _engine.ReactionTime;
         _data.properties.AddRange(_params.GetPostTrialProperties(_data.properties));
 
-        //File.AppendAllText(_mainDataFile, _data.ToJSONString(_engine.GetEventsAsJSON()));
         AppendDataToMainFile(_mainDataFile, _data.ToJSONString(_engine.GetEventsAsJSON()));
 
         HTS_Server.SendMessage("Turandot", "State:Finished");

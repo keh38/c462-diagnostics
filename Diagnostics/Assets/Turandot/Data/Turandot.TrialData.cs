@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Xml.Serialization;
 
 using Newtonsoft.Json;
@@ -71,6 +72,7 @@ namespace Turandot
                     json += "{";
                     for (int k = 0; k < subResults.Length; k++)
                     {
+                        UnityEngine.Debug.Log($"subResult[{k}] = {subResults[k]}"); 
                         string[] eqparts = subResults[k].Split(new char[] { '=' });
                         json += "\"" + eqparts[0] + "\":" + eqparts[1];
                         if (k < subResults.Length - 1) json += ",";

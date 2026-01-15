@@ -82,6 +82,7 @@
     <Compile Include="Assets\Scripts\KLib\Signals\Wave\KLib.Wave.WaveFormat.cs" />
     <Compile Include="Assets\Turandot\Data\Turandot.TrialData.cs" />
     <Compile Include="Assets\Scripts\Home\WorkPanel.cs" />
+    <Compile Include="Assets\Basic\TypeConverters\HapticSeqVarVariableConverter.cs" />
     <Compile Include="Assets\Turandot\Parameters\Turandot.EndAction.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotCue.cs" />
     <Compile Include="Assets\AlgLib\alglibinternal.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\RippleNoise.cs" />
     <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.ManikinSpec.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\ToneCloud.cs" />
+    <Compile Include="Assets\Basic\LDL\Haptics\LDL.HapticsSeqVar.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Wave\KLib.Wave.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.CatchInterval.cs" />
     <Compile Include="Assets\Turandot\Cues\Turandot.Cues.TextBoxAction.cs" />
@@ -306,6 +308,7 @@
     <Compile Include="Assets\Scripts\Home\ProtocolPanel.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotInputCategorizer.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\Sinusoid.cs" />
+    <Compile Include="Assets\Basic\TypeConverters\HapticSeqVarCollectionConverter.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotState.cs" />
     <Compile Include="Assets\Scripts\Hardware\HardwareConfiguration.cs" />
     <Compile Include="Assets\Unity UI Controls\Scripts\ListItem Scripts\ListBoxLineItem.cs" />

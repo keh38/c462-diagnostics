@@ -322,10 +322,42 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
         SceneManager.LoadScene(newScene);
     }
 
+    private float FindMinHapticDelay()
+    {
+        float minDelay = 0;
+        var delayVar = _settings.HapticStimulus.SeqVars.Find(x => x.Variable.StartsWith("Delay"));
+        if (delayVar != null)
+        {
+            float[] delayValues = KLib.Expressions.Evaluate(delayVar.Expression);
+            minDelay = delayValues.Min();
+        }
+
+        return minDelay;
+    }
+
+    private List<PropValPairList> GetStimulusConditionList()
+    {
+        var scl = new List<PropValPairList>();
+
+        var seqVars = _settings.HapticStimulus.SeqVars;
+        foreach (var seqVar in seqVars)
+        {
+            seqVar.EvaluateExpression();
+        }
+        
+        Argh(scl, seqVars, new PropValPairList());
+
+        return scl;
+    }
+
+    private void Argh(List<PropValPairList> scl, List<HapticSeqVar> seqVars, PropValPairList pvpl)
+    {
+
+    }
+
     private void InitializeSliderPanel()
     {
-        float[] hapticValues = KLib.Expressions.Evaluate(_settings.HapticStimulus.Expression);
-        float minDelay = hapticValues.Min();
+        float minDelay = FindMinHapticDelay();
         float toneDelay = minDelay < 0 ? -minDelay : 0;
 
         var ch = new Channel()
@@ -413,10 +445,10 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
     {
         _state = new HapticsMeasurementState();
 
-        float[] hapticValues = KLib.Expressions.Evaluate(_settings.HapticStimulus.Expression);
-        float minDelay = hapticValues.Min();
+        float[] hapticValues = null;// KLib.Expressions.Evaluate(_settings.HapticStimulus.Expression);
+        float minDelay = FindMinHapticDelay();
         if (minDelay > 0) minDelay = 0;
-        string hapticVariable = $"Gate.{_settings.HapticStimulus.Variable}";
+        string hapticVariable = null;// $"Gate.{_settings.HapticStimulus.Variable}";
 
         if (_settings.LevelUnits == LevelUnits.dB_SL)
         {
