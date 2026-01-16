@@ -129,7 +129,7 @@ public class LDLHapticsLevelSlider : MonoBehaviour
 
         _myChannel.Laterality = _settings.ear;
 
-        _myHaptic.SetParameter(test.hapticVariable, test.hapticValue);
+        SetHapticParameters(test.propValPairs);
 
         _paramSetter(_settings.start);
         _signalManager.Initialize();
@@ -141,6 +141,39 @@ public class LDLHapticsLevelSlider : MonoBehaviour
         _slider.enabled = true;
 
         Lock(false);
+    }
+
+    private void SetHapticParameters(PropValPairList propValPairs)
+    {
+        if (propValPairs.Count == 0)
+        {
+            _myHaptic.active = false;
+            return;
+        }
+
+        _myHaptic.active = true;
+        foreach (PropValPair pair in propValPairs)
+        {
+            switch (pair.variable)
+            {
+                case "Delay_ms":
+                    _myHaptic.SetParameter("Gate.Delay_ms", pair.value);
+                    break;
+                case "Duration_ms":
+                    _myHaptic.SetParameter("Gate.Duration_ms", pair.value);
+                    break;
+                case "Frequency_Hz":
+                    if (_myHaptic.waveform is Digitimer)
+                    {
+                        _myHaptic.SetParameter("Digitimer.PulseRate_Hz", pair.value);
+                    }
+                    else if (_myHaptic.waveform is Sinusoid)
+                    {
+                        _myHaptic.SetParameter("Sinusoid.Frequency_Hz", pair.value);
+                    }
+                    break;
+            }
+        }
     }
 
     public void OnPointerDown(BaseEventData data)

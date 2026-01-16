@@ -1,5 +1,13 @@
 ## Changelog
 
+### v1.9 (unreleased)
+#### Changed
+- LDL Haptics:
+  - expanded haptic parameter sequencing
+  - option to save LDL gram in metadata
+
+---
+
 ### v1.8 (2026-01-13)
 #### Changed
 - Basic measurements: added exception handling

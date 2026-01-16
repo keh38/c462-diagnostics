@@ -66,35 +66,41 @@ namespace LDL
         private bool ShouldSerializeToneDuration() { return false; }
 
         [Category("Stimulus")]
+        [Description("Delay of tone (ms)")]
+        [PropertyOrder(2)]
+        public float ToneDelay { set; get; }
+        private bool ShouldSerializeToneDelay() { return false; }
+
+        [Category("Stimulus")]
         [Description("Pip interval (ms)")]
         [DisplayName("Pip interval")]
-        [PropertyOrder(2)]
+        [PropertyOrder(3)]
         public float ISI_ms { set; get; }
         private bool ShouldSerializeISI_ms() { return false; }
 
         [Category("Stimulus")]
         [Description("Ramp applied to tones (ms)")]
-        [PropertyOrder(3)]
+        [PropertyOrder(4)]
         public float Ramp { set; get; }
         private bool ShouldSerializeRamp() { return false; }
 
         [Category("Stimulus")]
         [Description("Minimum level")]
         [DisplayName("Min level")]
-        [PropertyOrder(4)]
+        [PropertyOrder(5)]
         public float MinLevel { set; get; }
         private bool ShouldSerializeMinLevel() { return false; }
 
         [Category("Stimulus")]
         [Description("Level units")]
-        [PropertyOrder(5)]
+        [PropertyOrder(6)]
         public LevelUnits LevelUnits { set; get; }
         private bool ShouldSerializeLevelUnits() { return false; }
 
         [Category("Stimulus")]
         [Description("FM depth (percent)")]
         [DisplayName("FM depth")]
-        [PropertyOrder(6)]
+        [PropertyOrder(7)]
         public float ModDepth_pct {  set; get; }
         private bool ShouldSerializeModDepth_pct() { return false; } 
 
@@ -113,6 +119,7 @@ namespace LDL
 
             Merge = true;
             Ramp = 5f;
+            ToneDelay = 0;
             ToneDuration = 200;
             Bandwidth = 0;
             ISI_ms = 400;
