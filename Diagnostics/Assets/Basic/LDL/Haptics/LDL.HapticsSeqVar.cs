@@ -17,18 +17,10 @@ namespace LDL.Haptics
         public string Expression { get; set; }
         private bool ShouldSerializeExpression() { return false; }
 
-        [Browsable(false)]
-        public float[] Values { get; private set; }
-
         public HapticSeqVar()
         {
             Variable = "Delay_ms";
             Expression = "-100:20:100";
-        }
-
-        public void EvaluateExpression()
-        {
-            Values = KLib.Expressions.Evaluate(Expression);
         }
 
         public override string ToString()

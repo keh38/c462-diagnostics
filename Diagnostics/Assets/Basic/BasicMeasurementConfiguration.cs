@@ -3,6 +3,8 @@ using System.ComponentModel.Design;
 using System.Drawing.Design;
 using System.Xml.Serialization;
 
+using Newtonsoft.Json;
+
 namespace BasicMeasurements
 {
     [XmlInclude(typeof(Audiograms.AudiogramMeasurementSettings))]
@@ -10,6 +12,7 @@ namespace BasicMeasurements
     [XmlInclude(typeof(DigitsTest.DigitsTestSettings))]
     [XmlInclude(typeof(LDL.LDLMeasurementSettings))]
     [XmlInclude(typeof(Questionnaires.Questionnaire))]
+    [JsonObject(MemberSerialization.OptOut)]
     public class BasicMeasurementConfiguration
     {
         [Category("Bookkeeping")]

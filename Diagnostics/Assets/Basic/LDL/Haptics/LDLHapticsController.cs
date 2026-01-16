@@ -49,7 +49,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
     private HapticsMeasurementState _state;
 
     private List<HapticsTestCondition> _curGroup = new List<HapticsTestCondition>();
-    private LoudnessDiscomfortData _data = new LoudnessDiscomfortData();
+    private LDLHapticsData _data = new LDLHapticsData();
 
     private InputAction _abortAction;
 
@@ -110,6 +110,14 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
         InitDataFile();
 
         _stateFile = Path.Combine(FileLocations.SubjectFolder, $"{_mySceneName}.bin");
+
+        // Need to delete the existing LDL, otherwise it will be loaded and used to constrain the 
+        // max output level, making it impossible ever to exceed the original LDL.
+        if (_settings.HapticStimulus.SaveLDLGram && File.Exists(FileLocations.LDLPath))
+        {
+            _data.LDLgram = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
+            File.Delete(FileLocations.LDLPath);
+        }
 
         CreatePlan();
 
@@ -355,7 +363,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
                 foreach (var sc in scl)
                 {
                     var pvpl = sc.Clone();
-                    pvpl.Add(new PropValPair(seqVar.Variable, values[k]));
+                    pvpl.Set(seqVar.Variable, values[k]);
                     toAdd.Add(pvpl);
                 }
             }
@@ -578,7 +586,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
         var sliderSettings = _sliderPanel.GetSliderSettings();
         for (int k = 0; k < _curGroup.Count; k++)
         {
-            _data.sliderSettings.Add(sliderSettings[k]);
+            _data.sliderSettings.Add(sliderSettings[k].Clone());
             _curGroup[k].discomfortLevel.Add(sliderSettings[k].isMaxed ? float.NaN : sliderSettings[k].end);
             _state.testOrder.RemoveAt(0);
         }
@@ -604,6 +612,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 
     void FinishData()
     {
+        _data.testConditions = _state.testConditions;
         if (_settings.HapticStimulus.SaveLDLGram)
         {
             UpdateLDLGram();
@@ -613,7 +622,8 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
             _data.LDLgram = null;
         }
 
-        File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
+//        File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
+        KLib.Utilities.AppendToJsonFile(_dataPath, FileIO.JSONSerializeToString(_data));
     }
 
     void UpdateLDLGram()
@@ -665,7 +675,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
                 float thresh_SPL = audiograms.Get(ear).GetThreshold(tc.Freq_Hz);
 
                 float LDL_SL = (n > 0) ? (sum / n) : float.NaN;
-                if (LDL_SL < current + thresh_SPL)
+                if (float.IsNaN(current) || LDL_SL < current + thresh_SPL)
                 {
                     _data.LDLgram.Set(ear, tc.Freq_Hz, LDL_SL, LDL_SL + thresh_SPL);
                 }
@@ -673,14 +683,13 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
             else
             {
                 float LDL_SPL = (n > 0) ? (sum / n) : float.NaN;
-                if (LDL_SPL < current)
+                if (float.IsNaN(current) || LDL_SPL < current)
                 {
                     _data.LDLgram.Set(ear, tc.Freq_Hz, float.NaN, LDL_SPL);
                 }
             }
         }
         _data.LDLgram.Save(FileLocations.LDLPath);
-        File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
     }
 
     private void SaveState()

@@ -3,13 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 
 using Newtonsoft.Json;
-using ProtoBuf;
 
 using KLib.Signals;
 
 namespace LDL
 {
-    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     [JsonObject(MemberSerialization.OptOut)]
     public class TestCondition
     {
@@ -18,9 +16,7 @@ namespace LDL
         public bool offerBreakAfter = false;
         public List<float> discomfortLevel = new List<float>();
 
-        public TestCondition()
-        {
-        }
+        public TestCondition() { }
 
         public TestCondition(Laterality ear, float Freq_Hz)
         {

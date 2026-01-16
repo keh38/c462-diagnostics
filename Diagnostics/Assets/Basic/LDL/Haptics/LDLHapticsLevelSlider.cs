@@ -21,7 +21,7 @@ public class LDLHapticsLevelSlider : MonoBehaviour
 
     private Action<float> _paramSetter;
 
-    private SliderSettings _settings = null;
+    private HapticSliderSettings _settings = null;
 
     private bool _isActive = true;
     private bool _hasMoved = false;
@@ -78,10 +78,11 @@ public class LDLHapticsLevelSlider : MonoBehaviour
         _isActive = true;
         _hasMoved = false;
 
-        _settings = new SliderSettings();
+        _settings = new HapticSliderSettings();
         _settings.var = "Level";
         _settings.ear = test.ear;
         _settings.Freq_Hz = test.Freq_Hz;
+        _settings.propValPairs = test.propValPairs.Clone();
 
         if (test.discomfortLevel.Count == 0 || float.IsNaN(test.discomfortLevel[^1]))
         {
@@ -202,7 +203,7 @@ public class LDLHapticsLevelSlider : MonoBehaviour
         get { return _mover; }
     }
 
-    public SliderSettings Settings
+    public HapticSliderSettings Settings
     {
         get { return _settings; }
     }
@@ -228,7 +229,7 @@ public class LDLHapticsLevelSlider : MonoBehaviour
         {
             _settings.end = _slider.value * (_settings.max - _settings.min) + _settings.min;
 
-            _settings.isMaxed = _slider.value > 0.99f;
+            _settings.isMaxed = (_settings.max - _settings.end) < 1;
             _paramSetter(_settings.end);
 
             if (!_hasMoved && _settings.end != _settings.start)

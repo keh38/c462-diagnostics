@@ -127,6 +127,10 @@ namespace Audiograms
         {
             if (Freq_Hz == 0)
             {
+                if (!StimulusSpecificThresholds.ContainsKey("BBN"))
+                {
+                    return float.NaN;
+                }   
                 return StimulusSpecificThresholds["BBN"];
             }
             return KMath.Interp1(Frequency_Hz, Threshold_dBSPL, Freq_Hz);

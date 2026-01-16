@@ -88,9 +88,9 @@ public class LDLHapticsSliderPanel : MonoBehaviour
         _lockInButton.gameObject.SetActive(false);
     }
 
-    public List<SliderSettings> GetSliderSettings()
+    public List<HapticSliderSettings> GetSliderSettings()
     {
-        return _sliders.Select(x => x.Settings).ToList();
+        return _sliders.FindAll(x => x.gameObject.activeSelf).Select(x => x.Settings).ToList();
     }
 
     public int NumSliders

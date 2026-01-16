@@ -1,5 +1,5 @@
 ﻿using KLib;
-using ProtoBuf;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace LDL.Haptics
 {
-    [ProtoContract(ImplicitFields=ImplicitFields.AllPublic)]
+    [JsonObject(MemberSerialization.OptOut)]
     public class HapticsMeasurementState
     {
         public List<int> testOrder;
@@ -31,18 +31,19 @@ namespace LDL.Haptics
             }
         }
 
+        [JsonIgnore]
         public int NumConditions { get; set; }
 
-        [ProtoIgnore]
+        [JsonIgnore]
         public int NumCompleted { get { return NumConditions - testOrder.Count; } }
 
-        [ProtoIgnore]
+        [JsonIgnore]
         public float FractionCompleted { get { return (float)NumCompleted / NumConditions; } }
 
-        [ProtoIgnore]
+        [JsonIgnore]
         public int PercentCompleted { get { return Mathf.RoundToInt(100 * FractionCompleted); } }
 
-        [ProtoIgnore]
+        [JsonIgnore]
         public bool IsComplete { get { return testOrder.Count == 0;} }
     }
 }

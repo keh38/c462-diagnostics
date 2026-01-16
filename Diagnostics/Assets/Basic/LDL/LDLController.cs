@@ -451,7 +451,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         var sliderSettings = _sliderPanel.GetSliderSettings();
         for (int k = 0; k < _curGroup.Count; k++)
         {
-            _data.sliderSettings.Add(sliderSettings[k]);
+            _data.sliderSettings.Add(sliderSettings[k].Clone());
             _curGroup[k].discomfortLevel.Add(sliderSettings[k].isMaxed ? float.NaN : sliderSettings[k].end);
             _state.testOrder.RemoveAt(0);
         }
@@ -477,6 +477,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
 
     void FinishData()
     {
+        _data.testConditions = _state.testConditions;
         Audiograms.AudiogramData audiograms = Audiograms.AudiogramData.Load();
 
         // 1. Create "LDL Audiogram"
@@ -528,7 +529,9 @@ public class LDLController : MonoBehaviour, IRemoteControllable
             }
         }
         _data.LDLgram.Save(FileLocations.LDLPath);
-        File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
+
+//        File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
+        KLib.Utilities.AppendToJsonFile(_dataPath, FileIO.JSONSerializeToString(_data));
     }
 
     private void SaveState()

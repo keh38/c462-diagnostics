@@ -1,27 +1,20 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
 using Newtonsoft.Json;
 
-namespace LDL
+namespace LDL.Haptics
 {
     [JsonObject(MemberSerialization.OptOut)]
-    public class SliderSettings
+    public class HapticSliderSettings : LDL.SliderSettings
     {
-        public KLib.Signals.Laterality ear;
-        public float Freq_Hz;
-        public string var;
-        public float min;
-        public float max;
-        public float start;
-        public float end;
-        public bool isMaxed;
+        public PropValPairList propValPairs;
 
-        public SliderSettings() { }
-        public SliderSettings Clone()
-        {
-            SliderSettings clone = new SliderSettings();
+        public HapticSliderSettings() { }
+        public new HapticSliderSettings Clone()
+        { 
+            HapticSliderSettings clone = new HapticSliderSettings();
             clone.ear = this.ear;
             clone.Freq_Hz = this.Freq_Hz;
             clone.var = this.var;
@@ -30,6 +23,7 @@ namespace LDL
             clone.start = this.start;
             clone.end = this.end;
             clone.isMaxed = this.isMaxed;
+            clone.propValPairs = this.propValPairs.Clone(); 
             return clone;
         }
     }

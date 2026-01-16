@@ -87,7 +87,7 @@ public class LDLSliderPanel : MonoBehaviour
 
     public List<SliderSettings> GetSliderSettings()
     {
-        return _sliders.Select(x => x.Settings).ToList();
+        return _sliders.FindAll(x => x.gameObject.activeSelf).Select(x => x.Settings).ToList();
     }
 
     public int NumSliders
