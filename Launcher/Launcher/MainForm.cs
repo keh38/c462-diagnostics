@@ -400,7 +400,7 @@ namespace Launcher
 
             var desiredFormat = new NAudio.Wave.WaveFormatExtensible(48000, 16, 8, (int)ChannelMapping.Surround7point1);
 
-            var device = Utilities.GetDefaultDevice();
+            var device = CoreAudio.Utilities.GetDefaultDevice();
             Log.Information($"Default device: {device.FriendlyName}");
 
             // is default device already in Surround 7.1 format?
@@ -429,7 +429,7 @@ namespace Launcher
             if (supports71)
             {
                 Log.Information("Setting device format to 7.1");
-                Utilities.SetDeviceFormat(device, desiredFormat);
+                CoreAudio.Utilities.SetDeviceFormat(device, desiredFormat);
                 //Utilities.SetDeviceFormat(device, magicKey, desiredFormat);
 
                 var errMsg = RestartService();
@@ -452,7 +452,7 @@ namespace Launcher
                     Log.Information($"Changing default device to {d.FriendlyName}");
                     d.Selected = true;
                     Log.Information("Setting device format to 7.1");
-                    Utilities.SetDeviceFormat(d, desiredFormat);
+                    CoreAudio.Utilities.SetDeviceFormat(d, desiredFormat);
 
                     var errMsg = RestartService();
                     return errMsg;

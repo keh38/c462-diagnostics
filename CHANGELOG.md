@@ -1,6 +1,6 @@
 ## Changelog
 
-### v1.9 (unreleased)
+### v1.9 (2026-01-20)
 #### Changed
 - LDL Haptics:
   - expanded haptic parameter sequencing
