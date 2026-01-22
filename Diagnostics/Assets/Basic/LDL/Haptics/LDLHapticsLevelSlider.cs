@@ -134,6 +134,7 @@ public class LDLHapticsLevelSlider : MonoBehaviour
 
         _paramSetter(_settings.start);
         _signalManager.Initialize();
+        HardwareInterface.Digitimer?.EnableDevices(_signalManager.GetDigitimerChannels());
         _signalManager.StartPaused();
 
         _settings.max = Mathf.Min(_settings.max, _myChannel.GetMaxLevel());
