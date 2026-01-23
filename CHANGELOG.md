@@ -1,5 +1,11 @@
 ## Changelog
 
+### v1.10.1 (2026-01-23)
+#### Fixed
+- LDL w/Haptics: was not correctly setting the Digitimer Level sequence variable
+
+---
+
 ### v1.10 (2026-01-22)
 #### Fixed
 - LDL w/Haptics:
