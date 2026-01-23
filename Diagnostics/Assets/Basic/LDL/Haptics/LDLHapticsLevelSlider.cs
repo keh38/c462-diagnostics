@@ -177,7 +177,7 @@ public class LDLHapticsLevelSlider : MonoBehaviour
                 case "Level":
                     if (_myHaptic.waveform is Digitimer)
                     {
-                        _myHaptic.SetParameter("Digitimer.Demand", pair.value);
+                        _myHaptic.SetParameter("Digitimer.Demand_mA", pair.value);
                     }
                     else if (_myHaptic.waveform is Sinusoid)
                     {
