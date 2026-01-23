@@ -136,6 +136,22 @@ namespace KLib
         {
             return TryEvaluate(expression, null);
         }
+        public static bool TryEvaluate(string expression, out float[] values)
+        {
+            values = null;
+            bool result = true;
+            try
+            {
+                values = Evaluate(expression);
+            }
+            catch (Exception ex)
+            {
+                result = false;
+                _lastError = ex.Message;
+            }
+
+            return result;
+        }
         public static bool TryEvaluate(string expression, List<PropVal> propVals)
         {
             bool result = true;

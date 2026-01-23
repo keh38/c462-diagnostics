@@ -1,5 +1,14 @@
 ## Changelog
 
+### v1.10 (2026-01-22)
+#### Fixed
+- LDL w/Haptics:
+  - now sets the Digitimer
+  - allow sequence variable expressions to use metrics
+  - added Level as a sequenceable variable
+
+---
+
 ### v1.9 (2026-01-20)
 #### Changed
 - LDL Haptics:

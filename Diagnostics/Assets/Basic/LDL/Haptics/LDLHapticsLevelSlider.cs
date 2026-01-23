@@ -174,6 +174,16 @@ public class LDLHapticsLevelSlider : MonoBehaviour
                         _myHaptic.SetParameter("Sinusoid.Frequency_Hz", pair.value);
                     }
                     break;
+                case "Level":
+                    if (_myHaptic.waveform is Digitimer)
+                    {
+                        _myHaptic.SetParameter("Digitimer.Demand", pair.value);
+                    }
+                    else if (_myHaptic.waveform is Sinusoid)
+                    {
+                        _myHaptic.SetParameter("Level", pair.value);
+                    }
+                    break;
             }
         }
     }

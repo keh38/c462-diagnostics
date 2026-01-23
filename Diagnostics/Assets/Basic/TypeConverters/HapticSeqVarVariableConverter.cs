@@ -16,7 +16,8 @@ namespace LDL.Haptics
             {
                 "Delay_ms",
                 "Duration_ms",
-                "Frequency_Hz"
+                "Frequency_Hz",
+                "Level"
             });
         }
     }

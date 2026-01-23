@@ -76,6 +76,12 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
     {
         HTS_Server.SetCurrentScene(_mySceneName, this);
 
+        KLib.Expressions.Metrics = GameManager.Metrics;
+        KLib.Expressions.Audiogram = Audiograms.AudiogramData.Load();
+        var ldl = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
+        if (ldl != null) ldl.ReplaceNaNWithMax(GameManager.Transducer);
+        KLib.Expressions.LDL = ldl;
+
         _title.text = "";
 
 #if HACKING
@@ -107,24 +113,35 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
     {
         _title.text = _settings.Title;
 
-        InitDataFile();
-
-        _stateFile = Path.Combine(FileLocations.SubjectFolder, $"{_mySceneName}.bin");
-
-        // Need to delete the existing LDL, otherwise it will be loaded and used to constrain the 
-        // max output level, making it impossible ever to exceed the original LDL.
-        if (_settings.HapticStimulus.SaveLDLGram && File.Exists(FileLocations.LDLPath))
+        try
         {
-            _data.LDLgram = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
-            File.Delete(FileLocations.LDLPath);
+
+            InitDataFile();
+
+            _stateFile = Path.Combine(FileLocations.SubjectFolder, $"{_mySceneName}.bin");
+
+            CreatePlan();
+
+            // Need to delete the existing LDL, otherwise it will be loaded and used to constrain the 
+            // max output level, making it impossible ever to exceed the original LDL.
+            if (_settings.HapticStimulus.SaveLDLGram && File.Exists(FileLocations.LDLPath))
+            {
+                _data.LDLgram = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
+                File.Delete(FileLocations.LDLPath);
+            }
+
+            _progressBar.maxValue = _state.NumConditions;
+            _progressBar.value = 0;
+
+            HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
+        }
+        catch (Exception ex)
+        {
+            var message = $"error{Environment.NewLine}{ex.Message}";
+            Debug.Log($"[{_mySceneName} error]: {ex.Message}");
+            HTS_Server.SendMessage(_mySceneName, $"File:{message}");
         }
 
-        CreatePlan();
-
-        _progressBar.maxValue = _state.NumConditions;
-        _progressBar.value = 0;
-
-        HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
     }
 
     void InitDataFile()
@@ -308,7 +325,8 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
         {
             case "Initialize":
                 _settings = FileIO.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as LDLMeasurementSettings;
-                InitializeMeasurement();
+                //                InitializeMeasurement();
+                StartCoroutine(RpcInitializeMeasurement()); 
                 break;
             case "StartSynchronizing":
                 HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
@@ -328,6 +346,12 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
     void IRemoteControllable.ChangeScene(string newScene)
     {
         SceneManager.LoadScene(newScene);
+    }
+    
+    IEnumerator RpcInitializeMeasurement()
+    {
+        yield return null;
+        InitializeMeasurement();
     }
 
     private List<PropValPairList> CreateStimulusConditionList()
@@ -350,7 +374,13 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 
     private void AddSequenceVariable(List<PropValPairList> scl, HapticSeqVar seqVar)
     {
-        float[] values = KLib.Expressions.Evaluate(seqVar.Expression);
+        float[] values = Expressions.Evaluate(seqVar.Expression);
+        //var success = Expressions.TryEvaluate(seqVar.Expression, out float[] values);
+        //if (!success)
+        //{
+        //    throw new System.Exception($"Error evaluating sequence variable expression: {seqVar.Expression}");
+        //}   
+
         List<PropValPairList> toAdd = new List<PropValPairList>();
         for (int k=0; k< values.Length; k++)
         {
