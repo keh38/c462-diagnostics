@@ -7,6 +7,7 @@ using BasicMeasurements;
 using KLib.TypeConverters;
 using System.ComponentModel.Design;
 using System.Drawing.Design;
+using Unity.VisualScripting;
 
 namespace DigitsTest
 {
@@ -19,14 +20,18 @@ namespace DigitsTest
         public new bool UseDefaultInstructions { get; set; }
 
         [Browsable(false)]
-        public new int InstructionFontSize { get; set; }
-
-        [Browsable(false)]
         public new string InstructionMarkdown { get; set; }
 
         [Category("Appearance")]
+        [PropertyOrder(0)]
         public string Title { get; set; }
         private bool ShouldSerializeTitle() { return false; }
+
+        [Category("Appearance")]
+        [PropertyOrder(1)]
+        [DisplayName("Illumination")]
+        public bool ApplyIllumination { get; set; }
+        private bool ShouldSerializeApplyIllumination() { return false; }
 
         [Category("Sequence")]
         [PropertyOrder(1)]
@@ -107,6 +112,8 @@ namespace DigitsTest
         public DigitsTestSettings() : base()
         {
             Title = "Digits Test";
+            ApplyIllumination = true;
+            InstructionFontSize = 60;
 
             NumPracticeTrials = 3;
             NumTestBlocksPerCondition = 1;

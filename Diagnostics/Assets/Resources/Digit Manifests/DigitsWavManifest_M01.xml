@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DigitsWavManifest>
+	<speakerID>M01</speakerID>
+	<wavfiles>
+		<string>M01_0a.wav</string>
+		<string>M01_1a.wav</string>
+		<string>M01_2a.wav</string>
+		<string>M01_3b.wav</string>
+		<string>M01_4b.wav</string>
+		<string>M01_5b.wav</string>
+		<string>M01_6b.wav</string>
+		<string>M01_7b.wav</string>
+		<string>M01_8b.wav</string>
+		<string>M01_9b.wav</string>
+	</wavfiles>
+</DigitsWavManifest>

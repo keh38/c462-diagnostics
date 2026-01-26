@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class DigitDisplay : MonoBehaviour
 {
     [SerializeField] private Keypad _keypad;
+    [SerializeField] private GameObject _digitsObject;
     [SerializeField] private SingleDigitDisplay[] _digitDisplays;
     [SerializeField] private Button _lockInButton;
 
@@ -69,16 +70,17 @@ public class DigitDisplay : MonoBehaviour
     {
         _isActive = false;
         _keypad.Hide();
-        //gameObject.SetActive(false);
+        _digitsObject.SetActive(false);
     }
 
     public void Show()
     {
+        gameObject.SetActive(true);
         _anyPressed = false;
         _isActive = true;
-        _lockInButton.enabled = true;
         _keypad.Show();
-        gameObject.SetActive(true);
+        _lockInButton.interactable = false;
+        _digitsObject.SetActive(true);
 
         Clear();
     }
@@ -86,13 +88,8 @@ public class DigitDisplay : MonoBehaviour
     public void Disable()
     {
         _isActive = false;
-        _lockInButton.enabled = false;
+        _lockInButton.interactable = false;
         _digitDisplays[_curTypeDigit].SetFocus(false);
-    }
-
-    public void Hide_lockInButton()
-    {
-        _lockInButton.gameObject.SetActive(false);
     }
 
     public void Clear()
@@ -105,8 +102,14 @@ public class DigitDisplay : MonoBehaviour
 
         _curTypeDigit = 0;
         _digitDisplays[_curTypeDigit].SetFocus(true);
-        _lockInButton.gameObject.SetActive(false);
     }
+
+    public void DisableLockInButton()
+    {
+        _lockInButton.interactable = false;
+    }
+
+
 
     private void OnKeypadPress(int num)
     {
@@ -173,13 +176,17 @@ public class DigitDisplay : MonoBehaviour
                 }
             }
             
-            if (digit > -1)
+            if (digit > -1 && digit < 10)
             {
                 OnKeypadPress(digit);
             }
             else if (Input.GetKeyDown(KeyCode.Backspace) && _keypad.BackspaceButton.State == KeypadButtonState.Enabled)
             {
                 OnBackspacePress(-1);
+            }
+            else if ((Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return)) && _keypad.EnterButton.State == KeypadButtonState.Enabled)
+            {
+                OnEnterPress(0);
             }
         }
     }
@@ -193,7 +200,7 @@ public class DigitDisplay : MonoBehaviour
             _digits[k] = _digitDisplays[k].Value;
             allSet &= _digits[k] > -1;
         }
-        _lockInButton.gameObject.SetActive(allSet);
+        _lockInButton.interactable = allSet;
     }
 
     public IEnumerator Feedback(int[] correctAnswer)

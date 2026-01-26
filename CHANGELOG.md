@@ -1,5 +1,11 @@
 ## Changelog
 
+### v1.11 (unreleased)
+#### added
+- restored Digits test
+
+---
+
 ### v1.10.1 (2026-01-23)
 #### Fixed
 - LDL w/Haptics: was not correctly setting the Digitimer Level sequence variable
