@@ -50,6 +50,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Speech/Digits/Digits.unity
     guid: e6e2eb4f008c6e04396f568e18380ccf
+  - enabled: 1
+    path: Assets/Speech/Speech Reception/SpeechReception.unity
+    guid: e3d58c57524cf894dbf132ccdf819f9f
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 28be48df767d2434681ec999065f06dc, type: 3}
   m_UseUCBPForAssetBundles: 0
