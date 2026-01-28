@@ -51,11 +51,11 @@ namespace SpeechReception
 
             foreach (int isnr in KMath.Permute(SNRs.Length))
             {
-                if (sequence.order == Sequence.Order.Sequential || sequence.order == Sequence.Order.Default)
+                if (sequence.Order == Order.Sequential)
                 {
-                    for (int kb = 0; kb < sequence.numBlocks; kb++)
+                    for (int kb = 0; kb < sequence.NumBlocks; kb++)
                     { 
-                        for (int k = 0; k < sequence.repeatsPerBlock; k++)
+                        for (int k = 0; k < sequence.RepeatsPerBlock; k++)
                         {
                             foreach (Sentence s in sentences)
                             {
@@ -65,19 +65,19 @@ namespace SpeechReception
                     }
                 }
 
-                else if (sequence.order == Sequence.Order.FullRandom)
+                else if (sequence.Order == Order.FullRandom)
                 {
-                    foreach (int isen in KMath.Permute(sentences.Count, sequence.numBlocks * sequence.repeatsPerBlock * sentences.Count))
+                    foreach (int isen in KMath.Permute(sentences.Count, sequence.NumBlocks * sequence.RepeatsPerBlock * sentences.Count))
                     {
                          seq.Add(new Sentence(sentences[isen], SNRs[isnr]));
                     }
                 }
 
-                else if (sequence.order == Sequence.Order.BlockRandom)
+                else if (sequence.Order == Order.BlockRandom)
                 {
-                    for (int kb = 0; kb < sequence.numBlocks; kb++)
+                    for (int kb = 0; kb < sequence.NumBlocks; kb++)
                     {
-                        for (int k = 0; k < sequence.repeatsPerBlock; k++)
+                        for (int k = 0; k < sequence.RepeatsPerBlock; k++)
                         {
                             foreach (int ioff in KMath.Permute(sentences.Count))
                             {
@@ -89,7 +89,7 @@ namespace SpeechReception
 
             }
 
-            sequence.ItemsPerBlock = sequence.repeatsPerBlock * sentences.Count;
+            sequence.ItemsPerBlock = sequence.RepeatsPerBlock * sentences.Count;
             sentences = seq;
         }
 

@@ -4,11 +4,8 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-using ProtoBuf;
 namespace SpeechReception
 {
-    [System.Serializable]
-    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public class MatrixTest
     {
         public enum Mode { VarySignal, VaryMasker}

@@ -2,37 +2,48 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-
+using System.Xml.Serialization;
 using KLib;
-
+using KLib.TypeConverters;
 using OrderedPropertyGrid;
 
 namespace SpeechReception
 {
     public enum Laterality { Left, Right, Binaural}
 
+    public enum TestType
+    {
+        QuickSIN,
+        OpenSet,
+        ClosedSet,
+        Matrix
+    }
+
+    [TypeConverter(typeof(SpeechTestConverter))]
     public class SpeechTest
     {
         [Category("About")]
         [PropertyOrder(0)]
-        [DisplayName("Type")]
-        public string TestType { get; set; }
-        private bool ShouldSerializeTestType() { return false; }
-
-        [Category("About")]
-        [PropertyOrder(1)]
         [DisplayName("Name")]
         public string TestName { get; set; }
         private bool ShouldSerializeTestName() { return false; }
 
+        [Category("About")]
+        [PropertyOrder(1)]
+        [DisplayName("Type")]
+        public TestType TestType { get; set; }
+        private bool ShouldSerializeTestType() { return false; }
+
         [Category("Instructions")]
+        [DisplayName("Font size")]
         [PropertyOrder(0)]
         public int InstructionFontSize { get; set; }
         private bool ShouldSerializeInstructionFontSize() { return false; }
 
         [Category("Instructions")]
         [PropertyOrder(1)]
-        public Instructions Instructions { get; set; }
+        [TypeConverter(typeof(InstructionFileCollectionConverter))]
+        public List<InstructionFile> Instructions { get; set; }
         private bool ShouldSerializeInstructions() { return false; }
 
         [Category("Timing")]
@@ -60,7 +71,13 @@ namespace SpeechReception
         private bool ShouldSerializeMaskerTail_s() { return false; }
 
         [Category("Procedure")]
+        [PropertyOrder(0)]
+        public bool BypassDataStreams { get; set; }
+        private bool ShouldSerializeBypassDataStreams() { return false; }
+
+        [Category("Procedure")]
         [PropertyOrder(6)]
+        [Description("Number of recordings to have subject review")]
         public int NumToReview { get; set; }
         private bool ShouldSerializeNumToReview() { return false; }
 
@@ -96,12 +113,12 @@ namespace SpeechReception
 
         [Category("Sequence")]
         [PropertyOrder(12)]
-        public Laterality laterality
+        public Laterality Laterality
         {
             get { return _laterality; }
             set { _laterality = value; }
         }
-        private bool ShouldSerializelaterality() { return false; }
+        private bool ShouldSerializeLaterality() { return false; }
 
         [Browsable(false)]
         public string MenuOptions { get; set; }
@@ -110,8 +127,8 @@ namespace SpeechReception
         [Category("Lists")]
         [PropertyOrder(14)]
         [Description("Total number of lists available")]
-        public int NumLists { get; set; }
-        private bool ShouldSerializeNumLists() { return false; }
+        public int NumListsAvailable { get; set; }
+        private bool ShouldSerializeNumListsAvailable() { return false; }
 
         [Category("Lists")]
         [PropertyOrder(15)]
@@ -127,6 +144,7 @@ namespace SpeechReception
 
         [Category("Lists")]
         [PropertyOrder(19)]
+        [TypeConverter(typeof(ListPropertiesCollectionConverter))]
         public List<ListProperties> Lists { get; set; }
         private bool ShouldSerializeLists() { return false; }
 
@@ -138,10 +156,10 @@ namespace SpeechReception
 
         public SpeechTest()
         {
-            TestType = null;
+            TestType = TestType.OpenSet;
             TestName = "untitled";
 
-            Instructions = null;
+            Instructions = new List<InstructionFile>();
             InstructionFontSize = 60;
 
             MinDelay_s = 0f;
@@ -156,7 +174,7 @@ namespace SpeechReception
             EarOrder = "Random";
             // laterality uses backing field _laterality which already defaults to Both
             MenuOptions = null;
-            NumLists = 1;
+            NumListsAvailable = 1;
             Choose = 0;
             Exclude = "";
             UseAudioCues = false;
@@ -178,36 +196,42 @@ namespace SpeechReception
 
             SpeechTest srt = FileIO.XmlDeserialize<SpeechTest>(FileLocations.ConfigFile(configFile));
 
-            var c = customizations.Get(srt.TestType);
-            srt.Initialize(option, c);
+            //var c = customizations.Get(srt.TestType);
+            //srt.Initialize(option, c);
 
             return srt;
         }
 
+        [XmlIgnore]
+        [Browsable(false)]
         public string Option
         {
             get { return _option; }
         }
 
+        [XmlIgnore]
+        [Browsable(false)]
         public int NumSentences
         {
             get { return _numSentences; }
         }
 
+        [XmlIgnore]
+        [Browsable(false)]
         public List<Laterality> Ears
         {
             get
             {
                 List<Laterality> ears = new List<Laterality>();
-                List<string> names = new List<string>(Enum.GetNames(typeof(Laterality)));
-                if (!string.IsNullOrEmpty(TestEars))
-                {
-                    foreach(string e in TestEars.Split(','))
-                    {
-                        int idx = names.FindIndex(o => o == e.Trim());
-                        if (idx >= 0) ears.Add((Laterality)idx);
-                    }
-                }
+                //List<string> names = new List<string>(Enum.GetNames(typeof(Laterality)));
+                //if (!string.IsNullOrEmpty(TestEars))
+                //{
+                //    foreach(string e in TestEars.Split(','))
+                //    {
+                //        int idx = names.FindIndex(o => o == e.Trim());
+                //        if (idx >= 0) ears.Add((Laterality)idx);
+                //    }
+                //}
                 return ears;
             }
         }
@@ -241,7 +265,7 @@ namespace SpeechReception
 
             foreach (ListProperties listProps in Lists)
             {
-                listProps.Initialize(TestType, laterality, option);
+                //listProps.Initialize(TestType, Laterality, option);
                 _numSentences += listProps.GetItemCount();
             }
         }
@@ -254,14 +278,14 @@ namespace SpeechReception
             foreach (var list in Lists)
             {
                 var lp = new ListProperties(list);
-                lp.level = customization.level;
+                lp.Level = customization.level;
 
                 if (lp.MaskerAvailable)
                 {
                     foreach (var snr in customization.snr)
                     {
                         var maskedList = new ListProperties(lp);
-                        maskedList.SNRs = new float[] { snr };
+                        //maskedList.SNRs = new float[] { snr };
                         newListProps.Add(maskedList);
                         numSNR++;
                     }
@@ -288,7 +312,7 @@ namespace SpeechReception
             else
             {
                 history = new ListHistory();
-                history.Order = KMath.Permute(NumLists);
+                history.Order = KMath.Permute(NumListsAvailable);
                 history.LastCompleted = -1;
                 FileIO.XmlSerialize(history, historyFile);
             }
@@ -297,24 +321,24 @@ namespace SpeechReception
             {
                 history.Order = KMath.SetDiff(history.Order, excluded);
                 FileIO.XmlSerialize(history, historyFile);
-                NumLists = history.Order.Length;
+                NumListsAvailable = history.Order.Length;
                 UnityEngine.Debug.Log("excluded " + KLib.Expressions.ToVectorString(excluded) + " from " + TestType + " history");
             }
 
             List<ListProperties> newListProps = new List<ListProperties>();
 
             int listIndex = history.LastCompleted + 1;
-            if (listIndex >= NumLists) listIndex = 0;
+            if (listIndex >= NumListsAvailable) listIndex = 0;
 
             for (int k = 0; k < NumPracticeLists; k++)
             {
                 var lp = new ListProperties(Lists[0]);
 
                 lp.listIndex = listIndex++;
-                if (listIndex >= NumLists) listIndex = 0;
+                if (listIndex >= NumListsAvailable) listIndex = 0;
 
                 int listNum = history.Order[lp.listIndex];
-                lp.file = String.Format(lp.file, listNum + 1);
+                //lp.file = String.Format(lp.file, listNum + 1);
 
                 newListProps.Add(lp);
             }
@@ -330,10 +354,10 @@ namespace SpeechReception
                     var lp = new ListProperties(Lists[firstMasked + klist]);
 
                     lp.listIndex = listIndex++;
-                    if (listIndex == NumLists) listIndex = 0;
+                    if (listIndex == NumListsAvailable) listIndex = 0;
 
                     int listNum = history.Order[lp.listIndex];
-                    lp.file = String.Format(lp.file, listNum + 1);
+                    //lp.file = String.Format(lp.file, listNum + 1);
 
                     newListProps.Add(lp);
                 }
@@ -351,24 +375,24 @@ namespace SpeechReception
             else
             {
                 history = new ListHistory();
-                history.Order = KMath.Permute(NumLists);
+                history.Order = KMath.Permute(NumListsAvailable);
                 history.LastCompleted = -1;
                 FileIO.XmlSerialize(history, historyFile);
             }
 
             listIndex = history.LastCompleted + 1;
-            if (listIndex >= NumLists) listIndex = 0;
+            if (listIndex >= NumListsAvailable) listIndex = 0;
 
             int listNum = history.Order[listIndex];
 
             return listNum;
         }
 
-        public float GetReference(string transducer, SpeechReception.LevelUnits units)
-        {
-            References r = new References(Path.Combine(FileLocations.SpeechWavFolder, TestType), TestType);
-            return r.GetReference(transducer, units.ToString());
-        }
+        //public float GetReference(string transducer, SpeechReception.LevelUnits units)
+        //{
+        //    References r = new References(Path.Combine(FileLocations.SpeechWavFolder, TestType), TestType);
+        //    return r.GetReference(transducer, units.ToString());
+        //}
 
     }
 }

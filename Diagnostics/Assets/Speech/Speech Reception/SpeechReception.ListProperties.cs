@@ -1,26 +1,57 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
-
+using System.Windows.Forms.Design;
 using ExtensionMethods;
 using KLib;
-using KLib.Signals.Enumerations;
+using KLib.TypeConverters;
+using OrderedPropertyGrid;
     
 namespace SpeechReception
 {
+    [TypeConverter(typeof(ListPropertiesConverter))]
     public class ListProperties
     {
-        public string file = "";
-        public Laterality laterality = Laterality.Binaural;
+        [Category("List properties")]
+        [PropertyOrder(0)]
+        public string Name { get; set; }
+        private bool ShouldSerializeName() { return false; }
 
-        public float level = 60;
-        public LevelUnits units = LevelUnits.dBSPL;
-        public float[] SNRs = null;
+        [Category("List properties")]
+        [PropertyOrder(1)]
+        public float Level { get; set; } 
+        private bool ShouldSerializeLevel() { return false; }
 
-        public Masker masker = null;
-        public Sequence sequence = null;
-        public ClosedSet closedSet = null;
-        public MatrixTest matrixTest = null;
+        [Category("List properties")]
+        [PropertyOrder(2)]
+        public LevelUnits Units { get; set; } 
+        private bool ShouldSerializeUnits() { return false; }
+
+        [Category("List properties")]
+        [PropertyOrder(3)]
+        public string SNR { get; set; }
+        private bool ShouldSerializeSNR() { return false; }
+
+        [Category("List properties")]
+        [PropertyOrder(4)]
+        public Masker Masker { get; set; } 
+        private bool ShouldSerializeMasker() { return false; }
+
+        [Category("List properties")]
+        [PropertyOrder(5)]
+        public ClosedSet ClosedSet { get; set; } 
+        private bool ShouldSerializeClosedSet() { return false; }
+
+        [Category("List properties")]
+        [PropertyOrder(6)]
+        public Sequence Sequence { get; set; } 
+        private bool ShouldSerializeSequence() { return false; }
+
+        [Category("List properties")]
+        [PropertyOrder(7)]
+        public MatrixTest MatrixTest { get; set; }
+        private bool ShouldSerializeMatrixTest() { return false; }
 
         public bool applyOptions = false;
         public bool applyCustom = true;
@@ -31,41 +62,56 @@ namespace SpeechReception
         public List<ListDescription.Sentence> sentences;
         private string _title;
 
-        public ListProperties() { }
-        public ListProperties(ListProperties that)
+        public ListProperties()
         {
-            this.file = that.file;
-            this.laterality = that.laterality;
-            this.level = that.level;
-            this.units = that.units;
-            this.SNRs = that.SNRs==null ? null : (float[]) that.SNRs.Clone();
-            this.masker = that.masker;
-            this.sequence = that.sequence;
-            this.closedSet = that.closedSet;
-            this.matrixTest = that.matrixTest;
-            this.applyCustom = that.applyCustom;
-            this.applyOptions = that.applyOptions;
+            Name = "";
+            Level = 60;
+            Units = LevelUnits.dBSPL;
+            SNR = "";
+            Masker = new Masker();
+            ClosedSet = new ClosedSet();
+            Sequence = new Sequence();
+            MatrixTest = new MatrixTest();
         }
 
+
+        public ListProperties(ListProperties that)
+        {
+            //this.file = that.file;
+            //this.laterality = that.laterality;
+            //this.level = that.level;
+            //this.units = that.units;
+            //this.SNRs = that.SNRs==null ? null : (float[]) that.SNRs.Clone();
+            //this.masker = that.masker;
+            //this.sequence = that.sequence;
+            //this.closedSet = that.closedSet;
+            //this.matrixTest = that.matrixTest;
+            //this.applyCustom = that.applyCustom;
+            //this.applyOptions = that.applyOptions;
+        }
+
+        [Browsable(false)]
         public string Title
         {
             get { return _title; }
         }
 
+        [Browsable(false)]
         public string TestType
         {
             get { return _testType; }
         }
 
+        [Browsable(false)]
         public bool ShowFeedback
         {
-            get { return closedSet != null && closedSet.feedback != ClosedSet.FeedbackType.None; }
+            get { return ClosedSet != null && ClosedSet.Feedback != ClosedSet.FeedbackType.None; }
         }
 
         public int GetItemCount()
         {
             var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(_testType));
-            return sequence.repeatsPerBlock * sequence.numBlocks * (sequence.choose > 0 ? sequence.choose : listDescription.sentences.Count);
+            return Sequence.RepeatsPerBlock * Sequence.NumBlocks * (Sequence.choose > 0 ? Sequence.choose : listDescription.sentences.Count);
         }
 
         public List<string> GetClosedSetResponses()
@@ -76,10 +122,10 @@ namespace SpeechReception
 
         public void SetSequence()
         {
-            var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(_testType));
-            float[] snr = (masker != null) ? SNRs : new float[] { float.PositiveInfinity};
-            listDescription.SetSequence(sequence, snr);
-            sentences = listDescription.sentences;
+            //var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(_testType));
+            //float[] snr = (masker != null) ? SNRs : new float[] { float.PositiveInfinity};
+            //listDescription.SetSequence(sequence, snr);
+            //sentences = listDescription.sentences;
         }
 
         public void Initialize(string testType, Laterality laterality, string option)
@@ -90,12 +136,12 @@ namespace SpeechReception
             var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(_testType));
             _title = listDescription.title;
 
-            if (laterality != Laterality.Binaural) this.laterality = laterality;
+            //if (laterality != Laterality.Binaural) this.laterality = laterality;
 
             ApplyOption(option);
 
-            if (sequence == null) sequence = new Sequence();
-            if (SNRs == null) SNRs = new float[] { float.PositiveInfinity };
+            if (Sequence == null) Sequence = new Sequence();
+            //if (SNRs == null) SNRs = new float[] { float.PositiveInfinity };
         }
 
         public void ApplyOption(string option)
@@ -104,27 +150,29 @@ namespace SpeechReception
 
             string[] parts = option.Split('=');
             float value = float.Parse(parts[1]);
-            switch (parts[0].Trim())
-            {
-                case "SNR":
-                    SNRs = new float[] { value };
-                    break;
-            }
+            //switch (parts[0].Trim())
+            //{
+            //    case "SNR":
+            //        SNRs = new float[] { value };
+            //        break;
+            //}
         }
 
+        [Browsable(false)]
         public bool MaskerAvailable
         {
             get
             {
-                return masker != null && !string.IsNullOrEmpty(masker.Source);
+                return Masker != null && !string.IsNullOrEmpty(Masker.Source);
             }
         }
 
+        [Browsable(false)]
         public bool UseMasker
         {
             get
             {
-                return masker != null && !string.IsNullOrEmpty(masker.Source) && (AnyFiniteSNR || (matrixTest!=null && matrixTest.active));
+                return Masker != null && !string.IsNullOrEmpty(Masker.Source) && (AnyFiniteSNR || (MatrixTest!=null && MatrixTest.active));
             }
         }
 
@@ -134,14 +182,14 @@ namespace SpeechReception
             {
                 bool any = false;
 
-                foreach (float v in SNRs)
-                {
-                    if (!float.IsInfinity(v))
-                    {
-                        any = true;
-                        break;
-                    }
-                }
+                //foreach (float v in SNRs)
+                //{
+                //    if (!float.IsInfinity(v))
+                //    {
+                //        any = true;
+                //        break;
+                //    }
+                //}
 
                 return any;
             }
@@ -151,10 +199,10 @@ namespace SpeechReception
         private string GetListDescriptionPath(string testType)
         {
             string listDescriptionPath;
-            if (file.StartsWith("SpeechList"))
-                listDescriptionPath = FileLocations.ConfigFile(file);
+            if (Name.StartsWith("SpeechList"))
+                listDescriptionPath = FileLocations.ConfigFile(Name);
             else
-                listDescriptionPath = Path.Combine(FileLocations.SpeechWavFolder, testType, "SpeechList." + file + ".xml");
+                listDescriptionPath = Path.Combine(FileLocations.SpeechWavFolder, testType, "SpeechList." + Name + ".xml");
 
             return listDescriptionPath;
         }
