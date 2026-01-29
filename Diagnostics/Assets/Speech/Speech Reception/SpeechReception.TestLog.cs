@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 using Newtonsoft.Json;
 
-namespace Digits
+namespace SpeechReception
 {
     [JsonObject(MemberSerialization.OptOut)]
     public class TestLog

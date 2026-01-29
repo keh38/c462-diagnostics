@@ -20,8 +20,8 @@ namespace SpeechReception
                 List<PropertyDescriptor> filteredProperties = new List<PropertyDescriptor>();
                 foreach (PropertyDescriptor prop in sortedProperties)
                 {
-                    if (prop.Category == "Level" && TestType == TestType.QuickSIN) { }
-                    else if (prop.Category == "Masker" && TestType == TestType.QuickSIN) { }
+                    if (prop.Category == "Masker" && TestType == TestType.QuickSIN) { }
+                    else if (prop.Name == "SNR" && TestType == TestType.QuickSIN) { }
                     else if (prop.Name == "ClosedSet" && TestType != TestType.ClosedSet) { }
                     else if (prop.Name == "Sequence" && TestType != TestType.ClosedSet) { }
                     else if (prop.Name == "MatrixTest" && TestType != TestType.Matrix) { }

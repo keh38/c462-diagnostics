@@ -1,20 +1,12 @@
-﻿using UnityEngine;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 
 using KLib;
-using KLib.Signals.Enumerations;
-using ExtensionMethods;
 
 namespace SpeechReception
 {
-    [Serializable]
     public class ListDescription
     {
-        [Serializable]
         public class Sentence
         {
             public string wavfile;
@@ -37,6 +29,8 @@ namespace SpeechReception
         public string type;
 
         public List<Sentence> sentences = new List<Sentence>();
+
+        public ListDescription() { }
 
         public void SetSequence(Sequence sequence, float[] SNRs)
         {

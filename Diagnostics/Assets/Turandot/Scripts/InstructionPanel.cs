@@ -68,12 +68,17 @@ public class InstructionPanel : MonoBehaviour
         rectTransform.anchorMin = new Vector2(0, yval);
         rectTransform.anchorMax = new Vector2(1, yval); ;
         rectTransform.pivot = new Vector2(0.5f, yval);
-
     }
 
     private void ShowPage(int index)
     {
-        _markdownRenderer.Source = _pages[index];
+        string text = _pages[index];
+        if (_instructions.LineSpacing > 1)
+        {
+            text = text.Replace("\n", "\n\n");
+        }
+
+        _markdownRenderer.Source = text;
         _backButton.interactable = index > 0;
     }
 

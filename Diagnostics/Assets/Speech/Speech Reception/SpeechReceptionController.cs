@@ -1,28 +1,22 @@
-using Audiograms;
-using BasicMeasurements;
-using DigitsTest;
 using KLib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+using ExtensionMethods;
 using SpeechReception;
-using JimmysUnityUtilities;
-using System.Runtime.Serialization;
-using KLib.Signals;
-using NUnit.Framework.Internal;
-using Project;
+using UnityEngine.Audio;
+using UnityEngine.Networking;
 using TMPro.EditorUtilities;
-using Digits;
 
 public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 {
+    [Header("UI Elements")]
     [SerializeField] private InputActionAsset _actions;
     [SerializeField] private TMPro.TMP_Text _title;
     [SerializeField] private InstructionPanel _instructionPanel;
@@ -32,7 +26,19 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
     [SerializeField] private GameObject _quitPanel;
     [SerializeField] private QuestionBox _questionBox;
     [SerializeField] private GameObject _workPanel;
+
+    [Header("Work Panel Elements")]
     [SerializeField] private Slider _progressBar;
+    [SerializeField] private GameObject _fixationPoint;
+    [SerializeField] private TMPro.TMP_Text _prompt;
+
+    [Header("Audio")]
+    [SerializeField] private SpeechMasker _masker;
+
+    [Header("Controls")]
+    [SerializeField] private RecordPanel _recordPanel;
+    public ClosedSetController closedSetController;
+    public MatrixTestController _matrixTestController;
 
     private bool _isRemote;
 
@@ -49,34 +55,20 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
     private TestPlan _plan;
 
-    public AudioSource audioPlay;
-    public AudioSource audioRecord;
-    public AudioSource audioAlert;
+    private AudioSource _audioPlay;
+    private AudioSource _audioAlert;
 
-    public AudioClip recordStartClip;
-    public AudioClip recordEndClip;
-
-    public SpeechMasker masker;
-
-    public ClosedSetController closedSetController;
-    public MatrixTestController _matrixTestController;
-
-    private SpeechReception.ListDescription _srItems;
+    private ListDescription _srItems;
     private ListProperties _srList;
-    private SpeechReception.Data _srData;
+    private Data _srData;
     private Data.Response _tentativeResponse;
     private int _qnum = -1;
-    private int _responseAttempt;
-    private bool _responseAccepted;
 
     private enum RecordingState { Waiting, Start, Recording, TimedOut, Stop, StopAndRedo, StopAndContinue, Validating };
     private RecordingState _recordingState;
 
-    private Color _buttonColor;
-
     private static float sMaxRecordTime_sec = 10;
 
-    private bool _reviewResponses = false;
     private static readonly int maxNumRecordAttempts = 3;
 
     private float _volumeAtten;
@@ -104,6 +96,9 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         _abortAction = _actions.FindAction("Abort");
         _abortAction.Enable();
         _abortAction.performed += OnAbortAction;
+
+        CreateAudioSources();
+
         Application.logMessageReceived += HandleException;
     }
 
@@ -117,6 +112,11 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         HTS_Server.SetCurrentScene(_mySceneName, this);
 
         _title.text = "";
+        _workPanel.SetActive(false);
+        
+        _recordPanel.StatusUpdate = OnRecordStatusChanged;
+        _recordPanel.SetAlertAudioSource(_audioAlert);
+
         _volumeManager = new VolumeManager();
 
 #if HACKING
@@ -142,6 +142,23 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
             InitializeMeasurement();
             Begin();
         }
+    }
+
+    private void CreateAudioSources()
+    {
+        _audioPlay = gameObject.AddComponent<AudioSource>();
+        _audioPlay.bypassEffects = true;
+        _audioPlay.bypassListenerEffects = true;
+        _audioPlay.bypassReverbZones = true;
+        _audioPlay.loop = false;
+        _audioPlay.spatialBlend = 0;
+
+        _audioAlert = gameObject.AddComponent<AudioSource>();
+        _audioAlert.bypassEffects = true;
+        _audioAlert.bypassListenerEffects = true;
+        _audioAlert.bypassReverbZones = true;
+        _audioAlert.loop = false;
+        _audioAlert.spatialBlend = 0;
     }
 
     void InitializeMeasurement()
@@ -175,28 +192,44 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
             source = _settings.TestSource
         };
 
-       if (_settings.TestEars.Count == 0)
+        if (_settings.TestEars.Count == 0)
         {
             _settings.TestEars = new List<SpeechReception.TestEar>() { SpeechReception.TestEar.SubjectDefault };
         }
 
+        int[] iorder = new int[_settings.TestEars.Count];
         if (_settings.EarOrder == "Random")
         {
-            foreach (int k in KMath.Permute(_settings.TestEars.Count))
-            {
-                var t = _settings.Clone();
-                t.Initialize(_settings.TestEars[k], customizations.Get(_settings.TestSource));
-                _plan.tests.Add(t);
-            }
+            iorder = KMath.Permute(_settings.TestEars.Count);
         }
         else
         {
-            foreach (var e in _settings.TestEars)
+            for (int k = 0; k < iorder.Length; k++) iorder[k] = k;
+        }
+
+        foreach (int k in iorder)
+        {
+            var testEar = _settings.TestEars[k];
+            if (testEar == SpeechReception.TestEar.SubjectDefault)
             {
-                var t = _settings.Clone();
-                t.Initialize(e, customizations.Get(_settings.TestSource));
-                _plan.tests.Add(t);
+                string subjectDefault = GameManager.Metrics["TestEar"];
+
+                if (string.IsNullOrEmpty(subjectDefault))
+                    throw new Exception("Subject default test ear not set");
+                else if (subjectDefault == "Left")
+                    testEar = SpeechReception.TestEar.Left;
+                else if (subjectDefault == "Right")
+                    testEar = SpeechReception.TestEar.Right;
+                else if (subjectDefault == "Binaural")
+                    testEar = SpeechReception.TestEar.Binaural;
+                else
+                    throw new Exception("Subject default test ear not set properly");
+
             }
+
+            var t = _settings.Clone();
+            t.Initialize(testEar, customizations.Get(_settings.TestSource));
+            _plan.tests.Add(t);
         }
     }
 
@@ -205,17 +238,10 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         _localAbort = false;
         _stopMeasurement = false;
 
-        _reviewResponses = _settings.ReviewResponses;
         _numListsCompleted = 0;
         _numSinceLastBreak = 0;
 
         StartCoroutine(StartNextList());
-    }
-
-    private void StartMeasurement()
-    {
-        _instructionPanel.gameObject.SetActive(false);
-        _workPanel.SetActive(true);
     }
 
     private float SetLevel(float level, SpeechReception.LevelUnits units, SpeechReception.TestEar testEar)
@@ -231,12 +257,10 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         Debug.Log("atten" + " = " + atten);
         atten = Math.Min(0f, atten);
 
-        audioPlay.volume = Mathf.Pow(10, atten / 20);
-        audioAlert.volume = Mathf.Pow(10, (atten - 10) / 20);
-        //audioPlay.panStereo = laterality.ToBalance();
+        _audioPlay.panStereo = _srList.TestEar.ToBalance();
 
-        audioPlay.volume = Mathf.Pow(10, atten / 20);
-        audioAlert.volume = Mathf.Pow(10, (atten - 10) / 20);
+        _audioPlay.volume = Mathf.Pow(10, atten / 20);
+        _audioAlert.volume = Mathf.Pow(10, (atten - 10) / 20);
         atten = 0;
 
         _volumeManager.SetMasterVolume(atten, VolumeManager.VolumeUnit.Decibel);
@@ -254,18 +278,17 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
         // Pop next test off the stack
         _srList = _plan.GetNextList();
+        _srList.ApplySequence();
 
         if (_settings.TestType == TestType.ClosedSet)
         {
-//            closedSetController.Initialize(_srList.closedSet, _srList.GetClosedSetResponses());
+            //            closedSetController.Initialize(_srList.closedSet, _srList.GetClosedSetResponses());
         }
         else if (_settings.TestType == TestType.Matrix)
         {
             //_matrixTestController.Initialize();
             //_srList.matrixTest.Initialize();
         }
-
-        _srList.SetSequence();
 
         _volumeAtten = SetLevel(_srList.Level, _srList.Units, _srList.TestEar);
 
@@ -311,7 +334,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         }
 
         _qnum = 0;
-        if (_srList.UseMasker)
+        if (_settings.TestType != TestType.QuickSIN && _srList.UseMasker)
         {
             float maskerLevel = _srList.Level - _srList.sentences[_qnum].SNR;
             if (_settings.TestType == TestType.Matrix) maskerLevel = _srList.MatrixTest.MaskerLevel;
@@ -323,11 +346,9 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
             //    _srList.laterality));
         }
 
-        // Display message, if appropriate
-        //var instructionsPath = _settings.Instructions == null ? null : _settings.Instructions.Find(_numListsCompleted);
-
+        // Display instructions if needed
         var instructions = GetInstructions(_plan.currentListIndex);
-        if (!string.IsNullOrEmpty(instructions))
+        if (false && !string.IsNullOrEmpty(instructions))
         {
             ShowInstructions(instructions);
         }
@@ -338,7 +359,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         }
         else
         {
-            //StartNextSentence();
+            StartNextSentence();
         }
     }
 
@@ -357,6 +378,585 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
         return value;
     }
+
+    public void StartNextSentence()
+    {
+        _instructionPanel.gameObject.SetActive(false);
+
+#if KDEBUG
+        if (KDebug.Settings.active && KDebug.Settings.data == KDebug.Data.Simulate)
+        {
+            commonUI.FormatHelpBox(_srList.sentences[_qnum].whole);
+            commonUI.IncrementProgressBar();
+            AutoRespond();
+            StartCoroutine(AutoAdvance(ResponseAcquired));
+        }
+#else
+        StartCoroutine(DoSentence());
+#endif
+    }
+
+    private IEnumerator DoSentence()
+    {
+        _workPanel.SetActive(true);
+        _fixationPoint.SetActive(true);
+        _prompt.gameObject.SetActive(true);
+        _prompt.text = "Listen...";
+
+        string wavfile = _srList.sentences[_qnum].wavfile;
+
+        //Debug.Log(_qnum + ": " + wavfile);
+
+        string filePath = Path.Combine(FileLocations.SpeechWavFolder, _settings.TestSource, wavfile);
+
+        // On Windows, you often need "file:///" prefix for local files when using UnityWebRequest,
+        // although using System.Uri is more robust across platforms.
+        string uriPath = new System.Uri(filePath).AbsoluteUri;
+
+        // Use UnityWebRequestMultimedia.GetAudioClip to create the request
+        using (UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(uriPath, AudioType.WAV)) // Specify the AudioType
+        {
+            // Send the request and wait for it to complete
+            yield return uwr.SendWebRequest();
+
+            if (uwr.result == UnityWebRequest.Result.ConnectionError || uwr.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Debug.LogError("Error loading audio clip: " + uwr.error);
+            }
+            else
+            {
+                // Get the AudioClip content from the download handler
+                AudioClip clip = DownloadHandlerAudioClip.GetContent(uwr);
+                _audioPlay.clip = clip;
+            }
+        }
+
+        if (_settings.TestType == TestType.Matrix)
+        {
+            _volumeAtten = SetLevel(_srList.MatrixTest.StimLevel, _srList.Units, _srList.TestEar);
+        }
+
+        _log.Add($"Sentence:{_qnum}");
+        HTS_Server.SendMessage(_mySceneName, $"Status: Sentence {_qnum}...");
+
+        if (_settings.TestType != TestType.QuickSIN && _srList.UseMasker)
+        {
+            if (_settings.TestType == TestType.Matrix)
+            {
+                _masker.SetLevel(_srList.MatrixTest.MaskerLevel);
+            }
+            else
+            {
+                _masker.SetLevel(_srList.Level - _srList.sentences[_qnum].SNR);
+            }
+            _log.Add($"MaskerOff:{_qnum}");
+            _masker.Play();
+        }
+
+        float delay_s = 0;
+        if (_settings.MaxDelay_s > 0)
+        {
+            Debug.Log("wtf");
+            delay_s = Expressions.UniformRandomNumber(_settings.MinDelay_s, _settings.MaxDelay_s);
+            yield return new WaitForSeconds(delay_s);
+        }
+
+        // Sentence
+        _volumeManager.SetMasterVolume(_volumeAtten, VolumeManager.VolumeUnit.Decibel);
+
+        _log.Add($"SentenceStart:{_qnum}");
+
+        //_audioPlay.clip = www.GetAudioClip(false, false, AudioType.WAV);
+        _audioPlay.Play();
+        
+        yield return new WaitForSeconds(_audioPlay.clip.length);
+
+        _log.Add($"SentenceEnd:{_qnum}");
+
+        // Post-sentence baseline
+        float wait_s = 0;
+        if (_srList.UseMasker)
+        {
+            wait_s = _settings.SentenceDuration_s - delay_s - _audioPlay.clip.length;
+        }
+
+        if (wait_s > 0)
+        {
+            yield return new WaitForSeconds(wait_s);
+        }
+
+        if (_srList.UseMasker)
+        {
+            _masker.Stop();
+            _log.Add($"MaskerOff:{_qnum}");
+        }
+
+        _fixationPoint.SetActive(false);
+
+        //if (_useClosedSet)
+        //{
+        //    StartCoroutine(AcquireClosedSetResponse());
+        //}
+        //else if (_useMatrixTest)
+        //{
+        //    StartCoroutine(AcquireMatrixTestResponse());
+        //}
+        //else
+        {
+            var reviewThisOne = _settings.ReviewResponses && _qnum < _settings.NumToReview;
+            _recordPanel.AcquireAudioResponse(_settings.UseAudioCues, reviewThisOne);
+        }
+    }
+
+    IEnumerator AcquireAudioResponse()
+    {
+        //_responseAttempt = 1;
+        //_responseAccepted = false;
+
+        //if (_settings.UseAudioCues)
+        //{
+        //    yield return new WaitForSeconds(0.5f);
+        //    _recordingState = RecordingState.Start;
+        //}
+        //else
+        //{
+        //    yield return StartCoroutine(WaitForRecordingStart());
+        //}
+
+        //_log.Add($"Response:{_qnum}");
+
+        //StartCoroutine(RecordResponse());
+
+        //while (!_responseAccepted)
+        //{
+        //    yield return null;
+        //}
+
+        //FileIO.AppendTextFile(_dataPath, FileIO.JSONSerializeToString(_tentativeResponse));
+
+        ////if (_tentativeResponse.volumeChanged)
+        ////{
+        ////    yield return StartCoroutine(ShowVolumeWarning());
+        ////}
+
+        ////commonUI.IncrementProgressBar();
+
+        //ResponseAcquired();
+        yield return null;
+    }
+
+    IEnumerator WaitForRecordingStart()
+    {
+        _recordingState = RecordingState.Waiting;
+
+        //NGUITools.SetActive(prompt.gameObject, true);
+        //prompt.text = "What did you hear?";
+
+        //RecordButton.transform.localPosition = _recordButtonTween.from;
+        //StopButton.transform.localPosition = _stopButtonTween.from;
+
+        //NGUITools.SetActive(RecordButton.gameObject, true);
+        //_recordButtonPressed = false;
+        //KLib.Unity.SetButtonState(RecordButton, true, _buttonColor);
+
+        //if (ReviewThisOne())
+        //{
+        //    NGUITools.SetActive(StopButton.gameObject, true);
+        //    _stopButtonPressed = false;
+        //    KLib.Unity.SetButtonState(StopButton, true, _buttonColor);
+        //    KLib.Unity.DisableButton(StopButton);
+        //}
+        //else
+        //{
+        //    NGUITools.SetActive(StopButton.gameObject, false);
+        //}
+
+        //while (_recordingState != RecordingState.Start)
+        //{
+        //    yield return null;
+        //}
+
+        //if (ReviewThisOne())
+        //{
+        //    KLib.Unity.SetButtonState(RecordButton, false);
+        //    KLib.Unity.SetButtonState(StopButton, true, _buttonColor);
+        //}
+        //else
+        //{
+        //    NGUITools.SetActive(RecordButton.gameObject, false);
+        //}
+        yield return null;
+    }
+
+    IEnumerator RecordResponse()
+    {
+        //commonUI.ShowPrompt("");
+        //NGUITools.SetActive(RepeatButton.gameObject, false);
+        //NGUITools.SetActive(ContinueButton.gameObject, false);
+
+        //bool reviewThisOne = ReviewThisOne();
+        //NGUITools.SetActive(OKButton.gameObject, !reviewThisOne);
+        //NGUITools.SetActive(RedoButton.gameObject, !reviewThisOne);
+        //if (!reviewThisOne)
+        //{
+        //    _itsGoodButtonPressed = false;
+        //    _rerecordButtonPressed = false;
+        //}
+
+
+        //_OKButtonLabel.text = (ReviewThisOne()) ? "It's good!" : "Done";
+
+        //NGUITools.SetActive(MicSprite.gameObject, true);
+        //NGUITools.SetActive(prompt.gameObject, true);
+        //prompt.text = "What did you hear?";
+        //NGUITools.SetActive(progressBar.gameObject, true);
+        //MicTweener.enabled = true;
+
+        //_recordingState = RecordingState.Recording;
+
+        //audioRecord.clip = Microphone.Start(null, false, (int)(sMaxRecordTime_sec), _srData.Fs);
+
+        //audioAlert.clip = recordStartClip;
+        //audioAlert.Play();
+
+        //float progressBarSamples = (float)(audioRecord.clip.samples);
+
+        //progressBar.value = 1.0f;
+        //while (Microphone.IsRecording(null) && _recordingState == RecordingState.Recording)
+        //{
+        //    yield return new WaitForSeconds(0.1f);
+        //    progressBar.value = Microphone.IsRecording(null) ? Mathf.Max(0f, 1f - (float)(Microphone.GetPosition(null) / progressBarSamples)) : 0;
+        //}
+
+        //if (_recordingState == RecordingState.Recording)
+        //{
+        //    _recordingState = RecordingState.TimedOut;
+        //}
+        //if (_recordingState == RecordingState.Stop || _recordingState == RecordingState.StopAndContinue)
+        //{
+        //    yield return new WaitForSeconds(0.5f);
+        //}
+
+        //int endPosition = Microphone.GetPosition(null);
+        //Microphone.End(null);
+
+        //KLib.Unity.SetButtonState(StopButton, false);
+
+        //// Trim response, if needed
+        //if (endPosition > 0 && endPosition < audioRecord.clip.samples)
+        //{
+        //    float[] data = new float[endPosition];
+        //    audioRecord.clip.GetData(data, 0);
+        //    audioRecord.clip = AudioClip.Create("clip", data.Length, 1, _srData.Fs, false, false);
+        //    audioRecord.clip.SetData(data, 0);
+        //}
+
+        //audioAlert.clip = recordEndClip;
+        //audioAlert.Play();
+
+        ////progressBar.value = 0;
+        //MicTweener.enabled = false;
+
+        //bool volumeChanged = _volumeManager.GetMasterVolume(VolumeManager.VolumeUnit.Decibel) != _volumeAtten;
+        //string respPath = SaveResponseClip(_srData.runNumber, _srData.test, _responseAttempt);
+
+        //_tentativeResponse = new SpeechReception.Data.Response(_srList.sentences[_qnum].whole, _srList.sentences[_qnum].words, _srList.sentences[_qnum].SNR, volumeChanged, respPath);
+
+        //if (ReviewThisOne())
+        //{
+        //    _recordingState = (_responseAttempt < maxNumRecordAttempts) ? RecordingState.Validating : RecordingState.StopAndContinue;
+        //}
+
+        //StartCoroutine(DisposeOfResponse());
+        yield return null;
+    }
+
+    private IEnumerator DisposeOfResponse()
+    {
+        //switch (_recordingState)
+        //{
+        //    case RecordingState.Validating:
+        //        NGUITools.SetActive(prompt.gameObject, true);
+        //        prompt.text = "Check your response";
+
+        //        audioRecord.Play();
+        //        while (audioRecord.isPlaying)
+        //        {
+        //            progressBar.value = 1f - (float)(audioRecord.time) / audioRecord.clip.length;
+        //            yield return new WaitForSeconds(0.1f);
+        //        }
+        //        progressBar.value = 0;
+
+        //        NGUITools.SetActive(MicSprite.gameObject, false);
+        //        NGUITools.SetActive(prompt.gameObject, false);
+        //        NGUITools.SetActive(progressBar.gameObject, false);
+        //        NGUITools.SetActive(RecordButton.gameObject, false);
+        //        NGUITools.SetActive(StopButton.gameObject, false);
+
+        //        commonUI.ShowPrompt("Was your response recorded OK?");
+        //        NGUITools.SetActive(OKButton.gameObject, true);
+        //        NGUITools.SetActive(RedoButton.gameObject, true);
+        //        _itsGoodButtonPressed = false;
+        //        _rerecordButtonPressed = false;
+        //        break;
+
+        //    case RecordingState.StopAndContinue:
+        //        yield return new WaitForSeconds(0.5f);
+        //        NGUITools.SetActive(MicSprite.gameObject, false);
+        //        NGUITools.SetActive(prompt.gameObject, false);
+        //        NGUITools.SetActive(progressBar.gameObject, false);
+        //        NGUITools.SetActive(RecordButton.gameObject, false);
+        //        NGUITools.SetActive(StopButton.gameObject, false);
+        //        _responseAccepted = true;
+        //        break;
+
+        //    case RecordingState.StopAndRedo:
+        //        yield return new WaitForSeconds(0.25f);
+        //        ++_responseAttempt;
+        //        StartCoroutine(RecordResponse());
+        //        break;
+
+        //    case RecordingState.TimedOut:
+        //        NGUITools.SetActive(prompt.gameObject, false);
+        //        NGUITools.SetActive(progressBar.gameObject, false);
+        //        NGUITools.SetActive(OKButton.gameObject, false);
+        //        NGUITools.SetActive(RedoButton.gameObject, false);
+        //        NGUITools.SetActive(RepeatButton.gameObject, true);
+        //        NGUITools.SetActive(ContinueButton.gameObject, true);
+        //        _rerecordButtonPressed = false;
+        //        _itsGoodButtonPressed = false;
+        //        break;
+        //}
+        yield return null;
+    }
+
+    public void ResponseAcquired()
+    {
+        //// Clear our work from the screen
+        //commonUI.ShowPrompt("");
+        //prompt.text = "";
+        //NGUITools.SetActive(MicSprite.gameObject, false);
+        //NGUITools.SetActive(OKButton.gameObject, false);
+        //NGUITools.SetActive(RedoButton.gameObject, false);
+        //NGUITools.SetActive(RepeatButton.gameObject, false);
+        //NGUITools.SetActive(ContinueButton.gameObject, false);
+
+        //_numSinceLastBreak++;
+
+        //// Figure out where to go next
+        //if (++_qnum < _srList.sentences.Count && !(_useClosedSet && _srClosedSetData.PassedPerformanceCriteria))
+        //{
+        //    if (!_useClosedSet && _reviewResponses && _qnum == _srTest.NumToReview)
+        //    {
+        //        _reviewResponses = false;
+        //        Vector3 delta = _recordButtonTween.to - _recordButtonTween.from;
+        //        _recordButtonTween.from = new Vector3(0, 110);
+        //        _recordButtonTween.to = _recordButtonTween.from + delta;
+        //        _recordButtonTween.enabled = true;
+
+        //        StartCoroutine(ShowEndReviewInstructions());
+        //    }
+        //    else
+        //    {
+        //        // go to next sentence
+        //        if (_srTest.GiveBreakEvery > 0 && _numSinceLastBreak >= _srTest.GiveBreakEvery)
+        //        {
+        //            _numSinceLastBreak = 0;
+        //            commonUI.FormatHelpBox("Great!\nTake a short break if you need one.");
+        //            commonUI.ShowNextButton("Press Next to continue", StartNextSentence);
+        //        }
+        //        else
+        //        {
+        //            StartNextSentence();
+        //        }
+        //        //commonUI.ShowNextButton("Press Next to continue", StartNextSentence);
+        //    }
+        //}
+        //else
+        //{
+        //    if (IPC.Instance.Use) IPC.Instance.StopRecording();
+
+        //    // save summary data
+        //    if (_useClosedSet)
+        //    {
+        //        _srClosedSetData.Finish();
+        //        DiagnosticsManager.Instance.CompleteTestButNoAdvance(_srClosedSetData, "Speech", _srClosedSetData.test);
+        //    }
+        //    else if (_useMatrixTest)
+        //    {
+        //        DiagnosticsManager.Instance.CompleteTestButNoAdvance(_srMatrixTestData, "Speech", _srMatrixTestData.test);
+        //    }
+        //    else
+        //    {
+        //        DiagnosticsManager.Instance.EndTest(_dataPath);
+        //        _dataPath = null;
+        //    }
+        //    _numListsCompleted++;
+
+        //    if (_srList.listIndex >= 0)
+        //    {
+        //        string historyFile = FileIO.CombinePaths(DataFileLocations.SubjectMetaFolder, _srList.TestType + "_History.xml");
+        //        if (File.Exists(historyFile))
+        //        {
+        //            var history = FileIO.XmlDeserialize<ListHistory>(historyFile);
+        //            history.LastCompleted = _srList.listIndex;
+        //            FileIO.XmlSerialize(history, historyFile);
+        //        }
+        //    }
+
+        //    // tests remaining?
+        //    if (_srTest.Lists.Count > 0)
+        //    {
+        //        StartCoroutine(StartNextList());
+        //    }
+        //    else
+        //    {
+        //        commonUI.ShowHelpBox("Excellent!");
+        //        commonUI.ShowNextButton("Press Next to start the next task", Return);
+        //    }
+        //}
+    }
+
+    public void ListenAgain()
+    {
+        StartCoroutine(DoListenAgain());
+    }
+
+    IEnumerator DoListenAgain()
+    {
+        //if (_srList.UseMasker)
+        //{
+        //    masker.SetLevel(_srList.level - _srList.sentences[_qnum].SNR);
+        //    masker.Play();
+        //}
+
+        //float delay_s = 0;
+        //if (_srTest.MaxDelay_s > 0)
+        //{
+        //    delay_s = Expressions.UniformRandomNumber(_srTest.MinDelay_s, _srTest.MaxDelay_s);
+        //    yield return new WaitForSeconds(delay_s);
+        //}
+
+        //// Sentence
+        //_volumeManager.SetMasterVolume(_volumeAtten, VolumeManager.VolumeUnit.Decibel);
+
+        //audioPlay.Play();
+        //yield return new WaitForSeconds(audioPlay.clip.length);
+
+        //// Post-sentence baseline
+        //float wait_s = 0;
+        //if (_srList.UseMasker)
+        //{
+        //    wait_s = _srTest.SentenceDuration_s - delay_s - audioPlay.clip.length;
+        //}
+
+        //if (wait_s > 0)
+        //{
+        //    yield return new WaitForSeconds(wait_s);
+        //}
+
+        //if (_srList.UseMasker)
+        //{
+        //    masker.Stop();
+        //}
+        yield return null;
+    }
+
+    public void OnOKButtonClick()
+    {
+        if (_itsGoodButtonPressed)
+        {
+            return;
+        }
+        _itsGoodButtonPressed = true;
+
+        //if (_recordingState == RecordingState.Validating)
+        //{
+        //    _responseAccepted = true;
+        //}
+        //else if (_recordingState == RecordingState.TimedOut)
+        //{
+        //    _responseAccepted = true;
+        //}
+        //else
+        //{
+        //    _recordingState = RecordingState.StopAndContinue;
+        //}
+    }
+
+    public void OnRecordButtonClick()
+    {
+        if (_recordButtonPressed)
+        {
+            // avoid double clicks
+            return;
+        }
+
+        //_recordButtonPressed = true;
+        //_recordButtonTween.ResetToBeginning();
+        //_recordButtonTween.PlayForward();
+
+        //recordingState = RecordingState.Start;
+    }
+
+    public void OnStopButtonClick()
+    {
+        //if (_stopButtonPressed)
+        //{
+        //    return;
+        //}
+        //_stopButtonPressed = true;
+
+        //_stopButtonTween.ResetToBeginning();
+        ////stopButtonTween.PlayForward();
+
+        //KLib.Unity.SetButtonState(StopButton, false);
+        //_recordingState = RecordingState.Stop;
+    }
+
+    public void OnRedoButtonClick()
+    {
+        //if (_rerecordButtonPressed)
+        //{
+        //    return;
+        //}
+        //_rerecordButtonPressed = true;
+
+        //if (_recordingState == RecordingState.Validating)
+        //{
+        //    NGUITools.SetActive(RepeatButton.gameObject, false);
+        //    NGUITools.SetActive(RedoButton.gameObject, false);
+        //    NGUITools.SetActive(ContinueButton.gameObject, false);
+
+        //    StopButton.transform.localPosition = _stopButtonTween.from;
+
+        //    NGUITools.SetActive(RecordButton.gameObject, true);
+        //    NGUITools.SetActive(StopButton.gameObject, true);
+        //    _recordButtonPressed = false;
+        //    _stopButtonPressed = false;
+        //    KLib.Unity.SetButtonState(StopButton, true, _buttonColor);
+
+        //    ++_responseAttempt;
+        //    StartCoroutine(RecordResponse());
+        //}
+        //else if (_recordingState == RecordingState.TimedOut)
+        //{
+        //    ++_responseAttempt;
+        //    StartCoroutine(RecordResponse());
+        //}
+        //else
+        //{
+        //    prompt.text = "Wait...";
+        //    _recordingState = RecordingState.StopAndRedo;
+        //}
+    }
+
+    void OnRecordStatusChanged(string status)
+    {
+        _log.Add($"{status}:{_qnum}");
+        Debug.Log($"Record status: {status}");
+    }
+
 
     void OnAbortAction(InputAction.CallbackContext context)
     {
@@ -391,14 +991,16 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
     private void ShowInstructions(string instructions)
     {
+        _workPanel.gameObject.SetActive(false);
         _instructionPanel.gameObject.SetActive(true);
-        _instructionPanel.InstructionsFinished = StartMeasurement;
+        _instructionPanel.InstructionsFinished = StartNextSentence;
         _instructionPanel.ShowInstructions(
             new Turandot.Instructions() 
             { 
                 Text = instructions, 
                 FontSize = _settings.InstructionFontSize,
-                VerticalAlignment = Turandot.Instructions.VerticalTextAlignment.Middle
+                VerticalAlignment = Turandot.Instructions.VerticalTextAlignment.Middle,
+                LineSpacing = 2
             });
     }
 
@@ -498,4 +1100,57 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
     {
         SceneManager.LoadScene(newScene);
     }
+
+#if KDEBUG
+    private IEnumerator AutoAdvance(KEventDelegate onAdvance)
+    {
+        yield return new WaitForSeconds(KDebug.Settings.advanceDelay_s);
+        onAdvance();
+    }
+    private void AutoRespond()
+    {
+        if (_useClosedSet)
+        {
+            _srClosedSetData.AddResponse(_srList.sentences[_qnum].whole, "hood", _srList.sentences[_qnum].SNR, false);
+        }
+        else if (_useMatrixTest)
+        {
+            string value = _matrixTestController.Simulate(_srList.sentences[_qnum].words, _srList.matrixTest.SNR);
+            int nc = _srMatrixTestData.AddResponse(_srList.sentences[_qnum].whole, value, _srList.matrixTest.StimLevel, _srList.matrixTest.maskerLevel, false);
+            _srList.matrixTest.UpdateSNR(nc);
+        }
+        else
+        {
+            var response = new SpeechReception.Data.Response(_srList.sentences[_qnum].whole, _srList.sentences[_qnum].words, _srList.sentences[_qnum].SNR, false, "");
+            FileIO.AppendTextFile(_dataPath, FileIO.JSONSerializeToString(response));
+        }
+        _responseAccepted = true;
+    }
+
+    IEnumerator SimulateAcquireAudioResponse()
+    {
+        _responseAttempt = 1;
+        _responseAccepted = false;
+
+        if (_srTest.AudioCues)
+        {
+            yield return new WaitForSeconds(0.5f);
+            _recordingState = RecordingState.Start;
+        }
+        else
+        {
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        if (IPC.Instance.Use) IPC.Instance.SendCommand("Response", _qnum.ToString());
+
+        yield return new WaitForSeconds(1.0f);
+        FileIO.AppendTextFile(_dataPath, FileIO.JSONSerializeToString(_tentativeResponse));
+
+        commonUI.IncrementProgressBar();
+        ResponseAcquired();
+    }
+
+#endif
+
 }

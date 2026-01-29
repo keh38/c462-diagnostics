@@ -30,11 +30,26 @@ namespace SpeechReception
             Open(folder, name);
         }
 
+        public References(string referencePath)
+        {
+            string folder = Path.GetDirectoryName(referencePath);
+            _name = Path.GetFileNameWithoutExtension(referencePath);
+
+            References r = KLib.FileIO.XmlDeserialize<References>(referencePath);
+            this.Transducers = r.Transducers;
+        }
+
         private void Open(string folder, string name)
         {
             _name = name;
             References r = KLib.FileIO.XmlDeserialize<References>(Path.Combine(folder, name + "_References.xml"));
             this.Transducers = r.Transducers;
+        }
+
+        public bool HasReferenceFor(string transducer, string units)
+        {
+            var data = Transducers.Find(o => o.name == transducer);
+            return data != null;
         }
 
         public float GetReference(string transducer, string units)

@@ -32,11 +32,17 @@ namespace Turandot
         public VerticalTextAlignment VerticalAlignment { get; set; }
         private bool ShouldSerializeVerticalAlignment() { return false; }
 
+        [Category("Alignment")]
+        [DisplayName("Line spacing")]
+        public int LineSpacing { get; set; }
+        private bool ShouldSerializeLineSpacing() { return false; }
+
         public Instructions()
         {
             FontSize = 60;
             HorizontalAlignment = HorizontalTextAlignment.Left;
             VerticalAlignment = VerticalTextAlignment.Top;
+            LineSpacing = 1;
         }
     }
 }

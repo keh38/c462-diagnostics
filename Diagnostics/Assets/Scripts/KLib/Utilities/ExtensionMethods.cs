@@ -48,6 +48,24 @@ namespace ExtensionMethods
             return (new List<T>(x).Contains(e));
         }
 
+        public static float ToBalance(this SpeechReception.TestEar testEar)
+        {
+            float balance = 0f;
+            switch (testEar)
+            {
+                case SpeechReception.TestEar.Left:
+                    balance = -1f;
+                    break;
+                case SpeechReception.TestEar.Right:
+                    balance = 1f;
+                    break;
+                case SpeechReception.TestEar.Binaural:
+                case SpeechReception.TestEar.SubjectDefault:
+                    balance = 0f;
+                    break;
+            }
+            return balance;
+        }
 
         //public static Laterality ToLaterality(this Audiograms.Ear ear)
         //{

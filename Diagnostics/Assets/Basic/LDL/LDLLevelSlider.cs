@@ -14,6 +14,7 @@ using LDL;
 public class LDLLevelSlider : MonoBehaviour
 {
     [SerializeField] private Image _fill;
+
     private Slider _slider;
     private SliderAnimator _mover;
 

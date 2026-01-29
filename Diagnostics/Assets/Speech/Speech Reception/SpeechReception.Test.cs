@@ -193,7 +193,7 @@ namespace SpeechReception
             }
 
             // A nonzero value of "Choose" is the indication to choose one or more lists at random
-            if (Choose > 0)
+            if (NumListsAvailable > 1 && Choose > 0)
             {
                 UnityEngine.Debug.Log("Choose = " + Choose);
                 UnityEngine.Debug.Log("NumPerSNR = " + NumPerSNR);
@@ -208,7 +208,7 @@ namespace SpeechReception
 
             foreach (ListProperties listProps in Lists)
             {
-                listProps.Initialize(TestSource, testEar);
+                listProps.Initialize(TestType, TestSource, testEar);
                 _numSentences += listProps.GetItemCount();
             }
         }
@@ -333,8 +333,25 @@ namespace SpeechReception
 
         public float GetReference(string transducer, SpeechReception.LevelUnits units)
         {
-            References r = new References(Path.Combine(FileLocations.SpeechWavFolder, TestSource), TestSource);
-            return r.GetReference(transducer, units.ToString());
+            References references = null;
+
+            string refPath = Path.Combine(FileLocations.LocalResourceFolder("Calibration"), TestSource + "_References.xml");
+            if (File.Exists(refPath))
+            {
+                var r = new References(refPath);
+                if (r.HasReferenceFor(transducer, units.ToString()))
+                {
+                    references = r;
+                }
+            }
+
+            if (references == null)
+            {
+                refPath = Path.Combine(FileLocations.SpeechWavFolder, TestSource, TestSource + "_References.xml");
+                references = new References(refPath);
+            }
+
+            return references.GetReference(transducer, units.ToString());
         }
 
         /// <summary>

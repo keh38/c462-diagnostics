@@ -25,7 +25,7 @@ Name: "custom"; Description: "Custom installation"; Flags: iscustom
 Name: "{#RootMusicFolder}"; Permissions: users-full;
 Name: "{#RootMusicFolder}{#BasicResourcesFolder}"; Permissions: users-full;
 Name: "{#RootMusicFolder}{#SpeechWavFolder}"; Permissions: users-full;
-Name: "{userdocs}\..\Music\EPL\Diagnostics"; Permissions: users-full;
+;Name: "{userdocs}\EPL\HTS"; Permissions: users-full;
 
 [Components]
 Name: "support"; Description: "Support files"; Types: full custom; Flags: restart;

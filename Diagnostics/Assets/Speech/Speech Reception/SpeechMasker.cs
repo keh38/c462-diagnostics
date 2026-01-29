@@ -6,11 +6,11 @@ using ExtensionMethods;
 using KLib.Signals.Calibration;
 using KLib.Signals.Enumerations;
 using SpeechReception;
+using System.IO;
 
-//[RequireComponent(typeof(AudioSource))]
 public class SpeechMasker : MonoBehaviour 
 {
-/*    private List<AudioSource> _speakers = new List<AudioSource>();
+    private List<AudioSource> _speakers = new List<AudioSource>();
     private List<string> _speechFiles = new List<string>(new string[]
     {
         "CHF10_60.wav",
@@ -29,7 +29,7 @@ public class SpeechMasker : MonoBehaviour
     private int _numBabblers = 1;
     private float _maxLevel;
 
-    public IEnumerator Initialize(Masker masker, float level, string transducer, SpeechReception.LevelUnits units, Laterality laterality)
+    public IEnumerator Initialize(Masker masker, float level, string transducer, LevelUnits units, TestEar testEar)
     {
         _source = masker.Source;
 
@@ -39,16 +39,16 @@ public class SpeechMasker : MonoBehaviour
 
         if (masker.Source == "Homebrew")
         {
-            yield return StartCoroutine(InitializeHomebrew(masker.NumBabblers, masker.BabbleSeed, laterality));
+            yield return StartCoroutine(InitializeHomebrew(masker.NumBabblers, masker.BabbleSeed, testEar));
         }
         else
         {
-            yield return StartCoroutine(InitializeWavFile(masker.Source, laterality));
+            yield return StartCoroutine(InitializeWavFile(masker.Source, testEar));
         }
         SetLevel(level);
     }
 
-    private IEnumerator InitializeWavFile(string source, Laterality laterality)
+    private IEnumerator InitializeWavFile(string source, TestEar testEar)
     {
         string clipName = "";
 
@@ -84,8 +84,7 @@ public class SpeechMasker : MonoBehaviour
 
         Debug.Log(clipName);
 
-        WWW www = new WWW("file:///" + KLib.FileIO.CombinePaths(DataFileLocations.SpeechWavFolder, "Maskers", clipName));
-        //WWW www = new WWW("file:///" + System.IO.Path.Combine(DataFileLocations.SpeechWavFolder, clipName));
+        WWW www = new WWW("file:///" + Path.Combine(FileLocations.SpeechWavFolder, "Maskers", clipName));
         while (!www.isDone)
             yield return null;
 
@@ -93,12 +92,12 @@ public class SpeechMasker : MonoBehaviour
             throw new System.Exception(www.error);
 
         _speakers[0].enabled = false;
-        _speakers[0].clip = www.audioClip;
+        _speakers[0].clip = www.GetAudioClip();
 
-        _speakers[0].panStereo = laterality.ToBalance();
+        _speakers[0].panStereo = testEar.ToBalance();
     }
 
-    private IEnumerator InitializeHomebrew(int numBabblers, int seed, Laterality laterality)
+    private IEnumerator InitializeHomebrew(int numBabblers, int seed, TestEar testEar)
     {
         _numBabblers = numBabblers;
 
@@ -119,15 +118,15 @@ public class SpeechMasker : MonoBehaviour
             _speakers[k].bypassReverbZones = true;
             _speakers[k].loop = true;
             _speakers[k].spatialBlend = 0;
-            _speakers[k].panStereo = laterality.ToBalance();
+            _speakers[k].panStereo = testEar.ToBalance();
 
             _speakers[k].enabled = false;
 
-            WWW www = new WWW("file:///" + KLib.FileIO.CombinePaths(DataFileLocations.SpeechWavFolder, "Maskers", _speechFiles[randomOrder[k]]));
+            WWW www = new WWW("file:///" + Path.Combine(FileLocations.SpeechWavFolder, "Maskers", _speechFiles[randomOrder[k]]));
             while (!www.isDone)
                 yield return null;
 
-            _speakers[k].clip = www.audioClip;
+            _speakers[k].clip = www.GetAudioClip();
             _speakers[k].time = Random.Range(0, 60f);
         }
     }
@@ -136,7 +135,7 @@ public class SpeechMasker : MonoBehaviour
     {
         if (units == "dBatten") return 0;
 
-        SpeechReception.References r = new SpeechReception.References(KLib.FileIO.CombinePaths(DataFileLocations.SpeechWavFolder, "Maskers"), source);
+        SpeechReception.References r = new SpeechReception.References(Path.Combine(FileLocations.SpeechWavFolder, "Maskers"), source);
         return r.GetReference(transducer, units);
     }
 
@@ -186,5 +185,5 @@ public class SpeechMasker : MonoBehaviour
     {
         get { return _speakers[0].isPlaying; }
     }
-*/
+
 }

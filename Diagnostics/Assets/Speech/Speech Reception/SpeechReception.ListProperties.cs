@@ -6,6 +6,7 @@ using System.Windows.Forms.Design;
 using System.Xml.Serialization;
 using ExtensionMethods;
 using KLib;
+using KLib.Signals.Calibration;
 using KLib.TypeConverters;
 using OrderedPropertyGrid;
     
@@ -94,26 +95,11 @@ namespace SpeechReception
         [Browsable(false)]
         public TestEar TestEar { get { return _testEar; } }
 
-        private bool AnyFiniteSNR
-        {
-            get
-            {
-                bool any = false;
+        [XmlIgnore]
+        [Browsable(false)]
+        public bool AnyFiniteSNR { get; private set; }
 
-                throw new System.Exception("AnyFiniteSNR is not implmented");
-                //foreach (float v in SNRs)
-                //{
-                //    if (!float.IsInfinity(v))
-                //    {
-                //        any = true;
-                //        break;
-                //    }
-                //}
-
-                return any;
-            }
-        }
-
+        private TestType _testType;
         private string _testSource;
         private string _title;
         private TestEar _testEar;
@@ -148,24 +134,40 @@ namespace SpeechReception
             return listDescription.sentences.Select(o => o.whole).ToList().Unique();
         }
 
-        public void SetSequence()
+        public void ApplySequence()
         {
-            //var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(_testType));
-            //float[] snr = (masker != null) ? SNRs : new float[] { float.PositiveInfinity};
-            //listDescription.SetSequence(sequence, snr);
-            //sentences = listDescription.sentences;
+            var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(_testSource));
+            float[] snr = null;
+
+            AnyFiniteSNR = false;
+            
+            if (_testType != TestType.QuickSIN)
+            {
+                if (Masker == null)
+                {
+                    snr = new float[] { float.PositiveInfinity };
+                }
+                else
+                {
+                    snr = KLib.Expressions.Evaluate(SNR);
+                    AnyFiniteSNR = snr.Any(o => !float.IsInfinity(o));
+                }
+                listDescription.SetSequence(Sequence, snr);
+            }
+
+            sentences = listDescription.sentences;
         }
 
-        public void Initialize(string testSource, TestEar testEar)
+        public void Initialize(TestType testType, string testSource, TestEar testEar)
         {
+            _testType = testType;
             _testSource = testSource;
             _testEar = testEar;
 
             var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(_testSource));
             _title = listDescription.title;
 
-            if (Sequence == null) Sequence = new Sequence();
-            //if (SNRs == null) SNRs = new float[] { float.PositiveInfinity };
+            AnyFiniteSNR = false;
         }
 
         public int GetItemCount()
@@ -176,11 +178,16 @@ namespace SpeechReception
 
         private string GetListDescriptionPath(string testSource)
         {
-            string listDescriptionPath;
-            if (Name.StartsWith("SpeechList"))
-                listDescriptionPath = FileLocations.ConfigFile(Name);
-            else
-                listDescriptionPath = Path.Combine(FileLocations.SpeechWavFolder, testSource, "SpeechList." + Name + ".xml");
+            string fileName = $"SpeechList.{Name}.xml";
+
+            // Check first for project-specific list
+            string listDescriptionPath = Path.Combine(FileLocations.LocalResourceFolder("ConfigFiles"), fileName);
+
+            if (!File.Exists(listDescriptionPath))
+            {
+                // otherwise use the default list installed with the speech test material
+                listDescriptionPath = Path.Combine(FileLocations.SpeechWavFolder, testSource, fileName);
+            }
 
             return listDescriptionPath;
         }
