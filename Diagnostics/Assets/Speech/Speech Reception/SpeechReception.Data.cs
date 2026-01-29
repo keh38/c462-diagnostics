@@ -2,18 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using ProtoBuf;
-
 using KLib.Signals.Enumerations;
+using Newtonsoft.Json;
 
 namespace SpeechReception
 {
-    [System.Serializable]
-    [ProtoContract(ImplicitFields=ImplicitFields.AllPublic)]
+    [JsonObject(MemberSerialization.OptOut)]
     public class Data
     {
-        [System.Serializable]
-        [ProtoContract(ImplicitFields=ImplicitFields.AllPublic)]
+        [JsonObject(MemberSerialization.OptOut)]
         public class Response
         {
             public string sentence;
@@ -39,9 +36,9 @@ namespace SpeechReception
         public int Fs;
         public int runNumber;
         public bool isPractice;
-        //public Laterality laterality;
-        
-        //public List<Response> responses = new List<Response>();
+        public TestEar testEar;
+
+        public List<Response> responses = new List<Response>();
 
         public Data() { }
         public Data(bool isPractice)

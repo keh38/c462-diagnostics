@@ -2,19 +2,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
-using ProtoBuf;
-
-using KLib.Signals.Enumerations;
+using Newtonsoft.Json;
 
 namespace SpeechReception
 {
-/*    [Serializable]
-    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    [JsonObject(MemberSerialization.OptOut)]
     public class MatrixTestData
     {
-        [Serializable]
-        [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+        [JsonObject(MemberSerialization.OptOut)]
         public class Response
         {
             public string sentence;
@@ -43,17 +38,17 @@ namespace SpeechReception
         public string date;
         public string test;
         public int runNumber;
-        public Laterality laterality;
+        public TestEar testEar;
         public float maskerLevel;
         public float stimLevel;
-        public MatrixTest.Mode mode;
+        public MatrixTestMode mode;
 
         private bool _passedCriteria;
 
         public List<Response> responses = new List<Response>();
 
         public MatrixTestData() { }
-        public MatrixTestData(float stimLevel, float maskerLevel, MatrixTest.Mode mode)
+        public MatrixTestData(float stimLevel, float maskerLevel, MatrixTestMode mode)
         {
             this.stimLevel = stimLevel;
             this.maskerLevel = maskerLevel;
@@ -67,5 +62,5 @@ namespace SpeechReception
             return numCorrect;
         }
 
-    }*/
+    }
 }

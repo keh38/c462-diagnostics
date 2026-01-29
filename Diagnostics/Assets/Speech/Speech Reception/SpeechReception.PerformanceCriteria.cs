@@ -16,15 +16,15 @@ namespace SpeechReception
 
         [PropertyOrder(1)]  
         public float AllowablePctRange { get; set; }
-        private bool ShouldSerializeAllowablePctRange() { return false; }
+        public bool ShouldSerializeAllowablePctRange() { return Apply; }
 
         [PropertyOrder(2)]
         public int MinBlocks { get; set; }
-        private bool ShouldSerializeMinBlocks() { return false; }
+        public bool ShouldSerializeMinBlocks() { return Apply; }
 
         [PropertyOrder(3)]
         public int MaxBlocks { get; set; }
-        private bool ShouldSerializeMaxBlocks() { return false; }
+        public bool ShouldSerializeMaxBlocks() { return Apply; }
 
         public PerformanceCriteria()
         {

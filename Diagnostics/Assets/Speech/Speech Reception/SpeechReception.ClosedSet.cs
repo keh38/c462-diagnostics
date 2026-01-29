@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Xml.Serialization;
 using KLib.TypeConverters;
 using OrderedPropertyGrid;
 
@@ -18,7 +19,7 @@ namespace SpeechReception
 
         [PropertyOrder(1)]
         public List<string> Decoys { get; set; } 
-        private bool ShouldSerializeDecoys() { return false; }
+        public bool ShouldSerializeDecoys() { return Decoys!=null && Decoys.Count > 0; }
 
         [PropertyOrder(2)]
         [DisplayName("Performance")]
@@ -32,9 +33,11 @@ namespace SpeechReception
             PerformanceCriteria = new PerformanceCriteria();
         }
 
-
+        [XmlIgnore]
         public bool active = false;
+        [XmlIgnore]
         public bool shuffle = false;
+        [XmlIgnore]
         public int numRows = -1;
     }
 }

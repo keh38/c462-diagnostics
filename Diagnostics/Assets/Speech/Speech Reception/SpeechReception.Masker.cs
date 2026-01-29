@@ -20,11 +20,11 @@ namespace SpeechReception
 
         [PropertyOrder(1)]
         public int NumBabblers { get; set; }
-        private bool ShouldSerializeNumBabblers() { return false; }
+        public bool ShouldSerializeNumBabblers() { return Source.Equals("IEEE"); }
 
         [PropertyOrder(2)]
         public int BabbleSeed { get; set; }
-        private bool ShouldSerializeBabbleSeed() { return false; }
+        public bool ShouldSerializeBabbleSeed() { return Source.Equals("IEEE"); }
 
         public Masker()
         {

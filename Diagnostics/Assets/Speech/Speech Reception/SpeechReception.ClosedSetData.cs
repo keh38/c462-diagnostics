@@ -2,19 +2,14 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
-using ProtoBuf;
-
-using KLib.Signals.Enumerations;
+using Newtonsoft.Json;
 
 namespace SpeechReception
 {
-/*    [Serializable]
-    [ProtoContract(ImplicitFields=ImplicitFields.AllPublic)]
+    [JsonObject(MemberSerialization.OptOut)]
     public class ClosedSetData
     {
-        [Serializable]
-        [ProtoContract(ImplicitFields=ImplicitFields.AllPublic)]
+        [JsonObject(MemberSerialization.OptOut)]
         public class Response
         {
             public int block;
@@ -41,7 +36,7 @@ namespace SpeechReception
         public string test;
         public int runNumber;
         public bool isPractice;
-        public Laterality laterality;
+        public TestEar testEar;
         public float percentCorrect = 0;
         public float[] pctCorrectByBlock = null;
 
@@ -85,7 +80,7 @@ namespace SpeechReception
                 _curBlock++;
                 _itemsThisBlock = 0;
 
-                if (_performanceCriteria != null && _curBlock >= _performanceCriteria.minBlocks)
+                if (_performanceCriteria != null && _curBlock >= _performanceCriteria.MinBlocks)
                 {
                     float pmin = float.PositiveInfinity;
                     float pmax = float.NegativeInfinity;
@@ -94,7 +89,7 @@ namespace SpeechReception
                         pmin = Mathf.Min(pmin, pctCorrectByBlock[k]);
                         pmax = Mathf.Max(pmax, pctCorrectByBlock[k]);
 
-                        _passedCriteria = (pmax - pmin) <= _performanceCriteria.allowablePctRange;
+                        _passedCriteria = (pmax - pmin) <= _performanceCriteria.AllowablePctRange;
                     }
                 }
             }
@@ -106,5 +101,4 @@ namespace SpeechReception
             percentCorrect = 100 * (float) responses.FindAll(o => o.correct).Count / responses.Count;
         }
     }
-*/
 }

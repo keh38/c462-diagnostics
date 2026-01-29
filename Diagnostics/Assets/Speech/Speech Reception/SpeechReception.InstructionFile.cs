@@ -22,13 +22,4 @@ namespace SpeechReception
         private bool ShouldSerializeBefore() { return false; }
     }
 
-    //public string Find(int listNum)
-    //{
-    //    string value = null;
-
-    //    var f = Files.Find(o => o.Before == listNum);
-    //    if (f != null) value = f.Name;
-
-    //    return value;
-    //}
 }

@@ -10,7 +10,7 @@ using LDL.Haptics;
 
 namespace SpeechReception
 {
-    public class SequenceTypeConverter : SortableExpandableObjectConverter
+    public class MatrixTestTypeConverter : SortableExpandableObjectConverter
     {
         public override PropertyDescriptorCollection GetProperties(ITypeDescriptorContext context, object value, Attribute[] attributes)
         {
@@ -19,7 +19,7 @@ namespace SpeechReception
 
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            if (destinationType == typeof(Sequence))
+            if (destinationType == typeof(MatrixTest))
             {
                 return true;
             }
@@ -28,9 +28,9 @@ namespace SpeechReception
 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            if (destinationType == typeof(System.String) && value is Sequence seq)
+            if (destinationType == typeof(System.String) && value is MatrixTest test)
             {
-                return seq.Order.ToString();
+                return test.Mode.ToString();
             }
             return base.ConvertTo(context, culture, value, destinationType);
         }
@@ -48,9 +48,9 @@ namespace SpeechReception
         {
             if (value is string)
             {
-                var seq = (context.Instance as ListProperties).Sequence;
-                seq.Order = (Order)Enum.Parse(typeof(Order), value as string);
-                return seq;
+                var test = (context.Instance as ListProperties).MatrixTest;
+                test.Mode = (MatrixTestMode)Enum.Parse(typeof(MatrixTestMode), value as string);
+                return test;
             }
             return base.ConvertFrom(context, culture, value);
         }

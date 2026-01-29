@@ -1,44 +1,60 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 using UnityEngine;
 
+using OrderedPropertyGrid;
+using System.Xml.Serialization;
+
 namespace SpeechReception
 {
+    public enum MatrixTestMode { VarySignal, VaryMasker }
+
+    [TypeConverter(typeof(MatrixTestTypeConverter))]
     public class MatrixTest
     {
-        public enum Mode { VarySignal, VaryMasker}
+        [XmlIgnore]
+        [Browsable(false)]
+        public bool Active { get; private set; } = false;
 
-        public bool active = false;
-        public Mode mode = Mode.VarySignal;
-        public float maskerLevel = 65;
-        public float stimLevel = 65;
-        public float startSNR = 0;
+        [Browsable(false)]
+        public MatrixTestMode Mode { get; set; } = MatrixTestMode.VarySignal;
+
+        [PropertyOrder(1)]
+        public float MaskerLevel { get; set; } = 65;
+        private bool ShouldSerializeMaskerLevel() { return false; }
+
+        [PropertyOrder(2)]
+        public float StimLevel { get; set; } = 65;
+        private bool ShouldSerializeStimLevel() { return false; }
+
+        [PropertyOrder(3)]
+        public float StartSNR { get; set; } = 0;
+        private bool ShouldSerializeStartSNR() { return false; }
+
 
         private int _numReversals;
         private int _lastDir;
 
-        public float StimLevel
-        {
-            get { return stimLevel; }
-        }
-
+        [XmlIgnore]
+        [Browsable(false)]
         public float SNR
         {
-            get { return stimLevel - maskerLevel; }
+            get { return StimLevel - MaskerLevel; }
         }
 
         public void Initialize()
         {
-            Debug.Log("Matrix test mode: " + mode);
-            if (mode == Mode.VarySignal)
+            Debug.Log("Matrix test mode: " + Mode);
+            if (Mode == MatrixTestMode.VarySignal)
             {
-                stimLevel = maskerLevel + startSNR;
+                StimLevel = MaskerLevel + StartSNR;
             }
-            else if (mode == Mode.VaryMasker)
+            else if (Mode == MatrixTestMode.VaryMasker)
             {
-                maskerLevel = stimLevel - startSNR;
+                MaskerLevel = StimLevel - StartSNR;
             }
 
             _numReversals = 0;
@@ -57,13 +73,13 @@ namespace SpeechReception
             bool isReversal = (delta < 0 && _lastDir > 0) || (delta > 0 && _lastDir < 0);
             _lastDir = (int) Mathf.Sign(delta);
 
-            if (mode == Mode.VarySignal)
+            if (Mode == MatrixTestMode.VarySignal)
             {
-                stimLevel += delta;
+                StimLevel += delta;
             }
-            else if (mode == Mode.VaryMasker)
+            else if (Mode == MatrixTestMode.VaryMasker)
             {
-                maskerLevel -= delta;
+                MaskerLevel -= delta;
             }
 
             if (isReversal)
