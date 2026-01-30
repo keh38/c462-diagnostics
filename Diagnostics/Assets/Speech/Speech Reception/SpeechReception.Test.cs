@@ -93,8 +93,9 @@ namespace SpeechReception
 
         [Category("Procedure")]
         [PropertyOrder(17)]
-        public bool UseAudioCues { get; set; }
-        private bool ShouldSerializeUseAudioCues() { return false; }
+        [Description("Do not use buttons to control recording")]
+        public bool AudioCuesOnly { get; set; }
+        private bool ShouldSerializeAudioCuesOnly() { return false; }
 
         [Category("Sequence")]
         [PropertyOrder(8)]
@@ -165,7 +166,7 @@ namespace SpeechReception
             NumListsAvailable = 1;
             Choose = 0;
             Exclude = "";
-            UseAudioCues = false;
+            AudioCuesOnly = false;
 
             Lists = new List<ListProperties>();
         }
@@ -373,7 +374,7 @@ namespace SpeechReception
                 BypassDataStreams = this.BypassDataStreams,
                 NumToReview = this.NumToReview,
                 GiveBreakEvery = this.GiveBreakEvery,
-                UseAudioCues = this.UseAudioCues,
+                AudioCuesOnly = this.AudioCuesOnly,
                 NumPracticeLists = this.NumPracticeLists,
                 NumPerSNR = this.NumPerSNR,
                 TestEars = this.TestEars != null

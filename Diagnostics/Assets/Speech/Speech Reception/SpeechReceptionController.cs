@@ -64,24 +64,10 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
     private Data.Response _tentativeResponse;
     private int _qnum = -1;
 
-    private enum RecordingState { Waiting, Start, Recording, TimedOut, Stop, StopAndRedo, StopAndContinue, Validating };
-    private RecordingState _recordingState;
-
-    private static float sMaxRecordTime_sec = 10;
-
-    private static readonly int maxNumRecordAttempts = 3;
-
     private float _volumeAtten;
     private VolumeManager _volumeManager;
 
     private int _numListsCompleted;
-
-    private string _testXmlFile;
-
-    private bool _recordButtonPressed;
-    private bool _stopButtonPressed;
-    private bool _rerecordButtonPressed;
-    private bool _itsGoodButtonPressed;
 
     private int _numPracticeLists;
     private int _numSinceLastBreak;
@@ -115,7 +101,8 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         _workPanel.SetActive(false);
         
         _recordPanel.StatusUpdate = OnRecordStatusChanged;
-        _recordPanel.SetAlertAudioSource(_audioAlert);
+        _recordPanel.Initialize(22050, _audioAlert);
+        _recordPanel.gameObject.SetActive(false);
 
         _volumeManager = new VolumeManager();
 
@@ -164,6 +151,9 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
     void InitializeMeasurement()
     {
         CreatePlan();
+
+        _recordPanel.AudioCuesOnly = _settings.AudioCuesOnly;
+
         HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
     }
 
@@ -288,6 +278,10 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         {
             //_matrixTestController.Initialize();
             //_srList.matrixTest.Initialize();
+        }
+        else if (_settings.UseMicrophone)
+        {
+            _recordPanel.gameObject.SetActive(true);
         }
 
         _volumeAtten = SetLevel(_srList.Level, _srList.Units, _srList.TestEar);
@@ -504,230 +498,8 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         //else
         {
             var reviewThisOne = _settings.ReviewResponses && _qnum < _settings.NumToReview;
-            _recordPanel.AcquireAudioResponse(_settings.UseAudioCues, reviewThisOne);
+            _recordPanel.AcquireAudioResponse(reviewThisOne);
         }
-    }
-
-    IEnumerator AcquireAudioResponse()
-    {
-        //_responseAttempt = 1;
-        //_responseAccepted = false;
-
-        //if (_settings.UseAudioCues)
-        //{
-        //    yield return new WaitForSeconds(0.5f);
-        //    _recordingState = RecordingState.Start;
-        //}
-        //else
-        //{
-        //    yield return StartCoroutine(WaitForRecordingStart());
-        //}
-
-        //_log.Add($"Response:{_qnum}");
-
-        //StartCoroutine(RecordResponse());
-
-        //while (!_responseAccepted)
-        //{
-        //    yield return null;
-        //}
-
-        //FileIO.AppendTextFile(_dataPath, FileIO.JSONSerializeToString(_tentativeResponse));
-
-        ////if (_tentativeResponse.volumeChanged)
-        ////{
-        ////    yield return StartCoroutine(ShowVolumeWarning());
-        ////}
-
-        ////commonUI.IncrementProgressBar();
-
-        //ResponseAcquired();
-        yield return null;
-    }
-
-    IEnumerator WaitForRecordingStart()
-    {
-        _recordingState = RecordingState.Waiting;
-
-        //NGUITools.SetActive(prompt.gameObject, true);
-        //prompt.text = "What did you hear?";
-
-        //RecordButton.transform.localPosition = _recordButtonTween.from;
-        //StopButton.transform.localPosition = _stopButtonTween.from;
-
-        //NGUITools.SetActive(RecordButton.gameObject, true);
-        //_recordButtonPressed = false;
-        //KLib.Unity.SetButtonState(RecordButton, true, _buttonColor);
-
-        //if (ReviewThisOne())
-        //{
-        //    NGUITools.SetActive(StopButton.gameObject, true);
-        //    _stopButtonPressed = false;
-        //    KLib.Unity.SetButtonState(StopButton, true, _buttonColor);
-        //    KLib.Unity.DisableButton(StopButton);
-        //}
-        //else
-        //{
-        //    NGUITools.SetActive(StopButton.gameObject, false);
-        //}
-
-        //while (_recordingState != RecordingState.Start)
-        //{
-        //    yield return null;
-        //}
-
-        //if (ReviewThisOne())
-        //{
-        //    KLib.Unity.SetButtonState(RecordButton, false);
-        //    KLib.Unity.SetButtonState(StopButton, true, _buttonColor);
-        //}
-        //else
-        //{
-        //    NGUITools.SetActive(RecordButton.gameObject, false);
-        //}
-        yield return null;
-    }
-
-    IEnumerator RecordResponse()
-    {
-        //commonUI.ShowPrompt("");
-        //NGUITools.SetActive(RepeatButton.gameObject, false);
-        //NGUITools.SetActive(ContinueButton.gameObject, false);
-
-        //bool reviewThisOne = ReviewThisOne();
-        //NGUITools.SetActive(OKButton.gameObject, !reviewThisOne);
-        //NGUITools.SetActive(RedoButton.gameObject, !reviewThisOne);
-        //if (!reviewThisOne)
-        //{
-        //    _itsGoodButtonPressed = false;
-        //    _rerecordButtonPressed = false;
-        //}
-
-
-        //_OKButtonLabel.text = (ReviewThisOne()) ? "It's good!" : "Done";
-
-        //NGUITools.SetActive(MicSprite.gameObject, true);
-        //NGUITools.SetActive(prompt.gameObject, true);
-        //prompt.text = "What did you hear?";
-        //NGUITools.SetActive(progressBar.gameObject, true);
-        //MicTweener.enabled = true;
-
-        //_recordingState = RecordingState.Recording;
-
-        //audioRecord.clip = Microphone.Start(null, false, (int)(sMaxRecordTime_sec), _srData.Fs);
-
-        //audioAlert.clip = recordStartClip;
-        //audioAlert.Play();
-
-        //float progressBarSamples = (float)(audioRecord.clip.samples);
-
-        //progressBar.value = 1.0f;
-        //while (Microphone.IsRecording(null) && _recordingState == RecordingState.Recording)
-        //{
-        //    yield return new WaitForSeconds(0.1f);
-        //    progressBar.value = Microphone.IsRecording(null) ? Mathf.Max(0f, 1f - (float)(Microphone.GetPosition(null) / progressBarSamples)) : 0;
-        //}
-
-        //if (_recordingState == RecordingState.Recording)
-        //{
-        //    _recordingState = RecordingState.TimedOut;
-        //}
-        //if (_recordingState == RecordingState.Stop || _recordingState == RecordingState.StopAndContinue)
-        //{
-        //    yield return new WaitForSeconds(0.5f);
-        //}
-
-        //int endPosition = Microphone.GetPosition(null);
-        //Microphone.End(null);
-
-        //KLib.Unity.SetButtonState(StopButton, false);
-
-        //// Trim response, if needed
-        //if (endPosition > 0 && endPosition < audioRecord.clip.samples)
-        //{
-        //    float[] data = new float[endPosition];
-        //    audioRecord.clip.GetData(data, 0);
-        //    audioRecord.clip = AudioClip.Create("clip", data.Length, 1, _srData.Fs, false, false);
-        //    audioRecord.clip.SetData(data, 0);
-        //}
-
-        //audioAlert.clip = recordEndClip;
-        //audioAlert.Play();
-
-        ////progressBar.value = 0;
-        //MicTweener.enabled = false;
-
-        //bool volumeChanged = _volumeManager.GetMasterVolume(VolumeManager.VolumeUnit.Decibel) != _volumeAtten;
-        //string respPath = SaveResponseClip(_srData.runNumber, _srData.test, _responseAttempt);
-
-        //_tentativeResponse = new SpeechReception.Data.Response(_srList.sentences[_qnum].whole, _srList.sentences[_qnum].words, _srList.sentences[_qnum].SNR, volumeChanged, respPath);
-
-        //if (ReviewThisOne())
-        //{
-        //    _recordingState = (_responseAttempt < maxNumRecordAttempts) ? RecordingState.Validating : RecordingState.StopAndContinue;
-        //}
-
-        //StartCoroutine(DisposeOfResponse());
-        yield return null;
-    }
-
-    private IEnumerator DisposeOfResponse()
-    {
-        //switch (_recordingState)
-        //{
-        //    case RecordingState.Validating:
-        //        NGUITools.SetActive(prompt.gameObject, true);
-        //        prompt.text = "Check your response";
-
-        //        audioRecord.Play();
-        //        while (audioRecord.isPlaying)
-        //        {
-        //            progressBar.value = 1f - (float)(audioRecord.time) / audioRecord.clip.length;
-        //            yield return new WaitForSeconds(0.1f);
-        //        }
-        //        progressBar.value = 0;
-
-        //        NGUITools.SetActive(MicSprite.gameObject, false);
-        //        NGUITools.SetActive(prompt.gameObject, false);
-        //        NGUITools.SetActive(progressBar.gameObject, false);
-        //        NGUITools.SetActive(RecordButton.gameObject, false);
-        //        NGUITools.SetActive(StopButton.gameObject, false);
-
-        //        commonUI.ShowPrompt("Was your response recorded OK?");
-        //        NGUITools.SetActive(OKButton.gameObject, true);
-        //        NGUITools.SetActive(RedoButton.gameObject, true);
-        //        _itsGoodButtonPressed = false;
-        //        _rerecordButtonPressed = false;
-        //        break;
-
-        //    case RecordingState.StopAndContinue:
-        //        yield return new WaitForSeconds(0.5f);
-        //        NGUITools.SetActive(MicSprite.gameObject, false);
-        //        NGUITools.SetActive(prompt.gameObject, false);
-        //        NGUITools.SetActive(progressBar.gameObject, false);
-        //        NGUITools.SetActive(RecordButton.gameObject, false);
-        //        NGUITools.SetActive(StopButton.gameObject, false);
-        //        _responseAccepted = true;
-        //        break;
-
-        //    case RecordingState.StopAndRedo:
-        //        yield return new WaitForSeconds(0.25f);
-        //        ++_responseAttempt;
-        //        StartCoroutine(RecordResponse());
-        //        break;
-
-        //    case RecordingState.TimedOut:
-        //        NGUITools.SetActive(prompt.gameObject, false);
-        //        NGUITools.SetActive(progressBar.gameObject, false);
-        //        NGUITools.SetActive(OKButton.gameObject, false);
-        //        NGUITools.SetActive(RedoButton.gameObject, false);
-        //        NGUITools.SetActive(RepeatButton.gameObject, true);
-        //        NGUITools.SetActive(ContinueButton.gameObject, true);
-        //        _rerecordButtonPressed = false;
-        //        _itsGoodButtonPressed = false;
-        //        break;
-        //}
-        yield return null;
     }
 
     public void ResponseAcquired()
@@ -862,99 +634,16 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         yield return null;
     }
 
-    public void OnOKButtonClick()
-    {
-        if (_itsGoodButtonPressed)
-        {
-            return;
-        }
-        _itsGoodButtonPressed = true;
-
-        //if (_recordingState == RecordingState.Validating)
-        //{
-        //    _responseAccepted = true;
-        //}
-        //else if (_recordingState == RecordingState.TimedOut)
-        //{
-        //    _responseAccepted = true;
-        //}
-        //else
-        //{
-        //    _recordingState = RecordingState.StopAndContinue;
-        //}
-    }
-
-    public void OnRecordButtonClick()
-    {
-        if (_recordButtonPressed)
-        {
-            // avoid double clicks
-            return;
-        }
-
-        //_recordButtonPressed = true;
-        //_recordButtonTween.ResetToBeginning();
-        //_recordButtonTween.PlayForward();
-
-        //recordingState = RecordingState.Start;
-    }
-
-    public void OnStopButtonClick()
-    {
-        //if (_stopButtonPressed)
-        //{
-        //    return;
-        //}
-        //_stopButtonPressed = true;
-
-        //_stopButtonTween.ResetToBeginning();
-        ////stopButtonTween.PlayForward();
-
-        //KLib.Unity.SetButtonState(StopButton, false);
-        //_recordingState = RecordingState.Stop;
-    }
-
-    public void OnRedoButtonClick()
-    {
-        //if (_rerecordButtonPressed)
-        //{
-        //    return;
-        //}
-        //_rerecordButtonPressed = true;
-
-        //if (_recordingState == RecordingState.Validating)
-        //{
-        //    NGUITools.SetActive(RepeatButton.gameObject, false);
-        //    NGUITools.SetActive(RedoButton.gameObject, false);
-        //    NGUITools.SetActive(ContinueButton.gameObject, false);
-
-        //    StopButton.transform.localPosition = _stopButtonTween.from;
-
-        //    NGUITools.SetActive(RecordButton.gameObject, true);
-        //    NGUITools.SetActive(StopButton.gameObject, true);
-        //    _recordButtonPressed = false;
-        //    _stopButtonPressed = false;
-        //    KLib.Unity.SetButtonState(StopButton, true, _buttonColor);
-
-        //    ++_responseAttempt;
-        //    StartCoroutine(RecordResponse());
-        //}
-        //else if (_recordingState == RecordingState.TimedOut)
-        //{
-        //    ++_responseAttempt;
-        //    StartCoroutine(RecordResponse());
-        //}
-        //else
-        //{
-        //    prompt.text = "Wait...";
-        //    _recordingState = RecordingState.StopAndRedo;
-        //}
-    }
-
     void OnRecordStatusChanged(string status)
     {
-        _log.Add($"{status}:{_qnum}");
-        Debug.Log($"Record status: {status}");
+        switch (status)
+        {
+            case "RecordingStarted":
+                _log.Add($"RecordingStarted:{_qnum}");
+                break;
+            case "ResponseAccepted":
+                break;
+        }
     }
 
 
