@@ -13,6 +13,8 @@ using SpeechReception;
 using UnityEngine.Audio;
 using UnityEngine.Networking;
 using TMPro.EditorUtilities;
+using System.Linq;
+using System.Runtime.Serialization;
 
 public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 {
@@ -47,6 +49,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
     private SpeechTest _settings = null;
 
+    private int _runNumber;
     private string _dataPath;
     private string _mySceneName = "SpeechReception";
     private string _configName;
@@ -58,16 +61,11 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
     private AudioSource _audioPlay;
     private AudioSource _audioAlert;
 
-    private ListDescription _srItems;
     private ListProperties _srList;
     private Data _srData;
-    private Data.Response _tentativeResponse;
-    private int _qnum = -1;
+    private Data.Response _provisionalResponse;
 
-    private float _volumeAtten;
     private VolumeManager _volumeManager;
-
-    private int _numListsCompleted;
 
     private int _numPracticeLists;
     private int _numSinceLastBreak;
@@ -152,24 +150,29 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
     {
         CreatePlan();
 
+        _progressBar.maxValue = _plan.totalNumSentences;
         _recordPanel.AudioCuesOnly = _settings.AudioCuesOnly;
 
-        HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
+        HTS_Server.SendMessage(_mySceneName, "File:Ready");
     }
 
-    void CreateDataFileName()
+    void CreateDataFileName(string testName, string listName)
     {
         var fileStemStart = $"{GameManager.Subject}-Speech";
+        string fileStem = "";
         while (true)
         {
-            string fileStem = $"{fileStemStart}-Run{GameManager.GetNextRunNumber(_mySceneName):000}";
-            fileStem = Path.Combine(FileLocations.SubjectFolder, fileStem);
-            _dataPath = fileStem + ".json";
-            if (!File.Exists(_dataPath))
+            _runNumber = GameManager.GetNextRunNumber("Speech");
+            fileStem = $"{fileStemStart}-Run{_runNumber:000}";
+            var existingFiles = Directory.GetFiles(FileLocations.SubjectFolder, fileStem + "*.json");
+            if (existingFiles==null || existingFiles.Length == 0)
             {
                 break;
             }
         }
+
+        _dataPath = Path.Combine(FileLocations.SubjectFolder, $"{fileStem}-{testName}-{listName}.json");
+        HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
     }
 
     private void CreatePlan()
@@ -184,7 +187,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
         if (_settings.TestEars.Count == 0)
         {
-            _settings.TestEars = new List<SpeechReception.TestEar>() { SpeechReception.TestEar.SubjectDefault };
+            _settings.TestEars = new List<TestEar>() { TestEar.SubjectDefault };
         }
 
         int[] iorder = new int[_settings.TestEars.Count];
@@ -200,18 +203,18 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         foreach (int k in iorder)
         {
             var testEar = _settings.TestEars[k];
-            if (testEar == SpeechReception.TestEar.SubjectDefault)
+            if (testEar == TestEar.SubjectDefault)
             {
                 string subjectDefault = GameManager.Metrics["TestEar"];
 
                 if (string.IsNullOrEmpty(subjectDefault))
                     throw new Exception("Subject default test ear not set");
                 else if (subjectDefault == "Left")
-                    testEar = SpeechReception.TestEar.Left;
+                    testEar = TestEar.Left;
                 else if (subjectDefault == "Right")
-                    testEar = SpeechReception.TestEar.Right;
+                    testEar = TestEar.Right;
                 else if (subjectDefault == "Binaural")
-                    testEar = SpeechReception.TestEar.Binaural;
+                    testEar = TestEar.Binaural;
                 else
                     throw new Exception("Subject default test ear not set properly");
 
@@ -220,6 +223,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
             var t = _settings.Clone();
             t.Initialize(testEar, customizations.Get(_settings.TestSource));
             _plan.tests.Add(t);
+            _plan.totalNumSentences += t.NumSentences;
         }
     }
 
@@ -228,13 +232,12 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         _localAbort = false;
         _stopMeasurement = false;
 
-        _numListsCompleted = 0;
         _numSinceLastBreak = 0;
 
         StartCoroutine(StartNextList());
     }
 
-    private float SetLevel(float level, SpeechReception.LevelUnits units, SpeechReception.TestEar testEar)
+    private void SetLevel(float level, SpeechReception.LevelUnits units, SpeechReception.TestEar testEar)
     {
         float dB_wavfile_fullscale = float.NaN;
 
@@ -251,24 +254,20 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
         _audioPlay.volume = Mathf.Pow(10, atten / 20);
         _audioAlert.volume = Mathf.Pow(10, (atten - 10) / 20);
-        atten = 0;
-
-        _volumeManager.SetMasterVolume(atten, VolumeManager.VolumeUnit.Decibel);
-
-        return atten;
     }
 
     public IEnumerator StartNextList()
     {
         yield return null;
 
-        _progressBar.gameObject.SetActive(true);
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(true);
 
         // Pop next test off the stack
         _srList = _plan.GetNextList();
         _srList.ApplySequence();
+
+        CreateDataFileName(_settings.TestName, _srList.Title);
 
         if (_settings.TestType == TestType.ClosedSet)
         {
@@ -284,7 +283,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
             _recordPanel.gameObject.SetActive(true);
         }
 
-        _volumeAtten = SetLevel(_srList.Level, _srList.Units, _srList.TestEar);
+        SetLevel(_srList.Level, _srList.Units, _srList.TestEar);
 
         _log.Clear();
         _log.Add($"List started: {_srList.Title}");
@@ -297,7 +296,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         if (_settings.TestType == TestType.ClosedSet)
         {
             _srClosedSetData = new ClosedSetData(
-                _numListsCompleted < _settings.NumPracticeLists,
+                _plan.currentListIndex < _settings.NumPracticeLists,
                 _srList.Sequence.NumBlocks,
                 _srList.Sequence.ItemsPerBlock,
                 _srList.ClosedSet.PerformanceCriteria);
@@ -305,7 +304,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
             _srClosedSetData.date = DateTime.Now.ToString();
             _srClosedSetData.test = _settings.TestType + "-" + _srList.Title;
             _srClosedSetData.testEar = _srList.TestEar;
-            //_srClosedSetData.runNumber = SubjectManager.Instance.PeekDiagnosticsRun();
+            _srClosedSetData.runNumber = _runNumber;
         }
         else if (_settings.TestType == TestType.Matrix)
         {
@@ -314,23 +313,21 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
             _srMatrixTestData.date = DateTime.Now.ToString();
             _srMatrixTestData.test = _settings.TestType + "-" + _srList.Title;
             _srMatrixTestData.testEar = _srList.TestEar;
-            //_srMatrixTestData.runNumber = SubjectManager.Instance.PeekDiagnosticsRun();
+            _srMatrixTestData.runNumber = _runNumber;
         }
         else
         {
-            _srData = new SpeechReception.Data(_numListsCompleted < _settings.NumPracticeLists);
+            _srData = new SpeechReception.Data(_plan.currentListIndex < _settings.NumPracticeLists);
             _srData.date = DateTime.Now.ToString();
             _srData.test = _settings.TestType + "-" + _srList.Title;
-            _srData.Fs = 22050;
-            //_srData.runNumber = SubjectManager.Instance.PeekDiagnosticsRun();
+            _srData.Fs = _recordPanel.Fs;
+            _srData.runNumber = _runNumber;
             _srData.testEar = _srList.TestEar;
-            //_dataPath = DiagnosticsManager.Instance.StartTest(_srData, "Speech", _srData.test);
         }
 
-        _qnum = 0;
         if (_settings.TestType != TestType.QuickSIN && _srList.UseMasker)
         {
-            float maskerLevel = _srList.Level - _srList.sentences[_qnum].SNR;
+            float maskerLevel = _srList.Level - _srList.sentences[_plan.currentSentenceIndex].SNR;
             if (_settings.TestType == TestType.Matrix) maskerLevel = _srList.MatrixTest.MaskerLevel;
             //yield return StartCoroutine(masker.Initialize(
             //    _srList.masker,
@@ -342,14 +339,13 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
         // Display instructions if needed
         var instructions = GetInstructions(_plan.currentListIndex);
-        if (false && !string.IsNullOrEmpty(instructions))
+        if (!string.IsNullOrEmpty(instructions))
         {
             ShowInstructions(instructions);
         }
-        else if (_numListsCompleted > 0)
+        else if (_plan.currentListIndex > 0)
         {
-            //commonUI.FormatHelpBox("Great!\nLet's try some more.");
-            //commonUI.ShowNextButton("Press Next to continue", StartNextSentence);
+            ShowInstructions("-Great!\n-Let's try some more.");
         }
         else
         {
@@ -397,7 +393,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         _prompt.gameObject.SetActive(true);
         _prompt.text = "Listen...";
 
-        string wavfile = _srList.sentences[_qnum].wavfile;
+        string wavfile = _srList.sentences[_plan.currentSentenceIndex].wavfile;
 
         //Debug.Log(_qnum + ": " + wavfile);
 
@@ -427,11 +423,11 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
         if (_settings.TestType == TestType.Matrix)
         {
-            _volumeAtten = SetLevel(_srList.MatrixTest.StimLevel, _srList.Units, _srList.TestEar);
+            SetLevel(_srList.MatrixTest.StimLevel, _srList.Units, _srList.TestEar);
         }
 
-        _log.Add($"Sentence:{_qnum}");
-        HTS_Server.SendMessage(_mySceneName, $"Status: Sentence {_qnum}...");
+        _log.Add($"Sentence:{_plan.currentSentenceIndex}");
+        HTS_Server.SendMessage(_mySceneName, $"Status: Sentence {_plan.currentSentenceIndex}...");
 
         if (_settings.TestType != TestType.QuickSIN && _srList.UseMasker)
         {
@@ -441,9 +437,9 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
             }
             else
             {
-                _masker.SetLevel(_srList.Level - _srList.sentences[_qnum].SNR);
+                _masker.SetLevel(_srList.Level - _srList.sentences[_plan.currentSentenceIndex].SNR);
             }
-            _log.Add($"MaskerOff:{_qnum}");
+            _log.Add($"MaskerOff:{_plan.currentSentenceIndex}");
             _masker.Play();
         }
 
@@ -456,16 +452,16 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         }
 
         // Sentence
-        _volumeManager.SetMasterVolume(_volumeAtten, VolumeManager.VolumeUnit.Decibel);
+        _volumeManager.SetMasterVolume(0, VolumeManager.VolumeUnit.Decibel);
 
-        _log.Add($"SentenceStart:{_qnum}");
+        _log.Add($"SentenceStart:{_plan.currentSentenceIndex}");
 
         //_audioPlay.clip = www.GetAudioClip(false, false, AudioType.WAV);
         _audioPlay.Play();
         
         yield return new WaitForSeconds(_audioPlay.clip.length);
 
-        _log.Add($"SentenceEnd:{_qnum}");
+        _log.Add($"SentenceEnd:{_plan.currentSentenceIndex}");
 
         // Post-sentence baseline
         float wait_s = 0;
@@ -482,7 +478,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         if (_srList.UseMasker)
         {
             _masker.Stop();
-            _log.Add($"MaskerOff:{_qnum}");
+            _log.Add($"MaskerOff:{_plan.currentSentenceIndex}");
         }
 
         _fixationPoint.SetActive(false);
@@ -497,96 +493,143 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         //}
         //else
         {
-            var reviewThisOne = _settings.ReviewResponses && _qnum < _settings.NumToReview;
+            var reviewThisOne = _settings.ReviewResponses && _plan.numSentencesDone < _settings.NumToReview;
             _recordPanel.AcquireAudioResponse(reviewThisOne);
         }
     }
 
+    private string SaveResponseClip()
+    {
+        Response r = new Response();
+        r.test = _srData.test;
+        r.sentenceNum = _plan.currentSentenceIndex;
+        r.sentence = _srList.sentences[_plan.currentSentenceIndex].whole;
+        r.Fs = _srData.Fs;
+        r.attemptNum = _recordPanel.NumAttempts;
+        r.date = DateTime.Now.ToString();
+
+        string responsePath = _dataPath.Replace(".json", $"-{_plan.currentSentenceIndex}");
+        if (_recordPanel.NumAttempts > 1)
+        {
+            responsePath += "-" + _recordPanel.NumAttempts;
+        }
+
+        string json = FileIO.JSONStringAdd("", "info", FileIO.JSONSerializeToString(r));
+        File.WriteAllText($"{responsePath}.json", json);
+
+        KLib.Wave.WaveFile.Write(_recordPanel.Data, (uint)r.Fs, 16, $"{responsePath}.wav");
+
+        return responsePath;
+    }
+
+    private void SaveOpenSetData()
+    {
+        var header = new BasicMeasurementFileHeader()
+        {
+            measurementType = _mySceneName,
+            configName = _configName,
+            subjectID = GameManager.Subject
+        };
+
+        string json = FileIO.JSONStringAdd("", "info", KLib.FileIO.JSONSerializeToString(header));
+        json = FileIO.JSONStringAdd(json, "data", KLib.FileIO.JSONSerializeToString(_srData));
+        json = FileIO.JSONStringAdd(json, "log", KLib.FileIO.JSONSerializeToString(_log.Trim()));
+        json += Environment.NewLine;
+
+        File.WriteAllText(_dataPath, json);
+
+        HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+    }
+
     public void ResponseAcquired()
     {
-        //// Clear our work from the screen
-        //commonUI.ShowPrompt("");
-        //prompt.text = "";
-        //NGUITools.SetActive(MicSprite.gameObject, false);
-        //NGUITools.SetActive(OKButton.gameObject, false);
-        //NGUITools.SetActive(RedoButton.gameObject, false);
-        //NGUITools.SetActive(RepeatButton.gameObject, false);
-        //NGUITools.SetActive(ContinueButton.gameObject, false);
+        _prompt.text = "";
+        _recordPanel.Hide();
 
-        //_numSinceLastBreak++;
+        _numSinceLastBreak++;
 
-        //// Figure out where to go next
-        //if (++_qnum < _srList.sentences.Count && !(_useClosedSet && _srClosedSetData.PassedPerformanceCriteria))
-        //{
-        //    if (!_useClosedSet && _reviewResponses && _qnum == _srTest.NumToReview)
-        //    {
-        //        _reviewResponses = false;
-        //        Vector3 delta = _recordButtonTween.to - _recordButtonTween.from;
-        //        _recordButtonTween.from = new Vector3(0, 110);
-        //        _recordButtonTween.to = _recordButtonTween.from + delta;
-        //        _recordButtonTween.enabled = true;
+        // Figure out where to go next
+        _plan.IncrementSentence();
 
-        //        StartCoroutine(ShowEndReviewInstructions());
-        //    }
-        //    else
-        //    {
-        //        // go to next sentence
-        //        if (_srTest.GiveBreakEvery > 0 && _numSinceLastBreak >= _srTest.GiveBreakEvery)
-        //        {
-        //            _numSinceLastBreak = 0;
-        //            commonUI.FormatHelpBox("Great!\nTake a short break if you need one.");
-        //            commonUI.ShowNextButton("Press Next to continue", StartNextSentence);
-        //        }
-        //        else
-        //        {
-        //            StartNextSentence();
-        //        }
-        //        //commonUI.ShowNextButton("Press Next to continue", StartNextSentence);
-        //    }
-        //}
-        //else
-        //{
-        //    if (IPC.Instance.Use) IPC.Instance.StopRecording();
+        if (_stopMeasurement)
+        {
+            EndRun(abort: true);
+            return;
+        }
 
-        //    // save summary data
-        //    if (_useClosedSet)
-        //    {
-        //        _srClosedSetData.Finish();
-        //        DiagnosticsManager.Instance.CompleteTestButNoAdvance(_srClosedSetData, "Speech", _srClosedSetData.test);
-        //    }
-        //    else if (_useMatrixTest)
-        //    {
-        //        DiagnosticsManager.Instance.CompleteTestButNoAdvance(_srMatrixTestData, "Speech", _srMatrixTestData.test);
-        //    }
-        //    else
-        //    {
-        //        DiagnosticsManager.Instance.EndTest(_dataPath);
-        //        _dataPath = null;
-        //    }
-        //    _numListsCompleted++;
+        _progressBar.value = _plan.numSentencesDone;
+        HTS_Server.SendMessage(_mySceneName, $"Progress:{_plan.PercentComplete}");
 
-        //    if (_srList.listIndex >= 0)
-        //    {
-        //        string historyFile = FileIO.CombinePaths(DataFileLocations.SubjectMetaFolder, _srList.TestType + "_History.xml");
-        //        if (File.Exists(historyFile))
-        //        {
-        //            var history = FileIO.XmlDeserialize<ListHistory>(historyFile);
-        //            history.LastCompleted = _srList.listIndex;
-        //            FileIO.XmlSerialize(history, historyFile);
-        //        }
-        //    }
+        if (_plan.currentSentenceIndex < _srList.sentences.Count && !(_settings.TestType == TestType.ClosedSet && _srClosedSetData.PassedPerformanceCriteria))
+        {
+            if (_settings.TestType != TestType.ClosedSet && _settings.ReviewResponses && _plan.numSentencesDone == _settings.NumToReview)
+            {
+                ShowInstructions(
+                    "-OK, it seems like the recording is working.\n" +
+                    "-We'll stop asking you to check it every time...\n" +
+                    "-...but you will always have the option to re-record your response." 
+                    );
+            }
+            else if (_settings.UseMicrophone && _provisionalResponse.volumeChanged)
+            {
+                HTS_Server.SendMessage(_mySceneName, $"Status: Volume changed!");
+                ShowInstructions(
+                    "-Please don't try to change the volume.\n" +
+                    "-It may seem too low, but we set it where it will give the most meaningful results.\n" +
+                    "-It's OK, just do your best!"
+                    );
+            }
+            else if (_settings.GiveBreakEvery > 0 && _numSinceLastBreak >= _settings.GiveBreakEvery)
+            {
+                HTS_Server.SendMessage(_mySceneName, $"Status: Offering a break");
+                _numSinceLastBreak = 0;
+                ShowInstructions("-Great!\n-Take a short break if you need one.");
+            }
+            else
+            {
+                StartNextSentence();
+            }
+        }
+        else
+        {
+            // save summary data
+            if (_settings.TestType == TestType.ClosedSet)
+            {
+                _srClosedSetData.Finish();
+//                DiagnosticsManager.Instance.CompleteTestButNoAdvance(_srClosedSetData, "Speech", _srClosedSetData.test);
+            }
+            else if (_settings.TestType == TestType.Matrix)
+            {
+//                DiagnosticsManager.Instance.CompleteTestButNoAdvance(_srMatrixTestData, "Speech", _srMatrixTestData.test);
+            }
+            else
+            {
+                SaveOpenSetData();
+            }
 
-        //    // tests remaining?
-        //    if (_srTest.Lists.Count > 0)
-        //    {
-        //        StartCoroutine(StartNextList());
-        //    }
-        //    else
-        //    {
-        //        commonUI.ShowHelpBox("Excellent!");
-        //        commonUI.ShowNextButton("Press Next to start the next task", Return);
-        //    }
-        //}
+            if (_srList.listIndex >= 0)
+            {
+                string historyFile = Path.Combine(FileLocations.SubjectMetaFolder, _settings.TestSource + "_History.xml");
+                if (File.Exists(historyFile))
+                {
+                    var history = FileIO.XmlDeserialize<ListHistory>(historyFile);
+                    history.LastCompleted = _srList.listIndex;
+                    FileIO.XmlSerialize(history, historyFile);
+                }
+            }
+
+            _plan.IncrementList();
+
+            // tests remaining?
+            if (!_plan.IsFinished())
+            {
+                StartCoroutine(StartNextList());
+            }
+            else
+            {
+                EndRun(abort: false);
+            }
+        }
     }
 
     public void ListenAgain()
@@ -639,13 +682,32 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         switch (status)
         {
             case "RecordingStarted":
-                _log.Add($"RecordingStarted:{_qnum}");
+                _log.Add($"RecordingStarted:{_plan.currentSentenceIndex}");
                 break;
+
+            case "ResponseAcquired":
+                var respPath = SaveResponseClip();
+                bool volumeChanged = _volumeManager.GetMasterVolume(VolumeManager.VolumeUnit.Decibel) != 0;
+                _provisionalResponse = new Data.Response(
+                    _srList.sentences[_plan.currentSentenceIndex].whole,
+                    _srList.sentences[_plan.currentSentenceIndex].words,
+                    _srList.sentences[_plan.currentSentenceIndex].SNR,
+                    volumeChanged,
+                    Path.GetFileName(respPath));
+                break;
+
             case "ResponseAccepted":
+                string jsonPath = Path.Combine(FileLocations.SubjectFolder, $"{_provisionalResponse.file}.json");
+                HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(jsonPath)}:{File.ReadAllText(jsonPath)}");
+
+                string wavPath = jsonPath.Replace(".json", ".wav");
+                HTS_Server.SendBufferedFile(wavPath);
+
+                _srData.responses.Add(_provisionalResponse);
+                ResponseAcquired();
                 break;
         }
     }
-
 
     void OnAbortAction(InputAction.CallbackContext context)
     {
@@ -653,17 +715,20 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
         _workPanel.SetActive(false);
         _instructionPanel.gameObject.SetActive(false);
+
         _quitPanel.SetActive(true);
     }
 
     void Update()
     {
-        if (_stopMeasurement)
-        {
-            _abortAction.Disable();
-            _stopMeasurement = false;
-            EndRun(abort: true);
-        }
+        // will stop after current trial
+
+        //if (_stopMeasurement)
+        //{
+        //    _abortAction.Disable();
+        //    _stopMeasurement = false;
+        //    EndRun(abort: true);
+        //}
     }
 
     public void OnQuitConfirmButtonClick()
@@ -680,6 +745,8 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
     private void ShowInstructions(string instructions)
     {
+        HTS_Server.SendMessage(_mySceneName, $"Status: Showing instructions");
+
         _workPanel.gameObject.SetActive(false);
         _instructionPanel.gameObject.SetActive(true);
         _instructionPanel.InstructionsFinished = StartNextSentence;
@@ -700,7 +767,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
         HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
-        HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+//        HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
 
         if (_localAbort)
         {

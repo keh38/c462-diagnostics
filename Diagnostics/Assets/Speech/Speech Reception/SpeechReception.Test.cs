@@ -161,7 +161,7 @@ namespace SpeechReception
             GiveBreakEvery = -1;
             NumPracticeLists = 0;
             NumPerSNR = 0;
-            TestEars = new List<TestEar>() { TestEar.Binaural };
+            TestEars = new List<TestEar>();
             EarOrder = "Random";
             NumListsAvailable = 1;
             Choose = 0;

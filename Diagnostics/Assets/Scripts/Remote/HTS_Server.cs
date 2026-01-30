@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 
 using KLib;
 using KLib.Network;
+using System.Threading.Tasks;
 
 public class HTS_Server : MonoBehaviour
 {
@@ -67,6 +68,36 @@ public class HTS_Server : MonoBehaviour
         {
             var result = KTcpClient.SendMessage(instance._remoteEndPoint, $"{message}:{data}");
         }
+    }
+
+    public static void SendBufferedFile(string localPath)
+    {
+        int bufferSize = 16384;
+
+        var fileInfo = new FileInfo(localPath);
+
+        long numBuffers = (long)Math.Ceiling((double)fileInfo.Length / bufferSize);
+
+        KTcpClient client = new KTcpClient();
+        client.ConnectTCPServer(instance._remoteEndPoint.Address.ToString(), _instance._remoteEndPoint.Port);
+
+        var result = client.WriteStringAsByteArray($"ReceiveBufferedFile:{Path.GetFileName(localPath)}:{bufferSize}:{numBuffers}");
+        if (result <= 0)
+        {
+            return;
+        }
+
+        using (FileStream fs = new FileStream(localPath, FileMode.Open, FileAccess.Read))
+        using (BinaryReader reader = new BinaryReader(fs))
+        {
+            for (int k = 0; k < numBuffers; k++)
+            {
+                var bytes = reader.ReadBytes(bufferSize);
+                result = client.SendBuffer(bytes);
+            }
+        }
+
+        client.CloseTCPServer();
     }
 
     private void _Init()

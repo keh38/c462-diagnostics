@@ -11,7 +11,7 @@ public class RecordButton : MonoBehaviour
     private Color _imageColor;
     private Color _textColor;
 
-    void Start()
+    void Awake()
     {
         _imageColor = _image.color;
         _textColor = _label.color;
