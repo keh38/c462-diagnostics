@@ -17,6 +17,8 @@ namespace Digits
         public float criterion;
         public int curBlock;
 
+        public TestSpec() { }
+
         public TestSpec(TestType type, float SNR, float ITD, int numBlocks, int numTrialsPerBlock, float criterion, int curBlock)
         {
             this.type = type;

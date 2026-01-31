@@ -39,6 +39,11 @@ namespace SpeechReception
         public string TestSource { get; set; }
         private bool ShouldSerializeTestSource() { return false; }
 
+        [Category("About")]
+        [PropertyOrder(3)]
+        public bool ApplyIllumination { get; set; }
+        private bool ShouldSerializeApplyIllumination() { return false; }
+
         [Category("Instructions")]
         [DisplayName("Font size")]
         [PropertyOrder(0)]

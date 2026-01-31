@@ -6,9 +6,9 @@ using System.IO;
 using KLib.Signals;
 using KLib.Signals.Calibration;
 
-public class DigitSpeaker : MonoBehaviour 
+public class DigitSpeaker : MonoBehaviour
 {
-    public enum SpeakerID {F01, M01, M02};
+    public enum SpeakerID { F01, M01, M02 };
     public SpeakerID speakerID;
 
     public float IDI_ms = 680; // interval between digits
@@ -20,11 +20,11 @@ public class DigitSpeaker : MonoBehaviour
     private bool _isSpeaking;
     private float _tZero = 1e-3f;
 
-    void Start() 
+    void Start()
     {
         _isSpeaking = false;
         StartCoroutine(GetClips());
-	}
+    }
 
     public int[] SpokenDigits
     {
@@ -40,7 +40,7 @@ public class DigitSpeaker : MonoBehaviour
 
     public bool IsSpeaking
     {
-        get { return _isSpeaking;}
+        get { return _isSpeaking; }
     }
 
     IEnumerator GetClips()
@@ -52,7 +52,7 @@ public class DigitSpeaker : MonoBehaviour
             WWW www = new WWW("file:///" + Path.Combine(FileLocations.BasicResourcesFolder, "Digits", speakerID.ToString(), fn));
             while (!www.isDone)
                 yield return null;
-            
+
             _digitClips.Add(ZeroPadClip(www.GetAudioClip()));
         }
         //Debug.Log(ComputeMaxSPL());
@@ -60,23 +60,27 @@ public class DigitSpeaker : MonoBehaviour
 
     public static float GetMaxLevel(string transducer, string units)
     {
-        SpeechReception.References r = new SpeechReception.References(Path.Combine(FileLocations.BasicResourcesFolder, "Digits"), "Digits");
-        return r.GetReference(transducer, units);
-    }
+        SpeechReception.References references = null;
 
-    public float ComputeMaxSPL()
-    {
-        CalibrationData cal = CalibrationFactory.Load(LevelUnits.dB_SPL, GameManager.Transducer, "Diotic");
-
-        float sum = 0;
-        foreach (AudioClip a in _digitClips)
+        string refPath = Path.Combine(FileLocations.LocalResourceFolder("Calibration"), "Digits_References.xml");
+        Debug.Log(refPath);
+        if (File.Exists(refPath))
         {
-            float[] data = new float[a.samples];
-            a.GetData(data, 0);
-            sum +=cal.GetMax(data, AudioSettings.outputSampleRate);
+            Debug.Log(refPath);
+            Debug.Log($"transducer = {transducer}, units = {units}");
+            var r = new SpeechReception.References(refPath);
+            if (r.HasReferenceFor(transducer, units.ToString()))
+            {
+                references = r;
+            }
         }
 
-        return sum / _digitClips.Count;
+        if (references == null)
+        {
+            references = new SpeechReception.References(Path.Combine(FileLocations.BasicResourcesFolder, "Digits"), "Digits");
+        }
+
+        return references.GetReference(transducer, units);
     }
 
     public void Clear()
@@ -88,7 +92,7 @@ public class DigitSpeaker : MonoBehaviour
     public void Randomize(List<List<int>> availableDigits)
     {
         _digits = new int[availableDigits.Count];
-        for (int k=0; k<_digits.Length; k++)
+        for (int k = 0; k < _digits.Length; k++)
         {
             int idx = Random.Range(0, availableDigits[k].Count);
 
@@ -102,19 +106,19 @@ public class DigitSpeaker : MonoBehaviour
         GetComponent<AudioSource>().volume = Mathf.Pow(10, atten_dB / 20);
         StartCoroutine(DoSpeakAll());
     }
-    
+
     IEnumerator DoSpeakAll()
     {
         _isSpeaking = true;
-        
+
         foreach (int digit in _digits)
         {
             GetComponent<AudioSource>().clip = _digitClips[digit];
             GetComponent<AudioSource>().Play();
-        
+
             yield return new WaitForSeconds(Mathf.Max(GetComponent<AudioSource>().clip.length, IDI_ms / 1000));
         }
-        
+
         _isSpeaking = false;
     }
 
@@ -135,9 +139,9 @@ public class DigitSpeaker : MonoBehaviour
 
         GetComponent<AudioSource>().clip = ApplyITDToClip(_digitClips[_digits[digitNum]], itd_us);
         GetComponent<AudioSource>().Play();
-        
-        yield return new WaitForSeconds(Mathf.Max(GetComponent<AudioSource>().clip.length, IDI_ms/1000));
-        
+
+        yield return new WaitForSeconds(Mathf.Max(GetComponent<AudioSource>().clip.length, IDI_ms / 1000));
+
         _isSpeaking = false;
     }
 
@@ -168,9 +172,9 @@ public class DigitSpeaker : MonoBehaviour
         int iright = ncenter + nshift;
         int ileft = ncenter - nshift;
 
-//        Debug.Log("ITD = " + ITD + "; nshift = " + nshift + "; iright = " + iright + "; ileft = " + ileft);
+        //        Debug.Log("ITD = " + ITD + "; nshift = " + nshift + "; iright = " + iright + "; ileft = " + ileft);
 
-        for (int k=0; k<clip.samples - 2*ncenter + Mathf.Abs(nshift); k++)
+        for (int k = 0; k < clip.samples - 2 * ncenter + Mathf.Abs(nshift); k++)
         {
             yitd[index++] = yclip[ileft++];
             yitd[index++] = yclip[iright++];

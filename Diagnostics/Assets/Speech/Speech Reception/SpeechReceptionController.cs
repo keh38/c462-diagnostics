@@ -19,6 +19,7 @@ using System.Runtime.Serialization;
 public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 {
     [Header("UI Elements")]
+    [SerializeField] private Camera _camera;
     [SerializeField] private InputActionAsset _actions;
     [SerializeField] private TMPro.TMP_Text _title;
     [SerializeField] private InstructionPanel _instructionPanel;
@@ -251,6 +252,8 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
         _numSinceLastBreak = 0;
 
+        SetIllumination();
+
         if (_plan.IsRunInProgress())
         {
             Debug.Log($"{_mySceneName}: Previous state exists. Asking whether to resume");
@@ -263,8 +266,21 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         {
             StartCoroutine(StartNextList());
         }
-
     }
+
+    void SetIllumination()
+    {
+        if (_settings.ApplyIllumination)
+        {
+            _camera.backgroundColor = GameManager.BackgroundColor;
+            if (HardwareInterface.LED.IsInitialized)
+            {
+                HardwareInterface.LED.SetColorFromString(GameManager.LEDColorString);
+                HTS_Server.SendMessage("ChangedLEDColors", GameManager.LEDColorString);
+            }
+        }
+    }
+
     private void OnQuestionResponse(bool yes)
     {
         _questionBox.gameObject.SetActive(false);

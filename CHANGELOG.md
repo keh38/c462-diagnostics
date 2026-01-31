@@ -3,6 +3,7 @@
 ### v1.11 (unreleased)
 #### added
 - restored Digits test
+- restored open set speech
 
 ---
 

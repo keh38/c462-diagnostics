@@ -13,11 +13,7 @@ using KLib;
 
 using BasicMeasurements;
 using DigitsTest;
-using System.Numerics;
 using Digits;
-using NUnit.Framework.Interfaces;
-using static UnityEngine.GraphicsBuffer;
-using System.Runtime.Serialization;
 
 public class DigitsTestController : MonoBehaviour, IRemoteControllable
 {
@@ -42,7 +38,6 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
     private bool _localAbort = false;
 
     private DigitsTestSettings _settings = new DigitsTestSettings();
-    private List<Digits.TestSpec> _plan = new List<Digits.TestSpec>();
     private Digits.TestData _data;
     private Digits.TestStatus _status = new Digits.TestStatus();
 
@@ -136,10 +131,12 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
     void InitializeMeasurement()
     {
         InitDataFile();
+
+        _status = new Digits.TestStatus();
         CreatePlan();
         InitializeSpeakers();
 
-        _progressBar.maxValue = _plan.Count;
+        _progressBar.maxValue = _status.plan.Count;
         _progressBar.value = 0;
 
         HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath.Replace(".json", ""))}");
@@ -157,6 +154,28 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
             {
                 break;
             }
+        }
+    }
+
+    private void OnQuestionResponse(bool yes)
+    {
+        _questionBox.gameObject.SetActive(false);
+
+        if (yes)
+        {
+            Debug.Log($"{_mySceneName}: Resuming previous");
+            HTS_Server.SendMessage(_mySceneName, "Status:Resuming previous");
+
+            _status = TestStatus.RestoreSavedState();
+
+            HTS_Server.SendMessage(_mySceneName, $"Progress:{_status.PercentComplete}");
+
+            StartMeasurement();
+        }
+        else
+        {
+            Debug.Log($"{_mySceneName}: starting test over");
+            HTS_Server.SendMessage(_mySceneName, "Status:Starting test over");
         }
     }
 
@@ -185,7 +204,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
     {
         if (_settings.NumPracticeTrials > 0)
         {
-            _plan.Add(new Digits.TestSpec(
+            _status.plan.Add(new Digits.TestSpec(
                 type: Digits.TestSpec.TestType.Practice,
                 SNR: float.PositiveInfinity,
                 ITD: 0,
@@ -194,7 +213,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
                 criterion: 0.9f,
                 curBlock: 0
             ));
-            _plan.Add(new Digits.TestSpec(
+            _status.plan.Add(new Digits.TestSpec(
                 type: Digits.TestSpec.TestType.Practice,
                 SNR: 20,
                 ITD: 0,
@@ -203,7 +222,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
                 criterion: 0.9f,
                 curBlock: 0
             ));
-            _plan.Add(new Digits.TestSpec(
+            _status.plan.Add(new Digits.TestSpec(
                 type: Digits.TestSpec.TestType.Practice,
                 SNR: 9,
                 ITD: 0,
@@ -212,7 +231,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
                 criterion: 0,
                 curBlock: 0
             ));
-            _plan.Add(new Digits.TestSpec(
+            _status.plan.Add(new Digits.TestSpec(
                 type: Digits.TestSpec.TestType.Practice,
                 SNR: 3,
                 ITD: 0,
@@ -227,7 +246,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         {
             foreach (float snr in _settings.SNR)
             {
-                _plan.Add(new Digits.TestSpec(
+                _status.plan.Add(new Digits.TestSpec(
                     type: Digits.TestSpec.TestType.Test,
                     SNR: snr,
                     ITD: 0,
@@ -249,7 +268,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
                 }
                 foreach (float snr in SNRs)
                 {
-                    _plan.Add(new Digits.TestSpec(
+                    _status.plan.Add(new Digits.TestSpec(
                         type: Digits.TestSpec.TestType.Test,
                         SNR: snr,
                         ITD: 0,
@@ -287,8 +306,19 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
 
         SetIllumination();
 
-        HTS_Server.SendMessage(_mySceneName, "Status:Instructions");
-        ShowInstructions(Instructions.Intro);
+        if (_status.IsRunInProgress())
+        {
+            Debug.Log($"{_mySceneName}: Previous state exists. Asking whether to resume");
+            HTS_Server.SendMessage(_mySceneName, "Status:Asking to resume");
+
+            _questionBox.gameObject.SetActive(true);
+            _questionBox.PoseQuestion("Continue previous session?", OnQuestionResponse);
+        }
+        else
+        {
+            HTS_Server.SendMessage(_mySceneName, "Status:Instructions");
+            ShowInstructions(Instructions.Intro);
+        }
     }
 
     private void StartMeasurement()
@@ -298,8 +328,9 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         _workPanel.SetActive(true);
 
         _status.dataFileNum++;
-        _data = new Digits.TestData(_plan[_status.testNum], _status.dataFileNum);
+        _data = new Digits.TestData(_status.plan[_status.testNum], _status.dataFileNum);
         _status.blockNum = 0;
+        _status.Save();
 
         HTS_Server.SendMessage(_mySceneName, $"Status:{_data.name}");
 
@@ -320,11 +351,12 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         _data.NewBlock();
         _log.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, "Block");
         _status.trialNum = 0;
+        _status.Save();
 
         _numRampTrials = 0;
-        if (_settings.RampStep > 0 && _plan[_status.testNum].SNR < _settings.RampStart)
+        if (_settings.RampStep > 0 && _status.plan[_status.testNum].SNR < _settings.RampStart)
         {
-            float endRamp = Mathf.Max(_plan[_status.testNum].SNR, _settings.RampEnd);
+            float endRamp = Mathf.Max(_status.plan[_status.testNum].SNR, _settings.RampEnd);
             _numRampTrials = Mathf.FloorToInt((float)(_settings.RampStart - endRamp) / (float)_settings.RampStep);
         }
 
@@ -333,10 +365,10 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
 
     public void NextTrial()
     {
-        float SNR = _plan[_status.testNum].SNR;
-        float ITD = _plan[_status.testNum].ITD;
+        float SNR = _status.plan[_status.testNum].SNR;
+        float ITD = _status.plan[_status.testNum].ITD;
 
-        if (_plan[_status.testNum].type == Digits.TestSpec.TestType.Test && _status.trialNum < _numRampTrials)
+        if (_status.plan[_status.testNum].type == Digits.TestSpec.TestType.Test && _status.trialNum < _numRampTrials)
         {
             SNR = _settings.RampStart - _settings.RampStep * _status.trialNum;
         }
@@ -442,7 +474,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         _data.AddTrial(trialData);
 
         // If practice, show feedback
-        if (_plan[_status.testNum].type == Digits.TestSpec.TestType.Practice)
+        if (_status.plan[_status.testNum].type == Digits.TestSpec.TestType.Practice)
         {
             if (!_doSimulation)
             {
@@ -451,7 +483,10 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         }
 
         // Whither next?
-        if (++_status.trialNum == _plan[_status.testNum].numTrialsPerBlock)
+        _status.trialNum++;
+        _status.Save();
+
+        if (_status.trialNum == _status.plan[_status.testNum].numTrialsPerBlock)
         {
             EndBlock();
         }
@@ -467,7 +502,10 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
 
     private void EndBlock()
     {
-        if (++_status.blockNum == _plan[_status.testNum].numBlocks)
+        _status.blockNum++;
+        _status.Save();
+
+        if (_status.blockNum == _status.plan[_status.testNum].numBlocks)
         {
             EndTest();
         }
@@ -499,35 +537,35 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         _digitDisplay.Hide();
 
         // Success criterion?
-        if (_data.FractionCorrect() < _plan[_status.testNum].criterion)
+        if (_data.FractionCorrect() < _status.plan[_status.testNum].criterion)
         {
             ShowInstructions(Instructions.MorePractice);
         }
         else
         {
             _status.testNum++;
+            _status.Save();
 
             _progressBar.value = _status.testNum;
-            int pctComplete = _status.testNum * 100 / _plan.Count;
-            HTS_Server.SendMessage(_mySceneName, $"Progress:{pctComplete}");
+            HTS_Server.SendMessage(_mySceneName, $"Progress:{_status.PercentComplete}");
 
             if (_status.testNum == 1)
             {
                 ShowInstructions(Instructions.FinishedPractice1);
             }
-            else if (_status.testNum == 2 && _plan.Count > _status.testNum && _plan[_status.testNum].type == Digits.TestSpec.TestType.Practice)
+            else if (_status.testNum == 2 && _status.plan.Count > _status.testNum && _status.plan[_status.testNum].type == Digits.TestSpec.TestType.Practice)
             {
                 ShowInstructions(Instructions.FinishedPractice2);
             }
-            else if (_status.testNum == 3 && _plan.Count > _status.testNum && _plan[_status.testNum].type == Digits.TestSpec.TestType.Practice)
+            else if (_status.testNum == 3 && _status.plan.Count > _status.testNum && _status.plan[_status.testNum].type == Digits.TestSpec.TestType.Practice)
             {
                 ShowInstructions(Instructions.FinishedPractice3);
             }
-            else if (_status.testNum < _plan.Count && _plan[_status.testNum - 1].type == Digits.TestSpec.TestType.Practice && _plan[_status.testNum].type == Digits.TestSpec.TestType.Test)
+            else if (_status.testNum < _status.plan.Count && _status.plan[_status.testNum - 1].type == Digits.TestSpec.TestType.Practice && _status.plan[_status.testNum].type == Digits.TestSpec.TestType.Test)
             {
                 ShowInstructions(Instructions.StartTest);
             }
-            else if (_status.testNum < _plan.Count)
+            else if (_status.testNum < _status.plan.Count)
             {
                 ShowInstructions(Instructions.MoreTesting);
             }
