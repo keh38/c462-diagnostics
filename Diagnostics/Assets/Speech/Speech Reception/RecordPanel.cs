@@ -32,7 +32,7 @@ public class RecordPanel : MonoBehaviour
     private float _playbackVolumeMin = -40f;
     private float _playbackVolumeMax = 0;
 
-    private enum RecordingState { Waiting, Recording, TimedOut, Stop, StopAndRedo, StopAndContinue, Validating };
+    private enum RecordingState { Waiting, Recording, TimedOut, Stop, StopAndRedo, StopAndContinue, Validating, Abort};
     private RecordingState _recordingState;
 
     public int NumAttempts { get; private set; }
@@ -48,6 +48,8 @@ public class RecordPanel : MonoBehaviour
 
     void Start()
     {
+        _recordingState = RecordingState.Waiting;
+
         Hide();
         CreateAudioSource();
     }
@@ -82,9 +84,15 @@ public class RecordPanel : MonoBehaviour
         _volumeSlider.gameObject.SetActive(false);
     }
 
+    public void Abort()
+    {
+        _recordingState = RecordingState.Abort;
+    }
+
     public void AcquireAudioResponse(bool review)
     {
         _reviewThisOne = review;
+        _recordingState = RecordingState.Waiting;
 
         NumAttempts = 1;
 
@@ -162,6 +170,12 @@ public class RecordPanel : MonoBehaviour
         int endPosition = Microphone.GetPosition(null);
         Microphone.End(null);
 
+        if (_recordingState == RecordingState.Abort)
+        {
+            Hide();
+            yield break;
+        }
+
         _stopButton.SetInteractable(false);
 
         // Trim response, if needed
@@ -219,11 +233,18 @@ public class RecordPanel : MonoBehaviour
         _volumeSlider.gameObject.SetActive(true);
         _powerBar.value = 0f;
         _audioRecord.Play();
-        while (_audioRecord.isPlaying)
+        while (_audioRecord.isPlaying && _recordingState != RecordingState.Abort)
         {
             _powerBar.value = (float)(_audioRecord.time) / _audioRecord.clip.length;
             yield return new WaitForSeconds(0.1f);
         }
+
+        if (_recordingState == RecordingState.Abort)
+        {
+            Hide();
+            yield break;
+        }
+
         _powerBar.value = 0;
 
         _recordButton.gameObject.SetActive(false);

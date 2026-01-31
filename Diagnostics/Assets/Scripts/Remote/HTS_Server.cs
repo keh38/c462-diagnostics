@@ -72,6 +72,8 @@ public class HTS_Server : MonoBehaviour
 
     public static void SendBufferedFile(string localPath)
     {
+        if (instance._remoteEndPoint == null) return;
+
         int bufferSize = 16384;
 
         var fileInfo = new FileInfo(localPath);

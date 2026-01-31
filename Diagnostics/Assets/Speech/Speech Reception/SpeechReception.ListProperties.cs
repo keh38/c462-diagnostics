@@ -9,7 +9,8 @@ using KLib;
 using KLib.Signals.Calibration;
 using KLib.TypeConverters;
 using OrderedPropertyGrid;
-    
+using Unity.VisualScripting;
+
 namespace SpeechReception
 {
     [TypeConverter(typeof(ListPropertiesConverter))]
@@ -66,18 +67,29 @@ namespace SpeechReception
         public MatrixTest MatrixTest { get; set; }
         public bool ShouldSerializeMatrixTest() { return _serializationTestType == TestType.Matrix; }
 
-        [XmlIgnore]
-        public int listIndex = -1;
-
-        [XmlIgnore]
+        [Browsable(false)]
         public List<ListDescription.Sentence> sentences;
+        public bool ShouldSerializeSentences() { return _serializeAllFields; }
+
+        [Browsable(false)]
+        public TestType TestType { get; set; }
+        public bool ShouldSerializeTestType() { return _serializeAllFields; }
+
+        [Browsable(false)]
+        public string TestSource { get; set; }
+        public bool ShouldSerializeTestSource() { return _serializeAllFields; }
+
+        [Browsable(false)]
+        public TestEar TestEar { get; set; }
+        public bool ShouldSerializeTestEar() { return _serializeAllFields; }
+
+        [Browsable(false)]
+        public string Title { get; set; }
+        public bool ShouldSerializeTitle() { return _serializeAllFields; }
 
         [XmlIgnore]
         [Browsable(false)]
-        public string Title
-        {
-            get { return _title; }
-        }
+        public int listIndex = -1;
 
         [XmlIgnore]
         [Browsable(false)]
@@ -93,16 +105,9 @@ namespace SpeechReception
 
         [XmlIgnore]
         [Browsable(false)]
-        public TestEar TestEar { get { return _testEar; } }
-
-        [XmlIgnore]
-        [Browsable(false)]
         public bool AnyFiniteSNR { get; private set; }
 
-        private TestType _testType;
-        private string _testSource;
-        private string _title;
-        private TestEar _testEar;
+        private bool _serializeAllFields = false;
 
         public ListProperties()
         {
@@ -130,18 +135,23 @@ namespace SpeechReception
 
         public List<string> GetClosedSetResponses()
         {
-            var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(_testSource));
+            var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(TestSource));
             return listDescription.sentences.Select(o => o.whole).ToList().Unique();
+        }
+
+        public void SerializeAllFields(bool serialize)
+        {
+            _serializeAllFields = serialize;
         }
 
         public void ApplySequence()
         {
-            var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(_testSource));
+            var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(TestSource));
             float[] snr = null;
 
             AnyFiniteSNR = false;
             
-            if (_testType != TestType.QuickSIN)
+            if (TestType != TestType.QuickSIN)
             {
                 if (Masker == null)
                 {
@@ -160,19 +170,19 @@ namespace SpeechReception
 
         public void Initialize(TestType testType, string testSource, TestEar testEar)
         {
-            _testType = testType;
-            _testSource = testSource;
-            _testEar = testEar;
+            TestType = testType;
+            TestSource = testSource;
+            TestEar = testEar;
 
-            var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(_testSource));
-            _title = listDescription.title;
+            var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(TestSource));
+            Title = listDescription.title;
 
             AnyFiniteSNR = false;
         }
 
         public int GetItemCount()
         {
-            var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(_testSource));
+            var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(TestSource));
             return Sequence.RepeatsPerBlock * Sequence.NumBlocks * (Sequence.choose > 0 ? Sequence.choose : listDescription.sentences.Count);
         }
 

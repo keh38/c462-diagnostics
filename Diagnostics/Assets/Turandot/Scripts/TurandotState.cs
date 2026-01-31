@@ -21,7 +21,6 @@ public class TurandotState
 
     public TurandotState() { }
 
-
     public TurandotState(string project, string subject, string configFile)
     {
         Project = project;

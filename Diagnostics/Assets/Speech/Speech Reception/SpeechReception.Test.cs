@@ -355,6 +355,14 @@ namespace SpeechReception
             return references.GetReference(transducer, units.ToString());
         }
 
+        public void MakeListsSerializable(bool serialize)
+        {
+            foreach (var list in Lists)
+            {
+                list.SerializeAllFields(serialize);
+            }
+        }
+
         /// <summary>
         /// Creates a deep copy of this SpeechTest instance.
         /// </summary>
