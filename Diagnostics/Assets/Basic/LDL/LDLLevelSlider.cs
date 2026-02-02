@@ -183,6 +183,11 @@ public class LDLLevelSlider : MonoBehaviour
         _fill.gameObject.SetActive(isLocked);
         _slider.interactable = !isLocked;
         _isActive = !isLocked;
+
+        if (LogSliderTrack)
+        {
+            _settings.log.Trim();
+        }
     }
 
     public void DefaultState()
@@ -202,7 +207,7 @@ public class LDLLevelSlider : MonoBehaviour
             _settings.isMaxed = _slider.value > 0.99f;
             _paramSetter(_settings.end);
 
-            if (LogSliderTrack)
+            if (LogSliderTrack && _isActive)
             {
                 _settings.log.Add(_slider.value, _settings.end);
             }

@@ -21,6 +21,7 @@ namespace Audiograms
         public Laterality ear;
         public float frequency;
         public float maskerLevel;
+        public float[] tunity;
         public float[] signalLevel;
         public float[] responseTime_s;
         public bool[] detected;
@@ -42,6 +43,7 @@ namespace Audiograms
             this.maskerLevel = float.NaN;
 
             this.lengthIncrement = lengthIncrement;
+            tunity = new float[lengthIncrement];
             signalLevel = new float[lengthIncrement];
             responseTime_s = new float[lengthIncrement];
             detected = new bool[lengthIncrement];
@@ -57,15 +59,17 @@ namespace Audiograms
             return index;
         }
         
-        public void Add(float signallevel, float maskerLevel, float responseTime_s, bool detected)
+        public void Add(float tunity, float signallevel, float maskerLevel, float responseTime_s, bool detected)
         {
             if (index == this.signalLevel.Length)
             {
                 int newLen = this.signalLevel.Length + lengthIncrement;
-                System.Array.Resize(ref this.signalLevel, newLen); 
+                System.Array.Resize(ref this.tunity, newLen);
+                System.Array.Resize(ref this.signalLevel, newLen);
                 System.Array.Resize(ref this.responseTime_s, newLen); 
                 System.Array.Resize(ref this.detected, newLen); 
             }
+            this.tunity[index] = tunity;
             this.signalLevel[index] = signallevel;
             this.responseTime_s[index] = responseTime_s;
             this.detected[index] = detected;
@@ -74,7 +78,8 @@ namespace Audiograms
         
         public void Trim()
         {
-            System.Array.Resize(ref this.signalLevel, index); 
+            System.Array.Resize(ref this.tunity, index);
+            System.Array.Resize(ref this.signalLevel, index);
             System.Array.Resize(ref this.responseTime_s, index); 
             System.Array.Resize(ref this.detected, index); 
         }

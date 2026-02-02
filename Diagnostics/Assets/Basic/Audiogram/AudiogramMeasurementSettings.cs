@@ -141,6 +141,7 @@ namespace Audiograms
             MaxISI = 7;
             Abridged = false;
             ModDepth = 0;
+            ModRate = 1;
             ShowOtherEarMessage = true;
             ShowNewFrequencyMessage = true;
             ButtonWidth = 500;

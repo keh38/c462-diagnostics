@@ -424,9 +424,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
             _curGroup.Add(_state.testConditions[index]);
         }
 
-        Debug.Log($"length now = {_data.sliderSettings[0].log.t.Length}");
         _sliderPanel.ResetSliders(_curGroup);
-        Debug.Log($"length now = {_data.sliderSettings[0].log.t.Length}");
 
         if (_doSimulation)
         {
@@ -469,7 +467,6 @@ public class LDLController : MonoBehaviour, IRemoteControllable
 
         if (_state.testOrder.Count > 0)
         {
-            Debug.Log($"length now = {_data.sliderSettings[0].log.t.Length}");
             DoNextGroup();
         }
         else

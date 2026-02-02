@@ -1,9 +1,11 @@
 ## Changelog
 
 ### v1.11 (unreleased)
-#### added
+#### Added
 - restored Digits test
 - restored open set speech
+- LDL: slider track logs
+- Audiogram: stimulus times, button press log
 
 ---
 

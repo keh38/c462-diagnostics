@@ -32,10 +32,8 @@ namespace LDL
             clone.start = this.start;
             clone.end = this.end;
             clone.isMaxed = this.isMaxed;
-            clone.log = this.log.Trim();
-            //this.log = new SliderLog();
+            clone.log = this.log;
 
-            Debug.Log($"log length = {clone.log.t.Length}");
             return clone;
         }
     }
