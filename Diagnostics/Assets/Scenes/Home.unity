@@ -7539,7 +7539,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11415712, guid: 8da81206961a7f340a92d51b06f8a443, type: 3}
       propertyPath: _startArray.Array.size
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 11415712, guid: 8da81206961a7f340a92d51b06f8a443, type: 3}
       propertyPath: _startArray.Array.data[0].Text
@@ -7547,10 +7547,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11415712, guid: 8da81206961a7f340a92d51b06f8a443, type: 3}
       propertyPath: _startArray.Array.data[1].Text
-      value: LDL
+      value: Digits
       objectReference: {fileID: 0}
     - target: {fileID: 11415712, guid: 8da81206961a7f340a92d51b06f8a443, type: 3}
       propertyPath: _startArray.Array.data[2].Text
+      value: LDL
+      objectReference: {fileID: 0}
+    - target: {fileID: 11415712, guid: 8da81206961a7f340a92d51b06f8a443, type: 3}
+      propertyPath: _startArray.Array.data[3].Text
       value: Questionnaire
       objectReference: {fileID: 0}
     - target: {fileID: 11415712, guid: 8da81206961a7f340a92d51b06f8a443, type: 3}
@@ -7568,6 +7572,14 @@ PrefabInstance:
     - target: {fileID: 11415712, guid: 8da81206961a7f340a92d51b06f8a443, type: 3}
       propertyPath: _startArray.Array.data[2].Value
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 11415712, guid: 8da81206961a7f340a92d51b06f8a443, type: 3}
+      propertyPath: _startArray.Array.data[3].Index
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 11415712, guid: 8da81206961a7f340a92d51b06f8a443, type: 3}
+      propertyPath: _startArray.Array.data[3].Value
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 11472250, guid: 8da81206961a7f340a92d51b06f8a443, type: 3}
       propertyPath: m_Text

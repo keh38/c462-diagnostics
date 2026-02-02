@@ -37,11 +37,14 @@ public class LDLLevelSlider : MonoBehaviour
 
     public UnityAction SliderMoved;
 
+    public bool LogSliderTrack { get; set; }
+
     void Awake()
     {
         _slider = GetComponent<Slider>();
         _mover = GetComponent<SliderAnimator>();
 
+        LogSliderTrack = false;
         _isActive = false;
     }
 
@@ -130,6 +133,13 @@ public class LDLLevelSlider : MonoBehaviour
         _settings.isMaxed = false;
         _slider.enabled = true;
 
+        if (LogSliderTrack)
+        {
+            _settings.log = new SliderLog();
+            _settings.log.Add(_slider.value, _settings.start);
+            _settings.log.Add(float.NaN, float.NaN);
+        }
+
         Lock(false);
     }
 
@@ -145,6 +155,10 @@ public class LDLLevelSlider : MonoBehaviour
     {
         if (_isActive)
         {
+            if (LogSliderTrack)
+            {
+                _settings.log.Add(float.NaN, float.NaN);
+            }
             _signalManager.Pause();
         }
     }
@@ -187,6 +201,11 @@ public class LDLLevelSlider : MonoBehaviour
 
             _settings.isMaxed = _slider.value > 0.99f;
             _paramSetter(_settings.end);
+
+            if (LogSliderTrack)
+            {
+                _settings.log.Add(_slider.value, _settings.end);
+            }
 
             if (!_hasMoved && _settings.end != _settings.start)
             {

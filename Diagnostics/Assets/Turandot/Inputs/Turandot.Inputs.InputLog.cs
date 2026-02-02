@@ -3,11 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 using Newtonsoft.Json;
-using ProtoBuf;
 
 namespace Turandot.Inputs
 {
-    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     [JsonObject(MemberSerialization.OptOut)]
     public class InputLog
     {

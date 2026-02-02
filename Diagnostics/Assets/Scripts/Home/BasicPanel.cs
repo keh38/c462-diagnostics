@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using BasicMeasurements;
 using KLib;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -41,10 +42,14 @@ public class BasicPanel : MonoBehaviour
         {
             SceneManager.LoadScene("Audiogram");
         }
+        else if (fileType == "Digits")
+        {
+            SceneManager.LoadScene("Digits");
+        }
         else if (fileType == "LDL")
         {
             var configPath = Path.Combine(FileLocations.ConfigFile("LDL", _listBox.SelectedText));
-            var config = FileIO.XmlDeserialize<LDL.LDLMeasurementSettings>(configPath);
+            var config = FileIO.XmlDeserialize<BasicMeasurementConfiguration>(configPath) as LDL.LDLMeasurementSettings;
             if (config.HapticStimulus != null && config.HapticStimulus.Source != LDL.Haptics.HapticSource.NONE)
             {
                 SceneManager.LoadScene("LDL_Haptics");

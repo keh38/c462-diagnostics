@@ -18,6 +18,8 @@ namespace LDL
         public float end;
         public bool isMaxed;
 
+        public SliderLog log;
+
         public SliderSettings() { }
         public SliderSettings Clone()
         {
@@ -30,6 +32,10 @@ namespace LDL
             clone.start = this.start;
             clone.end = this.end;
             clone.isMaxed = this.isMaxed;
+            clone.log = this.log.Trim();
+            //this.log = new SliderLog();
+
+            Debug.Log($"log length = {clone.log.t.Length}");
             return clone;
         }
     }

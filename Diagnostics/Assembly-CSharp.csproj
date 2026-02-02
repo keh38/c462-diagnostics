@@ -193,6 +193,7 @@
     <Compile Include="Assets\Turandot\Cues\Turandot.Cues.Help.cs" />
     <Compile Include="Assets\Scripts\Hardware\LEDController.cs" />
     <Compile Include="Assets\Scripts\KLib\Utilities\ColorTranslator.cs" />
+    <Compile Include="Assets\Basic\LDL\LDL.SliderLog.cs" />
     <Compile Include="Assets\Speech\Digits\Prefabs\Keypad.cs" />
     <Compile Include="Assets\Scripts\Home\TurandotPanel.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\MovingRippleNoise.cs" />

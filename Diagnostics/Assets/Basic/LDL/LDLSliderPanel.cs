@@ -44,6 +44,7 @@ public class LDLSliderPanel : MonoBehaviour
         {
             _sliders[k].InitializeStimulusGeneration(ch.Clone(), settings.Bandwidth, settings.MinLevel, settings.ModDepth_pct);
             _sliders[k].SliderMoved += OnSliderMoved;
+            _sliders[k].LogSliderTrack = settings.LogSliderTracks;
 
             var rt = _sliders[k].gameObject.GetComponent<RectTransform>();
             _xPositions[k] = rt.anchoredPosition.x;
