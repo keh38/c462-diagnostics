@@ -1,6 +1,6 @@
 ## Changelog
 
-### v1.11 (unreleased)
+### v1.11 (2026-02-04)
 #### Added
 - restored Digits test
 - restored open set speech

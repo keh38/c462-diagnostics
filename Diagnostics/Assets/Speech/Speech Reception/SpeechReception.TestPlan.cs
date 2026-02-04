@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
-using UnityEditor.SceneManagement;
-using UnityEditorInternal;
 using UnityEngine;
 
 namespace SpeechReception

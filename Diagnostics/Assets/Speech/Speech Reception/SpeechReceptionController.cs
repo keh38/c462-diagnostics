@@ -10,11 +10,7 @@ using UnityEngine.UI;
 
 using ExtensionMethods;
 using SpeechReception;
-using UnityEngine.Audio;
 using UnityEngine.Networking;
-using TMPro.EditorUtilities;
-using System.Linq;
-using System.Runtime.Serialization;
 
 public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 {
