@@ -1,5 +1,11 @@
 ## Changelog
 
+### v1.12 (unreleased)
+#### Added 
+- linspace to expressions
+
+---
+
 ### v1.11 (2026-02-04)
 #### Added
 - restored Digits test

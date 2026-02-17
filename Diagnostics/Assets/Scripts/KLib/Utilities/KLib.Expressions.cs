@@ -535,6 +535,20 @@ namespace KLib
                 return expression;
             }
 
+            // linspace(min, max, nsteps)
+            pattern = @"(linspace\(\s*([\d.-]+)\s*,\s*([\d.-]+),\s*([\d.-]+)\s*\))";
+            m = Regex.Match(expression, pattern);
+
+            if (m.Success)
+            {
+                float min = float.Parse(m.Groups[2].Value);
+                float max = float.Parse(m.Groups[3].Value);
+                int nsteps  = int.Parse(m.Groups[4].Value);
+                float stepSize = (max - min) / (nsteps - 1);
+                expression = expression.Replace(m.Groups[1].Value, $"{min}:{stepSize}:{max}");
+                return expression;
+            }
+
             return expression;
         }
 
