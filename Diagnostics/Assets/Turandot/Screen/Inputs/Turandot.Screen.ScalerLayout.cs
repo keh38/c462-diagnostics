@@ -7,10 +7,14 @@ using System.ComponentModel;
 using Newtonsoft.Json;
 using ProtoBuf;
 
+using OrderedPropertyGrid;
+using KLib.TypeConverters;
+
 namespace Turandot.Screen
 {
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     [JsonObject(MemberSerialization.OptOut)]
+    [TypeConverter(typeof(SortableTypeConverter))]
     public class ScalerLayout : InputLayout
     {
         [Category("Appearance")]
@@ -40,14 +44,46 @@ namespace Turandot.Screen
         private bool ShouldSerializeBarClickable() { return false; }
 
         [Category("Labels")]
+        [PropertyOrder(0)]
         [DisplayName("Min")]
         public string MinLabel { get; set; }
         private bool ShouldSerializeMinLabel() { return false; }
 
         [Category("Labels")]
+        [PropertyOrder(1)]
         [DisplayName("Max")]
         public string MaxLabel { get; set; }
         private bool ShouldSerializeMaxLabel() { return false; }
+
+        [Category("Scale")]
+        [DisplayName("Min")]
+        [PropertyOrder(0)]
+        public float MinValue { get; set; }
+        private bool ShouldSerializeMinValue() { return false; }
+
+        [Category("Scale")]
+        [DisplayName("Max")]
+        [PropertyOrder(1)]
+        public float MaxValue { get; set; }
+        private bool ShouldSerializeMaxValue() { return false; }
+
+        [Category("Scale")]
+        [DisplayName("Whole numbers")]
+        [PropertyOrder(1)]
+        public bool WholeNumbers { get; set; }
+        private bool ShouldSerializeWholeNumbers() { return false; }
+
+        [Category("Ticks")]
+        [DisplayName("Show")]
+        [PropertyOrder(0)]
+        public bool ShowTicks { get; set; }
+        private bool ShouldSerializeShowTicks() { return false; }
+
+        [Category("Ticks")]
+        [PropertyOrder(1)]
+        [DisplayName("Label")]
+        public bool LabelTicks { get; set; }
+        private bool ShouldSerializeLabelTicks() { return false; }
 
 
         public ScalerLayout()
@@ -61,6 +97,11 @@ namespace Turandot.Screen
             ShowFill = true;
             ShowThumb = true;
             BarClickable = false;
+            MinValue = 0;
+            MaxValue = 1;
+            WholeNumbers = false;
+            ShowTicks = false;
+            LabelTicks = false;
         }
     }
 }

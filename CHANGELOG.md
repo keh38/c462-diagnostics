@@ -1,5 +1,11 @@
 ## Changelog
 
+### v1.12 (unreleased)
+#### Changed
+- Turandot scaler: added options for min/max value, whole numbers and showing tick marks
+
+---
+
 ### v1.11.1 (2026-02-20)
 #### Added 
 - linspace to expressions
