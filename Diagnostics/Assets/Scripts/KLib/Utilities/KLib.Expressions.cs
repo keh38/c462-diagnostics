@@ -541,11 +541,22 @@ namespace KLib
 
             if (m.Success)
             {
-                float min = float.Parse(m.Groups[2].Value);
-                float max = float.Parse(m.Groups[3].Value);
+                float start = float.Parse(m.Groups[2].Value);
+                float stop = float.Parse(m.Groups[3].Value);
                 int nsteps  = int.Parse(m.Groups[4].Value);
-                float stepSize = (max - min) / (nsteps - 1);
-                expression = expression.Replace(m.Groups[1].Value, $"{min}:{stepSize}:{max}");
+                float stepSize = (stop - start) / (nsteps - 1);
+                if (stepSize == 0)
+                {
+                    expression = expression.Replace(m.Groups[1].Value, $"{start}");
+                }
+                else if (stepSize > 0)
+                {
+                    expression = expression.Replace(m.Groups[1].Value, $"{start}:{stepSize}:{stop}");
+                }
+                else if (stepSize < 0)
+                {
+                    expression = expression.Replace(m.Groups[1].Value, $"{start}:(-{Mathf.Abs(stepSize)}):{stop}");
+                }
                 return expression;
             }
 

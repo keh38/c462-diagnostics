@@ -245,11 +245,6 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
             {
                 StartCoroutine(StartTrack());
             }
-            else if (lastTrack.ear != _currentTrack.ear)
-            {
-                _instructionPanel.InstructionsFinished = ResumeFromInstructions;
-                ShowInstructions("- Great!\n- Let's try the same thing with your right ear", _settings.InstructionFontSize);
-            }
             else if (lastTrack.Freq_Hz != _currentTrack.Freq_Hz)
             { 
                 _instructionPanel.InstructionsFinished = ResumeFromInstructions;
@@ -259,6 +254,11 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
                     "- Let's try some more.\n" +
                     "- The pitch will be different, but your job is the same.",
                     _settings.InstructionFontSize);
+            }
+            else if (lastTrack.ear != _currentTrack.ear)
+            {
+                _instructionPanel.InstructionsFinished = ResumeFromInstructions;
+                ShowInstructions("- Great!\n- Let's try the same thing with your right ear", _settings.InstructionFontSize);
             }
             else
             {
@@ -283,7 +283,15 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
     {
         HTS_Server.SendMessage(_mySceneName, $"Status:{_currentTrack.ear} ear, {_currentTrack.Freq_Hz} Hz");
 
+        _signalManager["Signal"].Laterality = _currentTrack.ear;
+
         var fm = (_signalManager["Signal"].waveform as FM);
+
+        if (_settings.ModRate == 0)
+        {
+            _settings.ModRate = 1;
+            _settings.ModDepth = 0;
+        }
 
         fm.Carrier_Hz = _currentTrack.Freq_Hz;
         fm.ModFreq_Hz = _currentTrack.Freq_Hz * _settings.ModDepth / 100f;

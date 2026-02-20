@@ -1,8 +1,12 @@
 ## Changelog
 
-### v1.12 (unreleased)
+### v1.11.1 (2026-02-20)
 #### Added 
 - linspace to expressions
+#### Fixed
+- Bekesy:
+  - correctly handle FM modulation rate = 0
+  - set the ear at the beginning of each track (was always doing diotic)
 
 ---
 
