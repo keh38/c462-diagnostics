@@ -1,6 +1,8 @@
 ## Changelog
 
 ### v1.12 (unreleased)
+#### Fixed
+- bug setting illumination in Digits test
 #### Changed
 - Turandot scaler: added options for min/max value, whole numbers and showing tick marks
 

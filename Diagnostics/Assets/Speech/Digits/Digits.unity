@@ -2208,7 +2208,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f28658c5755a5124996e31f91b3b08ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _camera: {fileID: 0}
+  _camera: {fileID: 65420988}
   _actions: {fileID: -944628639613478452, guid: 28be48df767d2434681ec999065f06dc, type: 3}
   _title: {fileID: 1911340988}
   _instructionPanel: {fileID: 12453397}

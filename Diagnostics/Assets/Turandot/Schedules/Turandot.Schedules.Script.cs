@@ -43,7 +43,7 @@ namespace Turandot.Schedules
         [Description("Root name of generated protocol files")]
         [PropertyOrder(1)]
         public string ProtocolRootName { get; set; }
-        private bool ShouldSerializeProtocolFileName() { return false; }
+        private bool ShouldSerializeProtocolRootName() { return false; }
 
         [Category("Bookkeeping")]
         [DisplayName("Single output")]
@@ -160,6 +160,7 @@ namespace Turandot.Schedules
 
                 if (values != null)
                 {
+                    args.dimension = Dim;
                     args.expression = "[";
                     int i2 = Mathf.Min(i1 + nperFile, values.Length);
                     for (int kv = i1; kv < i2; kv++) args.expression += $"{values[kv]} ";
