@@ -1,8 +1,12 @@
 ## Changelog
 
-### v1.12 (unreleased)
+### v1.12 (2026-02-27)
 #### Fixed
-- bug setting illumination in Digits test
+- Digits test: 
+  - bug setting illumination
+  - state file should be subject-specific
+  - choosing to start new test acknowledged the request but didn't actually do anything
+  
 #### Changed
 - Turandot scaler: added options for min/max value, whole numbers and showing tick marks
 

@@ -176,6 +176,9 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         {
             Debug.Log($"{_mySceneName}: starting test over");
             HTS_Server.SendMessage(_mySceneName, "Status:Starting test over");
+
+            HTS_Server.SendMessage(_mySceneName, "Status:Instructions");
+            ShowInstructions(Instructions.Intro);
         }
     }
 

@@ -61,7 +61,7 @@ namespace Digits
 
         private static string StateFile
         {
-            get { return Path.Combine(Application.persistentDataPath, "DigitsState.xml"); }
+            get { return Path.Combine(FileLocations.SubjectFolder, "DigitsState.xml"); }
         }
 
     }
