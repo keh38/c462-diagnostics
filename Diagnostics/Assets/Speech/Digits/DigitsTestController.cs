@@ -139,7 +139,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         _progressBar.maxValue = _status.plan.Count;
         _progressBar.value = 0;
 
-        HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath.Replace(".json", ""))}");
+        HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
     }
 
     void InitDataFile()
