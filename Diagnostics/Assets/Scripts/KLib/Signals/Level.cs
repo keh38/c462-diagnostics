@@ -246,7 +246,7 @@ namespace KLib.Signals
 
                     if (Units == LevelUnits.PercentDR) Value = tmpValue;
 
-                    throw new Exception("Level over range.");
+                    throw new Exception($"Level over range: asked for {Value}, max = {r.maxVal}");
                 }
             }
 

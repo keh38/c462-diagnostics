@@ -5,10 +5,12 @@
 - Digits test: 
   - bug setting illumination
   - state file should be subject-specific
-  - choosing to start new test acknowledged the request but didn't actually do anything
-  
+  - choosing to start new test acknowledged the request but didn't actually do anything  
 #### Changed
-- Turandot scaler: added options for min/max value, whole numbers and showing tick marks
+- Turandot:
+  - scaler: added options for min/max value, whole numbers and showing tick marks
+  - receive script arguments when run from a remote protocol
+- Expressions: now also accepts a numeric value for the laterality in THR, LDL, and DR expressions
 
 ---
 

@@ -346,7 +346,7 @@ namespace KLib
 
         private string SubstituteAudiogram(string expression)
         {
-            string pattern = @"(THR\(([LlRrBb])\s*,\s*([0-9.]+)\))";
+            string pattern = @"(THR\(([LlRrBb123])\s*,\s*([0-9.]+)\))";
             Match m = Regex.Match(expression, pattern);
 
             if (m.Success && Audiogram == null)
@@ -363,14 +363,17 @@ namespace KLib
                 switch (laterality.ToUpper())
                 {
                     case "L":
+                    case "1":
                         metricVal = Audiogram.Get(Audiograms.Ear.Left).GetThreshold(freq);
                         break;
 
                     case "R":
+                    case "2":
                         metricVal = Audiogram.Get(Audiograms.Ear.Right).GetThreshold(freq);
                         break;
 
                     case "B":
+                    case "3":
                         metricVal = 0.5f * (Audiogram.Get(Audiograms.Ear.Right).GetThreshold(freq) + Audiogram.Get(Audiograms.Ear.Right).GetThreshold(freq));
                         break;
                 }
@@ -384,7 +387,7 @@ namespace KLib
 
         private string SubstituteLDL(string expression)
         {
-            string pattern = @"(LDL\(([LlRrBb])\s*,\s*([0-9.]+)\))";
+            string pattern = @"(LDL\(([LlRrBb123])\s*,\s*([0-9.]+)\))";
             Match m = Regex.Match(expression, pattern);
 
             if (m.Success && Audiogram == null)
@@ -401,14 +404,17 @@ namespace KLib
                 switch (laterality.ToUpper())
                 {
                     case "L":
+                    case "1":
                         metricVal = LDL.Get(Audiograms.Ear.Left).GetThreshold(freq);
                         break;
 
                     case "R":
+                    case "2":                        
                         metricVal = LDL.Get(Audiograms.Ear.Right).GetThreshold(freq);
                         break;
 
                     case "B":
+                    case "3":
                         metricVal = 0.5f * (LDL.Get(Audiograms.Ear.Right).GetThreshold(freq) + LDL.Get(Audiograms.Ear.Right).GetThreshold(freq));
                         break;
                 }
@@ -425,7 +431,7 @@ namespace KLib
         {
             if (Audiogram ==null || LDL == null) return expression;
 
-            string pattern = @"(DR\(([LlRrBb])\s*,\s*([0-9.]+)\))";
+            string pattern = @"(DR\(([LlRrBb123])\s*,\s*([0-9.]+)\))";
             Match m = Regex.Match(expression, pattern);
 
             if (m.Success)
@@ -449,16 +455,19 @@ namespace KLib
                 switch (laterality.ToUpper())
                 {
                     case "L":
+                    case "1":
                         metricVal = LDL.Get(Audiograms.Ear.Left).GetThreshold(freq)
                             -Audiogram.Get(Audiograms.Ear.Left).GetThreshold(freq);
                         break;
 
                     case "R":
+                    case "2":
                         metricVal = LDL.Get(Audiograms.Ear.Right).GetThreshold(freq)
                             - Audiogram.Get(Audiograms.Ear.Right).GetThreshold(freq);
                         break;
 
                     case "B":
+                    case "3":
                         metricVal = 0.5f * (LDL.Get(Audiograms.Ear.Right).GetThreshold(freq) + LDL.Get(Audiograms.Ear.Right).GetThreshold(freq))
                             - (0.5f * (Audiogram.Get(Audiograms.Ear.Right).GetThreshold(freq) + Audiogram.Get(Audiograms.Ear.Right).GetThreshold(freq)));
                         break;

@@ -38,6 +38,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
     string _fileStem = "";
     string _mainDataFile = "";
+    ScriptArguments _scriptArguments;
 
     bool _waitingForResponse = false;
     bool _waitingForTap = false;
@@ -185,6 +186,15 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             {
                 earVar.expression = $"{(int)args.laterality}";
             }
+
+            foreach(var v in _params.schedule.families[0].variables)
+            {
+                v.expression = v.expression.Replace("THR(L", $"THR({(int)args.laterality}");
+                v.expression = v.expression.Replace("LDL(L", $"LDL({(int)args.laterality}");
+                v.expression = v.expression.Replace("DR(L", $"DR({(int)args.laterality}");
+                Debug.Log($"Variable: {v.property}, dim {v.dim}, expr {v.expression}");
+            }
+
         }
 
         if (!string.IsNullOrEmpty(args.expression))
@@ -973,6 +983,9 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     {
         switch (command)
         {
+            case "SetScriptArguments":
+                RpcSetScriptArguments(data);
+                break;
             case "SetParams":
                 RpcSetParameters(data);
                 break;
@@ -1009,11 +1022,21 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         }
     }
 
+    public void RpcSetScriptArguments(string json)
+    {
+        _scriptArguments = FileIO.JSONDeserializeFromString<ScriptArguments>(json);
+    }
+
     public void RpcSetParameters(string xml)
     {
         _params = KLib.FileIO.XmlDeserializeFromString<Parameters>(xml);
         _paramFile = "remote";
         _state = new TurandotState(GameManager.Project, GameManager.Subject, _params.tag);
+
+        if (_scriptArguments != null)
+        {
+            ApplyScriptArguments(_scriptArguments);
+        }
 
         ApplyParameters();
     }

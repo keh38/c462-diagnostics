@@ -231,7 +231,7 @@ namespace Turandot.Schedules
             {
                 var entry = new ProtocolEntry()
                 {
-                    Title = configFile,
+                    Title = $"{configFile}-{args.laterality}-{args.expression}",
                     Scene = "Turandot",
                     Settings = $"{configFile}:{serializedArgs}"
                 };
