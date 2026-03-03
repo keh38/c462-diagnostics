@@ -1,12 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
     <AssemblyName>HTSLauncher</AssemblyName>
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <FileVersion>1.12</FileVersion>
-    <AssemblyVersion>1.12</AssemblyVersion>
+    <FileVersion>1.12.0.0</FileVersion>
+    <AssemblyVersion>1.12.0.0</AssemblyVersion>
     <Version>1.12</Version>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
@@ -66,4 +66,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if &quot;$(ConfigurationName)&quot; == &quot;Release&quot; (&quot;C:\Program Files (x86)\Inno Setup 6\Compil32.exe&quot; /cc &quot;$(SolutionDir)\..\Installer\c462-diagnostics-installer.iss&quot;)" />
+  </Target>
 </Project>
