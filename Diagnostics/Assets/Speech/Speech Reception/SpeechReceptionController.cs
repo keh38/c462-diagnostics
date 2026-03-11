@@ -1,4 +1,5 @@
 using KLib;
+using KLibU.Net;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -962,26 +963,29 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         }
     }
 
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        switch (command)
+        var data = request.GetPayload<string>();
+        switch (request.Command)
         {
             case "Initialize":
                 _settings = FileIO.XmlDeserializeFromString<SpeechTest>(data);
                 InitializeMeasurement();
-                break;
+                return TcpMessage.Ok();
             case "StartSynchronizing":
                 HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                break;
+                return TcpMessage.Ok();
             case "StopSynchronizing":
                 HardwareInterface.ClockSync.StopSynchronizing();
-                break;
+                return TcpMessage.Ok();
             case "Begin":
                 Begin();
-                break;
+                return TcpMessage.Ok();
             case "Abort":
                 OnAbortAction(new InputAction.CallbackContext());
-                break;
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
     }
 

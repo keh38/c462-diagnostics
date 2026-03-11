@@ -83,15 +83,15 @@ public class GameManager : MonoBehaviour
         return instance._subjectMetadata;
     }
 
-    public static void DeserializeSubjectMetadata(string data)
+    public static void SetSubjectMetadata(SubjectMetadata metaData)
     {
-        instance._subjectMetadata = FileIO.XmlDeserializeFromString<SubjectMetadata>(data);
+        instance._subjectMetadata = metaData;
         instance._SaveSubjectMetadata();
     }
 
-    public static void DeserializeSubjectMetrics(string data)
+    public static void SetSubjectMetrics(SerializeableDictionary<string> data)
     {
-        instance._subjectMetadata.metrics = FileIO.XmlDeserializeFromString<SerializeableDictionary<string>>(data);
+        instance._subjectMetadata.metrics = data;
         instance._SaveSubjectMetadata();
     }
 

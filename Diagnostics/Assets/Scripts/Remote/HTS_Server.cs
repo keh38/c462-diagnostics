@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 using KLib;
 using KLibU.Net;
 using System.Threading.Tasks;
-using HTS.Tcp;
+using HTS.Unity.Tcp;
 
 public class HTS_Server : MonoBehaviour
 {
@@ -49,6 +49,10 @@ public class HTS_Server : MonoBehaviour
         }
     }
 
+    public static event EventHandler OnControllerConnected;
+    public static event EventHandler OnControllerDisconnected;
+    public static event EventHandler OnSubjectChanged;
+
     public static void StartServer() => instance._StartServer();
     public static bool RemoteConnected { get { return instance._remoteConnected; } }
     public static string MyAddress { get { return instance._address.Equals("localhost") ? "127.0.0.1" : instance._address; } }
@@ -70,6 +74,22 @@ public class HTS_Server : MonoBehaviour
             return null;
         }
         return KTcpClient.SendRequest(instance._remoteEndPoint, TcpMessage.Request(command, payload));
+    }
+
+    public static void SendRequest(string command, string target, object data)
+    {
+        var payload = new RemoteMessagePayload
+        {
+            Target = target,
+            Data = FileIO.JSONSerializeToString(data)
+        };
+        SendRequest(command, payload);
+    }
+
+    public static void SendRequest(string command, string target, string data = "")
+    {
+        var payload = new RemoteMessagePayload { Target = target, Data = data };
+        SendRequest(command, payload);
     }
 
     public static void SendBufferedFile(string localPath)
@@ -160,6 +180,7 @@ public class HTS_Server : MonoBehaviour
                 }
                 catch (Exception ex)
                 {
+                    _tcpListener.WriteResponse(TcpMessage.Error(ex.Message));   
                     Debug.Log("error processing TCP message: " + ex.Message);
                 }
             }
@@ -177,7 +198,7 @@ public class HTS_Server : MonoBehaviour
         {
             Debug.Log("Command received: " + request.Command);
         }
-        string data = "";
+
         switch (request.Command)
         {
             case "Connect":
@@ -203,21 +224,24 @@ public class HTS_Server : MonoBehaviour
                     Debug.Log($"Connection accepted from {incomingEndPoint}");
                     _remoteConnected = true;
                     _remoteEndPoint = incomingEndPoint;
-                    _currentScene.ProcessRPC("Connect");
+                    OnControllerConnected?.Invoke(this, EventArgs.Empty);
                 }
                 break;
 
             case "SetDataRoot":
+                string dataRoot = request.GetPayload<string>();
                 _tcpListener.WriteResponse(TcpMessage.Ok());
-                FileLocations.SetDataRoot(data);
-                _currentScene.ProcessRPC("SetDataRoot");
+                //FileLocations.SetDataRoot(dataRoot);
                 break;
 
             case "Disconnect":
                 _tcpListener.WriteResponse(TcpMessage.Ok());
                 _remoteConnected = false;
-                _currentScene.ProcessRPC("Disconnect");
-                SceneManager.LoadScene("Home");
+                OnControllerDisconnected?.Invoke(this, EventArgs.Empty);
+                if (SceneManager.GetActiveScene().name != "Home")
+                {
+                    SceneManager.LoadScene("Home");
+                }
                 break;
 
             case "Ping":
@@ -225,16 +249,18 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "ChangeScene":
+                string sceneName = request.GetPayload<string>();
                 _tcpListener.WriteResponse(TcpMessage.Ok());
                 KLogger.Log.FlushLog();
                 GameManager.DataForNextScene = "";
-                Debug.Log($"changing scene to {data}...");
-                _currentScene.ChangeScene(data);
+                Debug.Log($"changing scene to {sceneName}...");
+                _currentScene.ChangeScene(sceneName);
                 break;
 
             case "CreateProject":
+                string projectName = request.GetPayload<string>();
                 _tcpListener.WriteResponse(TcpMessage.Ok());
-                FileLocations.CreateProjectFolder(data);
+                FileLocations.CreateProjectFolder(projectName);
                 break;
 
             case "GetCurrentSceneName":
@@ -259,9 +285,10 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "SetSubjectInfo":
+                string projectAndSubject = request.GetPayload<string>();
                 _tcpListener.WriteResponse(TcpMessage.Ok());
-                GameManager.SetSubject(data);
-                _currentScene.ProcessRPC("SubjectChanged");
+                GameManager.SetSubject(projectAndSubject);
+                OnSubjectChanged?.Invoke(this, EventArgs.Empty);
                 break;
 
             case "GetSubjectMetadata":
@@ -270,27 +297,34 @@ public class HTS_Server : MonoBehaviour
 
             case "SetSubjectMetadata":
                 _tcpListener.WriteResponse(TcpMessage.Ok());
-                GameManager.DeserializeSubjectMetadata(data);
-                _currentScene.ProcessRPC("SubjectMetadataChanged");
+                var metaData = request.GetPayload<SubjectMetadata>();
+                GameManager.SetSubjectMetadata(metaData);
+                OnSubjectChanged?.Invoke(this, EventArgs.Empty);
                 break;
 
             case "SetSubjectMetrics":
                 _tcpListener.WriteResponse(TcpMessage.Ok());
-                GameManager.DeserializeSubjectMetrics(data);
-                _currentScene.ProcessRPC("SubjectMetricsChanged");
+                var metrics = request.GetPayload<SerializeableDictionary<string>>();
+                GameManager.SetSubjectMetrics(metrics);
+                OnSubjectChanged?.Invoke(this, EventArgs.Empty);
                 break;
 
             case "GetTransducers":
                 _tcpListener.WriteResponse(TcpMessage.Ok(GameManager.EnumerateTransducers()));
                 break;
 
-            case "GetAdapterMap":
-                _tcpListener.WriteStringAsByteArray(KLib.FileIO.XmlSerializeToString(HardwareInterface.AdapterMap));
-                break;
+            //case "GetAdapterMap":
+            //    _tcpListener.WriteStringAsByteArray(KLib.FileIO.XmlSerializeToString(HardwareInterface.AdapterMap));
+            //    break;
 
             case "GetLog":
                 KLogger.Log.FlushLog();
-                _tcpListener.WriteStringAsByteArray($"{Path.GetFileName(KLogger.LogPath)}:{File.ReadAllText(KLogger.LogPath)}");
+                var logFilePayload = new TextFilePayload() 
+                { 
+                    Filename = Path.GetFileName(KLogger.LogPath),
+                    Content = File.ReadAllText(KLogger.LogPath)
+                }; 
+                _tcpListener.WriteResponse(TcpMessage.Ok(logFilePayload));
                 break;
 
             case "GetSyncLog":
@@ -310,12 +344,12 @@ public class HTS_Server : MonoBehaviour
                 }
                 else
                 {
-                    _tcpListener.WriteStringAsByteArray("none");
+                    _tcpListener.WriteResponse(TcpMessage.NotFound(logPath));
                 }
                 break;
 
             case "GetScreenSize":
-                _tcpListener.WriteStringAsByteArray($"{Screen.width},{Screen.height}");
+                _tcpListener.WriteResponse(TcpMessage.Ok($"{Screen.width},{Screen.height}"));
                 break;
 
             case "GetLEDColors":
@@ -324,39 +358,47 @@ public class HTS_Server : MonoBehaviour
                 {
                     cstring = HardwareInterface.LED.GetColor();
                 }
-                _tcpListener.WriteStringAsByteArray($"{cstring}");
+                _tcpListener.WriteResponse(TcpMessage.Ok($"{cstring}"));
                 break;
 
             case "TransferFile":
                 _tcpListener.WriteResponse(TcpMessage.Ok());
-                ReceiveFile(data);
+                //ReceiveFile(data);
                 break;
 
             case "RunInstaller":
                 _tcpListener.WriteResponse(TcpMessage.Ok());
-                RunInstaller(data);
+                //RunInstaller(data);
                 break;
 
-            case "FileExists":
-                var fullpath = Path.Combine(FileLocations.ProjectFolder, "Resources", data);
-                if (File.Exists(fullpath))
-                {
-                    var dt = File.GetLastAccessTime(fullpath);
-                    _tcpListener.WriteStringAsByteArray(FileIO.JSONSerializeToString(dt));
-                }
-                else
-                {
-                    _tcpListener.WriteStringAsByteArray("404");
-                }
-                break;
+            //case "FileExists":
+            //    _tcpListener.WriteResponse(TcpMessage.Error());
+            //    //var fullpath = Path.Combine(FileLocations.ProjectFolder, "Resources", data);
+            //    //if (File.Exists(fullpath))
+            //    //{
+            //    //    var dt = File.GetLastAccessTime(fullpath);
+            //    //    _tcpListener.WriteStringAsByteArray(FileIO.JSONSerializeToString(dt));
+            //    //}
+            //    //else
+            //    //{
+            //    //    _tcpListener.WriteStringAsByteArray("404");
+            //    //}
+            //    break;
 
             case "ReceiveBufferedFile":
-                ReceiveBufferedFile(data);
+                //ReceiveBufferedFile(data);
                 break;
                 
             default:
-                _tcpListener.WriteResponse(TcpMessage.Ok());
-                _currentScene.ProcessRPC(request.Command, data);
+                if (_currentScene != null)
+                {
+                    _tcpListener.WriteResponse(_currentScene.ProcessRPC(request));
+                }
+                else
+                {
+                    _tcpListener.WriteResponse(TcpMessage.BadRequest());
+                }
+
                 break;
         }
         _tcpListener.CloseTcpClient();

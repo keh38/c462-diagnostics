@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 using KLib;
+using KLibU.Net;
 using KLib.MSGraph;
 
 public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
@@ -155,25 +156,28 @@ public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
     }
 
 
-    void IRemoteControllable.ProcessRPC(string command, string data = "")
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        switch (command)
+        var data = request.GetPayload<string>();
+        switch (request.Command)
         {
             case "StartResourceSync":
                 FileLocations.SetDataRoot();
                 _message.text = "Syncing resources";
-                break;
+                return TcpMessage.Ok();
             case "EndResourceSync":
                 _message.text = "";
-                break;
+                return TcpMessage.Ok();
             case "SendResourceList":
                 var fileList = EnumerateResources();
                 HTS_Server.SendRequest("FileSync", $"ReceiveFileList:{FileIO.JSONSerializeToString(fileList)}");
-                break;
+                return TcpMessage.Ok();
             case "DeleteFile":
                 var fullpath = Path.Combine(FileLocations.ProjectFolder, "Resources", data);
                 File.Delete(fullpath);
-                break;
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
     }
 

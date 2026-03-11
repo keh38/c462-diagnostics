@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 using KLib;
+using KLibU.Net;
 using KLib.Signals;
 using KLib.Signals.Waveforms;
 
@@ -149,19 +150,22 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
         }
     }
 
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        switch (command)
+        var data = request.GetPayload<string>();
+        switch (request.Command)
         {
             case "Noise":
                 PlayNoise(data);
-                break;
+                return TcpMessage.Ok();
             case "Tone":
                 PlayTone(data);
-                break;
+                return TcpMessage.Ok();
             case "Stop":
                 Stop();
-                break;
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
     }
 

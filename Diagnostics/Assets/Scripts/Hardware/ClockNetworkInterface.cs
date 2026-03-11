@@ -6,7 +6,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-using KLib.Network;
+using KLibU.Net;
+using System.Collections.Concurrent;
+using HTS.Unity.Tcp;
+using static ClockSynchronizer;
+using UnityEditor.PackageManager.Requests;
 
 public class ClockNetworkInterface : MonoBehaviour
 {
@@ -16,7 +20,7 @@ public class ClockNetworkInterface : MonoBehaviour
 
     private KTcpListener _listener = null;
     private bool _stopServer;
-    private NetworkDiscoveryServer _discoveryServer;
+    NetworkDiscoveryBeacon _discoveryBeacon;
     private IPEndPoint _ipEndPoint;
 
     private string _currentSceneName = "";
@@ -24,12 +28,10 @@ public class ClockNetworkInterface : MonoBehaviour
     private IPEndPoint _remoteEndPoint = null;
 
     private Thread _readThread;
+    private static readonly ConcurrentQueue<Action> _mainThreadActions = new ConcurrentQueue<Action>();
 
     public void Initialize()
     {
-        var go = new GameObject("Discovery Server").AddComponent<NetworkDiscoveryServer>();
-        go.transform.parent = this.gameObject.transform;
-        _discoveryServer = go.GetComponent<NetworkDiscoveryServer>();
         StartServer();
     }
 
@@ -38,23 +40,29 @@ public class ClockNetworkInterface : MonoBehaviour
         _remoteConnected = false;
         _stopServer = false;
 
-        _ipEndPoint = NetworkUtils.FindNextAvailableEndPoint();
-        //_address = NetworkUtils.FindServerAddress();
+        _ipEndPoint = Discovery.FindNextAvailableEndPoint();
 
         _listener = new KTcpListener();
-        _listener.StartListener(_ipEndPoint, bigEndian: false);
+        _listener.StartListener(_ipEndPoint);
 
         // create thread for reading UDP messages
         _readThread = new Thread(new ThreadStart(TCPServer));
         _readThread.IsBackground = true;
         _readThread.Start();
 
-        _discoveryServer.StartReceiving("HEARING.TEST.SUITE.SYNC", _ipEndPoint.Address.ToString(), _ipEndPoint.Port);
         Debug.Log("started HTS Sync TCP server on " + _ipEndPoint.ToString());
+
+        _discoveryBeacon = gameObject.AddComponent<NetworkDiscoveryBeacon>();
+        _discoveryBeacon.StartBroadcasting(
+            name: $"HEARING.TEST.SUITE.SYNC",
+            address: _ipEndPoint.Address.ToString(),
+            port: _ipEndPoint.Port);
+
     }
 
     public void StopServer()
     {
+        Debug.Log("Stop sync server");
         _stopServer = true;
         if (_listener != null)
         {
@@ -62,9 +70,13 @@ public class ClockNetworkInterface : MonoBehaviour
             _listener = null;
         }
 
-        _readThread.Abort();
-        _discoveryServer.StopReceiving();
-        Debug.Log("stopped HTS Sync TCP listener");
+        _discoveryBeacon.StopBroadcast();
+
+        if (_readThread != null && _readThread.IsAlive)
+        {
+            _readThread.Abort();
+            Debug.Log("stopped HTS Sync TCP listener");
+        }
     }
 
     private void TCPServer()
@@ -85,39 +97,49 @@ public class ClockNetworkInterface : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        while (_mainThreadActions.TryDequeue(out var action))
+        {
+            action?.Invoke();
+        }
+    }
+
     void ProcessMessage()
     {
         var receiveTime = HighPrecisionClock.UtcNowIn100nsTicks;
 
         _listener.AcceptTcpClient();
 
-        string input = _listener.ReadString();
+        var request = _listener.ReadRequest();
 
-        var parts = input.Split(new char[] { ':' }, 2);
-        string command = parts[0];
-        string data = null;
-        if (parts.Length > 1)
-        {
-            data = parts[1];
-        }
-
-        switch (command)
+        switch (request.Command)
         {
             case "Record":
-                _listener.SendAcknowledgement();
-                //_clockSynchronizer.StartSynchronizing(data);
+                var filename = request.GetPayload<string>();
+                _listener.WriteResponse(TcpMessage.Ok());
+//                _syncStatus = ClockSynchronizer.SyncStatus.Recording;
+                // Schedule for main thread
+                _mainThreadActions.Enqueue(() => _clockSynchronizer.StartSynchronizing(filename));
                 break;
             case "Stop":
-                _listener.SendAcknowledgement();
+                _listener.WriteResponse(TcpMessage.Ok());
+                _mainThreadActions.Enqueue(() => _clockSynchronizer.StopSynchronizing());
                 //_clockSynchronizer.StopSynchronizing();
                 break;
             case "Status":
-                _listener.Write((int)_clockSynchronizer.Status);
+                _listener.WriteResponse(TcpMessage.Ok(new DataStreamStatusPayload()
+                {
+                    Status = (int)_clockSynchronizer.Status
+                }));
                 break;
             case "Sync":
-                var byteArray = new byte[16];
-                Buffer.BlockCopy(new long[] { receiveTime, HighPrecisionClock.UtcNowIn100nsTicks }, 0, byteArray, 0, 16);
-                _listener.Write(byteArray);
+                var clockSyncData = new ClockSyncPayload()
+                {
+                    T1 = receiveTime,
+                    T2 = HighPrecisionClock.UtcNowIn100nsTicks
+                };
+                _listener.WriteResponse(TcpMessage.Ok(clockSyncData));
                 break;
         }
         _listener.CloseTcpClient();

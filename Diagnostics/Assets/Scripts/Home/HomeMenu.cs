@@ -7,9 +7,11 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 using KLib;
+using KLibU.Net;
 using KLib.MSGraph;
 using KLib.Signals;
 using KLib.Signals.Waveforms;
+using System;
 
 public class HomeMenu : MonoBehaviour, IRemoteControllable
 {
@@ -87,6 +89,9 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
         }
 
         HTS_Server.SetCurrentScene("Home", this);
+        HTS_Server.OnSubjectChanged += HandleSubjectChanged;
+        HTS_Server.OnControllerConnected += HandleControllerConnected;
+        HTS_Server.OnControllerDisconnected += HandleControllerDisconnected;
 
         ConnectToCloud();
 
@@ -99,6 +104,13 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
         OnSubjectMenuButtonClick();
 
         _networkIcon.color = HTS_Server.RemoteConnected ? _networkActiveColor : Color.gray;
+    }
+
+    private void OnDisable()
+    {
+        HTS_Server.OnSubjectChanged -= HandleSubjectChanged;
+        HTS_Server.OnControllerConnected -= HandleControllerConnected;
+        HTS_Server.OnControllerDisconnected -= HandleControllerDisconnected;
     }
 
     private IEnumerator InitializeHardware()
@@ -231,40 +243,33 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
         yield return null;
     }
 
-    void IRemoteControllable.ProcessRPC(string command, string data="")
+    private void HandleControllerConnected(object sender, EventArgs e)
     {
-        switch (command)
+        _networkIcon.color = _networkActiveColor;
+    }
+
+    private void HandleControllerDisconnected(object sender, EventArgs e)
+    {
+        _networkIcon.color = Color.gray;
+    }
+
+    private void HandleSubjectChanged(object sender, EventArgs e)
+    {
+        StartCoroutine(SelectSubjectPanel());
+    }
+
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
+    {
+        var data = request.GetPayload<string>();
+        switch (request.Command)
         {
-            case "Connect":
-                _networkIcon.color = _networkActiveColor;
-                break;
-
-            case "SetDataRoot":
-                StartCoroutine(SelectSubjectPanel());
-                break;
-
             case "SetProject":
                 GameManager.SetSubject(data, GameManager.Subject);
                 StartCoroutine(SelectSubjectPanel());
-                break;
+                return TcpMessage.Ok();
 
-            case "Disconnect":
-                _networkIcon.color = Color.gray;
-                break;
-
-            case "SubjectChanged":
-                if (_activePanel == _subjectPanel.gameObject)
-                {
-                    _subjectPanel.ShowPanel();
-                }
-                break;
-
-            case "SubjectMetadataChanged":
-                if (_activePanel == _subjectPanel.gameObject)
-                {
-                    _subjectPanel.ShowPanel();
-                }
-                break;
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
     }
     void IRemoteControllable.ChangeScene(string newScene)

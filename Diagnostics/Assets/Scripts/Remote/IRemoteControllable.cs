@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using KLibU.Net;
 
 public interface IRemoteControllable
 {
-    void ProcessRPC(string command, string data="");
+    TcpMessage ProcessRPC(TcpMessage request);
     void ChangeScene(string newScene);
 }

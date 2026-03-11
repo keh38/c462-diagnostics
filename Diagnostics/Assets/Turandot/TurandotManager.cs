@@ -15,6 +15,7 @@ using Turandot.Schedules;
 using Turandot.Scripts;
 using UnityEngine.Video;
 using KLib;
+using KLibU.Net;
 using NUnit.Framework;
 using System.Xml.Linq;
 
@@ -979,39 +980,40 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         }
     }
 
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        switch (command)
+        var data = request.GetPayload<string>();
+        switch (request.Command)
         {
             case "SetScriptArguments":
                 RpcSetScriptArguments(data);
-                break;
+                return TcpMessage.Ok();
             case "SetParams":
                 RpcSetParameters(data);
-                break;
+                return TcpMessage.Ok();
             case "StartSynchronizing":
                 HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                break;
+                return TcpMessage.Ok();
             case "StopSynchronizing":
                 HardwareInterface.ClockSync.StopSynchronizing();
-                break;
+                return TcpMessage.Ok();
             case "Begin":
                 Begin();
-                break;
+                return TcpMessage.Ok();
             case "Abort":
                 RpcAbort();
-                break;
+                return TcpMessage.Ok();
             case "SubjectChanged":
             case "SubjectMetadataChanged":
             case "SubjectMetricsChanged":
                 RpcUpdateSubject();
-                break;
+                return TcpMessage.Ok();
             case "ShowInstructions":
                 RpcShowInstructions(data);
-                break;
+                return TcpMessage.Ok();
             case "ShowState":
                 RpcShowState(data);
-                break;
+                return TcpMessage.Ok();
                 //case "SendSyncLog":
                 //    var logPath = HardwareInterface.ClockSync.LogFile;
                 //    if (!string.IsNullOrEmpty(logPath))
@@ -1019,6 +1021,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
                 //        HTS_Server.SendRequest("Turandot", $"ReceiveData:{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
                 //    }
                 //    break;
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
     }
 

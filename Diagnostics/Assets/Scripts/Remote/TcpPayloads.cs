@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace HTS.Tcp
+namespace HTS.Unity.Tcp
 {
     [JsonObject]
     public class ConnectionRequestPayload
@@ -67,5 +67,12 @@ namespace HTS.Tcp
         public string Folder { get; set; }
         public string Filename { get; set; }
         public string Content { get; set; }
+    }
+
+    [JsonObject]
+    public class RemoteMessagePayload
+    {
+        public string Target { get; set; }
+        public string Data { get; set; }
     }
 }

@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 
 using Pupillometry;
 using KLib;
+using KLibU.Net;
 
 public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 {
@@ -199,32 +200,35 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
         SceneManager.LoadScene(newScene);
     }
 
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        switch (command)
+        var data = request.GetPayload<string>();
+        switch (request.Command)
         {
             case "Initialize":
                 InitializeMeasurement(data);
-                break;
+                return TcpMessage.Ok();
             case "StartSynchronizing":
                 HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                break;
+                return TcpMessage.Ok();
             case "StopSynchronizing":
                 HardwareInterface.ClockSync.StopSynchronizing();
-                break;
+                return TcpMessage.Ok();
             case "Begin":
                 Begin();
-                break;
+                return TcpMessage.Ok();
             case "Abort":
                 _stopMeasurement = true;
-                break;
+                return TcpMessage.Ok();
             case "SendSyncLog":
                 var logPath = HardwareInterface.ClockSync.LogFile;
                 if (!string.IsNullOrEmpty(logPath))
                 {
                     HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
                 }
-                break;
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
     }
 }

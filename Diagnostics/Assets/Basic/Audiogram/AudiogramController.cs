@@ -12,12 +12,14 @@ using UnityEngine.UI;
 
 using Audiograms;
 using KLib;
+using KLibU.Net;
 using KLib.Signals;
 using KLib.Signals.Enumerations;
 using KLib.Signals.Waveforms;
 
 using BasicMeasurements;
 using Newtonsoft.Json;
+using HTS.Unity.Tcp;
 
 public class AudiogramController : MonoBehaviour, IRemoteControllable
 {
@@ -170,8 +172,6 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         _progressBar.value = 0;
 
         InitializeStimulusGeneration();
-
-        HTS_Server.SendRequest(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
     }
 
     void InitDataFile()
@@ -217,6 +217,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
 
             _sceneState = SceneState.Instructions;
             HTS_Server.SendRequest(_mySceneName, "Status:Instructions");
+
             _instructionPanel.InstructionsFinished = StartMeasurement;
             ShowInstructions(
                 instructions: _settings.InstructionMarkdown,
@@ -334,6 +335,13 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         _sceneState = SceneState.Done;
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
+
+        HTS_Server.SendRequest("ReceiveData", _mySceneName, new TextFilePayload
+        {
+            Filename = Path.GetFileName(_dataPath),
+            Content = File.ReadAllText(_dataPath)
+        });
+
         HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
         HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
 
@@ -365,28 +373,23 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         SceneManager.LoadScene("Home");
     }
 
-
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        switch (command)
+        switch (request.Command)
         {
             case "Initialize":
                 _configName = "remote";
-                _settings = FileIO.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as AudiogramMeasurementSettings;
+                _settings = request.GetPayload<AudiogramMeasurementSettings>();
                 InitializeMeasurement();
-                break;
-            case "StartSynchronizing":
-                HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                break;
-            case "StopSynchronizing":
-                HardwareInterface.ClockSync.StopSynchronizing();
-                break;
+                return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
                 Begin();
-                break;
+                return TcpMessage.Ok();
             case "Abort":
                 _stopMeasurement = true;
-                break;
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
     }
 

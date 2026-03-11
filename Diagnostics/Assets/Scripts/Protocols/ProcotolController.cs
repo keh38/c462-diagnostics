@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 using Protocols;
+using KLibU.Net;
 
 public class ProcotolController : MonoBehaviour, IRemoteControllable
 {
@@ -241,27 +242,28 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
         _outline.gameObject.SetActive(false);
     }
 
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        var parts = data.Split(':');
-
-        switch (command)
+        var data = request.GetPayload<string>();
+        switch (request.Command)
         {
             case "Abort":
                 RpcAbort();
-                break;
+                return TcpMessage.Ok();
             case "SetProtocol":
                 RpcSetProtocol(data);
-                break;
+                return TcpMessage.Ok();
             case "SetHistory":
                 RpcSetHistory(data);
-                break;
+                return TcpMessage.Ok();
             case "Begin":
                 RpcBegin(int.Parse(data));
-                break;
+                return TcpMessage.Ok();
             case "Finish":
                 RpcFinish();
-                break;
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
     }
 

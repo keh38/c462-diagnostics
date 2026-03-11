@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 using KLib;
+using KLibU.Net;
 using Pupillometry;
 
 public class GazeCalibration : MonoBehaviour, IRemoteControllable
@@ -137,36 +138,39 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
         SceneManager.LoadScene(newScene);
     }
 
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        switch (command)
+        var data = request.GetPayload<string>();
+        switch (request.Command)
         {
             case "Initialize":
                 Initialize(data);
-                break;
+                return TcpMessage.Ok();
             case "StartSynchronizing":
                 HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                break;
+                return TcpMessage.Ok();
             case "StopSynchronizing":
                 HardwareInterface.ClockSync.StopSynchronizing();
-                break;
+                return TcpMessage.Ok();
             case "Abort":
                 _isRunning = false;
                 _target.gameObject.SetActive(false);
-                break;
+                return TcpMessage.Ok();
             case "SendData":
                 SendData();
-                break;
+                return TcpMessage.Ok();
             case "SendSyncLog":
                 SendSyncLog();
-                break;
+                return TcpMessage.Ok();
             case "Location":
                 var parts = data.Split(',');
                 int x = int.Parse(parts[0]);
                 int y = int.Parse(parts[1]);
                 _canRespond = true;
                 ShowTarget(x, y);
-                break;
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
 
     }

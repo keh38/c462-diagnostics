@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 using KLib;
+using KLibU.Net;
 using KLib.Signals;
 using KLib.Signals.Waveforms;
 
@@ -307,30 +308,33 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         }
     }
 
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        Debug.Log("Turandot Interactive: " + command);
-        switch (command)
+        Debug.Log("Turandot Interactive: " + request.Command);
+        var data = request.GetPayload<string>();
+        switch (request.Command)
         {
             case "Start":
                 StartStreaming();
-                break;
+                return TcpMessage.Ok();
             case "Stop":
                 StopStreaming();
-                break;
+                return TcpMessage.Ok();
             case "SetParams":
                 SetParams(data);
-                break;
+                return TcpMessage.Ok();
             case "SetProperty":
                 Debug.Log($"property: {data}");
                 SetProperty(data);
-                break;
+                return TcpMessage.Ok();
             case "SetActive":
                 SetActive(data);
-                break;
+                return TcpMessage.Ok();
             case "ShowSliders":
                 _sliderArea.SetActive(data.Equals("True"));
-                break;
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
     }
 

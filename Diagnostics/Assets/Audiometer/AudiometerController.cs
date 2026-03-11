@@ -1,6 +1,7 @@
 using Audiograms;
 using Audiometer;
 using KLib;
+using KLibU.Net;
 using KLib.Signals;
 using KLib.Signals.Waveforms;
 
@@ -243,29 +244,32 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
     }
 
 
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        switch (command)
+        var data = request.GetPayload<string>();
+        switch (request.Command)
         {
             case "Initialize":
                 _settings = FileIO.JSONDeserializeFromString<AudiometerSettings>(data);
                 InitializeStimulusGeneration();
-                break;
+                return TcpMessage.Ok();
             case "Channel":
                 UpdateChannel(data);
-                break;
+                return TcpMessage.Ok();
             case "Pulsed":
                 UpdatePulsedChannelIndex(data);
-                break;
+                return TcpMessage.Ok();
             case "SetDuration":
                 SetDuration(data);
-                break;
+                return TcpMessage.Ok();
             case "Pulse":
                 Pulse();
-                break;
+                return TcpMessage.Ok();
             case "Stop":
                 _signalManager.Pause();
-                break;
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
     }
 

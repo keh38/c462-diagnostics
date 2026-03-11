@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 using KLib;
+using KLibU.Net;
 using Questionnaires;
 
 using BasicMeasurements;
@@ -275,26 +276,29 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
     }
 
 
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        switch (command)
+        var data = request.GetPayload<string>();
+        switch (request.Command)
         {
             case "Initialize":
                 _questionnaire = FileIO.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as Questionnaire;
                 InitializeMeasurement();
-                break;
+                return TcpMessage.Ok();
             case "StartSynchronizing":
                 HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                break;
+                return TcpMessage.Ok();
             case "StopSynchronizing":
                 HardwareInterface.ClockSync.StopSynchronizing();
-                break;
+                return TcpMessage.Ok();
             case "Begin":
                 Begin();
-                break;
+                return TcpMessage.Ok();
             case "Abort":
                 _stopMeasurement = true;
-                break;
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
     }
 
