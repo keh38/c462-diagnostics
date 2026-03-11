@@ -122,7 +122,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         _progressBar.maxValue = _state.NumConditions;
         _progressBar.value = 0;
 
-        HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
+        HTS_Server.SendRequest(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
     }
 
     void InitDataFile()
@@ -164,7 +164,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
                 _settings.InstructionMarkdown = _defaultInstructions.text;
             }
 
-            HTS_Server.SendMessage(_mySceneName, "Status:Instructions");
+            HTS_Server.SendRequest(_mySceneName, "Status:Instructions");
             ShowInstructions(
                 instructions: _settings.InstructionMarkdown,
                 fontSize: _settings.InstructionFontSize);
@@ -183,7 +183,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         if (File.Exists(_stateFile))
         {
             Debug.Log("LDL: Previous state exists. Asking whether to resume");
-            HTS_Server.SendMessage(_mySceneName, "Status:Asking to resume");
+            HTS_Server.SendRequest(_mySceneName, "Status:Asking to resume");
 
             _questionBox.gameObject.SetActive(true);
             _questionBox.PoseQuestion("Continue previous session?", OnQuestionResponse);
@@ -195,7 +195,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
             _workPanel.SetActive(true);
             InitializeSliderPanel();
 
-            HTS_Server.SendMessage(_mySceneName, "Status:Running measurement");
+            HTS_Server.SendRequest(_mySceneName, "Status:Running measurement");
             DoNextGroup();
         }
     }
@@ -207,7 +207,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         if (yes)
         {
             Debug.Log("LDL: Resuming previous");
-            HTS_Server.SendMessage(_mySceneName, "Status:Resuming previous");
+            HTS_Server.SendRequest(_mySceneName, "Status:Resuming previous");
 
             _state = RestoreState();
             _progressBar.maxValue = _state.NumConditions;
@@ -216,13 +216,13 @@ public class LDLController : MonoBehaviour, IRemoteControllable
             _workPanel.SetActive(true);
             InitializeSliderPanel();
 
-            HTS_Server.SendMessage(_mySceneName, "Status:Running measurement");
+            HTS_Server.SendRequest(_mySceneName, "Status:Running measurement");
             DoNextGroup();
         }
         else
         {
             Debug.Log("LDL: Starting new measurement");
-            HTS_Server.SendMessage(_mySceneName, "Status:Starting new measurement");
+            HTS_Server.SendRequest(_mySceneName, "Status:Starting new measurement");
 
             File.Delete(_stateFile);
             StartMeasurement();
@@ -273,8 +273,8 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         }
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
-        HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
-        HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
+        HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+        HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
 
         if (_localAbort)
         {
@@ -460,7 +460,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         yield return new WaitForSeconds(0.25f);
 
         _progressBar.value = _state.NumCompleted;
-        HTS_Server.SendMessage(_mySceneName, $"Progress:{_state.PercentCompleted}");
+        HTS_Server.SendRequest(_mySceneName, $"Progress:{_state.PercentCompleted}");
         _sliderPanel.HideLockInButton();
 
         yield return new WaitForSeconds(0.25f);
@@ -578,7 +578,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
             error = "An exception occurred";
         }
 
-        HTS_Server.SendMessage(_mySceneName, $"Error:{error}");
+        HTS_Server.SendRequest(_mySceneName, $"Error:{error}");
         Debug.Log($"[{_mySceneName} error]: {error}{Environment.NewLine}{stackTrace}");
 
         if (!_isRemote)

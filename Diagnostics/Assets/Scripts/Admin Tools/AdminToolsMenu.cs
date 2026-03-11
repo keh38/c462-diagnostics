@@ -168,7 +168,7 @@ public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
                 break;
             case "SendResourceList":
                 var fileList = EnumerateResources();
-                HTS_Server.SendMessage("FileSync", $"ReceiveFileList:{FileIO.JSONSerializeToString(fileList)}");
+                HTS_Server.SendRequest("FileSync", $"ReceiveFileList:{FileIO.JSONSerializeToString(fileList)}");
                 break;
             case "DeleteFile":
                 var fullpath = Path.Combine(FileLocations.ProjectFolder, "Resources", data);

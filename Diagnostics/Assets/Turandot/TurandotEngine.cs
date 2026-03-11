@@ -231,7 +231,7 @@ public class TurandotEngine : MonoBehaviour
 
             a.Activate(timeOut, _params.flags, startAudio);
 
-            HTS_Server.SendMessage("Turandot", $"State:{_currentFlowElement.name}");
+            HTS_Server.SendRequest("Turandot", $"State:{_currentFlowElement.name}");
 
             _log.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, HistoryEvent.StartState, _currentFlowElement.name);
 

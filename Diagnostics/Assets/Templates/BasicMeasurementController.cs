@@ -80,7 +80,7 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
     {
         InitDataFile();
 
-        HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
+        HTS_Server.SendRequest(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
     }
 
     void InitDataFile()
@@ -128,7 +128,7 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
                 _settings.InstructionMarkdown = _defaultInstructions.text;
             }
 
-            HTS_Server.SendMessage(_mySceneName, "Status:Instructions");
+            HTS_Server.SendRequest(_mySceneName, "Status:Instructions");
             ShowInstructions(
                 instructions: _settings.InstructionMarkdown,
                 fontSize: _settings.InstructionFontSize);
@@ -189,8 +189,8 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
         _workPanel.SetActive(false);
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
-        HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
-        HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+        HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
+        HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
 
         if (_localAbort)
         {
@@ -243,7 +243,7 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
             error = "An exception occurred";
         }
 
-        HTS_Server.SendMessage(_mySceneName, $"Error:{error}");
+        HTS_Server.SendRequest(_mySceneName, $"Error:{error}");
         Debug.Log($"[{_mySceneName} error]: {error}{Environment.NewLine}{stackTrace}");
 
         if (!_isRemote)

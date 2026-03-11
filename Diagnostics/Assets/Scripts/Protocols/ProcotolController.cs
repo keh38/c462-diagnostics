@@ -83,7 +83,7 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
                 }
                 else
                 {
-                    HTS_Server.SendMessage("Protocol", "Advance");
+                    HTS_Server.SendRequest("Protocol", "Advance");
                 }
             }
         }
@@ -104,7 +104,7 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
 
     public void OnQuitConfirmButtonClick()
     {
-        HTS_Server.SendMessage("Protocol", "Quit");
+        HTS_Server.SendRequest("Protocol", "Quit");
         SceneManager.LoadScene("Home");
     }
 
@@ -127,7 +127,7 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
         _instructionPanel.gameObject.SetActive(false);
         if (_advanceAfterInstructions)
         {
-            HTS_Server.SendMessage("Protocol", "Advance");
+            HTS_Server.SendRequest("Protocol", "Advance");
         }
         else
         {
@@ -148,7 +148,7 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
         }
         DrawOutline(_history.Data.Count, _nextTestIndex);
 
-        HTS_Server.SendMessage("Protocol", "Waiting");
+        HTS_Server.SendRequest("Protocol", "Waiting");
         _waitingForResponse = true;
     }
 
@@ -219,7 +219,7 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
         _nextTestIndex = testIndex;
         if (testIndex == 0 && !string.IsNullOrEmpty(_protocol.Introduction))
         {
-            HTS_Server.SendMessage("Protocol", "Instructions");
+            HTS_Server.SendRequest("Protocol", "Instructions");
             ShowInstructions(
                 _protocol.Introduction, 
                 fontSize: _protocol.Appearance.InstructionFontSize,

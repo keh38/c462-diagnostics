@@ -184,7 +184,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
             listName = $"-{listName}";
         }
         _dataPath = Path.Combine(FileLocations.SubjectFolder, $"{fileStem}-{testName}{listName}.json");
-        HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
+        HTS_Server.SendRequest(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
 
         return _dataPath;
     }
@@ -253,7 +253,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         if (_plan.IsRunInProgress())
         {
             Debug.Log($"{_mySceneName}: Previous state exists. Asking whether to resume");
-            HTS_Server.SendMessage(_mySceneName, "Status:Asking to resume");
+            HTS_Server.SendRequest(_mySceneName, "Status:Asking to resume");
 
             _questionBox.gameObject.SetActive(true);
             _questionBox.PoseQuestion("Continue previous session?", OnQuestionResponse);
@@ -272,7 +272,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
             if (HardwareInterface.LED.IsInitialized)
             {
                 HardwareInterface.LED.SetColorFromString(GameManager.LEDColorString);
-                HTS_Server.SendMessage("ChangedLEDColors", GameManager.LEDColorString);
+                HTS_Server.SendRequest("ChangedLEDColors", GameManager.LEDColorString);
             }
         }
     }
@@ -284,7 +284,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         if (yes)
         {
             Debug.Log($"{_mySceneName}: Resuming previous");
-            HTS_Server.SendMessage(_mySceneName, "Status:Resuming previous");
+            HTS_Server.SendRequest(_mySceneName, "Status:Resuming previous");
 
             _plan = TestPlan.RestoreSavedState();
             _srList = _plan.GetCurrentList();
@@ -296,7 +296,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
             _log.Clear();
             _log.Add($"List started: {_srList.Title}");
-           HTS_Server.SendMessage(_mySceneName, $"Progress:{_plan.PercentComplete}");
+           HTS_Server.SendRequest(_mySceneName, $"Progress:{_plan.PercentComplete}");
            
             if (_settings.UseMicrophone)
             {
@@ -310,7 +310,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         else
         {
             Debug.Log($"{_mySceneName}: starting test over");
-            HTS_Server.SendMessage(_mySceneName, "Status:Starting test over");
+            HTS_Server.SendRequest(_mySceneName, "Status:Starting test over");
 
             StartCoroutine(StartNextList());
         }
@@ -368,7 +368,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         _log.Clear();
         _log.Add($"List started: {_srList.Title}");
         Debug.Log($"List started: {_srList.Title}");
-        HTS_Server.SendMessage(_mySceneName, $"Status: Starting list '{_srList.Title}'");
+        HTS_Server.SendRequest(_mySceneName, $"Status: Starting list '{_srList.Title}'");
 
         _settings.Lists.RemoveAt(0);
 
@@ -516,7 +516,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         }
 
         _log.Add($"Sentence:{_plan.currentSentenceIndex}");
-        HTS_Server.SendMessage(_mySceneName, $"Status: Sentence {_plan.currentSentenceIndex}...");
+        HTS_Server.SendRequest(_mySceneName, $"Status: Sentence {_plan.currentSentenceIndex}...");
 
         if (_settings.TestType != TestType.QuickSIN && _srList.UseMasker)
         {
@@ -652,7 +652,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
         File.WriteAllText(_dataPath, json);
 
-        HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+        HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
     }
 
     public void ResponseAcquired()
@@ -672,7 +672,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         }
 
         _progressBar.value = _plan.numSentencesDone;
-        HTS_Server.SendMessage(_mySceneName, $"Progress:{_plan.PercentComplete}");
+        HTS_Server.SendRequest(_mySceneName, $"Progress:{_plan.PercentComplete}");
 
         if (_plan.currentSentenceIndex < _srList.sentences.Count && !(_settings.TestType == TestType.ClosedSet && _srClosedSetData.PassedPerformanceCriteria))
         {
@@ -686,7 +686,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
             }
             else if (_settings.UseMicrophone && _provisionalResponse.volumeChanged)
             {
-                HTS_Server.SendMessage(_mySceneName, $"Status: Volume changed!");
+                HTS_Server.SendRequest(_mySceneName, $"Status: Volume changed!");
                 ShowInstructions(
                     "-Please don't try to change the volume.\n" +
                     "-It may seem too low, but we set it where it will give the most meaningful results.\n" +
@@ -695,7 +695,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
             }
             else if (_settings.GiveBreakEvery > 0 && _numSinceLastBreak >= _settings.GiveBreakEvery)
             {
-                HTS_Server.SendMessage(_mySceneName, $"Status: Offering a break");
+                HTS_Server.SendRequest(_mySceneName, $"Status: Offering a break");
                 _numSinceLastBreak = 0;
                 ShowInstructions("-Great!\n-Take a short break if you need one.");
             }
@@ -800,7 +800,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
             case "ResponseAccepted":
                 string jsonPath = Path.Combine(FileLocations.SubjectFolder, $"{_provisionalResponse.file}.json");
-                HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(jsonPath)}:{File.ReadAllText(jsonPath)}");
+                HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(jsonPath)}:{File.ReadAllText(jsonPath)}");
 
                 string wavPath = jsonPath.Replace(".json", ".wav");
                 HTS_Server.SendBufferedFile(wavPath);
@@ -821,7 +821,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         if (_state == State.PlayingSentence)
         {
             Debug.Log("Abort requested");
-            HTS_Server.SendMessage(_mySceneName, $"Status: Abort requested");
+            HTS_Server.SendRequest(_mySceneName, $"Status: Abort requested");
         }
         else
         {
@@ -870,7 +870,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
     private void ShowInstructions(string instructions)
     {
         _state = State.Instructions;
-        HTS_Server.SendMessage(_mySceneName, $"Status: Showing instructions");
+        HTS_Server.SendRequest(_mySceneName, $"Status: Showing instructions");
 
         _workPanel.gameObject.SetActive(false);
         _instructionPanel.gameObject.SetActive(true);
@@ -896,7 +896,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         }
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
-        HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
+        HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
 
         if (_localAbort)
         {
@@ -953,7 +953,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
             error = "An exception occurred";
         }
 
-        HTS_Server.SendMessage(_mySceneName, $"Error:{error}");
+        HTS_Server.SendRequest(_mySceneName, $"Error:{error}");
         Debug.Log($"[{_mySceneName} error]: {error}{Environment.NewLine}{stackTrace}");
 
         if (!_isRemote)

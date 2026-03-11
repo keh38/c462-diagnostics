@@ -251,7 +251,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         catch (Exception ex)
         {
             Debug.Log($"[Turandot Interactive] error setting parameters: {ex.Message}");
-            HTS_Server.SendMessage("TurandotInteractive", "Error:failed to set parameters...check log");
+            HTS_Server.SendRequest("TurandotInteractive", "Error:failed to set parameters...check log");
         }
     }
 

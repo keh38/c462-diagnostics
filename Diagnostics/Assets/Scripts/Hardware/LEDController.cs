@@ -84,7 +84,7 @@ public class LEDController : MonoBehaviour
         int b = ApplyGamma(float.Parse(parts[2]));
         int w = ApplyGamma(float.Parse(parts[3]));
 
-        HTS_Server.SendMessage("ChangedLEDColor", colorSpec);
+        HTS_Server.SendRequest("ChangedLEDColor", colorSpec);
 
         return SetColor(r, g, b, w);
     }

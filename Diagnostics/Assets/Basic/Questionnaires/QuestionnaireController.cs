@@ -92,7 +92,7 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
         _data = new QuestionnaireData(_questionnaire);
         InitDataFile();
 
-        HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
+        HTS_Server.SendRequest(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
     }
 
     void InitDataFile()
@@ -129,7 +129,7 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
 
         if (!string.IsNullOrEmpty(_questionnaire.InstructionMarkdown))
         {
-            HTS_Server.SendMessage(_mySceneName, "Status:Instructions");
+            HTS_Server.SendRequest(_mySceneName, "Status:Instructions");
             ShowInstructions(
                 instructions: _questionnaire.InstructionMarkdown,
                 fontSize: _questionnaire.InstructionFontSize);
@@ -142,7 +142,7 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
 
     private void StartMeasurement()
     {
-        HTS_Server.SendMessage(_mySceneName, "Status:Questions started");
+        HTS_Server.SendRequest(_mySceneName, "Status:Questions started");
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(true);
 
@@ -194,7 +194,7 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
     private void ShowQuestion()
     {
         _progressBar.value = _qnum;
-        HTS_Server.SendMessage(_mySceneName, $"Progress:{Mathf.RoundToInt(100f * _qnum / _questionnaire.Questions.Count)}");
+        HTS_Server.SendRequest(_mySceneName, $"Progress:{Mathf.RoundToInt(100f * _qnum / _questionnaire.Questions.Count)}");
 
         _checklist.LayoutChecklist(
             _questionnaire.Questions[_qnum],
@@ -243,8 +243,8 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
         File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
-        HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
-        HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+        HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
+        HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
 
         if (_localAbort)
         {

@@ -8,16 +8,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 using KLib;
-using KLib.Network;
+using KLibU.Net;
 using System.Threading.Tasks;
+using HTS.Tcp;
 
 public class HTS_Server : MonoBehaviour
 {
     private bool _listenerReady = false;
 
-    private KTcpListener _listener = null;
+    private KTcpListener _tcpListener = null;
     private bool _stopServer;
-    private NetworkDiscoveryServer _discoveryServer;
     private IPEndPoint _ipEndPoint;
     private string _address;
 
@@ -59,55 +59,53 @@ public class HTS_Server : MonoBehaviour
         instance._currentScene = controllableScene;
         if (instance._remoteEndPoint != null)
         {
-            var result = KTcpClient.SendMessage(instance._remoteEndPoint, $"ChangedScene:{name}");
+            var changeScenePayload = new ChangeScenePayload() { SceneName = name };
+            KTcpClient.SendRequest(instance._remoteEndPoint, TcpMessage.Request("ChangedScene", changeScenePayload));
         }
     }
-    public static void SendMessage(string message, string data)
+    public static TcpMessage SendRequest(string command, object payload)
     {
-        if (instance._remoteEndPoint != null)
+        if (instance._remoteEndPoint == null)
         {
-            var result = KTcpClient.SendMessage(instance._remoteEndPoint, $"{message}:{data}");
+            return null;
         }
+        return KTcpClient.SendRequest(instance._remoteEndPoint, TcpMessage.Request(command, payload));
     }
 
     public static void SendBufferedFile(string localPath)
     {
-        if (instance._remoteEndPoint == null) return;
+        //if (instance._remoteEndPoint == null) return;
 
-        int bufferSize = 16384;
+        //int bufferSize = 16384;
 
-        var fileInfo = new FileInfo(localPath);
+        //var fileInfo = new FileInfo(localPath);
 
-        long numBuffers = (long)Math.Ceiling((double)fileInfo.Length / bufferSize);
+        //long numBuffers = (long)Math.Ceiling((double)fileInfo.Length / bufferSize);
 
-        KTcpClient client = new KTcpClient();
-        client.ConnectTCPServer(instance._remoteEndPoint.Address.ToString(), _instance._remoteEndPoint.Port);
+        //KTcpClient client = new KTcpClient();
+        //client.ConnectTCPServer(instance._remoteEndPoint.Address.ToString(), _instance._remoteEndPoint.Port);
 
-        var result = client.WriteStringAsByteArray($"ReceiveBufferedFile:{Path.GetFileName(localPath)}:{bufferSize}:{numBuffers}");
-        if (result <= 0)
-        {
-            return;
-        }
+        //var result = client.WriteStringAsByteArray($"ReceiveBufferedFile:{Path.GetFileName(localPath)}:{bufferSize}:{numBuffers}");
+        //if (result <= 0)
+        //{
+        //    return;
+        //}
 
-        using (FileStream fs = new FileStream(localPath, FileMode.Open, FileAccess.Read))
-        using (BinaryReader reader = new BinaryReader(fs))
-        {
-            for (int k = 0; k < numBuffers; k++)
-            {
-                var bytes = reader.ReadBytes(bufferSize);
-                result = client.SendBuffer(bytes);
-            }
-        }
+        //using (FileStream fs = new FileStream(localPath, FileMode.Open, FileAccess.Read))
+        //using (BinaryReader reader = new BinaryReader(fs))
+        //{
+        //    for (int k = 0; k < numBuffers; k++)
+        //    {
+        //        var bytes = reader.ReadBytes(bufferSize);
+        //        result = client.SendBuffer(bytes);
+        //    }
+        //}
 
-        client.CloseTCPServer();
+        //client.CloseTCPServer();
     }
 
     private void _Init()
     {
-        var go = new GameObject("Discovery Server").AddComponent<NetworkDiscoveryServer>();
-        go.transform.parent = this.gameObject.transform;
-        _discoveryServer = go.GetComponent<NetworkDiscoveryServer>();
-
         DontDestroyOnLoad(this);
     }
 
@@ -117,28 +115,31 @@ public class HTS_Server : MonoBehaviour
         _remoteConnected = false;
         _stopServer = false;
 
-        _ipEndPoint = NetworkUtils.FindNextAvailableEndPoint();
+        _ipEndPoint = Discovery.FindNextAvailableEndPoint();
         _address = _ipEndPoint.Address.ToString();
 
-        _listener = new KTcpListener();
-        _listener.StartListener(_ipEndPoint, bigEndian: false);
+        _tcpListener = new KTcpListener();
+        _tcpListener.StartListener(_ipEndPoint);
 
         StartCoroutine(TCPServer());
-        _discoveryServer.StartReceiving("HEARING.TEST.SUITE", _ipEndPoint.Address.ToString(), _ipEndPoint.Port);
-
         Debug.Log("started HTS TCP server on " + _ipEndPoint.ToString());
+        
+        var discoveryBeacon = gameObject.AddComponent<NetworkDiscoveryBeacon>();
+        discoveryBeacon.StartBroadcasting(
+            name: $"HEARING.TEST.SUITE",
+            address: _ipEndPoint.Address.ToString(),
+            port: _ipEndPoint.Port);
     }
 
     public void StopServer()
     {
         _stopServer = true;
-        if (_listener != null)
+        if (_tcpListener != null)
         {
-            _listener.CloseListener();
-            _listener = null;
+            _tcpListener.CloseListener();
+            _tcpListener = null;
         }
 
-        _discoveryServer.StopReceiving();
         Debug.Log("stopped HTS TCP listener");
     }
 
@@ -151,7 +152,7 @@ public class HTS_Server : MonoBehaviour
     {
         while (!_stopServer)
         {
-            if (_listener.Pending())
+            if (_tcpListener.Pending())
             {
                 try
                 {
@@ -168,61 +169,63 @@ public class HTS_Server : MonoBehaviour
 
     void ProcessMessage()
     {
-        _listener.AcceptTcpClient();
+        _tcpListener.AcceptTcpClient();
 
-        string input = _listener.ReadString();
-        var parts = input.Split(new char[] { ':' }, 2);
-        string command = parts[0];
-        string data = null;
-        if (parts.Length > 1)
+        var request = _tcpListener.ReadRequest();
+
+        if (!request.Command.Equals("Ping"))
         {
-            data = parts[1];
+            Debug.Log("Command received: " + request.Command);
         }
-
-        if (!command.Equals("Ping"))
-        {
-            Debug.Log("Command received: " + command);
-        }
-
-        switch (command)
+        string data = "";
+        switch (request.Command)
         {
             case "Connect":
-                var remoteRequestFrom = ParseEndPoint(data);
-                bool acceptConnection = !_remoteConnected || remoteRequestFrom.Equals(_remoteEndPoint);
+                var connectionData = request.GetPayload<ConnectionRequestPayload>();
+                var incomingEndPoint = new IPEndPoint(IPAddress.Parse(connectionData.Address), connectionData.Port);
+                bool acceptConnection = !_remoteConnected || incomingEndPoint.Equals(_remoteEndPoint);
 
-                _listener.SendAcknowledgement(acceptConnection);
+                var response = new ConnectionResponsePayload()
+                {
+                    HostName = "unknown",
+                    SceneName = _currentSceneName,
+                    VersionNumber = Application.version
+                };
+
+                _tcpListener.WriteResponse(TcpMessage.Ok(response));
+
                 if (!acceptConnection)
                 {
-                    Debug.Log($"Refused incoming connection from {remoteRequestFrom}");
+                    Debug.Log($"Refused incoming connection from {incomingEndPoint}");
                 }
                 else
                 {
-                    Debug.Log($"Connection accepted from {remoteRequestFrom}");
+                    Debug.Log($"Connection accepted from {incomingEndPoint}");
                     _remoteConnected = true;
-                    _remoteEndPoint = ParseEndPoint(data);
+                    _remoteEndPoint = incomingEndPoint;
                     _currentScene.ProcessRPC("Connect");
                 }
                 break;
 
             case "SetDataRoot":
-                _listener.SendAcknowledgement();
+                _tcpListener.WriteResponse(TcpMessage.Ok());
                 FileLocations.SetDataRoot(data);
                 _currentScene.ProcessRPC("SetDataRoot");
                 break;
 
             case "Disconnect":
-                _listener.SendAcknowledgement();
+                _tcpListener.WriteResponse(TcpMessage.Ok());
                 _remoteConnected = false;
                 _currentScene.ProcessRPC("Disconnect");
                 SceneManager.LoadScene("Home");
                 break;
 
             case "Ping":
-                _listener.SendAcknowledgement(_remoteConnected);
+                _tcpListener.WriteResponse(TcpMessage.Ok());
                 break;
 
             case "ChangeScene":
-                _listener.SendAcknowledgement();
+                _tcpListener.WriteResponse(TcpMessage.Ok());
                 KLogger.Log.FlushLog();
                 GameManager.DataForNextScene = "";
                 Debug.Log($"changing scene to {data}...");
@@ -230,63 +233,64 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "CreateProject":
-                _listener.SendAcknowledgement();
+                _tcpListener.WriteResponse(TcpMessage.Ok());
                 FileLocations.CreateProjectFolder(data);
                 break;
 
             case "GetCurrentSceneName":
-                _listener.WriteStringAsByteArray(_currentSceneName);
+                _tcpListener.WriteStringAsByteArray(_currentSceneName);
                 break;
 
             case "GetVersionNumber":
-                _listener.WriteStringAsByteArray(Application.version);
+                _tcpListener.WriteStringAsByteArray(Application.version);
                 break;
 
             case "GetSubjectInfo":
-                _listener.WriteStringAsByteArray($"{GameManager.Project}/{GameManager.Subject}");
+                _tcpListener.WriteResponse(TcpMessage.Ok((object)$"{GameManager.Project}/{GameManager.Subject}"));
                 break;
 
             case "GetProjectList":
-                _listener.WriteStringAsByteArray(KLib.FileIO.JSONSerializeToString(FileLocations.EnumerateProjects()));
+                _tcpListener.WriteResponse(TcpMessage.Ok(KLib.FileIO.JSONSerializeToString(FileLocations.EnumerateProjects())));
                 break;
 
             case "GetSubjectList":
-                _listener.WriteStringAsByteArray(KLib.FileIO.JSONSerializeToString(FileLocations.EnumerateSubjects(data)));
+                string projectToEnumerate = request.GetPayload<string>();
+                _tcpListener.WriteResponse(TcpMessage.Ok(KLib.FileIO.JSONSerializeToString(FileLocations.EnumerateSubjects(projectToEnumerate))));
                 break;
 
             case "SetSubjectInfo":
-                _listener.SendAcknowledgement();
+                _tcpListener.WriteResponse(TcpMessage.Ok());
                 GameManager.SetSubject(data);
                 _currentScene.ProcessRPC("SubjectChanged");
                 break;
 
             case "GetSubjectMetadata":
-                _listener.WriteStringAsByteArray(GameManager.SerializeSubjectMetadata());
+                _tcpListener.WriteResponse(TcpMessage.Ok(GameManager.GetSubjectMetadata()));
                 break;
 
             case "SetSubjectMetadata":
-                _listener.SendAcknowledgement();
+                _tcpListener.WriteResponse(TcpMessage.Ok());
                 GameManager.DeserializeSubjectMetadata(data);
                 _currentScene.ProcessRPC("SubjectMetadataChanged");
                 break;
 
             case "SetSubjectMetrics":
-                _listener.SendAcknowledgement();
+                _tcpListener.WriteResponse(TcpMessage.Ok());
                 GameManager.DeserializeSubjectMetrics(data);
                 _currentScene.ProcessRPC("SubjectMetricsChanged");
                 break;
 
             case "GetTransducers":
-                _listener.WriteStringAsByteArray(KLib.FileIO.XmlSerializeToString(GameManager.EnumerateTransducers()));
+                _tcpListener.WriteResponse(TcpMessage.Ok(GameManager.EnumerateTransducers()));
                 break;
 
             case "GetAdapterMap":
-                _listener.WriteStringAsByteArray(KLib.FileIO.XmlSerializeToString(HardwareInterface.AdapterMap));
+                _tcpListener.WriteStringAsByteArray(KLib.FileIO.XmlSerializeToString(HardwareInterface.AdapterMap));
                 break;
 
             case "GetLog":
                 KLogger.Log.FlushLog();
-                _listener.WriteStringAsByteArray($"{Path.GetFileName(KLogger.LogPath)}:{File.ReadAllText(KLogger.LogPath)}");
+                _tcpListener.WriteStringAsByteArray($"{Path.GetFileName(KLogger.LogPath)}:{File.ReadAllText(KLogger.LogPath)}");
                 break;
 
             case "GetSyncLog":
@@ -297,21 +301,21 @@ public class HTS_Server : MonoBehaviour
                     var syncLogText = File.ReadAllText(logPath);
                     if (string.IsNullOrEmpty(syncLogText))
                     {
-                        _listener.WriteStringAsByteArray("none");
+                        _tcpListener.WriteStringAsByteArray("none");
                     }
                     else
                     {
-                        _listener.WriteStringAsByteArray($"{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
+                        _tcpListener.WriteStringAsByteArray($"{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
                     }
                 }
                 else
                 {
-                    _listener.WriteStringAsByteArray("none");
+                    _tcpListener.WriteStringAsByteArray("none");
                 }
                 break;
 
             case "GetScreenSize":
-                _listener.WriteStringAsByteArray($"{Screen.width},{Screen.height}");
+                _tcpListener.WriteStringAsByteArray($"{Screen.width},{Screen.height}");
                 break;
 
             case "GetLEDColors":
@@ -320,16 +324,16 @@ public class HTS_Server : MonoBehaviour
                 {
                     cstring = HardwareInterface.LED.GetColor();
                 }
-                _listener.WriteStringAsByteArray($"{cstring}");
+                _tcpListener.WriteStringAsByteArray($"{cstring}");
                 break;
 
             case "TransferFile":
-                _listener.SendAcknowledgement();
+                _tcpListener.WriteResponse(TcpMessage.Ok());
                 ReceiveFile(data);
                 break;
 
             case "RunInstaller":
-                _listener.SendAcknowledgement();
+                _tcpListener.WriteResponse(TcpMessage.Ok());
                 RunInstaller(data);
                 break;
 
@@ -338,11 +342,11 @@ public class HTS_Server : MonoBehaviour
                 if (File.Exists(fullpath))
                 {
                     var dt = File.GetLastAccessTime(fullpath);
-                    _listener.WriteStringAsByteArray(FileIO.JSONSerializeToString(dt));
+                    _tcpListener.WriteStringAsByteArray(FileIO.JSONSerializeToString(dt));
                 }
                 else
                 {
-                    _listener.WriteStringAsByteArray("404");
+                    _tcpListener.WriteStringAsByteArray("404");
                 }
                 break;
 
@@ -351,11 +355,11 @@ public class HTS_Server : MonoBehaviour
                 break;
                 
             default:
-                _listener.SendAcknowledgement();
-                _currentScene.ProcessRPC(command, data);
+                _tcpListener.WriteResponse(TcpMessage.Ok());
+                _currentScene.ProcessRPC(request.Command, data);
                 break;
         }
-        _listener.CloseTcpClient();
+        _tcpListener.CloseTcpClient();
     }
 
     private void ReceiveFile(string data)
@@ -373,45 +377,45 @@ public class HTS_Server : MonoBehaviour
 
     private void ReceiveBufferedFile(string data)
     {
-        var parts = data.Split(new char[] { ':' }, 3);
-        if (parts.Length != 3)
-        {
-            _listener.SendAcknowledgement(false);
-            return;
-        }
+        //var parts = data.Split(new char[] { ':' }, 3);
+        //if (parts.Length != 3)
+        //{
+        //    _tcpListener.SendAcknowledgement(false);
+        //    return;
+        //}
  
-        int bufferSize = int.Parse(parts[1]);
-        int numBuffers = int.Parse(parts[2]);
+        //int bufferSize = int.Parse(parts[1]);
+        //int numBuffers = int.Parse(parts[2]);
 
-        var filePath = Path.Combine(FileLocations.ProjectFolder, "Resources", parts[0]);
-        if (parts[0].StartsWith("Downloads"))
-        {
-            filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), parts[0]);
-        }
-        var tempPath = Path.GetTempFileName();
+        //var filePath = Path.Combine(FileLocations.ProjectFolder, "Resources", parts[0]);
+        //if (parts[0].StartsWith("Downloads"))
+        //{
+        //    filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), parts[0]);
+        //}
+        //var tempPath = Path.GetTempFileName();
 
-        _listener.SendAcknowledgement();
+        //_tcpListener.SendAcknowledgement();
 
-        using (FileStream fs = new FileStream(tempPath, FileMode.Create, FileAccess.Write))
-        using (BinaryWriter bw = new BinaryWriter(fs))
-        {
-            for (int k = 0; k < numBuffers; k++)
-            {
-                var bytes = _listener.ReadByteArray();
-                bw.Write(bytes);
+        //using (FileStream fs = new FileStream(tempPath, FileMode.Create, FileAccess.Write))
+        //using (BinaryWriter bw = new BinaryWriter(fs))
+        //{
+        //    for (int k = 0; k < numBuffers; k++)
+        //    {
+        //        var bytes = _tcpListener.ReadByteArray();
+        //        bw.Write(bytes);
 
-                _listener.SendAcknowledgement();
-            }
+        //        _tcpListener.SendAcknowledgement();
+        //    }
 
-            bw.Close();
-            fs.Close();
-        }
+        //    bw.Close();
+        //    fs.Close();
+        //}
 
-        if (File.Exists(filePath))
-        {
-            File.Delete(filePath);
-        }
-        File.Move(tempPath, filePath); 
+        //if (File.Exists(filePath))
+        //{
+        //    File.Delete(filePath);
+        //}
+        //File.Move(tempPath, filePath); 
     }
 
     private void RunInstaller(string data)

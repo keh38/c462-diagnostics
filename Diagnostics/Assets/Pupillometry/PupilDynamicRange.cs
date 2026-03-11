@@ -78,7 +78,7 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
         int npts = Mathf.RoundToInt(approxDuration * 100);
 
         _data = new DynamicRangeData(_dataPath, npts);
-        HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
+        HTS_Server.SendRequest(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
 
         _useLEDs = HardwareInterface.LED.IsInitialized;
         if (_useLEDs)
@@ -131,14 +131,14 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
             if (_curTime > _nextColorUpdate)
             {
                 _nextColorUpdate += 0.5f;
-                HTS_Server.SendMessage("ChangedLEDColors", $"0,0,0,{Math.Max(0.01f, ledIntensity)}");
+                HTS_Server.SendRequest("ChangedLEDColors", $"0,0,0,{Math.Max(0.01f, ledIntensity)}");
             }
         }
 
         if (_curTime > _nextUpdate)
         {
             _nextUpdate += 1;
-            HTS_Server.SendMessage(_mySceneName, $"Progress:{Mathf.RoundToInt(_curTime/_endRunTime * 100)}");
+            HTS_Server.SendRequest(_mySceneName, $"Progress:{Mathf.RoundToInt(_curTime/_endRunTime * 100)}");
         }
 
         if (_curTime > _endRunTime || _stopMeasurement)
@@ -159,7 +159,7 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
         {
             HardwareInterface.LED.Close();
             HardwareInterface.LED.SetColorFromString(GameManager.ProjectSettings.DefaultLEDColor);
-            HTS_Server.SendMessage("ChangedLEDColors", GameManager.ProjectSettings.DefaultLEDColor);
+            HTS_Server.SendRequest("ChangedLEDColors", GameManager.ProjectSettings.DefaultLEDColor);
         }
 
         _data.Trim();
@@ -178,8 +178,8 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
         File.WriteAllText(_dataPath, json);
 
         string status = _stopMeasurement ? "Measurement aborted" : "Measurement finished";
-        HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
-        HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+        HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
+        HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
     }
 
     void OnGUI()
@@ -222,7 +222,7 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
                 var logPath = HardwareInterface.ClockSync.LogFile;
                 if (!string.IsNullOrEmpty(logPath))
                 {
-                    HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
+                    HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
                 }
                 break;
         }
