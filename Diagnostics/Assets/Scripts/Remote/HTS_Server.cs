@@ -86,10 +86,18 @@ public class HTS_Server : MonoBehaviour
         SendRequest(command, payload);
     }
 
-    public static void SendRequest(string command, string target, string data = "")
+    //public static void SendRequest(string command, string target, string data = "")
+    //{
+    //    var payload = new RemoteMessagePayload { Target = target, Data = data };
+    //    SendRequest(command, payload);
+    //}
+    public static void SendRequest(string target, string command)
     {
-        var payload = new RemoteMessagePayload { Target = target, Data = data };
-        SendRequest(command, payload);
+        if (instance._remoteEndPoint == null)
+        {
+            return;
+        }
+        KTcpClient.SendRequest(instance._remoteEndPoint, TcpMessage.Request($"{target}:{command}"));
     }
 
     public static void SendBufferedFile(string localPath)
@@ -272,16 +280,16 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "GetSubjectInfo":
-                _tcpListener.WriteResponse(TcpMessage.Ok((object)$"{GameManager.Project}/{GameManager.Subject}"));
+                _tcpListener.WriteResponse(TcpMessage.Ok($"{GameManager.Project}/{GameManager.Subject}"));
                 break;
 
             case "GetProjectList":
-                _tcpListener.WriteResponse(TcpMessage.Ok(KLib.FileIO.JSONSerializeToString(FileLocations.EnumerateProjects())));
+                _tcpListener.WriteResponse(TcpMessage.Ok(FileLocations.EnumerateProjects()));
                 break;
 
             case "GetSubjectList":
                 string projectToEnumerate = request.GetPayload<string>();
-                _tcpListener.WriteResponse(TcpMessage.Ok(KLib.FileIO.JSONSerializeToString(FileLocations.EnumerateSubjects(projectToEnumerate))));
+                _tcpListener.WriteResponse(TcpMessage.Ok(FileLocations.EnumerateSubjects(projectToEnumerate)));
                 break;
 
             case "SetSubjectInfo":

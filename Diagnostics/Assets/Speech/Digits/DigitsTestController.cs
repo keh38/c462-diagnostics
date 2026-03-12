@@ -15,6 +15,7 @@ using KLibU.Net;
 using BasicMeasurements;
 using DigitsTest;
 using Digits;
+using HTS.Unity.Tcp;
 
 public class DigitsTestController : MonoBehaviour, IRemoteControllable
 {
@@ -139,8 +140,6 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
 
         _progressBar.maxValue = _status.plan.Count;
         _progressBar.value = 0;
-
-        HTS_Server.SendRequest(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
     }
 
     void InitDataFile()
@@ -201,7 +200,11 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         var filepath = _dataPath.Replace(".json", $"-{_data.name}.json");
         File.WriteAllText(filepath, json);
 
-        HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(filepath)}:{File.ReadAllText(filepath)}");
+        HTS_Server.SendRequest("ReceiveData", _mySceneName, new TextFilePayload
+        {
+            Filename = Path.GetFileName(filepath),
+            Content = File.ReadAllText(filepath)
+        });
     }
 
     private void CreatePlan()
@@ -732,15 +735,9 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         switch (request.Command)
         {
             case "Initialize":
-                _settings = FileIO.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as DigitsTestSettings;
+                _settings = request.GetPayload<DigitsTestSettings>();
                 InitializeMeasurement();
-                return TcpMessage.Ok();
-            case "StartSynchronizing":
-                HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                return TcpMessage.Ok();
-            case "StopSynchronizing":
-                HardwareInterface.ClockSync.StopSynchronizing();
-                return TcpMessage.Ok();
+                return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
                 Begin();
                 return TcpMessage.Ok();

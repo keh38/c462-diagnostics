@@ -18,6 +18,8 @@ using LDL;
 
 using BasicMeasurements;
 using KLib.Wave;
+using HTS.Unity.Tcp;
+//using Audiograms;
 
 public class LDLController : MonoBehaviour, IRemoteControllable
 {
@@ -122,8 +124,6 @@ public class LDLController : MonoBehaviour, IRemoteControllable
 
         _progressBar.maxValue = _state.NumConditions;
         _progressBar.value = 0;
-
-        HTS_Server.SendRequest(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
     }
 
     void InitDataFile()
@@ -274,7 +274,12 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         }
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
-        HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+
+        HTS_Server.SendRequest("ReceiveData", _mySceneName, new TextFilePayload
+        {
+            Filename = Path.GetFileName(_dataPath),
+            Content = File.ReadAllText(_dataPath)
+        });
         HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
 
         if (_localAbort)
@@ -306,15 +311,9 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         switch (request.Command)
         {
             case "Initialize":
-                _settings = FileIO.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as LDLMeasurementSettings;
+                _settings = request.GetPayload<LDLMeasurementSettings>();
                 InitializeMeasurement();
-                return TcpMessage.Ok();
-            case "StartSynchronizing":
-                HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                return TcpMessage.Ok();
-            case "StopSynchronizing":
-                HardwareInterface.ClockSync.StopSynchronizing();
-                return TcpMessage.Ok();
+                return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
                 Begin();
                 return TcpMessage.Ok();
@@ -363,7 +362,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
 
     private void CreatePlan()
     {
-        _state = new MeasurementState();
+        _state = new LDL.MeasurementState();
 
         if (_settings.LevelUnits == LevelUnits.dB_SL)
         {

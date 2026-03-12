@@ -342,7 +342,6 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             Content = File.ReadAllText(_dataPath)
         });
 
-        HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
         HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
 
         if (_localAbort)

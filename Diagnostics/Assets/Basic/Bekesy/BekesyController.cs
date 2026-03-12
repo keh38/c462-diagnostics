@@ -18,6 +18,7 @@ using KLib.Signals.Waveforms;
 using UnityEngine.EventSystems;
 
 using BasicMeasurements;
+using HTS.Unity.Tcp;
 
 public class BekesyController : MonoBehaviour, IRemoteControllable
 {
@@ -116,8 +117,6 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         CreatePlan();
         InitializeStimulusGeneration();
         InitDataFile();
-
-        HTS_Server.SendRequest(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
     }
 
     void InitDataFile()
@@ -410,8 +409,14 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         //_data.audiogramData.Save();
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
+
+        HTS_Server.SendRequest("ReceiveData", _mySceneName, new TextFilePayload
+        {
+            Filename = Path.GetFileName(_dataPath),
+            Content = File.ReadAllText(_dataPath)
+        });
+
         HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
-        HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
 
         if (_localAbort)
         {
@@ -448,15 +453,9 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         switch (request.Command)
         {
             case "Initialize":
-                _settings = FileIO.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as BekesyMeasurementSettings;
+                _settings = request.GetPayload<BekesyMeasurementSettings>();
                 InitializeMeasurement();
-                return TcpMessage.Ok();
-            case "StartSynchronizing":
-                HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                return TcpMessage.Ok();
-            case "StopSynchronizing":
-                HardwareInterface.ClockSync.StopSynchronizing();
-                return TcpMessage.Ok();
+                return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
                 Begin();
                 return TcpMessage.Ok();

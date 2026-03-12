@@ -14,6 +14,8 @@ using KLibU.Net;
 using Questionnaires;
 
 using BasicMeasurements;
+using HTS.Unity.Tcp;
+using Audiograms;
 
 public class QuestionnaireController : MonoBehaviour, IRemoteControllable
 {
@@ -92,8 +94,6 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
 
         _data = new QuestionnaireData(_questionnaire);
         InitDataFile();
-
-        HTS_Server.SendRequest(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
     }
 
     void InitDataFile()
@@ -244,8 +244,13 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
         File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
+
+        HTS_Server.SendRequest("ReceiveData", _mySceneName, new TextFilePayload
+        {
+            Filename = Path.GetFileName(_dataPath),
+            Content = File.ReadAllText(_dataPath)
+        });
         HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
-        HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
 
         if (_localAbort)
         {
@@ -282,15 +287,9 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
         switch (request.Command)
         {
             case "Initialize":
-                _questionnaire = FileIO.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as Questionnaire;
+                _questionnaire = request.GetPayload<Questionnaire>();
                 InitializeMeasurement();
-                return TcpMessage.Ok();
-            case "StartSynchronizing":
-                HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                return TcpMessage.Ok();
-            case "StopSynchronizing":
-                HardwareInterface.ClockSync.StopSynchronizing();
-                return TcpMessage.Ok();
+                return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
                 Begin();
                 return TcpMessage.Ok();

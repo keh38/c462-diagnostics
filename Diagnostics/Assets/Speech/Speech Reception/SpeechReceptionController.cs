@@ -12,6 +12,7 @@ using UnityEngine.UI;
 using ExtensionMethods;
 using SpeechReception;
 using UnityEngine.Networking;
+using HTS.Unity.Tcp;
 
 public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 {
@@ -185,7 +186,6 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
             listName = $"-{listName}";
         }
         _dataPath = Path.Combine(FileLocations.SubjectFolder, $"{fileStem}-{testName}{listName}.json");
-        HTS_Server.SendRequest(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
 
         return _dataPath;
     }
@@ -653,7 +653,11 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
         File.WriteAllText(_dataPath, json);
 
-        HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+        HTS_Server.SendRequest("ReceiveData", _mySceneName, new TextFilePayload
+        {
+            Filename = Path.GetFileName(_dataPath),
+            Content = File.ReadAllText(_dataPath)
+        });
     }
 
     public void ResponseAcquired()
@@ -969,15 +973,9 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         switch (request.Command)
         {
             case "Initialize":
-                _settings = FileIO.XmlDeserializeFromString<SpeechTest>(data);
+                _settings = request.GetPayload<SpeechTest>();
                 InitializeMeasurement();
-                return TcpMessage.Ok();
-            case "StartSynchronizing":
-                HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                return TcpMessage.Ok();
-            case "StopSynchronizing":
-                HardwareInterface.ClockSync.StopSynchronizing();
-                return TcpMessage.Ok();
+                return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
                 Begin();
                 return TcpMessage.Ok();
