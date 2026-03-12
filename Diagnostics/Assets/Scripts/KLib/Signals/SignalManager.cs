@@ -13,6 +13,7 @@ using KLib.Signals.Calibration;
 using KLib.Signals.Enumerations;
 using KLib.Signals.Modulations;
 using KLib.Signals.Waveforms;
+using System.Runtime.InteropServices;
 
 namespace KLib.Signals
 {

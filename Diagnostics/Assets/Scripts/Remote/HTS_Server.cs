@@ -337,18 +337,15 @@ public class HTS_Server : MonoBehaviour
 
             case "GetSyncLog":
                 var logPath = HardwareInterface.ClockSync.LogFile;
-                Debug.Log($"sync log path = {logPath}");
+                //Debug.Log($"sync log path = {logPath}");
                 if (!string.IsNullOrEmpty(logPath))
                 {
-                    var syncLogText = File.ReadAllText(logPath);
-                    if (string.IsNullOrEmpty(syncLogText))
+                    var syncLogPayload = new TextFilePayload()
                     {
-                        _tcpListener.WriteStringAsByteArray("none");
-                    }
-                    else
-                    {
-                        _tcpListener.WriteStringAsByteArray($"{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
-                    }
+                        Filename = Path.GetFileName(logPath),
+                        Content = File.ReadAllText(logPath)
+                    };
+                    _tcpListener.WriteResponse(TcpMessage.Ok(syncLogPayload));
                 }
                 else
                 {

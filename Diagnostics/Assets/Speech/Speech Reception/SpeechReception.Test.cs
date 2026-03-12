@@ -5,6 +5,7 @@ using System.IO;
 using System.Xml.Serialization;
 using KLib;
 using KLib.TypeConverters;
+using Newtonsoft.Json;
 using OrderedPropertyGrid;
 
 namespace SpeechReception
@@ -20,6 +21,7 @@ namespace SpeechReception
     }
 
     [TypeConverter(typeof(SpeechTestConverter))]
+    [JsonObject(MemberSerialization.OptOut)]
     public class SpeechTest
     {
         [Category("About")]

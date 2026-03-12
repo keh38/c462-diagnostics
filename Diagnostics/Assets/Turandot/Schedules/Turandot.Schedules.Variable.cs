@@ -102,7 +102,7 @@ namespace Turandot.Schedules
             }
             else
             {
-                Debug.Log($"expression = {expression}");
+                //Debug.Log($"expression = {expression}");
                 _values = Expressions.Evaluate(expression);
             }
 

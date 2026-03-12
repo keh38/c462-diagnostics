@@ -25,7 +25,7 @@ namespace Questionnaires
 
         [Category("Content")]
         [Editor(typeof(QuestionCollectionEditor), typeof(System.Drawing.Design.UITypeEditor))]
-        public QuestionCollection Questions { get; set; }
+        public List<Question> Questions { get; set; }
         private bool ShouldSerializeQuestions {  get; set; }
 
         //public bool saveLocalCopy = false;
@@ -38,23 +38,7 @@ namespace Questionnaires
         {
             Title = "Questionnaire";
             FontSize = 60;
-            Questions = new QuestionCollection();
-        }
-    }
-
-    public class QuestionCollection : CollectionBase
-    {
-        public Question this[int index]
-        {
-            get { return (Question)List[index]; }
-        }
-        public void Add(Question question)
-        {
-            List.Add(question);
-        }
-        public void Remove(Question question)
-        {
-            List.Remove(question);
+            Questions = new List<Question>();
         }
     }
 

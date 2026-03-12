@@ -20,6 +20,7 @@ using KLib.Signals.Waveforms;
 using BasicMeasurements;
 using Newtonsoft.Json;
 using HTS.Unity.Tcp;
+using Unity.VisualScripting;
 
 public class AudiogramController : MonoBehaviour, IRemoteControllable
 {
@@ -382,6 +383,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
                 InitializeMeasurement();
                 return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
+                StartCoroutine(BeginNextFrame());
                 Begin();
                 return TcpMessage.Ok();
             case "Abort":
@@ -390,6 +392,12 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             default:
                 return TcpMessage.NotFound(request.Command);
         }
+    }
+
+    IEnumerator BeginNextFrame()
+    {
+        yield return null;
+        Begin();
     }
 
     void IRemoteControllable.ChangeScene(string newScene)

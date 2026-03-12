@@ -4,6 +4,7 @@ using System.ComponentModel;
 using KLib.Signals.Modulations;
 using KLib.Signals.Waveforms;
 
+using Newtonsoft.Json;
 using OrderedPropertyGrid;
 
 namespace LDL.Haptics
@@ -11,6 +12,7 @@ namespace LDL.Haptics
     public enum HapticSource { NONE, Vibration, TENS}
 
     [TypeConverter(typeof(HapticStimulusConverter))]
+    [JsonObject(MemberSerialization.OptOut)]
     public class HapticStimulus
     {
         //        [PropertyOrder(0)]

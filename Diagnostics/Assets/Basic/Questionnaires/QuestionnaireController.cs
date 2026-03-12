@@ -93,6 +93,7 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
         _title.text = _questionnaire.Title;
 
         _data = new QuestionnaireData(_questionnaire);
+        Debug.Log("yo");
         InitDataFile();
     }
 
@@ -283,15 +284,14 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
 
     TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        var data = request.GetPayload<string>();
-        switch (request.Command)
+       switch (request.Command)
         {
             case "Initialize":
                 _questionnaire = request.GetPayload<Questionnaire>();
                 InitializeMeasurement();
                 return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
-                Begin();
+                StartCoroutine(BeginNextFrame());
                 return TcpMessage.Ok();
             case "Abort":
                 _stopMeasurement = true;
@@ -299,6 +299,12 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
             default:
                 return TcpMessage.NotFound(request.Command);
         }
+    }
+
+    IEnumerator BeginNextFrame()
+    {
+        yield return null;
+        Begin();
     }
 
     void IRemoteControllable.ChangeScene(string newScene)

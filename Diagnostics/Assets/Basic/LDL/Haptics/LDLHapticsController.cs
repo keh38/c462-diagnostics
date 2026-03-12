@@ -327,23 +327,33 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 
     TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        var data = request.GetPayload<string>();
         switch (request.Command)
         {
             case "Initialize":
                 _settings = request.GetPayload<LDLMeasurementSettings>();
                 InitializeMeasurement();
-                //StartCoroutine(RpcInitializeMeasurement());
                 return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
-                Begin();
+                StartCoroutine(BeginNextFrame());
                 return TcpMessage.Ok();
             case "Abort":
-                EndRun(abort: true);
+                StartCoroutine(AbortNextFrame());
                 return TcpMessage.Ok();
             default:
                 return TcpMessage.NotFound(request.Command);
         }
+    }
+
+    IEnumerator BeginNextFrame()
+    {
+        yield return null;
+        Begin();
+    }
+
+    IEnumerator AbortNextFrame()
+    {
+        yield return null;
+        EndRun(abort: true);
     }
 
     void IRemoteControllable.ChangeScene(string newScene)

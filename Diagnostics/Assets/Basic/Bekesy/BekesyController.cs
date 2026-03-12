@@ -365,6 +365,11 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
     {
         if (_stopMeasurement)
         {
+            if (_trackActive)
+            {
+                _signalManager.Pause();
+            }
+
             _abortAction.Disable();
             _stopMeasurement = false;
             EndRun(abort: true);
@@ -449,7 +454,6 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
 
     TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        var data = request.GetPayload<string>();
         switch (request.Command)
         {
             case "Initialize":
@@ -457,7 +461,7 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
                 InitializeMeasurement();
                 return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
-                Begin();
+                StartCoroutine(BeginNextFrame());
                 return TcpMessage.Ok();
             case "Abort":
                 _stopMeasurement = true;
@@ -465,6 +469,12 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
             default:
                 return TcpMessage.NotFound(request.Command);
         }
+    }
+
+    IEnumerator BeginNextFrame()
+    {
+        yield return null;
+        Begin();
     }
 
     void IRemoteControllable.ChangeScene(string newScene)
@@ -497,6 +507,11 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
                 _levelSetter(_currentLevel);
 
                 _signalManager.Synthesize(data);
+            }
+
+            if (_stopMeasurement)
+            {
+                _trackActive = false;
             }
         }
     }

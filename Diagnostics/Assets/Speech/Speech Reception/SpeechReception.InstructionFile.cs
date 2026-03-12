@@ -4,10 +4,12 @@ using UnityEngine;
 
 using OrderedPropertyGrid;
 using KLib.TypeConverters;
+using Newtonsoft.Json;
 
 namespace SpeechReception
 {
     [TypeConverter(typeof(SortableTypeConverter))]
+    [JsonObject(MemberSerialization.OptOut)]
     public class InstructionFile
     {
         [PropertyOrder(0)]

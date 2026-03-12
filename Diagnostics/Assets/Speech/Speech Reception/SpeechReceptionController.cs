@@ -192,6 +192,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
     private void CreatePlan()
     {
+        Debug.Log("Create Plan");
         var customizations = UserCustomizations.Initialize(FileLocations.SubjectCustomSpeechPath, GameManager.Subject);
         _plan = new TestPlan()
         {
@@ -204,6 +205,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         {
             _settings.TestEars = new List<TestEar>() { TestEar.Binaural };
         }
+        Debug.Log("Create Plan2");
 
         int[] iorder = new int[_settings.TestEars.Count];
         if (_settings.EarOrder == "Random")
@@ -214,6 +216,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         {
             for (int k = 0; k < iorder.Length; k++) iorder[k] = k;
         }
+        Debug.Log("Create Plan3");
 
         foreach (int k in iorder)
         {
@@ -969,22 +972,35 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
     TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        var data = request.GetPayload<string>();
         switch (request.Command)
         {
             case "Initialize":
+                Debug.Log(request.Payload);
                 _settings = request.GetPayload<SpeechTest>();
+                Debug.Log("init");
                 InitializeMeasurement();
                 return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
-                Begin();
+                StartCoroutine(BeginNextFrame());
                 return TcpMessage.Ok();
             case "Abort":
-                OnAbortAction(new InputAction.CallbackContext());
+                StartCoroutine(AbortNextFrame());
                 return TcpMessage.Ok();
             default:
                 return TcpMessage.NotFound(request.Command);
         }
+    }
+
+    IEnumerator BeginNextFrame()
+    {
+        yield return null;
+        Begin();
+    }
+
+    IEnumerator AbortNextFrame()
+    {
+        yield return null;
+        OnAbortAction(new InputAction.CallbackContext());
     }
 
     void IRemoteControllable.ChangeScene(string newScene)

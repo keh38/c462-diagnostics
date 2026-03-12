@@ -44,6 +44,11 @@ namespace KLibU.Net
             return JsonConvert.DeserializeObject<TcpMessage>(json);
         }
 
+        private static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.Auto
+        };
+
         // -------------------------------------------------------------------------
         // Factory helpers — keep response construction concise at call sites
         // -------------------------------------------------------------------------
@@ -60,7 +65,7 @@ namespace KLibU.Net
             return new TcpMessage
             {
                 Code = 200,
-                Payload = JsonConvert.SerializeObject(payloadObject)
+                Payload = JsonConvert.SerializeObject(payloadObject, Settings)
             };
         }
 
@@ -96,7 +101,7 @@ namespace KLibU.Net
 
         public static TcpMessage Request(string command, object payloadObject)
         {
-            var payload = JsonConvert.SerializeObject(payloadObject);
+            var payload = JsonConvert.SerializeObject(payloadObject, Settings);
             return new TcpMessage { Command = command, Payload = payload };
         }
 
@@ -112,7 +117,7 @@ namespace KLibU.Net
         /// </summary>
         public T GetPayload<T>()
         {
-            return JsonConvert.DeserializeObject<T>(Payload);
+            return JsonConvert.DeserializeObject<T>(Payload, Settings);
         }
     }
 }

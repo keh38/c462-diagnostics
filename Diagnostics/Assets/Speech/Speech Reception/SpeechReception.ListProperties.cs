@@ -8,12 +8,14 @@ using ExtensionMethods;
 using KLib;
 using KLib.Signals.Calibration;
 using KLib.TypeConverters;
+using Newtonsoft.Json;
 using OrderedPropertyGrid;
 using Unity.VisualScripting;
 
 namespace SpeechReception
 {
     [TypeConverter(typeof(ListPropertiesConverter))]
+    [JsonObject(MemberSerialization.OptOut)]
     public class ListProperties
     {
         private static TestType _serializationTestType = TestType.OpenSet;

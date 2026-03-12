@@ -307,7 +307,6 @@ public class LDLController : MonoBehaviour, IRemoteControllable
 
     TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        var data = request.GetPayload<string>();
         switch (request.Command)
         {
             case "Initialize":
@@ -315,7 +314,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
                 InitializeMeasurement();
                 return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
-                Begin();
+                StartCoroutine(BeginNextFrame());
                 return TcpMessage.Ok();
             case "Abort":
                 EndRun(abort: true);
@@ -323,6 +322,12 @@ public class LDLController : MonoBehaviour, IRemoteControllable
             default:
                 return TcpMessage.NotFound(request.Command);
         }
+    }
+
+    IEnumerator BeginNextFrame()
+    {
+        yield return null;
+        Begin();
     }
 
     void IRemoteControllable.ChangeScene(string newScene)

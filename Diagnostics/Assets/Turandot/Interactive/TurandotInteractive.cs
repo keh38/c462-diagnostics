@@ -240,11 +240,10 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         _audioInitialized = true;
     }
 
-    private void SetParams(string data)
+    private void SetParams(InteractiveSettings settings)
     {
         try
         {
-            var settings = FileIO.XmlDeserializeFromString<InteractiveSettings>(data);
             ApplyParameters(settings);
             InitializeSliders(settings.Sliders);
             _sliderArea.SetActive(settings.ShowSliders);
@@ -311,7 +310,6 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
         Debug.Log("Turandot Interactive: " + request.Command);
-        var data = request.GetPayload<string>();
         switch (request.Command)
         {
             case "Start":
@@ -321,17 +319,21 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
                 StopStreaming();
                 return TcpMessage.Ok();
             case "SetParams":
-                SetParams(data);
+                var settings = request.GetPayload<InteractiveSettings>();
+                SetParams(settings);
                 return TcpMessage.Ok();
             case "SetProperty":
-                Debug.Log($"property: {data}");
-                SetProperty(data);
+                var propertyData = request.GetPayload<string>();
+                Debug.Log($"property: {propertyData}");
+                SetProperty(propertyData);
                 return TcpMessage.Ok();
             case "SetActive":
-                SetActive(data);
+                var activeData = request.GetPayload<string>();
+                SetActive(activeData);
                 return TcpMessage.Ok();
             case "ShowSliders":
-                _sliderArea.SetActive(data.Equals("True"));
+                var sliderData = request.GetPayload<string>();
+                _sliderArea.SetActive(sliderData.Equals("True"));
                 return TcpMessage.Ok();
             default:
                 return TcpMessage.NotFound(request.Command);

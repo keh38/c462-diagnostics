@@ -63,8 +63,11 @@ public class HardwareInterface : MonoBehaviour
 
     private void OnDestroy()
     {
-        Debug.Log("OnDestroy hardware interface");
-        _CleanUp();
+        if (_instance == this)
+        {
+            Debug.Log("OnDestroy hardware interface");
+            _CleanUp();
+        }
     }
 
     #region PRIVATE METHODS
