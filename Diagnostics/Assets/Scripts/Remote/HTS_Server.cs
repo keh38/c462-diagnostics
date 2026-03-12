@@ -321,9 +321,9 @@ public class HTS_Server : MonoBehaviour
                 _tcpListener.WriteResponse(TcpMessage.Ok(GameManager.EnumerateTransducers()));
                 break;
 
-            //case "GetAdapterMap":
-            //    _tcpListener.WriteStringAsByteArray(KLib.FileIO.XmlSerializeToString(HardwareInterface.AdapterMap));
-            //    break;
+            case "GetAdapterMap":
+                _tcpListener.WriteResponse(TcpMessage.Ok(HardwareInterface.AdapterMap));
+                break;
 
             case "GetLog":
                 KLogger.Log.FlushLog();
@@ -368,32 +368,55 @@ public class HTS_Server : MonoBehaviour
 
             case "TransferFile":
                 _tcpListener.WriteResponse(TcpMessage.Ok());
-                //ReceiveFile(data);
+                var filePayload = request.GetPayload<TransferFilePayload>();
+                ReceiveFile(filePayload);
                 break;
 
             case "RunInstaller":
                 _tcpListener.WriteResponse(TcpMessage.Ok());
-                //RunInstaller(data);
+                var data = request.GetPayload<string>();
+                RunInstaller(data);
                 break;
 
-            //case "FileExists":
-            //    _tcpListener.WriteResponse(TcpMessage.Error());
-            //    //var fullpath = Path.Combine(FileLocations.ProjectFolder, "Resources", data);
-            //    //if (File.Exists(fullpath))
-            //    //{
-            //    //    var dt = File.GetLastAccessTime(fullpath);
-            //    //    _tcpListener.WriteStringAsByteArray(FileIO.JSONSerializeToString(dt));
-            //    //}
-            //    //else
-            //    //{
-            //    //    _tcpListener.WriteStringAsByteArray("404");
-            //    //}
-            //    break;
-
-            case "ReceiveBufferedFile":
-                //ReceiveBufferedFile(data);
+            case "FileExists":
+                var filename = request.GetPayload<string>();
+                var fullpath = Path.Combine(FileLocations.ProjectFolder, "Resources", filename);
+                if (File.Exists(fullpath))
+                {
+                    var fileInfo = new FileInformationPayload()
+                    {
+                        Filename = filename,
+                        LastModified = File.GetLastAccessTime(fullpath)
+                    };
+                    _tcpListener.WriteResponse(TcpMessage.Ok(fileInfo));
+                }
+                else
+                {
+                    _tcpListener.WriteResponse(TcpMessage.NotFound(filename));
+                }
                 break;
-                
+
+            case "ReceiveFile":
+                var largeFilePayload = request.GetPayload<BufferedFilePayload>();
+                _tcpListener.WriteResponse(TcpMessage.Ok()); // signal ready
+
+                var destPath = Path.Combine(FileLocations.ProjectFolder, largeFilePayload.Filename);
+                Directory.CreateDirectory(Path.GetDirectoryName(destPath));
+
+                using (var fs = new FileStream(destPath, FileMode.Create, FileAccess.Write))
+                using (var writer = new BinaryWriter(fs))
+                {
+                    for (long k = 0; k < largeFilePayload.NumBuffers; k++)
+                    {
+                        var bytes = _tcpListener.ReadRawBytes();
+                        writer.Write(bytes);
+                    }
+                }
+
+                _tcpListener.WriteResponse(TcpMessage.Ok()); // signal complete
+                Debug.Log($"ReceiveFile complete: {largeFilePayload.Filename}");
+                break;
+
             default:
                 if (_currentScene != null)
                 {
@@ -409,17 +432,71 @@ public class HTS_Server : MonoBehaviour
         _tcpListener.CloseTcpClient();
     }
 
-    private void ReceiveFile(string data)
+    public static void SendBufferedFile(string localPath, string remoteFilename)
     {
-        var parts = data.Split(new char[] { ':' }, 3);
-        if (parts.Length != 3) return;
-        var folder = FileLocations.LocalResourceFolder(parts[0]);
+        if (instance._remoteEndPoint == null) return;
+        Task.Run(() => instance._SendBufferedFile(localPath, remoteFilename));
+    }
+
+    private void _SendBufferedFile(string localPath, string remoteFilename)
+    {
+        int bufferSize = 16384;
+        var fileInfo = new FileInfo(localPath);
+        long numBuffers = (long)Math.Ceiling((double)fileInfo.Length / bufferSize);
+
+        var client = new KTcpClient();
+        try
+        {
+            client.StartBufferedSend(_remoteEndPoint);
+
+            var payload = new BufferedFilePayload
+            {
+                Filename = remoteFilename,
+                NumBuffers = numBuffers,
+                BufferSize = bufferSize
+            };
+
+            client.WriteBuffer(System.Text.Encoding.UTF8.GetBytes(
+                TcpMessage.Request("ReceiveFile", payload).Serialize()));
+
+            var ready = client.ReadBufferedSendResponse();
+            if (!ready.IsOk)
+            {
+                Debug.Log($"ReceiveFile refused by controller: {ready.Command}");
+                return;
+            }
+
+            using (var fs = new FileStream(localPath, FileMode.Open, FileAccess.Read))
+            using (var reader = new BinaryReader(fs))
+            {
+                for (long k = 0; k < numBuffers; k++)
+                {
+                    var bytes = reader.ReadBytes(bufferSize);
+                    client.WriteBuffer(bytes);
+                }
+            }
+
+            client.ReadBufferedSendResponse(); // wait for completion acknowledgement
+            Debug.Log($"SendBufferedFile complete: {remoteFilename}");
+        }
+        catch (Exception ex)
+        {
+            Debug.Log($"SendBufferedFile error: {ex.Message}");
+        }
+        finally
+        {
+            client.EndBufferedSend();
+        }
+    }
+    private void ReceiveFile(TransferFilePayload filePayload)
+    {
+        var folder = FileLocations.LocalResourceFolder(filePayload.Folder);
         if (!Directory.Exists(folder))
         {
             Directory.CreateDirectory(folder);
         }
-        var filePath = Path.Combine(folder, parts[1]);
-        File.WriteAllText(filePath, parts[2]);
+        var filePath = Path.Combine(folder, filePayload.Filename);
+        File.WriteAllText(filePath, filePayload.Content);
     }
 
     private void ReceiveBufferedFile(string data)
@@ -465,15 +542,21 @@ public class HTS_Server : MonoBehaviour
         //File.Move(tempPath, filePath); 
     }
 
-    private void RunInstaller(string data)
+    private void RunInstaller(string filename)
     {
-        string exePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", data);
-        System.Diagnostics.Process.Start(exePath);
+        string exePath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            "Downloads", filename);
+
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = exePath,
+            Arguments = "/SILENT /NORESTART /RESTARTAPPLICATIONS"
+        });
 
 #if !UNITY_EDITOR
-        if (!Application.isEditor) System.Diagnostics.Process.GetCurrentProcess().Kill();
+    Application.Quit();
 #endif
-
     }
 
     private IPEndPoint ParseEndPoint(string address)

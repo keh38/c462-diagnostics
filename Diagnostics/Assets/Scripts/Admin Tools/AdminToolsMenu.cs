@@ -145,20 +145,23 @@ public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
         foreach (var resourceFolder in resourceFolders)
         {
             string folder = Path.Combine(Path.Combine(rootResourceFolder, resourceFolder));
+            if (!Directory.Exists(folder))
+            {
+                continue;
+            }
             var files = Directory.GetFiles(folder);
             foreach (var file in files)
             {
                 resources.Add(file.Remove(0, rootResourceFolder.Length+1));
             }
         }
-
+        Debug.Log($"{rootResourceFolder} contains {resources.Count} resources");
         return resources;
     }
 
 
     TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        var data = request.GetPayload<string>();
         switch (request.Command)
         {
             case "StartResourceSync":
@@ -170,9 +173,9 @@ public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
                 return TcpMessage.Ok();
             case "SendResourceList":
                 var fileList = EnumerateResources();
-                HTS_Server.SendRequest("FileSync", $"ReceiveFileList:{FileIO.JSONSerializeToString(fileList)}");
-                return TcpMessage.Ok();
+                return TcpMessage.Ok(fileList);
             case "DeleteFile":
+                var data = request.GetPayload<string>();
                 var fullpath = Path.Combine(FileLocations.ProjectFolder, "Resources", data);
                 File.Delete(fullpath);
                 return TcpMessage.Ok();
