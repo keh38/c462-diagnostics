@@ -272,11 +272,7 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "GetCurrentSceneName":
-                _tcpListener.WriteStringAsByteArray(_currentSceneName);
-                break;
-
-            case "GetVersionNumber":
-                _tcpListener.WriteStringAsByteArray(Application.version);
+                _tcpListener.WriteResponse(TcpMessage.Ok(_currentSceneName));
                 break;
 
             case "GetSubjectInfo":
@@ -488,6 +484,7 @@ public class HTS_Server : MonoBehaviour
             client.EndBufferedSend();
         }
     }
+
     private void ReceiveFile(TransferFilePayload filePayload)
     {
         var folder = FileLocations.LocalResourceFolder(filePayload.Folder);
@@ -497,49 +494,6 @@ public class HTS_Server : MonoBehaviour
         }
         var filePath = Path.Combine(folder, filePayload.Filename);
         File.WriteAllText(filePath, filePayload.Content);
-    }
-
-    private void ReceiveBufferedFile(string data)
-    {
-        //var parts = data.Split(new char[] { ':' }, 3);
-        //if (parts.Length != 3)
-        //{
-        //    _tcpListener.SendAcknowledgement(false);
-        //    return;
-        //}
- 
-        //int bufferSize = int.Parse(parts[1]);
-        //int numBuffers = int.Parse(parts[2]);
-
-        //var filePath = Path.Combine(FileLocations.ProjectFolder, "Resources", parts[0]);
-        //if (parts[0].StartsWith("Downloads"))
-        //{
-        //    filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), parts[0]);
-        //}
-        //var tempPath = Path.GetTempFileName();
-
-        //_tcpListener.SendAcknowledgement();
-
-        //using (FileStream fs = new FileStream(tempPath, FileMode.Create, FileAccess.Write))
-        //using (BinaryWriter bw = new BinaryWriter(fs))
-        //{
-        //    for (int k = 0; k < numBuffers; k++)
-        //    {
-        //        var bytes = _tcpListener.ReadByteArray();
-        //        bw.Write(bytes);
-
-        //        _tcpListener.SendAcknowledgement();
-        //    }
-
-        //    bw.Close();
-        //    fs.Close();
-        //}
-
-        //if (File.Exists(filePath))
-        //{
-        //    File.Delete(filePath);
-        //}
-        //File.Move(tempPath, filePath); 
     }
 
     private void RunInstaller(string filename)

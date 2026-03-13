@@ -1000,7 +1000,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         switch (request.Command)
         {
             case "SetScriptArguments":
-                //RpcSetScriptArguments(data);
+                _scriptArguments = request.GetPayload<ScriptArguments>();
                 return TcpMessage.Ok();
             case "SetParams":
                 var turandotParams = request.GetPayload<Parameters>();
@@ -1013,10 +1013,11 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
                 StartCoroutine(AbortNextFrame());
                 return TcpMessage.Ok();
             case "ShowInstructions":
-                //RpcShowInstructions(data);
+                StartCoroutine(InstructionsNextFrame());
                 return TcpMessage.Ok();
             case "ShowState":
-                //RpcShowState(data);
+                string stateName = request.GetPayload<string>();
+                StartCoroutine(StateNextFrame(stateName));
                 return TcpMessage.Ok();
             default:
                 return TcpMessage.NotFound(request.Command);
@@ -1035,9 +1036,16 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         RpcAbort();
     }
 
-    public void RpcSetScriptArguments(string json)
+    IEnumerator InstructionsNextFrame()
     {
-        _scriptArguments = FileIO.JSONDeserializeFromString<ScriptArguments>(json);
+        yield return null;
+        RpcShowInstructions();
+    }
+
+    IEnumerator StateNextFrame(string stateName)
+    {
+        yield return null;
+        RpcShowState(stateName);
     }
 
     public void RpcSetParameters(Parameters turandotParams)
@@ -1054,7 +1062,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         ApplyParameters();
     }
 
-    private void RpcShowInstructions(string stateName)
+    private void RpcShowInstructions()
     {
         if (!string.IsNullOrEmpty(_params.instructions.Text))
         {
