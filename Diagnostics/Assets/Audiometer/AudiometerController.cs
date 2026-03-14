@@ -246,21 +246,25 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
 
     TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        var data = request.GetPayload<string>();
         switch (request.Command)
         {
             case "Initialize":
-                _settings = FileIO.JSONDeserializeFromString<AudiometerSettings>(data);
+                Debug.Log(request.Payload);
+                Debug.Log(KLib.FileIO.JSONSerializeToString(new AudiometerSettings()));
+                _settings = request.GetPayload<AudiometerSettings>();
                 InitializeStimulusGeneration();
                 return TcpMessage.Ok();
             case "Channel":
+                var data = request.GetPayload<string>();
                 UpdateChannel(data);
                 return TcpMessage.Ok();
             case "Pulsed":
-                UpdatePulsedChannelIndex(data);
+                var chanStr = request.GetPayload<string>();
+                UpdatePulsedChannelIndex(chanStr);
                 return TcpMessage.Ok();
             case "SetDuration":
-                SetDuration(data);
+                var durStr = request.GetPayload<string>();
+                SetDuration(durStr);
                 return TcpMessage.Ok();
             case "Pulse":
                 Pulse();

@@ -109,6 +109,7 @@ namespace KLibU.Net
         // Convenience
         // -------------------------------------------------------------------------
 
+        [JsonIgnore]
         public bool IsOk => Code == 200;
 
         /// <summary>
