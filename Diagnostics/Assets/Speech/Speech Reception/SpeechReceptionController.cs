@@ -14,6 +14,8 @@ using SpeechReception;
 using UnityEngine.Networking;
 using HTS.Unity.Tcp;
 
+using KLib.Expressions;
+
 public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 {
     [Header("UI Elements")]
@@ -539,7 +541,8 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         float delay_s = 0;
         if (_settings.MaxDelay_s > 0)
         {
-            delay_s = Expressions.UniformRandomNumber(_settings.MinDelay_s, _settings.MaxDelay_s);
+
+            delay_s = UnityEngine.Random.Range(_settings.MinDelay_s, _settings.MaxDelay_s);
             yield return new WaitForSeconds(delay_s);
         }
 

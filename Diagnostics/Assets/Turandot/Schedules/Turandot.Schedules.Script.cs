@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using KLib.Signals;
 using KLib;
+using KLib.Expressions;
 using KLib.TypeConverters;
 using OrderedPropertyGrid;
 using Unity.VisualScripting;

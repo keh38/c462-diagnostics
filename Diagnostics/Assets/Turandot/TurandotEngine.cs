@@ -13,6 +13,8 @@ using Turandot.Scripts;
 using System.Xml;
 using UnityEngine.Rendering;
 
+using KLib.Expressions;
+
 public class TurandotEngine : MonoBehaviour
 {
     [SerializeField] private TurandotCueController _cueController;
@@ -380,7 +382,7 @@ public class TurandotEngine : MonoBehaviour
             var lhs = parts[0].Trim();
 
             var rhs = parts[1].Replace(";", "");
-            if (KLib.Expressions.TryEvaluateScalar(rhs, out float value))
+            if (Expressions.TryEvaluateScalar(rhs, out float value))
             {
                 var rx = new Regex(lhs + @"=\[([\d\.,]+)\]");
                 var m = rx.Match(previous);
@@ -441,7 +443,7 @@ public class TurandotEngine : MonoBehaviour
 
             if (orExpr.Length == 2)
             {
-                _params.OrFlag(orExpr[0].Trim(), KLib.Expressions.EvaluateToIntScalar(orExpr[1]));
+                _params.OrFlag(orExpr[0].Trim(), Expressions.EvaluateToIntScalar(orExpr[1]));
             }
             else
             {
@@ -462,7 +464,7 @@ public class TurandotEngine : MonoBehaviour
                     }
                     else
                     {
-                        _params.SetFlag(exprParts[0].Trim(), KLib.Expressions.EvaluateToIntScalar(ExpandSignalExpression(rh)));
+                        _params.SetFlag(exprParts[0].Trim(), Expressions.EvaluateToIntScalar(ExpandSignalExpression(rh)));
                     }
                 }
                 else if (e.Substring(e.Length - 2, 2) == "++")

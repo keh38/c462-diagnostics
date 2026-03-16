@@ -8,6 +8,8 @@ using ProtoBuf;
 
 using ExtensionMethods;
 
+using KLib.Expressions;
+
 namespace Turandot
 {
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
@@ -42,7 +44,7 @@ namespace Turandot
         public void Initialize()
         {
             _sequenced = false;
-            _value = KLib.Expressions.Evaluate(expr).GetRandom();
+            _value = Expressions.Evaluate(expr).GetRandom();
         }
 
         [XmlIgnore]
@@ -53,7 +55,7 @@ namespace Turandot
             {
                 if (!_sequenced)
                 {
-                    _value = KLib.Expressions.Evaluate(expr).GetRandom();
+                    _value = Expressions.Evaluate(expr).GetRandom();
                 }
 
                 return _value;
