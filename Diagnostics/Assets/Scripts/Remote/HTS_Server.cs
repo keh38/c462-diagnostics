@@ -328,6 +328,11 @@ public class HTS_Server : MonoBehaviour
                 ReceiveFile(data);
                 break;
 
+            case "TransferAudiogram":
+                _listener.SendAcknowledgement();
+                ReceiveAudiogram(data);
+                break;
+
             case "RunInstaller":
                 _listener.SendAcknowledgement();
                 RunInstaller(data);
@@ -369,6 +374,15 @@ public class HTS_Server : MonoBehaviour
         }
         var filePath = Path.Combine(folder, parts[1]);
         File.WriteAllText(filePath, parts[2]);
+    }
+
+    private void ReceiveAudiogram(string data)
+    {
+        var parts = data.Split(new char[] { ':' }, 2);
+        if (parts.Length != 2) return;
+        var folder = FileLocations.SubjectMetaFolder;
+        var filePath = Path.Combine(folder, parts[0]);
+        File.WriteAllText(filePath, parts[1]);
     }
 
     private void ReceiveBufferedFile(string data)

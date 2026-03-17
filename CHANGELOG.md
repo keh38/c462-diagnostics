@@ -1,5 +1,11 @@
 ## Changelog
 
+### v1.13 (unreleased)
+#### Added
+- ability to receive audiogram data from manual audiometer
+
+---
+
 ### v1.12 (2026-03-03)
 #### Fixed
 - Digits test: 
