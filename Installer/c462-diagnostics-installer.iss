@@ -2,7 +2,7 @@
 
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING .ISS SCRIPT FILES!
 #define SemanticVersion() \
-   GetVersionComponents("..\Launcher\Launcher\bin\Release\net8.0-windows\HTSLauncher.exe", Local[0], Local[1], Local[2], Local[3]), \
+   GetVersionComponents("..\Launcher\Launcher\bin\x64\Release\net8.0-windows\HTSLauncher.exe", Local[0], Local[1], Local[2], Local[3]), \
    Str(Local[0]) + "." + Str(Local[1]) + ((Local[2]>0) ? "." + Str(Local[2]) : "")
     
 #define verStr_ StringChange(SemanticVersion(), '.', '-')
