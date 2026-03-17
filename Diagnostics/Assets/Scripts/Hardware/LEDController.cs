@@ -15,11 +15,14 @@ public class LEDController : MonoBehaviour
 
     public bool IsInitialized { get; private set; }
 
+    public KLib.LEDType LEDType { get; private set; }
+
     public bool Initialize(string comPort, KLib.LEDType ledType, int numPixels, float gamma)
     {
         bool success = false;
 
         _gamma = gamma;
+        LEDType = ledType;
 
         _serialPort = new SerialPort();
         _serialPort.PortName = comPort;
@@ -188,7 +191,16 @@ public class LEDController : MonoBehaviour
 
     public bool SetColorDynamically(int intensity)
     {
-        //return SetColorDynamically(intensity, intensity, intensity, intensity);
+        return SetColorDynamically(intensity, intensity, intensity, intensity);
+    }
+
+    public bool SetWhiteDynamically(float intensity)
+    {
+        return SetWhiteDynamically(ApplyGamma(intensity));
+    }
+
+    public bool SetWhiteDynamically(int intensity)
+    {
         return SetColorDynamically(0, 0, 0, intensity);
     }
 

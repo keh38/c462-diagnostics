@@ -26,7 +26,7 @@ RestartApplications=yes
 [Files]
 Source: "..\Diagnostics\Build\*.*"; DestDir: "{app}"; Flags: replacesameversion recursesubdirs;
 Source: ".\Dependencies\Mono\*.*"; DestDir: "{app}"; Flags: replacesameversion;
-Source: "..\Launcher\Launcher\bin\Release\net8.0-windows\*.*"; DestDir: "{app}\Launcher"; Flags: replacesameversion recursesubdirs;
+Source: "..\Launcher\Launcher\bin\x64\Release\net8.0-windows\*.*"; DestDir: "{app}\Launcher"; Flags: replacesameversion recursesubdirs;
 Source: "..\CHANGELOG.md"; DestDir: "{app}"; Flags: replacesameversion;
 
 [Icons]

@@ -127,11 +127,19 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 
         if (_useLEDs)
         {
-            HardwareInterface.LED.SetColorDynamically(ledIntensity);
+            if (HardwareInterface.LED.LEDType == KLib.LEDType.RGBW)
+            {
+                HardwareInterface.LED.SetWhiteDynamically(ledIntensity);
+            }
+            else
+            {
+                HardwareInterface.LED.SetColorDynamically(ledIntensity);
+            }
             if (_curTime > _nextColorUpdate)
             {
                 _nextColorUpdate += 0.5f;
-                HTS_Server.SendRequest("ChangedLEDColors", $"0,0,0,{Math.Max(0.01f, ledIntensity)}");
+                var istr = Math.Max(0.01f, ledIntensity).ToString("0.000");
+                HTS_Server.SendRequest("ChangedLEDColors", $"{istr},{istr},{istr},{istr}");
             }
         }
 
