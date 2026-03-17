@@ -1,6 +1,6 @@
 ## Changelog
 
-### v1.13 (unreleased)
+### v1.13 (2026-03-17)
 #### Added
 - ability to receive audiogram data from manual audiometer
 #### Changed
