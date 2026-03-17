@@ -12,6 +12,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using KLib;
+
 namespace Launcher
 {
     public partial class LEDTestForm : Form
@@ -20,6 +22,7 @@ namespace Launcher
         string _comPort;
         int _baudRate;
         float _gamma;
+        LEDType _ledType;
 
         SerialPort _serialPort;
 
@@ -30,12 +33,13 @@ namespace Launcher
         int _blue;
         int _white;
 
-        public LEDTestForm(string comPort, int baudRate, int numPixels, float gamma)
+        public LEDTestForm(string comPort, int baudRate, LEDType ledType, int numPixels, float gamma)
         {
             InitializeComponent();
 
             _comPort = comPort;
             _baudRate = baudRate;
+            _ledType = ledType;
             _numPixels = numPixels;
             _gamma = gamma;
         }
@@ -56,7 +60,7 @@ namespace Launcher
                 return;
             }
 
-            SetNumPixels(_numPixels);
+            SetNumPixels(_ledType, _numPixels);
             GetColor();
         }
         private void LEDTestForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -111,7 +115,7 @@ namespace Launcher
             catch { }
         }
 
-        private void SetNumPixels(int numPixels)
+        private void SetNumPixels(LEDType ledType, int numPixels)
         {
             if (_serialPort == null) return;
 
@@ -119,6 +123,7 @@ namespace Launcher
 
             try
             {
+                _serialPort.Write($"setledtype {ledType.ToString()}\n");
                 _serialPort.Write($"setnumpixels {numPixels}\n");
                 string response = _serialPort.ReadLine();
                 success = response.Equals("OK");

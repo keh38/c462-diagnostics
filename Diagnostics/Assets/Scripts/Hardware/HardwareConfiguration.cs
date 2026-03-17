@@ -2,12 +2,15 @@
 
 namespace KLib
 {
+    public enum LEDType { RGBW, RGB }
+
     public class HardwareConfiguration
     {
         public string CurrentAdapterMap { set; get; }
         public List<AdapterMap> AdapterMaps { set; get; }
         public string SyncComPort { set; get; }
         public string LEDComPort { set; get; }
+        public LEDType LEDType { set; get; }
         public float LEDGamma { get; set; }
         public int NumPixels { get; set; }
         public int ScreenBrightness { set; get; }
@@ -31,6 +34,7 @@ namespace KLib
             config.CurrentAdapterMap = config.AdapterMaps[0].Name;
             config.SyncComPort = "";
             config.LEDComPort = "";
+            config.LEDType = LEDType.RGBW;
             config.LEDGamma = 2.8f;
             config.ScreenBrightness = -1;
             config.RunWindowed = false;

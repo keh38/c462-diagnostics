@@ -56,6 +56,7 @@ namespace Launcher
             FillLEDComPortDropDown();
 
             _ignoreEvents = true;
+            ledComPortDropDown.SelectedIndex = (int)_config.LEDType;
             numPixelsNumeric.IntValue = _config.NumPixels;
             gammaNumeric.FloatValue = _config.LEDGamma;
             brightnessNumeric.IntValue = _config.ScreenBrightness;
@@ -498,6 +499,15 @@ namespace Launcher
             {
                 _config.NumPixels = numPixelsNumeric.IntValue;
             }
+        }
+
+        private void ledTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!_ignoreEvents)
+            {
+                _config.LEDType = (LEDType)ledComPortDropDown.SelectedIndex;
+            }
+
         }
     }
 }

@@ -59,6 +59,7 @@
             label6 = new System.Windows.Forms.Label();
             label7 = new System.Windows.Forms.Label();
             numPixelsNumeric = new KLib.Controls.KNumericBox();
+            ledTypeComboBox = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)dataGridView).BeginInit();
             SuspendLayout();
             // 
@@ -450,11 +451,24 @@
             numPixelsNumeric.Value = 8D;
             numPixelsNumeric.ValueChanged += numPixelsNumeric_ValueChanged;
             // 
+            // ledTypeComboBox
+            // 
+            ledTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            ledTypeComboBox.FormattingEnabled = true;
+            ledTypeComboBox.Items.AddRange(new object[] { "RGBW", "RGB" });
+            ledTypeComboBox.Location = new System.Drawing.Point(512, 478);
+            ledTypeComboBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            ledTypeComboBox.Name = "ledTypeComboBox";
+            ledTypeComboBox.Size = new System.Drawing.Size(64, 23);
+            ledTypeComboBox.TabIndex = 24;
+            ledTypeComboBox.SelectedIndexChanged += ledTypeComboBox_SelectedIndexChanged;
+            // 
             // ConfigForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(613, 661);
+            Controls.Add(ledTypeComboBox);
             Controls.Add(label7);
             Controls.Add(numPixelsNumeric);
             Controls.Add(label6);
@@ -522,5 +536,6 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
         private KLib.Controls.KNumericBox numPixelsNumeric;
+        private System.Windows.Forms.ComboBox ledTypeComboBox;
     }
 }
