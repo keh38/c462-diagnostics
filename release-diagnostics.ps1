@@ -8,12 +8,16 @@ $ErrorActionPreference = "Stop"
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
 
 # --- Configuration -----------------------------------------------------------
-$Version        = "2.0"
+$Version        = "2.0.1"
+# Pad to exactly 4 parts for AssemblyVersion / FileVersion
+$vParts          = $Version.Split('.')
+$AssemblyVersion = ($vParts + @('0','0','0'))[ 0..3 ] -join '.'
+$VersionDashed  = $Version -replace '\.', '-'
 $RepoRoot       = "D:\Development\C462\c462-diagnostics"
 $CsprojFile     = "$RepoRoot\Launcher\Launcher\Launcher.csproj"
 $Changelog      = "$RepoRoot\CHANGELOG.md"
 $SolutionFile   = "$RepoRoot\Launcher\Launcher.sln"
-$InstallerPath  = "$RepoRoot\Installer\Output\Hearing_Test_Suite_2-0.exe"
+$InstallerPath  = "$RepoRoot\Installer\Output\Hearing_Test_Suite_$VersionDashed.exe"
 $ReleaseDate    = (Get-Date -Format "yyyy-MM-dd")
 $CommitMessage  = "Built $Version"
 $TagName        = $Version
@@ -29,8 +33,8 @@ Step "Updating Launcher.csproj to version $Version"
 
 $csproj = Get-Content $CsprojFile -Raw
 $csproj = $csproj -replace '<Version>[^<]*</Version>',         "<Version>$Version</Version>"
-$csproj = $csproj -replace '<AssemblyVersion>[^<]*</AssemblyVersion>', "<AssemblyVersion>$Version.0.0</AssemblyVersion>"
-$csproj = $csproj -replace '<FileVersion>[^<]*</FileVersion>', "<FileVersion>$Version.0.0</FileVersion>"
+$csproj = $csproj -replace '<AssemblyVersion>[^<]*</AssemblyVersion>', "<AssemblyVersion>$AssemblyVersion</AssemblyVersion>"
+$csproj = $csproj -replace '<FileVersion>[^<]*</FileVersion>',         "<FileVersion>$AssemblyVersion</FileVersion>"
 Set-Content $CsprojFile $csproj -NoNewline
 Write-Host "Done."
 
