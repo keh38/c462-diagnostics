@@ -124,8 +124,13 @@ namespace Launcher
             try
             {
                 _serialPort.Write($"setledtype {ledType.ToString()}\n");
-                _serialPort.Write($"setnumpixels {numPixels}\n");
                 string response = _serialPort.ReadLine();
+
+                if (response.Equals("OK"))
+                { 
+                    _serialPort.Write($"setnumpixels {numPixels}\n");
+                    response = _serialPort.ReadLine();
+                }
                 success = response.Equals("OK");
             }
             catch { }

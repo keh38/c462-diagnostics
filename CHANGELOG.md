@@ -1,5 +1,11 @@
 ## Changelog
 
+### v2.0.1 (unreleased)
+#### Changed
+- added support for RGB LEDs
+
+---
+
 ### v2.0 (2026-03-17)
 #### Changed
 - updated discovery/message system
