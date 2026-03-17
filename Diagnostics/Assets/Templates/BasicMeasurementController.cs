@@ -10,6 +10,7 @@ using UnityEngine.UI;
 
 using Audiograms;
 using KLib;
+using KLibU.Net;
 
 using BasicMeasurements;
 
@@ -80,7 +81,7 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
     {
         InitDataFile();
 
-        HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
+        HTS_Server.SendRequest(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
     }
 
     void InitDataFile()
@@ -128,7 +129,7 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
                 _settings.InstructionMarkdown = _defaultInstructions.text;
             }
 
-            HTS_Server.SendMessage(_mySceneName, "Status:Instructions");
+            HTS_Server.SendRequest(_mySceneName, "Status:Instructions");
             ShowInstructions(
                 instructions: _settings.InstructionMarkdown,
                 fontSize: _settings.InstructionFontSize);
@@ -189,8 +190,8 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
         _workPanel.SetActive(false);
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
-        HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
-        HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+        HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
+        HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
 
         if (_localAbort)
         {
@@ -243,7 +244,7 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
             error = "An exception occurred";
         }
 
-        HTS_Server.SendMessage(_mySceneName, $"Error:{error}");
+        HTS_Server.SendRequest(_mySceneName, $"Error:{error}");
         Debug.Log($"[{_mySceneName} error]: {error}{Environment.NewLine}{stackTrace}");
 
         if (!_isRemote)
@@ -252,26 +253,29 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
         }
     }
 
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        switch (command)
+        var data = request.GetPayload<string>();
+        switch (request.Command)
         {
             case "Initialize":
                 _settings = FileIO.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as AudiogramMeasurementSettings;
                 InitializeMeasurement();
-                break;
+                return TcpMessage.Ok();
             case "StartSynchronizing":
                 HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                break;
+                return TcpMessage.Ok();
             case "StopSynchronizing":
                 HardwareInterface.ClockSync.StopSynchronizing();
-                break;
+                return TcpMessage.Ok();
             case "Begin":
                 Begin();
-                break;
+                return TcpMessage.Ok();
             case "Abort":
                 _stopMeasurement = true;
-                break;
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
     }
 

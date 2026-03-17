@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using ProtoBuf;
 
-using KLib;
+using KLib.Expressions;
 using ExtensionMethods;
 
 namespace Turandot.Schedules
@@ -89,7 +89,7 @@ namespace Turandot.Schedules
             }
 
             _values = Expressions.Evaluate(expr);
-
+            Debug.Log($"expr = {expr}");
             return _values.Length;
         }
 
@@ -98,11 +98,11 @@ namespace Turandot.Schedules
             if (Expressions.ContainsPDF(expression))
             {
                 _values = new float[N];
-                for (int k = 0; k < N; k++) _values[k] = Expressions.EvaluateToFloatScalar(expression);
+                for (int k = 0; k < N; k++) _values[k] = Expressions.EvaluateRandomElement(expression);
             }
             else
             {
-                Debug.Log($"expression = {expression}");
+                //Debug.Log($"expression = {expression}");
                 _values = Expressions.Evaluate(expression);
             }
 

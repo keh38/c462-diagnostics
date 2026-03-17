@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 using KLib;
+using KLibU.Net;
 using Pupillometry;
 
 public class GazeCalibration : MonoBehaviour, IRemoteControllable
@@ -66,7 +67,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
             string json = FileIO.JSONStringAdd("", "info", KLib.FileIO.JSONSerializeToString(header));
             File.WriteAllText(_dataPath, json);
 
-            HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
+            HTS_Server.SendRequest(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
         }
         catch (Exception ex)
         {
@@ -103,7 +104,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
         //if (!_finished && (Input.GetButtonDown("XboxA") || Input.GetMouseButtonDown(0) || Input.GetKeyDown(_settings.keyCode)))
         if (_isRunning && (Input.GetMouseButtonDown(0) || Input.GetKeyDown(_settings.KeyCode)))
         {
-            HTS_Server.SendMessage("Gaze Calibration", "Response");
+            HTS_Server.SendRequest("Gaze Calibration", "Response");
             //_canRespond = false;
 
             if (_numAcquired == _numTargets)
@@ -111,7 +112,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
                 _numAcquired++;
                 _target.gameObject.SetActive(false);
                 _isRunning = false;
-                HTS_Server.SendMessage("Gaze Calibration", "GazeCalibrationFinished");
+                HTS_Server.SendRequest("Gaze Calibration", "GazeCalibrationFinished");
             }
         }
     }
@@ -120,7 +121,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
     {
         _data.Trim();
         File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
-        HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+        HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
     }
 
     void SendSyncLog()
@@ -128,7 +129,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
         var logPath = HardwareInterface.ClockSync.LogFile;
         if (!string.IsNullOrEmpty(logPath))
         {
-            HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
+            HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
         }
     }
 
@@ -137,36 +138,39 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
         SceneManager.LoadScene(newScene);
     }
 
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        switch (command)
+        var data = request.GetPayload<string>();
+        switch (request.Command)
         {
             case "Initialize":
                 Initialize(data);
-                break;
+                return TcpMessage.Ok();
             case "StartSynchronizing":
                 HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                break;
+                return TcpMessage.Ok();
             case "StopSynchronizing":
                 HardwareInterface.ClockSync.StopSynchronizing();
-                break;
+                return TcpMessage.Ok();
             case "Abort":
                 _isRunning = false;
                 _target.gameObject.SetActive(false);
-                break;
+                return TcpMessage.Ok();
             case "SendData":
                 SendData();
-                break;
+                return TcpMessage.Ok();
             case "SendSyncLog":
                 SendSyncLog();
-                break;
+                return TcpMessage.Ok();
             case "Location":
                 var parts = data.Split(',');
                 int x = int.Parse(parts[0]);
                 int y = int.Parse(parts[1]);
                 _canRespond = true;
                 ShowTarget(x, y);
-                break;
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
 
     }

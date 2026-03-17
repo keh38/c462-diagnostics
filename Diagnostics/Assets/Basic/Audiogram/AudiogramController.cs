@@ -12,12 +12,15 @@ using UnityEngine.UI;
 
 using Audiograms;
 using KLib;
+using KLibU.Net;
 using KLib.Signals;
 using KLib.Signals.Enumerations;
 using KLib.Signals.Waveforms;
 
 using BasicMeasurements;
 using Newtonsoft.Json;
+using HTS.Unity.Tcp;
+using Unity.VisualScripting;
 
 public class AudiogramController : MonoBehaviour, IRemoteControllable
 {
@@ -170,8 +173,6 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         _progressBar.value = 0;
 
         InitializeStimulusGeneration();
-
-        HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
     }
 
     void InitDataFile()
@@ -216,7 +217,8 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             }
 
             _sceneState = SceneState.Instructions;
-            HTS_Server.SendMessage(_mySceneName, "Status:Instructions");
+            HTS_Server.SendRequest(_mySceneName, "Status:Instructions");
+
             _instructionPanel.InstructionsFinished = StartMeasurement;
             ShowInstructions(
                 instructions: _settings.InstructionMarkdown,
@@ -334,8 +336,14 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         _sceneState = SceneState.Done;
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
-        HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
-        HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
+
+        HTS_Server.SendRequest("ReceiveData", _mySceneName, new TextFilePayload
+        {
+            Filename = Path.GetFileName(_dataPath),
+            Content = File.ReadAllText(_dataPath)
+        });
+
+        HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
 
         if (_localAbort)
         {
@@ -365,29 +373,31 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         SceneManager.LoadScene("Home");
     }
 
-
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        switch (command)
+        switch (request.Command)
         {
             case "Initialize":
                 _configName = "remote";
-                _settings = FileIO.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as AudiogramMeasurementSettings;
+                _settings = request.GetPayload<AudiogramMeasurementSettings>();
                 InitializeMeasurement();
-                break;
-            case "StartSynchronizing":
-                HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                break;
-            case "StopSynchronizing":
-                HardwareInterface.ClockSync.StopSynchronizing();
-                break;
+                return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
+                StartCoroutine(BeginNextFrame());
                 Begin();
-                break;
+                return TcpMessage.Ok();
             case "Abort":
                 _stopMeasurement = true;
-                break;
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
+    }
+
+    IEnumerator BeginNextFrame()
+    {
+        yield return null;
+        Begin();
     }
 
     void IRemoteControllable.ChangeScene(string newScene)
@@ -412,7 +422,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
     private void AdvanceMeasurement()
     {
         _progressBar.value = _state.NumCompleted;
-        HTS_Server.SendMessage(_mySceneName, $"Progress:{_state.PercentComplete}");
+        HTS_Server.SendRequest(_mySceneName, $"Progress:{_state.PercentComplete}");
 
         _currentStimulusCondition = _state.GetNext();
 
@@ -423,7 +433,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         }
 
         string logMessage = $"Status:{_currentStimulusCondition.Laterality} ear, {_currentStimulusCondition.Frequency} Hz";
-        HTS_Server.SendMessage(_mySceneName, logMessage);
+        HTS_Server.SendRequest(_mySceneName, logMessage);
         Debug.Log(logMessage);
 
         if (_currentStimulusCondition.NewFrequency && _settings.ShowNewFrequencyMessage)
@@ -958,7 +968,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             error = "An exception occurred";
         }
 
-        HTS_Server.SendMessage(_mySceneName, $"Error:{error}");
+        HTS_Server.SendRequest(_mySceneName, $"Error:{error}");
         Debug.Log($"[{_mySceneName} error]: {error}{Environment.NewLine}{stackTrace}");
 
         if (!_isRemote)

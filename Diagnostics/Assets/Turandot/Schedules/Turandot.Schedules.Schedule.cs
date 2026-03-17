@@ -25,9 +25,7 @@ namespace Turandot.Schedules
         public string breakInstructions = "";
         public int maxPracticeBlocks = -1;
 
-        public Schedule()
-        {
-        }
+        public Schedule() { }
 
         public void AppendNewStimConList(StimConList sclIn, int numNewBlocks)
         {
@@ -60,7 +58,7 @@ namespace Turandot.Schedules
 
             foreach (Family f in families)
             {
-                sclByFamily.Add(f.CreateStimConList(mode, numBlocks, !string.IsNullOrEmpty(decisionState)));
+                sclByFamily.Add(f.CreateStimConList(mode, numBlocks, hasDecisionState: !string.IsNullOrEmpty(decisionState)));
             }
 
             switch (order)

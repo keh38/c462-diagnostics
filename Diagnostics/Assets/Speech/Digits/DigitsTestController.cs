@@ -10,10 +10,13 @@ using UnityEngine.UI;
 
 using Audiograms;
 using KLib;
+using KLib.Expressions;
+using KLibU.Net;
 
 using BasicMeasurements;
 using DigitsTest;
 using Digits;
+using HTS.Unity.Tcp;
 
 public class DigitsTestController : MonoBehaviour, IRemoteControllable
 {
@@ -123,7 +126,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
             if (HardwareInterface.LED.IsInitialized)
             {
                 HardwareInterface.LED.SetColorFromString(GameManager.LEDColorString);
-                HTS_Server.SendMessage("ChangedLEDColors", GameManager.LEDColorString);
+                HTS_Server.SendRequest("ChangedLEDColors", GameManager.LEDColorString);
             }
         }
     }
@@ -138,8 +141,6 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
 
         _progressBar.maxValue = _status.plan.Count;
         _progressBar.value = 0;
-
-        HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
     }
 
     void InitDataFile()
@@ -164,20 +165,20 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         if (yes)
         {
             Debug.Log($"{_mySceneName}: Resuming previous");
-            HTS_Server.SendMessage(_mySceneName, "Status:Resuming previous");
+            HTS_Server.SendRequest(_mySceneName, "Status:Resuming previous");
 
             _status = TestStatus.RestoreSavedState();
 
-            HTS_Server.SendMessage(_mySceneName, $"Progress:{_status.PercentComplete}");
+            HTS_Server.SendRequest(_mySceneName, $"Progress:{_status.PercentComplete}");
 
             StartMeasurement();
         }
         else
         {
             Debug.Log($"{_mySceneName}: starting test over");
-            HTS_Server.SendMessage(_mySceneName, "Status:Starting test over");
+            HTS_Server.SendRequest(_mySceneName, "Status:Starting test over");
 
-            HTS_Server.SendMessage(_mySceneName, "Status:Instructions");
+            HTS_Server.SendRequest(_mySceneName, "Status:Instructions");
             ShowInstructions(Instructions.Intro);
         }
     }
@@ -200,7 +201,11 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         var filepath = _dataPath.Replace(".json", $"-{_data.name}.json");
         File.WriteAllText(filepath, json);
 
-        HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(filepath)}:{File.ReadAllText(filepath)}");
+        HTS_Server.SendRequest("ReceiveData", _mySceneName, new TextFilePayload
+        {
+            Filename = Path.GetFileName(filepath),
+            Content = File.ReadAllText(filepath)
+        });
     }
 
     private void CreatePlan()
@@ -312,14 +317,14 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         if (_status.IsRunInProgress())
         {
             Debug.Log($"{_mySceneName}: Previous state exists. Asking whether to resume");
-            HTS_Server.SendMessage(_mySceneName, "Status:Asking to resume");
+            HTS_Server.SendRequest(_mySceneName, "Status:Asking to resume");
 
             _questionBox.gameObject.SetActive(true);
             _questionBox.PoseQuestion("Continue previous session?", OnQuestionResponse);
         }
         else
         {
-            HTS_Server.SendMessage(_mySceneName, "Status:Instructions");
+            HTS_Server.SendRequest(_mySceneName, "Status:Instructions");
             ShowInstructions(Instructions.Intro);
         }
     }
@@ -335,7 +340,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         _status.blockNum = 0;
         _status.Save();
 
-        HTS_Server.SendMessage(_mySceneName, $"Status:{_data.name}");
+        HTS_Server.SendRequest(_mySceneName, $"Status:{_data.name}");
 
         _log.Clear();
 
@@ -550,7 +555,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
             _status.Save();
 
             _progressBar.value = _status.testNum;
-            HTS_Server.SendMessage(_mySceneName, $"Progress:{_status.PercentComplete}");
+            HTS_Server.SendRequest(_mySceneName, $"Progress:{_status.PercentComplete}");
 
             if (_status.testNum == 1)
             {
@@ -695,7 +700,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         _workPanel.SetActive(false);
 
         string _status = abort ? "Measurement aborted" : "Measurement finished";
-        HTS_Server.SendMessage(_mySceneName, $"Finished:{_status}");
+        HTS_Server.SendRequest(_mySceneName, $"Finished:{_status}");
 
         if (_localAbort)
         {
@@ -725,27 +730,29 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         SceneManager.LoadScene("Home");
     }
 
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        switch (command)
+        switch (request.Command)
         {
             case "Initialize":
-                _settings = FileIO.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as DigitsTestSettings;
+                _settings = request.GetPayload<DigitsTestSettings>();
                 InitializeMeasurement();
-                break;
-            case "StartSynchronizing":
-                HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                break;
-            case "StopSynchronizing":
-                HardwareInterface.ClockSync.StopSynchronizing();
-                break;
+                return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
-                Begin();
-                break;
+                StartCoroutine(BeginNextFrame());
+                return TcpMessage.Ok();
             case "Abort":
                 _stopMeasurement = true;
-                break;
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
+    }
+
+    IEnumerator BeginNextFrame()
+    {
+        yield return null;
+        Begin();
     }
 
     void IRemoteControllable.ChangeScene(string newScene)
@@ -776,7 +783,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
             error = "An exception occurred";
         }
 
-        HTS_Server.SendMessage(_mySceneName, $"Error:{error}");
+        HTS_Server.SendRequest(_mySceneName, $"Error:{error}");
         Debug.Log($"[{_mySceneName} error]: {error}{Environment.NewLine}{stackTrace}");
 
         if (!_isRemote)

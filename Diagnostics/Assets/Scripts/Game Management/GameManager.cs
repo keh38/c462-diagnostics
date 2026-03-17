@@ -78,20 +78,20 @@ public class GameManager : MonoBehaviour
     public static string ScreenColorString { get { return instance._GetBackgroundColorString(); } }
     public static string LEDColorString { get { return instance._GetLEDColorString(); } }
 
-    public static string SerializeSubjectMetadata()
+    public static SubjectMetadata GetSubjectMetadata()
     {
-        return FileIO.XmlSerializeToString(instance._subjectMetadata);
+        return instance._subjectMetadata;
     }
 
-    public static void DeserializeSubjectMetadata(string data)
+    public static void SetSubjectMetadata(SubjectMetadata metaData)
     {
-        instance._subjectMetadata = FileIO.XmlDeserializeFromString<SubjectMetadata>(data);
+        instance._subjectMetadata = metaData;
         instance._SaveSubjectMetadata();
     }
 
-    public static void DeserializeSubjectMetrics(string data)
+    public static void SetSubjectMetrics(SerializeableDictionary<string> data)
     {
-        instance._subjectMetadata.metrics = FileIO.XmlDeserializeFromString<SerializeableDictionary<string>>(data);
+        instance._subjectMetadata.metrics = data;
         instance._SaveSubjectMetadata();
     }
 

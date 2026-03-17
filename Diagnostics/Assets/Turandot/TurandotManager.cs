@@ -15,6 +15,8 @@ using Turandot.Schedules;
 using Turandot.Scripts;
 using UnityEngine.Video;
 using KLib;
+using KLib.Expressions;
+using KLibU.Net;
 using NUnit.Framework;
 using System.Xml.Linq;
 
@@ -71,12 +73,14 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
     void OnDestroy()
     {
+        HTS_Server.OnSubjectChanged -= HandleSubjectChanged;
         Application.logMessageReceived -= HandleException;
     }
 
     void Start()
     {
         HTS_Server.SetCurrentScene("Turandot", this);
+        HTS_Server.OnSubjectChanged += HandleSubjectChanged;
 
 #if HACKING
         Application.targetFrameRate = 60;
@@ -103,11 +107,11 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         _engine.ClearScreen();
 
-        KLib.Expressions.Metrics = GameManager.Metrics;
-        KLib.Expressions.Audiogram = Audiograms.AudiogramData.Load();
+        Expressions.Metrics = GameManager.Metrics;
+        Expressions.Audiogram = Audiograms.AudiogramData.Load();
         var ldl = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
         if (ldl != null) ldl.ReplaceNaNWithMax(GameManager.Transducer);
-        KLib.Expressions.LDL = ldl;
+        Expressions.LDL = ldl;
 
         string localName = "";
         if (!_isRemote)
@@ -130,11 +134,18 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             Begin();
         }
     }
-    
-    private void ApplyParameters()
-    {
-        string filename = "";
 
+    private void HandleSubjectChanged(object sender, EventArgs e)
+    {
+        Expressions.Metrics = GameManager.Metrics;
+        Expressions.Audiogram = Audiograms.AudiogramData.Load();
+        var ldl = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
+        if (ldl != null) ldl.ReplaceNaNWithMax(GameManager.Transducer);
+        Expressions.LDL = ldl;
+    }
+
+    private bool ApplyParameters()
+    {
         try
         {
             _params.ApplyDefaultWavFolder(GameManager.Project);
@@ -150,7 +161,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
                 if (HardwareInterface.LED.IsInitialized)
                 {
                     HardwareInterface.LED.SetColorFromString(GameManager.LEDColorString);
-                    HTS_Server.SendMessage("ChangedLEDColors", GameManager.LEDColorString);
+                    HTS_Server.SendRequest("ChangedLEDColors", GameManager.LEDColorString);
                 }
             }
             if (_params.screen.ApplyParamSpecificScreenColor)
@@ -161,18 +172,14 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             _params.Initialize();
 
             InitDataFile();
-            filename = Path.GetFileName(_mainDataFile);
+            return true;
         }
         catch (Exception ex)
         {
-            filename = "error";
             HandleException(ex.Message, ex.StackTrace, LogType.Exception);
             _engine.ClearScreen();
         }
-        finally
-        {
-            HTS_Server.SendMessage("Turandot", $"File:{filename}");
-        }
+        return false;
     }
 
     private void ApplyScriptArguments(ScriptArguments args)
@@ -218,7 +225,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             //else 
             { 
                 Debug.Log("Turandot: Previous state exists. Asking whether to resume");
-                HTS_Server.SendMessage("Turandot", "Status:Asking to resume");
+                HTS_Server.SendRequest("Turandot", "Status:Asking to resume");
 
                 _questionBox.gameObject.SetActive(true);
                 _questionBox.PoseQuestion("Continue previous session?", OnQuestionResponse);
@@ -244,7 +251,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             _titleBar.SetActive(false);
 
             Debug.Log("Turandot: Resuming previous");
-            HTS_Server.SendMessage("Turandot", "Status:Resuming previous");
+            HTS_Server.SendRequest("Turandot", "Status:Resuming previous");
 
             _state.RestoreProgress();
             // **must** be a new file name, because previous sync logs, .edf's, .bdf's etc must stand as is
@@ -252,7 +259,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             _state.Save();
 
             _blockNum = _state.LastBlockCompleted + 1;
-            HTS_Server.SendMessage("Turandot", $"Progress:{Mathf.RoundToInt(_state.Progress * 100)}");
+            HTS_Server.SendRequest("Turandot", $"Progress:{Mathf.RoundToInt(_state.Progress * 100)}");
 
             _params.Initialize();
 
@@ -275,7 +282,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         else
         {
             Debug.Log("Turandot: Starting new measurement");
-            HTS_Server.SendMessage("Turandot", "Status:Starting new measurement");
+            HTS_Server.SendRequest("Turandot", "Status:Starting new measurement");
 
             if (!string.IsNullOrEmpty(_params.instructions.Text))
             {
@@ -291,7 +298,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
     IEnumerator ShowInstructions()
     {
-        HTS_Server.SendMessage("Turandot", "State:Instructions");
+        HTS_Server.SendRequest("Turandot", "State:Instructions");
 
         yield return new WaitForSeconds(1);
         _titleBar.SetActive(false);
@@ -315,36 +322,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             EndRun(abort: false);
         }
     }
-
-    /*
-    void ShowMorePracticeInstructions()
-    {
-        diagnosticsUI.transform.position = new Vector2(0, 0);
-        diagnosticsUI.SetHelpBalloonSize(1750, 800);
-        diagnosticsUI.SetHelpBalloonPosition(new Vector3(0, 100, 0));
-        diagnosticsUI.SetHelpBalloonAlpha(0.85f);
-        var prompt = new List<string>() { "Let's practice a little more." };
-        if (!string.IsNullOrEmpty(_params.schedule.performancePrompt))
-        {
-            prompt.Clear();
-            prompt.Add(_params.schedule.performancePrompt);
-        }
-        diagnosticsUI.ShowInstructions(prompt, MorePractice);
-    }
-
-    void ShowBreakInstructions(string instructions)
-    {
-        if (string.IsNullOrEmpty(instructions))
-        {
-            instructions = "Great work!\nTake a short break if you need one.";
-        }
-        diagnosticsUI.transform.position = new Vector2(0, 0);
-        diagnosticsUI.SetHelpBalloonSize(1750, 800);
-        diagnosticsUI.SetHelpBalloonPosition(new Vector3(0, 100, 0));
-        diagnosticsUI.SetHelpBalloonAlpha(0.85f);
-        diagnosticsUI.ShowInstructions(new List<string>() { instructions }, EndBreak, "resume");
-    }
-    */
 
     void StartRun()
     {
@@ -424,7 +401,10 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             _isRunning = true;
             AdvanceSequence();
         }
-        else EndRun(false);
+        else
+        {
+            EndRun(false);
+        }
         yield break;
     }
 
@@ -437,16 +417,17 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         var audioFile = _mainDataFile.Replace(".json", ".audio.json");
         _engine.WriteAudioLogFile(audioFile);
 
-        HTS_Server.SendMessage("Turandot", $"ReceiveData:{Path.GetFileName(_mainDataFile)}:{File.ReadAllText(_mainDataFile)}");
-        HTS_Server.SendMessage("Turandot", $"ReceiveData:{Path.GetFileName(audioFile)}:{File.ReadAllText(audioFile)}");
-        HTS_Server.SendMessage("Turandot", "Finished:");
+        HTS_Server.SendRequest("Turandot", $"ReceiveData:{Path.GetFileName(_mainDataFile)}:{File.ReadAllText(_mainDataFile)}");
+        HTS_Server.SendRequest("Turandot", $"ReceiveData:{Path.GetFileName(audioFile)}:{File.ReadAllText(audioFile)}");
+        HTS_Server.SendRequest("Turandot", "Finished:");
+        Debug.Log("send finish");
 
         if (_params.trialLogOption == TrialLogOption.Upload)
         {
             var trialFiles = Directory.EnumerateFiles(FileLocations.SubjectFolder, Path.GetFileName(_mainDataFile).Replace(".json", "-Block*-Trial*.json")).ToList();
             foreach (var trialFile in trialFiles)
             {
-                HTS_Server.SendMessage("Turandot", $"ReceiveData:{Path.GetFileName(trialFile)}:{File.ReadAllText(trialFile)}");
+                HTS_Server.SendRequest("Turandot", $"ReceiveData:{Path.GetFileName(trialFile)}:{File.ReadAllText(trialFile)}");
             }
         }
 
@@ -599,7 +580,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
     public void OnQuitConfirmButtonClick()
     {
-        HTS_Server.SendMessage("Turandot", "Error:Quit");
+        HTS_Server.SendRequest("Turandot", "Error:Quit");
         SceneManager.LoadScene("Home");
     }
 
@@ -648,7 +629,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         {
             string logPath = _fileStem + "-Block" + _data.block + "-Trial" + _data.trial + ".json";
 
-            HTS_Server.SendMessage("Turandot", $"Trial:{stringBuilder.ToString()}");
+            HTS_Server.SendRequest("Turandot", $"Trial:{stringBuilder.ToString()}");
 
 #if !KDEBUG
             StartCoroutine(_engine.ExecuteFlowchart(_state.CurrentBlockSCL[0].trialType, _params.flags, logPath));
@@ -679,7 +660,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         AppendDataToMainFile(_mainDataFile, _data.ToJSONString(_engine.GetEventsAsJSON()));
 
-        HTS_Server.SendMessage("Turandot", "State:Finished");
+        HTS_Server.SendRequest("Turandot", "State:Finished");
 
         if (_engine.FlowchartEndAction != EndAction.None)
         {
@@ -693,7 +674,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         _state.Save();
 
         _progressBar?.SetValue(_state.Progress);
-        HTS_Server.SendMessage("Turandot", $"Progress:{Mathf.RoundToInt(_state.Progress * 100)}");
+        HTS_Server.SendRequest("Turandot", $"Progress:{Mathf.RoundToInt(_state.Progress * 100)}");
 
         if (_state.CurrentBlockSCL.Count > 0)
         {
@@ -768,7 +749,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         else
         {
             string logPath = _fileStem + "-Block" + _data.block + "-Track" + _data.track + "-Trial" + _data.trial + ".json";
-            HTS_Server.SendMessage("Turandot", $"Trial:{stringBuilder.ToString()}");
+            HTS_Server.SendRequest("Turandot", $"Trial:{stringBuilder.ToString()}");
 
 #if !KDEBUG
             StartCoroutine(_engine.ExecuteFlowchart(sc.trialType, _params.flags, logPath));
@@ -785,14 +766,14 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         _data.properties.AddRange(_params.GetPostTrialProperties(_data.properties));
         KLib.FileIO.AppendTextFile(_mainDataFile, _data.ToJSONString(_engine.GetEventsAsJSON()));
         
-        HTS_Server.SendMessage("Turandot", "State:Finished");
+        HTS_Server.SendRequest("Turandot", "State:Finished");
 
         _params.adapt.Process(_data.result);
 
         if (_params.adapt.IsBlockFinished)
         {
             _state.Progress += _progressBarStep;
-            HTS_Server.SendMessage("Turandot", $"Progress:{Mathf.RoundToInt(_state.Progress * 100)}");
+            HTS_Server.SendRequest("Turandot", $"Progress:{Mathf.RoundToInt(_state.Progress * 100)}");
 
             string json = "";
             foreach (AdaptiveTrack at in _params.adapt.tracks)
@@ -909,7 +890,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
     void HandleError(string error, string stackTrace = "")
     {
-        HTS_Server.SendMessage("Turandot", $"Error:{error}");
+        HTS_Server.SendRequest("Turandot", $"Error:{error}");
         Debug.Log($"[Turandot error]: {error}{Environment.NewLine}{stackTrace}");
 
         _runAborted = true;
@@ -966,7 +947,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             }
 
             string resultExpr = f.resultExpression.Replace("{" + operand + "}", expr);
-            float v = KLib.Expressions.EvaluateToFloatScalar(resultExpr);
+            float v = Expressions.EvaluateRandomElement(resultExpr);
             GameManager.AddMetric(f.storeResultAs, v.ToString());
         }
     }
@@ -979,57 +960,70 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         }
     }
 
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        switch (command)
+        switch (request.Command)
         {
             case "SetScriptArguments":
-                RpcSetScriptArguments(data);
-                break;
+                _scriptArguments = request.GetPayload<ScriptArguments>();
+                Debug.Log($"Received script arguments: laterality {_scriptArguments.laterality}, dimension {_scriptArguments.dimension}, expression {_scriptArguments.expression}");
+                return TcpMessage.Ok();
             case "SetParams":
-                RpcSetParameters(data);
-                break;
-            case "StartSynchronizing":
-                HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                break;
-            case "StopSynchronizing":
-                HardwareInterface.ClockSync.StopSynchronizing();
-                break;
+                var turandotParams = request.GetPayload<Parameters>();
+                var success = RpcSetParameters(turandotParams);
+                if (success)
+                {
+                    return TcpMessage.Ok(Path.GetFileName(_mainDataFile));
+                }
+                else
+                {
+                    return TcpMessage.Error("Failed to apply parameters");
+                }
             case "Begin":
-                Begin();
-                break;
-            case "Abort":
-                RpcAbort();
-                break;
-            case "SubjectChanged":
-            case "SubjectMetadataChanged":
-            case "SubjectMetricsChanged":
-                RpcUpdateSubject();
-                break;
-            case "ShowInstructions":
-                RpcShowInstructions(data);
-                break;
-            case "ShowState":
-                RpcShowState(data);
-                break;
-                //case "SendSyncLog":
-                //    var logPath = HardwareInterface.ClockSync.LogFile;
-                //    if (!string.IsNullOrEmpty(logPath))
-                //    {
-                //        HTS_Server.SendMessage("Turandot", $"ReceiveData:{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
-                //    }
-                //    break;
-        }
+                        StartCoroutine(BeginNextFrame());
+                        return TcpMessage.Ok();
+                    case "Abort":
+                        StartCoroutine(AbortNextFrame());
+                        return TcpMessage.Ok();
+                    case "ShowInstructions":
+                        StartCoroutine(InstructionsNextFrame());
+                        return TcpMessage.Ok();
+                    case "ShowState":
+                        string stateName = request.GetPayload<string>();
+                        StartCoroutine(StateNextFrame(stateName));
+                        return TcpMessage.Ok();
+                    default:
+                        return TcpMessage.NotFound(request.Command);
+                    }
     }
 
-    public void RpcSetScriptArguments(string json)
+    IEnumerator BeginNextFrame()
     {
-        _scriptArguments = FileIO.JSONDeserializeFromString<ScriptArguments>(json);
+        yield return null;
+        Begin();
     }
 
-    public void RpcSetParameters(string xml)
+    IEnumerator AbortNextFrame()
     {
-        _params = KLib.FileIO.XmlDeserializeFromString<Parameters>(xml);
+        yield return null;
+        RpcAbort();
+    }
+
+    IEnumerator InstructionsNextFrame()
+    {
+        yield return null;
+        RpcShowInstructions();
+    }
+
+    IEnumerator StateNextFrame(string stateName)
+    {
+        yield return null;
+        RpcShowState(stateName);
+    }
+
+    public bool RpcSetParameters(Parameters turandotParams)
+    {
+        _params = turandotParams;
         _paramFile = "remote";
         _state = new TurandotState(GameManager.Project, GameManager.Subject, _params.tag);
 
@@ -1038,10 +1032,11 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             ApplyScriptArguments(_scriptArguments);
         }
 
-        ApplyParameters();
+        var success = ApplyParameters();
+        return success;
     }
 
-    private void RpcShowInstructions(string stateName)
+    private void RpcShowInstructions()
     {
         if (!string.IsNullOrEmpty(_params.instructions.Text))
         {
@@ -1069,7 +1064,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         if (_instructionPanel.gameObject.activeSelf)
         {
             _instructionPanel.gameObject.SetActive(false);
-            HTS_Server.SendMessage("Turandot", "Finished:Run stopped by user");
+            HTS_Server.SendRequest("Turandot", "Finished:Run stopped by user");
         }
         else
         {
@@ -1078,15 +1073,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             _engine.Abort();
             EndRun(abort: true);
         }
-    }
-
-    public void RpcUpdateSubject()
-    {
-        KLib.Expressions.Metrics = GameManager.Metrics;
-        KLib.Expressions.Audiogram = Audiograms.AudiogramData.Load();
-        var ldl = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
-        if (ldl != null) ldl.ReplaceNaNWithMax(GameManager.Transducer);
-        KLib.Expressions.LDL = ldl;
     }
 
 }

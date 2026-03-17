@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 using KLib;
+using KLibU.Net;
 using KLib.MSGraph;
 
 public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
@@ -144,36 +145,42 @@ public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
         foreach (var resourceFolder in resourceFolders)
         {
             string folder = Path.Combine(Path.Combine(rootResourceFolder, resourceFolder));
+            if (!Directory.Exists(folder))
+            {
+                continue;
+            }
             var files = Directory.GetFiles(folder);
             foreach (var file in files)
             {
                 resources.Add(file.Remove(0, rootResourceFolder.Length+1));
             }
         }
-
+        Debug.Log($"{rootResourceFolder} contains {resources.Count} resources");
         return resources;
     }
 
 
-    void IRemoteControllable.ProcessRPC(string command, string data = "")
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        switch (command)
+        switch (request.Command)
         {
             case "StartResourceSync":
                 FileLocations.SetDataRoot();
                 _message.text = "Syncing resources";
-                break;
+                return TcpMessage.Ok();
             case "EndResourceSync":
                 _message.text = "";
-                break;
+                return TcpMessage.Ok();
             case "SendResourceList":
                 var fileList = EnumerateResources();
-                HTS_Server.SendMessage("FileSync", $"ReceiveFileList:{FileIO.JSONSerializeToString(fileList)}");
-                break;
+                return TcpMessage.Ok(fileList);
             case "DeleteFile":
+                var data = request.GetPayload<string>();
                 var fullpath = Path.Combine(FileLocations.ProjectFolder, "Resources", data);
                 File.Delete(fullpath);
-                break;
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
     }
 

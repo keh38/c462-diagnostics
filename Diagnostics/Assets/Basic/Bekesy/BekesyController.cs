@@ -12,11 +12,13 @@ using UnityEngine.UI;
 //using Audiograms;
 using Bekesy;
 using KLib;
+using KLibU.Net;
 using KLib.Signals;
 using KLib.Signals.Waveforms;
 using UnityEngine.EventSystems;
 
 using BasicMeasurements;
+using HTS.Unity.Tcp;
 
 public class BekesyController : MonoBehaviour, IRemoteControllable
 {
@@ -115,8 +117,6 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         CreatePlan();
         InitializeStimulusGeneration();
         InitDataFile();
-
-        HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
     }
 
     void InitDataFile()
@@ -204,7 +204,7 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
 
         if (!string.IsNullOrEmpty(_settings.InstructionMarkdown))
         {
-            HTS_Server.SendMessage(_mySceneName, "Status:Instructions");
+            HTS_Server.SendRequest(_mySceneName, "Status:Instructions");
             ShowInstructions(
                 instructions: _settings.InstructionMarkdown,
                 fontSize: _settings.InstructionFontSize);
@@ -218,7 +218,7 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
 
     private void StartMeasurement()
     {
-        HTS_Server.SendMessage(_mySceneName, "Status:Starting measurement");
+        HTS_Server.SendRequest(_mySceneName, "Status:Starting measurement");
 
         _instructionPanel.gameObject.SetActive(false);
 
@@ -239,7 +239,7 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         if (_currentTrack != null)
         {
             _progressBar.value = _data.NumCompleted + 1;
-            HTS_Server.SendMessage(_mySceneName, $"Progress:{_data.PercentCompleted}");
+            HTS_Server.SendRequest(_mySceneName, $"Progress:{_data.PercentCompleted}");
 
             if (lastTrack == null)
             {
@@ -281,7 +281,7 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
 
     private IEnumerator StartTrack()
     {
-        HTS_Server.SendMessage(_mySceneName, $"Status:{_currentTrack.ear} ear, {_currentTrack.Freq_Hz} Hz");
+        HTS_Server.SendRequest(_mySceneName, $"Status:{_currentTrack.ear} ear, {_currentTrack.Freq_Hz} Hz");
 
         _signalManager["Signal"].Laterality = _currentTrack.ear;
 
@@ -365,6 +365,11 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
     {
         if (_stopMeasurement)
         {
+            if (_trackActive)
+            {
+                _signalManager.Pause();
+            }
+
             _abortAction.Disable();
             _stopMeasurement = false;
             EndRun(abort: true);
@@ -409,8 +414,14 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         //_data.audiogramData.Save();
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
-        HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
-        HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+
+        HTS_Server.SendRequest("ReceiveData", _mySceneName, new TextFilePayload
+        {
+            Filename = Path.GetFileName(_dataPath),
+            Content = File.ReadAllText(_dataPath)
+        });
+
+        HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
 
         if (_localAbort)
         {
@@ -441,27 +452,29 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
     }
 
 
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        switch (command)
+        switch (request.Command)
         {
             case "Initialize":
-                _settings = FileIO.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as BekesyMeasurementSettings;
+                _settings = request.GetPayload<BekesyMeasurementSettings>();
                 InitializeMeasurement();
-                break;
-            case "StartSynchronizing":
-                HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                break;
-            case "StopSynchronizing":
-                HardwareInterface.ClockSync.StopSynchronizing();
-                break;
+                return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
-                Begin();
-                break;
+                StartCoroutine(BeginNextFrame());
+                return TcpMessage.Ok();
             case "Abort":
                 _stopMeasurement = true;
-                break;
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
+    }
+
+    IEnumerator BeginNextFrame()
+    {
+        yield return null;
+        Begin();
     }
 
     void IRemoteControllable.ChangeScene(string newScene)
@@ -495,6 +508,11 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
 
                 _signalManager.Synthesize(data);
             }
+
+            if (_stopMeasurement)
+            {
+                _trackActive = false;
+            }
         }
     }
 
@@ -521,7 +539,7 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
             error = "An exception occurred";
         }
 
-        HTS_Server.SendMessage(_mySceneName, $"Error:{error}");
+        HTS_Server.SendRequest(_mySceneName, $"Error:{error}");
         Debug.Log($"[{_mySceneName} error]: {error}{Environment.NewLine}{stackTrace}");
 
         if (!_isRemote)

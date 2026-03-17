@@ -68,9 +68,11 @@ namespace KLib.Signals
         public Laterality Laterality { set; get; }
 
         [ProtoMember(9, IsRequired = true)]
+        [JsonProperty]
         public Modality Modality { set; get; }
 
         [ProtoMember(10, IsRequired = true)]
+        [JsonProperty]
         public string Location { set; get; }
 
         [ProtoMember(11, IsRequired = true)]
@@ -515,7 +517,7 @@ namespace KLib.Signals
         /// <returns></returns>
         public void Initialize(float Fs, int N)
         {
-            string location = "";
+            string location = "dafuq";
 
             try
             {
@@ -608,6 +610,7 @@ namespace KLib.Signals
 
         public void ApplyBinauralProperties()
         {
+            Debug.Log($"{Name}: {Laterality}");
             if (Laterality == Laterality.Binaural)
             {
                 SetBinauralCoherence();
@@ -620,9 +623,13 @@ namespace KLib.Signals
             if (binaural.balance != 0 && binaural.ILD != 0)
                 throw new System.Exception("Balance and ILD cannot both be nonzero");
 
+            Debug.Log("binaural level");
             SetBinauralLevel();
+            Debug.Log("binaural level");
             SetBinauralBalance();
+            Debug.Log("binaural level");
             SetBinauralPhase();
+            Debug.Log("binaural level");
             SetBinauralCoherence();
 
             ResetSweepables();
@@ -709,6 +716,7 @@ namespace KLib.Signals
         {
             if (Laterality == Laterality.Binaural && ContraSide != null && waveform.Shape == Waveshape.Noise)
             {
+                var noise = waveform as Noise;
                 int seed = (waveform as Noise).seed;
                 if (seed <= 0)
                 {

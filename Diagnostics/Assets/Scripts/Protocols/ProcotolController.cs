@@ -5,6 +5,8 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 using Protocols;
+using KLibU.Net;
+using Turandot;
 
 public class ProcotolController : MonoBehaviour, IRemoteControllable
 {
@@ -83,7 +85,7 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
                 }
                 else
                 {
-                    HTS_Server.SendMessage("Protocol", "Advance");
+                    HTS_Server.SendRequest("Protocol", "Advance");
                 }
             }
         }
@@ -104,7 +106,7 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
 
     public void OnQuitConfirmButtonClick()
     {
-        HTS_Server.SendMessage("Protocol", "Quit");
+        HTS_Server.SendRequest("Protocol", "Quit");
         SceneManager.LoadScene("Home");
     }
 
@@ -127,7 +129,7 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
         _instructionPanel.gameObject.SetActive(false);
         if (_advanceAfterInstructions)
         {
-            HTS_Server.SendMessage("Protocol", "Advance");
+            HTS_Server.SendRequest("Protocol", "Advance");
         }
         else
         {
@@ -148,7 +150,7 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
         }
         DrawOutline(_history.Data.Count, _nextTestIndex);
 
-        HTS_Server.SendMessage("Protocol", "Waiting");
+        HTS_Server.SendRequest("Protocol", "Waiting");
         _waitingForResponse = true;
     }
 
@@ -200,18 +202,13 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
         SceneManager.LoadScene("Home");
     }
 
-    private void RpcSetProtocol(string data)
+    private void RpcSetProtocol(Protocol protocol)
     {
         ProtocolManager.Clear();
 
-        _protocol = KLib.FileIO.XmlDeserializeFromString<Protocol>(data);
+        _protocol = protocol;
         _title.text = _protocol.Title;
         _outline.fontSize = _protocol.Appearance.ListFontSize;
-    }
-
-    private void RpcSetHistory(string data)
-    {
-        _history = KLib.FileIO.XmlDeserializeFromString<ProtocolHistory>(data);
     }
 
     private void RpcBegin(int testIndex)
@@ -219,7 +216,7 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
         _nextTestIndex = testIndex;
         if (testIndex == 0 && !string.IsNullOrEmpty(_protocol.Introduction))
         {
-            HTS_Server.SendMessage("Protocol", "Instructions");
+            HTS_Server.SendRequest("Protocol", "Instructions");
             ShowInstructions(
                 _protocol.Introduction, 
                 fontSize: _protocol.Appearance.InstructionFontSize,
@@ -241,28 +238,51 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
         _outline.gameObject.SetActive(false);
     }
 
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        var parts = data.Split(':');
-
-        switch (command)
+        switch (request.Command)
         {
             case "Abort":
-                RpcAbort();
-                break;
+                StartCoroutine(AbortNextFrame());
+                return TcpMessage.Ok();
             case "SetProtocol":
-                RpcSetProtocol(data);
-                break;
+                Debug.Log($"payload  = {request.Payload}");
+                var protocol = request.GetPayload<Protocol>();
+                RpcSetProtocol(protocol);
+                return TcpMessage.Ok();
             case "SetHistory":
-                RpcSetHistory(data);
-                break;
+                Debug.Log($"payload  = {request.Payload}");
+                _history = request.GetPayload<ProtocolHistory>();
+                return TcpMessage.Ok();
             case "Begin":
-                RpcBegin(int.Parse(data));
-                break;
+                int nextTestIndex = request.GetPayload<int>();
+                Debug.Log($"nextTestIndex = {nextTestIndex}");  
+                StartCoroutine(BeginNextFrame(nextTestIndex));
+                return TcpMessage.Ok();
             case "Finish":
-                RpcFinish();
-                break;
+                StartCoroutine(FinishNextFrame());
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
+    }
+
+    IEnumerator BeginNextFrame(int nextTextIndex)
+    {
+        yield return null;
+        RpcBegin(nextTextIndex);
+    }
+
+    IEnumerator AbortNextFrame()
+    {
+        yield return null;
+        RpcAbort();
+    }
+
+    IEnumerator FinishNextFrame()
+    {
+        yield return null;
+        RpcFinish();
     }
 
     void IRemoteControllable.ChangeScene(string newScene)

@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 using KLib;
+using KLibU.Net;
 using KLib.Signals;
 using KLib.Signals.Waveforms;
 
@@ -239,11 +240,10 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         _audioInitialized = true;
     }
 
-    private void SetParams(string data)
+    private void SetParams(InteractiveSettings settings)
     {
         try
         {
-            var settings = FileIO.XmlDeserializeFromString<InteractiveSettings>(data);
             ApplyParameters(settings);
             InitializeSliders(settings.Sliders);
             _sliderArea.SetActive(settings.ShowSliders);
@@ -251,7 +251,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         catch (Exception ex)
         {
             Debug.Log($"[Turandot Interactive] error setting parameters: {ex.Message}");
-            HTS_Server.SendMessage("TurandotInteractive", "Error:failed to set parameters...check log");
+            HTS_Server.SendRequest("TurandotInteractive", "Error:failed to set parameters...check log");
         }
     }
 
@@ -307,30 +307,36 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         }
     }
 
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        Debug.Log("Turandot Interactive: " + command);
-        switch (command)
+        Debug.Log("Turandot Interactive: " + request.Command);
+        switch (request.Command)
         {
             case "Start":
                 StartStreaming();
-                break;
+                return TcpMessage.Ok();
             case "Stop":
                 StopStreaming();
-                break;
+                return TcpMessage.Ok();
             case "SetParams":
-                SetParams(data);
-                break;
+                var settings = request.GetPayload<InteractiveSettings>();
+                SetParams(settings);
+                return TcpMessage.Ok();
             case "SetProperty":
-                Debug.Log($"property: {data}");
-                SetProperty(data);
-                break;
+                var propertyData = request.GetPayload<string>();
+                Debug.Log($"property: {propertyData}");
+                SetProperty(propertyData);
+                return TcpMessage.Ok();
             case "SetActive":
-                SetActive(data);
-                break;
+                var activeData = request.GetPayload<string>();
+                SetActive(activeData);
+                return TcpMessage.Ok();
             case "ShowSliders":
-                _sliderArea.SetActive(data.Equals("True"));
-                break;
+                var sliderData = request.GetPayload<string>();
+                _sliderArea.SetActive(sliderData.Equals("True"));
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
     }
 

@@ -10,9 +10,12 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 using KLib;
+using KLibU.Net;
 using Questionnaires;
 
 using BasicMeasurements;
+using HTS.Unity.Tcp;
+using Audiograms;
 
 public class QuestionnaireController : MonoBehaviour, IRemoteControllable
 {
@@ -90,9 +93,8 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
         _title.text = _questionnaire.Title;
 
         _data = new QuestionnaireData(_questionnaire);
+        Debug.Log("yo");
         InitDataFile();
-
-        HTS_Server.SendMessage(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
     }
 
     void InitDataFile()
@@ -129,7 +131,7 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
 
         if (!string.IsNullOrEmpty(_questionnaire.InstructionMarkdown))
         {
-            HTS_Server.SendMessage(_mySceneName, "Status:Instructions");
+            HTS_Server.SendRequest(_mySceneName, "Status:Instructions");
             ShowInstructions(
                 instructions: _questionnaire.InstructionMarkdown,
                 fontSize: _questionnaire.InstructionFontSize);
@@ -142,7 +144,7 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
 
     private void StartMeasurement()
     {
-        HTS_Server.SendMessage(_mySceneName, "Status:Questions started");
+        HTS_Server.SendRequest(_mySceneName, "Status:Questions started");
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(true);
 
@@ -194,7 +196,7 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
     private void ShowQuestion()
     {
         _progressBar.value = _qnum;
-        HTS_Server.SendMessage(_mySceneName, $"Progress:{Mathf.RoundToInt(100f * _qnum / _questionnaire.Questions.Count)}");
+        HTS_Server.SendRequest(_mySceneName, $"Progress:{Mathf.RoundToInt(100f * _qnum / _questionnaire.Questions.Count)}");
 
         _checklist.LayoutChecklist(
             _questionnaire.Questions[_qnum],
@@ -243,8 +245,13 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
         File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
-        HTS_Server.SendMessage(_mySceneName, $"Finished:{status}");
-        HTS_Server.SendMessage(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+
+        HTS_Server.SendRequest("ReceiveData", _mySceneName, new TextFilePayload
+        {
+            Filename = Path.GetFileName(_dataPath),
+            Content = File.ReadAllText(_dataPath)
+        });
+        HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
 
         if (_localAbort)
         {
@@ -275,27 +282,29 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
     }
 
 
-    void IRemoteControllable.ProcessRPC(string command, string data)
+    TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        switch (command)
+       switch (request.Command)
         {
             case "Initialize":
-                _questionnaire = FileIO.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as Questionnaire;
+                _questionnaire = request.GetPayload<Questionnaire>();
                 InitializeMeasurement();
-                break;
-            case "StartSynchronizing":
-                HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                break;
-            case "StopSynchronizing":
-                HardwareInterface.ClockSync.StopSynchronizing();
-                break;
+                return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
-                Begin();
-                break;
+                StartCoroutine(BeginNextFrame());
+                return TcpMessage.Ok();
             case "Abort":
                 _stopMeasurement = true;
-                break;
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
         }
+    }
+
+    IEnumerator BeginNextFrame()
+    {
+        yield return null;
+        Begin();
     }
 
     void IRemoteControllable.ChangeScene(string newScene)

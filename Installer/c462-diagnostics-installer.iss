@@ -20,16 +20,16 @@ UsePreviousGroup=no
 UsePreviousSetupType=no
 DisableProgramGroupPage=yes
 PrivilegesRequired=admin
+CloseApplications=yes
+RestartApplications=yes
 
 [Files]
 Source: "..\Diagnostics\Build\*.*"; DestDir: "{app}"; Flags: replacesameversion recursesubdirs;
 Source: ".\Dependencies\Mono\*.*"; DestDir: "{app}"; Flags: replacesameversion;
 Source: "..\Launcher\Launcher\bin\Release\net8.0-windows\*.*"; DestDir: "{app}\Launcher"; Flags: replacesameversion recursesubdirs;
 Source: "..\CHANGELOG.md"; DestDir: "{app}"; Flags: replacesameversion;
-;Source: "D:\Development\C462\c462-odi\Installer\Output\ODI_Installer_1-0.exe"; DestDir: "{tmp}";
 
 [Icons]
-;Name: "{commondesktop}\Hearing Diagnostics"; Filename: "{app}\HearingDiagnostics.exe";
 Name: "{commondesktop}\Hearing Test Suite"; Filename: "{app}\Launcher\HTSLauncher.exe"; IconFilename: "{app}\Launcher\Diagnostics.ico"; IconIndex: 0;
 
 [Registry]
@@ -38,20 +38,6 @@ Name: "{commondesktop}\Hearing Test Suite"; Filename: "{app}\Launcher\HTSLaunche
 ;Root: HKCU; Subkey: "SOFTWARE\MEEI\HearingDiagnostics"; ValueType: none; ValueName: "Screenmanager Resolution Height_h2627697771"; Flags: deleteValue
 
 [Run]
-;Filename: "{tmp}\{code:GetODIInstaller}"; Parameters: "/VERYSILENT"; StatusMsg: "Installing OneDrive interface";
 Filename: "{app}\Launcher\HTSLauncher.exe"; Parameters: "-nodelay"; 
 
-[Code]
-function GetODIInstaller(Dummy: String): String;
-  var rec: TFindRec;
-  var installerName: String;
-begin
-  installerName := '';
-  
-  if FindFirst(ExpandConstant('{tmp}\ODI_Installer_*'), rec) then begin
-    installerName := rec.Name;
-  end;
-
-  Result := installerName;
-end;
 

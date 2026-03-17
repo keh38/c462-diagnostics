@@ -6,14 +6,17 @@ using System.Windows.Forms.Design;
 using System.Xml.Serialization;
 using ExtensionMethods;
 using KLib;
+using KLib.Expressions;
 using KLib.Signals.Calibration;
 using KLib.TypeConverters;
+using Newtonsoft.Json;
 using OrderedPropertyGrid;
 using Unity.VisualScripting;
 
 namespace SpeechReception
 {
     [TypeConverter(typeof(ListPropertiesConverter))]
+    [JsonObject(MemberSerialization.OptOut)]
     public class ListProperties
     {
         private static TestType _serializationTestType = TestType.OpenSet;
@@ -159,7 +162,7 @@ namespace SpeechReception
                 }
                 else
                 {
-                    snr = KLib.Expressions.Evaluate(SNR);
+                    snr = Expressions.Evaluate(SNR);
                     AnyFiniteSNR = snr.Any(o => !float.IsInfinity(o));
                 }
                 listDescription.SetSequence(Sequence, snr);

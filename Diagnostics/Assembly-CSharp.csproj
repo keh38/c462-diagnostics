@@ -80,6 +80,7 @@
     <Compile Include="Assets\Basic\LDL\LDL.SliderSettings.cs" />
     <Compile Include="Assets\Scripts\Remote\HTS_Server.cs" />
     <Compile Include="Assets\Speech\Speech Reception\TypeConverters\SpeechTestConverter.cs" />
+    <Compile Include="Assets\Scripts\Remote\Temp\KTcpListener.cs" />
     <Compile Include="Assets\Pupillometry\PupilDynamicRange.cs" />
     <Compile Include="Assets\Speech\Digits\Digits.Block.cs" />
     <Compile Include="Assets\Turandot\Cues\Turandot.Cues.CounterAction.cs" />
@@ -119,7 +120,6 @@
     <Compile Include="Assets\Scripts\KLib\Signals\Enumerations\AMShape.cs" />
     <Compile Include="Assets\Speech\Speech Reception\SpeechReception.UserCustomizations.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotKeypad.cs" />
-    <Compile Include="Assets\Scripts\KLib\Utilities\KLib.Expressions.cs" />
     <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.InputLayout.cs" />
     <Compile Include="Assets\Turandot\Parameters\Turandot.TrialLogOption.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Enumerations\Modality.cs" />
@@ -169,6 +169,7 @@
     <Compile Include="Assets\Turandot\TurandotEngine.cs" />
     <Compile Include="Assets\Turandot\Data\Turandot.AudioLog.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptStepMode.cs" />
+    <Compile Include="Assets\Scripts\Remote\TcpPayloads.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\TypeConverters\DigitimerPolarityConverter.cs" />
     <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.ScalerLayout.cs" />
     <Compile Include="Assets\Speech\Speech Reception\SpeechReception.LevelUnits.cs" />
@@ -270,6 +271,7 @@
     <Compile Include="Assets\Speech\Digits\Digits.Trial.cs" />
     <Compile Include="Assets\Basic\LDL\LDL.LoudnessDiscomfortData.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\Waveform.cs" />
+    <Compile Include="Assets\Scripts\Remote\Temp\TcpMessage.cs" />
     <Compile Include="Assets\Turandot\TypeConverters\ButtonActionTypeConverter.cs" />
     <Compile Include="Assets\Scripts\Game Management\Project.Settings.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Wave\KLib.Wave.WaveChunk.cs" />
@@ -286,13 +288,14 @@
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptSwitchType.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Enumerations\FilterShape.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\MenuButtonStyle.cs" />
+    <Compile Include="Assets\Scripts\Remote\Temp\DiscoveryBeacon.cs" />
     <Compile Include="Assets\Turandot\Screen\Cues\Turandot.Screen.VideoLayout.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.EventLog.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptMode.cs" />
     <Compile Include="Assets\AlgLib\fasttransforms.cs" />
+    <Compile Include="Assets\Scripts\KLib\Expressions\Tokenizer.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotAudio.cs" />
     <Compile Include="Assets\Scripts\Hardware\DigitimerControl.cs" />
-    <Compile Include="Assets\Scripts\KLib\Utilities\ExpressionEvaluator.cs" />
     <Compile Include="Assets\Audiometer\AudiometerController.cs" />
     <Compile Include="Assets\Speech\Speech Reception\SpeechReception.MatrixTest.cs" />
     <Compile Include="Assets\Turandot\Parameters\Turandot.Instructions.cs" />
@@ -301,6 +304,7 @@
     <Compile Include="Assets\Basic\LDL\SliderAnimator.cs" />
     <Compile Include="Assets\Turandot\Parameters\TurandotAction.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptiveTrack.cs" />
+    <Compile Include="Assets\Scripts\Remote\Temp\KTcpClient.cs" />
     <Compile Include="Assets\Speech\Speech Reception\SpeechReception.InstructionFile.cs" />
     <Compile Include="Assets\Scripts\KLib\TypeConverters\PropertySorter.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.Family.cs" />
@@ -375,12 +379,14 @@
     <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.CheckListLayout.cs" />
     <Compile Include="Assets\Prefabs\ParameterSlider.cs" />
     <Compile Include="Assets\Speech\Speech Reception\SpeechReception.ListProperties.cs" />
+    <Compile Include="Assets\Scripts\KLib\Expressions\Expressions.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.Schedule.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Audiograms\Audiograms.Ear.cs" />
     <Compile Include="Assets\Prefabs\WaitSpinner.cs" />
     <Compile Include="Assets\Scripts\Remote\IRemoteControllable.cs" />
     <Compile Include="Assets\Speech\Digits\Prefabs\KeypadButtonState.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotManikinSlider.cs" />
+    <Compile Include="Assets\Scripts\Remote\Temp\ServerBeacon.cs" />
     <Compile Include="Assets\Scripts\Admin Tools\UpdatePanel.cs" />
     <Compile Include="Assets\Basic\Bekesy\Bekesy.Data.cs" />
     <Compile Include="Assets\Basic\Questionnaires\QuestionnaireController.cs" />
@@ -398,6 +404,7 @@
     <Compile Include="Assets\Turandot\Inputs\ChecklistItem.cs" />
     <Compile Include="Assets\Speech\Digits\DigitsWavManifest.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Calibration\CalibrationData.cs" />
+    <Compile Include="Assets\Scripts\Remote\Temp\Discovery.cs" />
     <Compile Include="Assets\Pupillometry\GazeCalibrationLog.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotCueController.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Calibration\CalibrationFactory.cs" />
@@ -406,6 +413,7 @@
     <Compile Include="Assets\Scripts\Menu Tools\ButtonStyle.cs" />
     <Compile Include="Assets\Basic\LDL\LDL.TestCondition.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.Variable.cs" />
+    <Compile Include="Assets\Scripts\KLib\Expressions\ExpressionParser.cs" />
     <Compile Include="Assets\Speech\Digits\Digits.TestSpec.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\StyleDefinition.cs" />
     <Compile Include="Assets\Speech\Digits\DigitsTestSettings.cs" />
