@@ -55,11 +55,11 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
         }
     }
 
-    void InitializeMeasurement(string data)
+    void InitializeMeasurement(DynamicRangeSettings settings)
     {
         Cursor.visible = false;
 
-        _settings = FileIO.XmlDeserializeFromString<Pupillometry.DynamicRangeSettings>(data);
+        _settings = settings;
         _modRateHz = 1.0f / _settings.StimulusPeriod;
 
         _stopMeasurement = false;
@@ -79,7 +79,6 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
         int npts = Mathf.RoundToInt(approxDuration * 100);
 
         _data = new DynamicRangeData(_dataPath, npts);
-        HTS_Server.SendRequest(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
 
         _useLEDs = HardwareInterface.LED.IsInitialized;
         if (_useLEDs)
@@ -180,7 +179,7 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 
         string status = _stopMeasurement ? "Measurement aborted" : "Measurement finished";
         HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
-        HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+        HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{json}");
     }
 
     void OnGUI()
@@ -202,18 +201,12 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 
     TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        var data = request.GetPayload<string>();
         switch (request.Command)
         {
             case "Initialize":
-                InitializeMeasurement(data);
-                return TcpMessage.Ok();
-            case "StartSynchronizing":
-                HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                return TcpMessage.Ok();
-            case "StopSynchronizing":
-                HardwareInterface.ClockSync.StopSynchronizing();
-                return TcpMessage.Ok();
+                var settings = request.GetPayload<DynamicRangeSettings>();
+                InitializeMeasurement(settings);
+                return TcpMessage.Ok(_dataPath);
             case "Begin":
                 Begin();
                 return TcpMessage.Ok();

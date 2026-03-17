@@ -8,12 +8,12 @@ $ErrorActionPreference = "Stop"
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
 
 # --- Configuration -----------------------------------------------------------
-$Version        = "1.12"
+$Version        = "2.0"
 $RepoRoot       = "D:\Development\C462\c462-diagnostics"
 $CsprojFile     = "$RepoRoot\Launcher\Launcher\Launcher.csproj"
 $Changelog      = "$RepoRoot\CHANGELOG.md"
 $SolutionFile   = "$RepoRoot\Launcher\Launcher.sln"
-$InstallerPath  = "$RepoRoot\Installer\Output\Hearing_Test_Suite_1-12.exe"
+$InstallerPath  = "$RepoRoot\Installer\Output\Hearing_Test_Suite_2-0.exe"
 $ReleaseDate    = (Get-Date -Format "yyyy-MM-dd")
 $CommitMessage  = "Built $Version"
 $TagName        = $Version

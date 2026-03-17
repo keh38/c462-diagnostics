@@ -1,5 +1,13 @@
 ## Changelog
 
+### v2.0 (unreleased)
+#### Changed
+- updated discovery/message system
+- can receive audiogram data directly from manual audiometer
+- updated expression parser
+
+---
+
 ### v1.12 (2026-03-03)
 #### Fixed
 - Digits test: 
