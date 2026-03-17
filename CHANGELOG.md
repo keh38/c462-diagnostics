@@ -3,6 +3,8 @@
 ### v1.13 (unreleased)
 #### Added
 - ability to receive audiogram data from manual audiometer
+#### Changed
+- Turandot parameter slider: restore clamp-to-max when property is Level
 
 ---
 
