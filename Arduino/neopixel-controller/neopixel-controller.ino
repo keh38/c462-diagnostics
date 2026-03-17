@@ -149,7 +149,7 @@ void receive_message(void)
 void process_message(void)
 {
 
-  char* token = strtok(buff, " ");
+  char* token = strtok((char*)buff, " ");
 
   if (token != NULL)
   {

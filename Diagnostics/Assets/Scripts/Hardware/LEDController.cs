@@ -15,7 +15,7 @@ public class LEDController : MonoBehaviour
 
     public bool IsInitialized { get; private set; }
 
-    public bool Initialize(string comPort, int numPixels, float gamma)
+    public bool Initialize(string comPort, KLib.LEDType ledType, int numPixels, float gamma)
     {
         bool success = false;
 
@@ -40,7 +40,7 @@ public class LEDController : MonoBehaviour
             string response = _serialPort.ReadLine();
             Debug.Log($"[LEDController] response to greeting: '{response}'");
 
-            SetNumPixels(numPixels);
+            SetNumPixels(ledType, numPixels);
             _serialPort.Close();
 
             IsInitialized = true;
@@ -58,7 +58,7 @@ public class LEDController : MonoBehaviour
         return success;
     }
 
-    private void SetNumPixels(int numPixels)
+    private void SetNumPixels(KLib.LEDType ledType, int numPixels)
     {
         if (_serialPort == null) return;
 
@@ -66,9 +66,21 @@ public class LEDController : MonoBehaviour
 
         try
         {
-            _serialPort.Write($"setnumpixels {numPixels}\n");
+            _serialPort.Write($"setledtype {ledType.ToString()}\n");
             string response = _serialPort.ReadLine();
-            success = response.Equals("OK");
+            if (!response.Equals("OK"))
+            {
+                Debug.Log($"[LEDController] negative response setting LED type: {response}");
+                return;
+            }
+
+            _serialPort.Write($"setnumpixels {numPixels}\n");
+            response = _serialPort.ReadLine();
+            if (!response.Equals("OK")) 
+            {
+                Debug.Log($"[LEDController] negative response setting number of pixels: {response}");
+                return;
+            }
         }
         catch (Exception ex)
         {

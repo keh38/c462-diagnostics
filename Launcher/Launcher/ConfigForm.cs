@@ -56,7 +56,7 @@ namespace Launcher
             FillLEDComPortDropDown();
 
             _ignoreEvents = true;
-            ledComPortDropDown.SelectedIndex = (int)_config.LEDType;
+            ledTypeComboBox.SelectedIndex = (int)_config.LEDType;
             numPixelsNumeric.IntValue = _config.NumPixels;
             gammaNumeric.FloatValue = _config.LEDGamma;
             brightnessNumeric.IntValue = _config.ScreenBrightness;
@@ -465,7 +465,7 @@ namespace Launcher
                 return;
             }
 
-            var dlg = new LEDTestForm(_config.LEDComPort, 9600, _config.NumPixels, _config.LEDGamma);
+            var dlg = new LEDTestForm(_config.LEDComPort, 9600, _config.LEDType, _config.NumPixels, _config.LEDGamma);
             dlg.ShowDialog();
         }
 
@@ -505,7 +505,7 @@ namespace Launcher
         {
             if (!_ignoreEvents)
             {
-                _config.LEDType = (LEDType)ledComPortDropDown.SelectedIndex;
+                _config.LEDType = (LEDType)ledTypeComboBox.SelectedIndex;
             }
 
         }
