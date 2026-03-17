@@ -1,5 +1,11 @@
 ## Changelog
 
+### v2.0.2 (2026-03-17)
+#### Fixed
+- pupil dynamic range now sets color correctly with RGB array
+
+---
+
 ### v2.0.1 (2026-03-17)
 #### Changed
 - added support for RGB LEDs
