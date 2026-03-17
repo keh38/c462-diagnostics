@@ -8,16 +8,20 @@ $ErrorActionPreference = "Stop"
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
 
 # --- Configuration -----------------------------------------------------------
-$Version        = "1.12"
+$Version        = "1.13"
+$vParts          = $Version.Split('.')
+$AssemblyVersion = ($vParts + @('0','0','0'))[ 0..3 ] -join '.'
+$VersionDashed  = $Version -replace '\.', '-'
 $RepoRoot       = "D:\Development\C462\c462-diagnostics"
 $CsprojFile     = "$RepoRoot\Launcher\Launcher\Launcher.csproj"
 $Changelog      = "$RepoRoot\CHANGELOG.md"
 $SolutionFile   = "$RepoRoot\Launcher\Launcher.sln"
-$InstallerPath  = "$RepoRoot\Installer\Output\Hearing_Test_Suite_1-12.exe"
+$InstallerPath  = "$RepoRoot\Installer\Output\Hearing_Test_Suite_$VersionDashed.exe"
 $ReleaseDate    = (Get-Date -Format "yyyy-MM-dd")
 $CommitMessage  = "Built $Version"
 $TagName        = $Version
 $ReleaseTitle   = "v$Version"
+$Branch 		= git -C $RepoRoot rev-parse --abbrev-ref HEAD
 # -----------------------------------------------------------------------------
 
 function Step($msg) {
@@ -102,7 +106,8 @@ Step "Creating GitHub release v$Version"
 Push-Location $RepoRoot
 gh release create $TagName $InstallerPath `
     --title $ReleaseTitle `
-    --notes $ReleaseNotes
+    --notes $ReleaseNotes `
+	--target $Branch
 Pop-Location
 
 Write-Host "`n[OK] Release $Version complete!" -ForegroundColor Green
