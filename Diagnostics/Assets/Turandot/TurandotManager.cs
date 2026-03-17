@@ -144,10 +144,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         Expressions.LDL = ldl;
     }
 
-    private void ApplyParameters()
+    private bool ApplyParameters()
     {
-        string filename = "";
-
         try
         {
             _params.ApplyDefaultWavFolder(GameManager.Project);
@@ -174,18 +172,14 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             _params.Initialize();
 
             InitDataFile();
-            filename = Path.GetFileName(_mainDataFile);
+            return true;
         }
         catch (Exception ex)
         {
-            filename = "error";
             HandleException(ex.Message, ex.StackTrace, LogType.Exception);
             _engine.ClearScreen();
         }
-        finally
-        {
-            HTS_Server.SendRequest("Turandot", $"File:{filename}");
-        }
+        return false;
     }
 
     private void ApplyScriptArguments(ScriptArguments args)
@@ -328,36 +322,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             EndRun(abort: false);
         }
     }
-
-    /*
-    void ShowMorePracticeInstructions()
-    {
-        diagnosticsUI.transform.position = new Vector2(0, 0);
-        diagnosticsUI.SetHelpBalloonSize(1750, 800);
-        diagnosticsUI.SetHelpBalloonPosition(new Vector3(0, 100, 0));
-        diagnosticsUI.SetHelpBalloonAlpha(0.85f);
-        var prompt = new List<string>() { "Let's practice a little more." };
-        if (!string.IsNullOrEmpty(_params.schedule.performancePrompt))
-        {
-            prompt.Clear();
-            prompt.Add(_params.schedule.performancePrompt);
-        }
-        diagnosticsUI.ShowInstructions(prompt, MorePractice);
-    }
-
-    void ShowBreakInstructions(string instructions)
-    {
-        if (string.IsNullOrEmpty(instructions))
-        {
-            instructions = "Great work!\nTake a short break if you need one.";
-        }
-        diagnosticsUI.transform.position = new Vector2(0, 0);
-        diagnosticsUI.SetHelpBalloonSize(1750, 800);
-        diagnosticsUI.SetHelpBalloonPosition(new Vector3(0, 100, 0));
-        diagnosticsUI.SetHelpBalloonAlpha(0.85f);
-        diagnosticsUI.ShowInstructions(new List<string>() { instructions }, EndBreak, "resume");
-    }
-    */
 
     void StartRun()
     {
@@ -1002,27 +966,35 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         {
             case "SetScriptArguments":
                 _scriptArguments = request.GetPayload<ScriptArguments>();
+                Debug.Log($"Received script arguments: laterality {_scriptArguments.laterality}, dimension {_scriptArguments.dimension}, expression {_scriptArguments.expression}");
                 return TcpMessage.Ok();
             case "SetParams":
                 var turandotParams = request.GetPayload<Parameters>();
-                RpcSetParameters(turandotParams);
-                return TcpMessage.Ok();
+                var success = RpcSetParameters(turandotParams);
+                if (success)
+                {
+                    return TcpMessage.Ok(Path.GetFileName(_mainDataFile));
+                }
+                else
+                {
+                    return TcpMessage.Error("Failed to apply parameters");
+                }
             case "Begin":
-                StartCoroutine(BeginNextFrame());
-                return TcpMessage.Ok();
-            case "Abort":
-                StartCoroutine(AbortNextFrame());
-                return TcpMessage.Ok();
-            case "ShowInstructions":
-                StartCoroutine(InstructionsNextFrame());
-                return TcpMessage.Ok();
-            case "ShowState":
-                string stateName = request.GetPayload<string>();
-                StartCoroutine(StateNextFrame(stateName));
-                return TcpMessage.Ok();
-            default:
-                return TcpMessage.NotFound(request.Command);
-        }
+                        StartCoroutine(BeginNextFrame());
+                        return TcpMessage.Ok();
+                    case "Abort":
+                        StartCoroutine(AbortNextFrame());
+                        return TcpMessage.Ok();
+                    case "ShowInstructions":
+                        StartCoroutine(InstructionsNextFrame());
+                        return TcpMessage.Ok();
+                    case "ShowState":
+                        string stateName = request.GetPayload<string>();
+                        StartCoroutine(StateNextFrame(stateName));
+                        return TcpMessage.Ok();
+                    default:
+                        return TcpMessage.NotFound(request.Command);
+                    }
     }
 
     IEnumerator BeginNextFrame()
@@ -1049,7 +1021,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         RpcShowState(stateName);
     }
 
-    public void RpcSetParameters(Parameters turandotParams)
+    public bool RpcSetParameters(Parameters turandotParams)
     {
         _params = turandotParams;
         _paramFile = "remote";
@@ -1060,7 +1032,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             ApplyScriptArguments(_scriptArguments);
         }
 
-        ApplyParameters();
+        var success = ApplyParameters();
+        return success;
     }
 
     private void RpcShowInstructions()

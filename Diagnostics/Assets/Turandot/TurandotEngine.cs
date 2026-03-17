@@ -320,7 +320,7 @@ public class TurandotEngine : MonoBehaviour
 
             if (!string.IsNullOrEmpty(term.result))
             {
-                Debug.Log(term.source + ": " + term.result);
+                //Debug.Log(term.source + ": " + term.result);
                 _result = ExpandResult(_result, term.result);
             }
 

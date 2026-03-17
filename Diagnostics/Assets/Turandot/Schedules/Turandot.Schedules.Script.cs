@@ -26,6 +26,7 @@ namespace Turandot.Schedules
         public ScriptArguments()
         {
             laterality = Laterality.None;
+            dimension = VarDimension.X;
         }
     }
 

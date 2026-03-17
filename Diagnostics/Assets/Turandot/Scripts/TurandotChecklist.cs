@@ -107,7 +107,6 @@ namespace Turandot.Scripts
             }
             else
             {
-                Debug.Log($"DisableApply = {_layout.DisableApply}");
                 _button.SetActive(_selectedItems.Count > 0 && !_layout.DisableApply);
             }
         }

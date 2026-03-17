@@ -237,9 +237,9 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "SetDataRoot":
-                string dataRoot = request.GetPayload<string>();
                 _tcpListener.WriteResponse(TcpMessage.Ok());
-                //FileLocations.SetDataRoot(dataRoot);
+                string dataRoot = request.GetPayload<string>();
+                FileLocations.SetDataRoot(dataRoot);
                 break;
 
             case "Disconnect":
