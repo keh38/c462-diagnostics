@@ -118,10 +118,10 @@ namespace Turandot.Scripts
                     throw new Exception($"{_action.Channel}.{_action.Property} not found");
                 }
 
-                //if (_action.parameter == "Level")
-                //{
-                //    _sigMan[_action.channel].ClampLevelToMax(true);
-                //}
+                if (_action.Property == "Level")
+                {
+                    _sigMan[_action.Channel].ClampLevelToMax(true);
+                }
 
                 //if (_ncalls == 0)
                 //{

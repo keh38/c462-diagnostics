@@ -368,6 +368,12 @@ public class HTS_Server : MonoBehaviour
                 ReceiveFile(filePayload);
                 break;
 
+            case "TransferAudiogram":
+                _tcpListener.WriteResponse(TcpMessage.Ok());
+                var audiogramPayload = request.GetPayload<TextFilePayload>();
+                ReceiveAudiogram(audiogramPayload);
+                break;
+
             case "RunInstaller":
                 _tcpListener.WriteResponse(TcpMessage.Ok());
                 var data = request.GetPayload<string>();
@@ -492,6 +498,13 @@ public class HTS_Server : MonoBehaviour
         {
             Directory.CreateDirectory(folder);
         }
+        var filePath = Path.Combine(folder, filePayload.Filename);
+        File.WriteAllText(filePath, filePayload.Content);
+    }
+
+    private void ReceiveAudiogram(TextFilePayload filePayload)
+    {
+        var folder = FileLocations.SubjectMetaFolder;
         var filePath = Path.Combine(folder, filePayload.Filename);
         File.WriteAllText(filePath, filePayload.Content);
     }
