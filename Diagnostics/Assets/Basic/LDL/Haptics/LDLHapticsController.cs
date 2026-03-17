@@ -11,6 +11,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 using KLib;
+using KLib.Expressions;
 using KLibU.Net;
 using KLib.Signals.Waveforms;
 using KLib.Signals;
@@ -79,11 +80,11 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
     {
         HTS_Server.SetCurrentScene(_mySceneName, this);
 
-        KLib.Expressions.Metrics = GameManager.Metrics;
-        KLib.Expressions.Audiogram = Audiograms.AudiogramData.Load();
+        Expressions.Metrics = GameManager.Metrics;
+        Expressions.Audiogram = Audiograms.AudiogramData.Load();
         var ldl = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
         if (ldl != null) ldl.ReplaceNaNWithMax(GameManager.Transducer);
-        KLib.Expressions.LDL = ldl;
+        Expressions.LDL = ldl;
 
         _title.text = "";
 

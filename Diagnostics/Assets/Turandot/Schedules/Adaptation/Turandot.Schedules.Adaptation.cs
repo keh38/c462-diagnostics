@@ -7,6 +7,8 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using ProtoBuf;
 
+using KLib.Expressions;
+
 namespace Turandot.Schedules
 {
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
@@ -124,7 +126,7 @@ namespace Turandot.Schedules
             foreach (AdaptiveTrack t in tracks)
             {
                 t.Initialize();
-                var pv = new List<KLib.Expressions.PropVal>() { new KLib.Expressions.PropVal("AV", t.startVal) };
+                var pv = new List<Expressions.PropVal>() { new Expressions.PropVal("AV", t.startVal) };
                 foreach (Variable v in t.variables)
                 {
                     v.EvaluateExpression(pv);
@@ -156,7 +158,7 @@ namespace Turandot.Schedules
 
                 if (v.expression.Contains("AV"))
                 {
-                    v.EvaluateExpression(new List<KLib.Expressions.PropVal>() { new KLib.Expressions.PropVal("AV", tracks[index].CurrentValue) });
+                    v.EvaluateExpression(new List<Expressions.PropVal>() { new Expressions.PropVal("AV", tracks[index].CurrentValue) });
                 }
 
                 float value = v.GetValue(ix, iy);

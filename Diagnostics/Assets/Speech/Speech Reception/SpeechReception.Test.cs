@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Xml.Serialization;
 using KLib;
+using KLib.Expressions;
 using KLib.TypeConverters;
 using Newtonsoft.Json;
 using OrderedPropertyGrid;
@@ -255,7 +256,7 @@ namespace SpeechReception
         {
             ListHistory history = null;
 
-            var excluded = KLib.Expressions.EvaluateToInt(Exclude);
+            var excluded = Expressions.EvaluateToInt(Exclude);
 
             string historyFile = Path.Combine(FileLocations.SubjectMetaFolder, TestType + "_History.xml");
             if (File.Exists(historyFile))
@@ -273,7 +274,7 @@ namespace SpeechReception
                 history.Order = KMath.SetDiff(history.Order, excluded);
                 FileIO.XmlSerialize(history, historyFile);
                 NumListsAvailable = history.Order.Length;
-                UnityEngine.Debug.Log("excluded " + KLib.Expressions.ToVectorString(excluded) + " from " + TestType + " history");
+                UnityEngine.Debug.Log("excluded " + Expressions.ToVectorString(excluded) + " from " + TestType + " history");
             }
 
             List<ListProperties> newListProps = new List<ListProperties>();

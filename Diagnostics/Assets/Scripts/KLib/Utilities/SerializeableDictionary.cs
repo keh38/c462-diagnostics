@@ -76,5 +76,16 @@ namespace KLib
             entries.Sort((x, y) => x.key.CompareTo(y.key));
         }
 
+        public bool TryGetValue(string key, out T value)
+        {
+            var entry = entries.Find(x => x.key.Equals(key));
+            if (entry != null)
+            {
+                value = entry.value;
+                return true;
+            }
+            value = default(T);
+            return false;
+        }
     }
 }

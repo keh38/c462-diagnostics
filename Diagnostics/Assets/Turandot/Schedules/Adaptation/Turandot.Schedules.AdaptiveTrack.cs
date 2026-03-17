@@ -7,6 +7,8 @@ using System.Text;
 using Newtonsoft.Json;
 using ProtoBuf;
 
+using KLib.Expressions;
+
 namespace Turandot.Schedules
 {
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
@@ -175,7 +177,7 @@ namespace Turandot.Schedules
             FinalValue = float.NaN;
             Threshold = float.NaN;
 
-            var pv = new List<KLib.Expressions.PropVal>() { new KLib.Expressions.PropVal("AV", startVal) };
+            var pv = new List<Expressions.PropVal>() { new Expressions.PropVal("AV", startVal) };
             foreach (Variable v in variables)
             {
                 v.EvaluateExpression(pv);
@@ -371,7 +373,7 @@ namespace Turandot.Schedules
 
             float thr;
             string expr = thresholdExpr.Replace("A", _state.finalValue.ToString());
-            KLib.Expressions.TryEvaluateScalar(expr, out thr);
+            Expressions.TryEvaluateScalar(expr, out thr);
 
             FinalValue = _state.finalValue;
             Threshold = thr;
@@ -433,7 +435,7 @@ namespace Turandot.Schedules
             // evaluate catch trial expressions replacing the letter "A" with the current adapted value
             foreach (Variable v in catches)
             {
-                KLib.Expressions.Evaluate(v.expression.Replace("A", _state.value.ToString()));
+                Expressions.Evaluate(v.expression.Replace("A", _state.value.ToString()));
             }
 
             _state.type = "catch";

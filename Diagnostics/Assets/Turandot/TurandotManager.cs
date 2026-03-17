@@ -15,6 +15,7 @@ using Turandot.Schedules;
 using Turandot.Scripts;
 using UnityEngine.Video;
 using KLib;
+using KLib.Expressions;
 using KLibU.Net;
 using NUnit.Framework;
 using System.Xml.Linq;
@@ -106,11 +107,11 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         _engine.ClearScreen();
 
-        KLib.Expressions.Metrics = GameManager.Metrics;
-        KLib.Expressions.Audiogram = Audiograms.AudiogramData.Load();
+        Expressions.Metrics = GameManager.Metrics;
+        Expressions.Audiogram = Audiograms.AudiogramData.Load();
         var ldl = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
         if (ldl != null) ldl.ReplaceNaNWithMax(GameManager.Transducer);
-        KLib.Expressions.LDL = ldl;
+        Expressions.LDL = ldl;
 
         string localName = "";
         if (!_isRemote)
@@ -136,11 +137,11 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
     private void HandleSubjectChanged(object sender, EventArgs e)
     {
-        KLib.Expressions.Metrics = GameManager.Metrics;
-        KLib.Expressions.Audiogram = Audiograms.AudiogramData.Load();
+        Expressions.Metrics = GameManager.Metrics;
+        Expressions.Audiogram = Audiograms.AudiogramData.Load();
         var ldl = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
         if (ldl != null) ldl.ReplaceNaNWithMax(GameManager.Transducer);
-        KLib.Expressions.LDL = ldl;
+        Expressions.LDL = ldl;
     }
 
     private void ApplyParameters()
@@ -982,7 +983,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             }
 
             string resultExpr = f.resultExpression.Replace("{" + operand + "}", expr);
-            float v = KLib.Expressions.EvaluateToFloatScalar(resultExpr);
+            float v = Expressions.EvaluateRandomElement(resultExpr);
             GameManager.AddMetric(f.storeResultAs, v.ToString());
         }
     }
