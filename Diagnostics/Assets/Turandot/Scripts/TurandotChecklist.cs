@@ -43,7 +43,6 @@ namespace Turandot.Scripts
             _label.fontSize = _layout.FontSize;
             _label.text = _layout.Label;
 
-            Debug.Log($"Checklist Button Font Size: {_layout.ButtonFontSize}");
             _button.GetComponentInChildren<TMPro.TMP_Text>().fontSize = _layout.ButtonFontSize > 0 ? _layout.ButtonFontSize : _layout.FontSize;
             var buttonRT = _button.GetComponent<RectTransform>();
             buttonRT.sizeDelta = new Vector2(_layout.ButtonWidth, _layout.ButtonHeight);

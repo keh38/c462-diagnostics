@@ -206,40 +206,48 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         if (!string.IsNullOrEmpty(args.expression))
         {
+            Debug.Log($"applying expression {args.expression} to dimension {args.dimension}");
             var seqVar = _params.schedule.families[0].variables.Find(x => x.dim == args.dimension);
             if (seqVar != null)
             {
                 seqVar.expression = args.expression;
             }
         }
+
+        if (!string.IsNullOrEmpty(args.flag) && _params.flags.Find(flag => flag.name == args.flag) != null)
+        {
+            _params.SetFlag(args.flag, args.value);
+        }
     }
 
     private void Begin()
     {
+        _haveException = false;
+
         if (_state.IsRunInProgress())
         {
+            Debug.Log("in progress");
             //if (_isRemote)
             //{
             //    OnQuestionResponse(true);
             //}
             //else 
-            { 
-                Debug.Log("Turandot: Previous state exists. Asking whether to resume");
+            {
                 HTS_Server.SendRequest("Turandot", "Status:Asking to resume");
 
                 _questionBox.gameObject.SetActive(true);
                 _questionBox.PoseQuestion("Continue previous session?", OnQuestionResponse);
             }
+            return;
         }
-        else if (!string.IsNullOrEmpty(_params.instructions.Text))
+        if (!string.IsNullOrEmpty(_params.instructions.Text))
         {
             StartCoroutine(ShowInstructions());
+            return;
         }
-        else
-        {
-            _titleBar.SetActive(false);
-            StartRun();
-        }
+
+        _titleBar.SetActive(false);
+        StartRun();
     }
 
     private void OnQuestionResponse(bool yes)
@@ -966,7 +974,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         {
             case "SetScriptArguments":
                 _scriptArguments = request.GetPayload<ScriptArguments>();
-                Debug.Log($"Received script arguments: laterality {_scriptArguments.laterality}, dimension {_scriptArguments.dimension}, expression {_scriptArguments.expression}");
+//                Debug.Log($"Received script arguments: laterality {_scriptArguments.laterality}, dimension {_scriptArguments.dimension}, expression {_scriptArguments.expression}");
                 return TcpMessage.Ok();
             case "SetParams":
                 var turandotParams = request.GetPayload<Parameters>();
@@ -980,21 +988,21 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
                     return TcpMessage.Error("Failed to apply parameters");
                 }
             case "Begin":
-                        StartCoroutine(BeginNextFrame());
-                        return TcpMessage.Ok();
-                    case "Abort":
-                        StartCoroutine(AbortNextFrame());
-                        return TcpMessage.Ok();
-                    case "ShowInstructions":
-                        StartCoroutine(InstructionsNextFrame());
-                        return TcpMessage.Ok();
-                    case "ShowState":
-                        string stateName = request.GetPayload<string>();
-                        StartCoroutine(StateNextFrame(stateName));
-                        return TcpMessage.Ok();
-                    default:
-                        return TcpMessage.NotFound(request.Command);
-                    }
+                    StartCoroutine(BeginNextFrame());
+                    return TcpMessage.Ok();
+            case "Abort":
+                StartCoroutine(AbortNextFrame());
+                return TcpMessage.Ok();
+            case "ShowInstructions":
+                StartCoroutine(InstructionsNextFrame());
+                return TcpMessage.Ok();
+            case "ShowState":
+                string stateName = request.GetPayload<string>();
+                StartCoroutine(StateNextFrame(stateName));
+                return TcpMessage.Ok();
+            default:
+                return TcpMessage.NotFound(request.Command);
+            }
     }
 
     IEnumerator BeginNextFrame()

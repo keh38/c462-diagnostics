@@ -89,7 +89,7 @@ namespace Turandot.Schedules
             }
 
             _values = Expressions.Evaluate(expr);
-            Debug.Log($"expr = {expr}");
+
             return _values.Length;
         }
 

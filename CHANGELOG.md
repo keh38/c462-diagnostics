@@ -1,5 +1,13 @@
 ## Changelog
 
+### v2.0.3 (unreleased)
+#### Added
+- Turandot: flag/value to script arguments
+#### Fixed
+- Turandot: can be restarted after exception
+
+---
+
 ### v2.0.2 (2026-03-17)
 #### Fixed
 - pupil dynamic range now sets color correctly with RGB array

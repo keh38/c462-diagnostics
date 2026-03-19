@@ -22,7 +22,9 @@ namespace Turandot.Schedules
         public Laterality laterality;
         public VarDimension dimension;
         public string expression;
-        
+        public string flag;
+        public int value;
+
         public ScriptArguments()
         {
             laterality = Laterality.None;
