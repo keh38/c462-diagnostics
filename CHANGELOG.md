@@ -1,6 +1,6 @@
 ## Changelog
 
-### v2.0.3 (unreleased)
+### v2.0.3 (2026-03-19)
 #### Added
 - Turandot: flag/value to script arguments
 #### Fixed
