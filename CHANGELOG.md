@@ -1,6 +1,6 @@
 ## Changelog
 
-### v1.13.1 (unreleased)
+### v1.13.1 (2026-03-20)
 #### Fixed
 - better handling of hardware cleanup on exit
 
