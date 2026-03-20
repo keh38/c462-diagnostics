@@ -61,10 +61,13 @@ public class HardwareInterface : MonoBehaviour
     public static void CleanUp() => instance._CleanUp();
     #endregion
 
-    private void OnApplicationQuit()
+    private void OnDestroy()
     {
-        Debug.Log("OnApplicationQuit");
-        _CleanUp();
+        if (_instance == this)
+        {
+            Debug.Log("OnDestroy hardware interface");
+            _CleanUp();
+        }
     }
 
     #region PRIVATE METHODS
