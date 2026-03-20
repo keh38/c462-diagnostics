@@ -1,5 +1,11 @@
 ## Changelog
 
+### v1.13.1 (unreleased)
+#### Fixed
+- better handling of hardware cleanup on exit
+
+---
+
 ### v1.13 (2026-03-17)
 #### Added
 - ability to receive audiogram data from manual audiometer
