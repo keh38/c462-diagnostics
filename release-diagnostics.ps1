@@ -33,8 +33,8 @@ Step "Updating Launcher.csproj to version $Version"
 
 $csproj = Get-Content $CsprojFile -Raw
 $csproj = $csproj -replace '<Version>[^<]*</Version>',         "<Version>$Version</Version>"
-$csproj = $csproj -replace '<AssemblyVersion>[^<]*</AssemblyVersion>', "<AssemblyVersion>$Version.0.0</AssemblyVersion>"
-$csproj = $csproj -replace '<FileVersion>[^<]*</FileVersion>', "<FileVersion>$Version.0.0</FileVersion>"
+$csproj = $csproj -replace '<AssemblyVersion>[^<]*</AssemblyVersion>', "<AssemblyVersion>$AssemblyVersion</AssemblyVersion>"
+$csproj = $csproj -replace '<FileVersion>[^<]*</FileVersion>', "<FileVersion>$AssemblyVersion</FileVersion>"
 Set-Content $CsprojFile $csproj -NoNewline
 Write-Host "Done."
 
