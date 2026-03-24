@@ -78,7 +78,7 @@ namespace Turandot.Inputs
             get
             {
                 Trim();
-                return KLib.FileIO.JSONSerializeToString(this);
+                return KLibU.Files.JSONSerializeToString(this);
             }
         }
 

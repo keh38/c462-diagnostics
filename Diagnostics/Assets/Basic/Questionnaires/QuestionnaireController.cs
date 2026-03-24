@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 using KLib;
+using KLibU;
 using KLibU.Net;
 using Questionnaires;
 
@@ -81,7 +82,7 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
         else
         {
             var fn = FileLocations.ConfigFile("Questionnaire", _configName);
-            _questionnaire = FileIO.XmlDeserialize<BasicMeasurementConfiguration>(fn) as Questionnaire;
+            _questionnaire = Files.XmlDeserialize<BasicMeasurementConfiguration>(fn) as Questionnaire;
 
             InitializeMeasurement();
             Begin();
@@ -93,7 +94,6 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
         _title.text = _questionnaire.Title;
 
         _data = new QuestionnaireData(_questionnaire);
-        Debug.Log("yo");
         InitDataFile();
     }
 
@@ -118,7 +118,7 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
             subjectID = GameManager.Subject
         };
 
-        string json = FileIO.JSONStringAdd("", "info", KLib.FileIO.JSONSerializeToString(header));
+        string json = Files.JSONStringAdd("", "info", KLibU.Files.JSONSerializeToString(header));
         json += Environment.NewLine;
 
         File.WriteAllText(_dataPath, json);
@@ -242,7 +242,7 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(false);
 
-        File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
+        File.AppendAllText(_dataPath, Files.JSONSerializeToString(_data));
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
 
@@ -261,6 +261,11 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
         bool finished = true;
         if (finished && !_isRemote)
         {
+            if (ProtocolManager.IsActive)
+            {
+                ProtocolManager.FinishTest(_dataPath);
+                return;
+            }
             ShowFinishPanel();
         }
     }

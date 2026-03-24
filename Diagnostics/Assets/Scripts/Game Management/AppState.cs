@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 
 using KLib;
+using KLibU;
 
 [Serializable]
 public class AppState
@@ -45,7 +46,7 @@ public class AppState
         AppState state = new AppState();
         if (File.Exists(FileLocations.StateFile))
         {
-            state = FileIO.XmlDeserialize<AppState>(FileLocations.StateFile);
+            state = Files.XmlDeserialize<AppState>(FileLocations.StateFile);
         }
         else
         {
@@ -56,7 +57,7 @@ public class AppState
 
     public void Save()
     {
-        FileIO.XmlSerialize(this, FileLocations.StateFile);
+        Files.XmlSerialize(this, FileLocations.StateFile);
     }
 
 

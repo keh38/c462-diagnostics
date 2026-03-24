@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 using KLib;
+using KLibU;
 using KLibU.Net;
 using Pupillometry;
 
@@ -40,7 +41,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
     {
         try
         {
-            _settings = FileIO.XmlDeserializeFromString<GazeCalibrationSettings>(data);
+            _settings = Files.XmlDeserializeFromString<GazeCalibrationSettings>(data);
 
             _numTargets = int.Parse(_settings.CalibrationType.Substring(_settings.CalibrationType.Length - 1)) + 1;
             _numAcquired = 0;
@@ -64,7 +65,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
                 subjectID = GameManager.Subject
             };
 
-            string json = FileIO.JSONStringAdd("", "info", KLib.FileIO.JSONSerializeToString(header));
+            string json = Files.JSONStringAdd("", "info", KLibU.Files.JSONSerializeToString(header));
             File.WriteAllText(_dataPath, json);
 
             HTS_Server.SendRequest(_mySceneName, $"File:{Path.GetFileName(_dataPath)}");
@@ -120,7 +121,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
     void SendData()
     {
         _data.Trim();
-        File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
+        File.AppendAllText(_dataPath, Files.JSONSerializeToString(_data));
         HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
     }
 

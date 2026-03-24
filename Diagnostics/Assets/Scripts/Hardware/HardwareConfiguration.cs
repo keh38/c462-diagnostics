@@ -17,6 +17,7 @@ namespace KLib
         public bool RunWindowed { set; get; }
         public int ScreenWidth { set; get; }
         public int ScreenHeight { set; get; }
+        public bool LockWindowInCenter { set; get; }
 
         public HardwareConfiguration() { }
 
@@ -40,6 +41,7 @@ namespace KLib
             config.RunWindowed = false;
             config.ScreenWidth = 640;
             config.ScreenHeight = 480;
+            config.LockWindowInCenter = false;
             return config;
         }
 

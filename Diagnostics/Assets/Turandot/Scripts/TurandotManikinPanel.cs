@@ -136,9 +136,9 @@ namespace Turandot.Scripts
             {
                 string json = "";
 #if !KDEBUG
-                //if (_sam.valence.visible) json = KLib.FileIO.JSONStringAdd(json, "valence", valenceSlider.LogJSONString);
-                //if (_sam.arousal.visible) json = KLib.FileIO.JSONStringAdd(json, "arousal", arousalSlider.LogJSONString);
-                //if (_sam.dominance.visible) json = KLib.FileIO.JSONStringAdd(json, "dominance", dominanceSlider.LogJSONString);
+                //if (_sam.valence.visible) json = KLibU.Files.JSONStringAdd(json, "valence", valenceSlider.LogJSONString);
+                //if (_sam.arousal.visible) json = KLibU.Files.JSONStringAdd(json, "arousal", arousalSlider.LogJSONString);
+                //if (_sam.dominance.visible) json = KLibU.Files.JSONStringAdd(json, "dominance", dominanceSlider.LogJSONString);
 #endif
                 return json;
             }

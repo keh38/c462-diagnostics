@@ -35,14 +35,14 @@ namespace SpeechReception
             string folder = Path.GetDirectoryName(referencePath);
             _name = Path.GetFileNameWithoutExtension(referencePath);
 
-            References r = KLib.FileIO.XmlDeserialize<References>(referencePath);
+            References r = KLibU.Files.XmlDeserialize<References>(referencePath);
             this.Transducers = r.Transducers;
         }
 
         private void Open(string folder, string name)
         {
             _name = name;
-            References r = KLib.FileIO.XmlDeserialize<References>(Path.Combine(folder, name + "_References.xml"));
+            References r = KLibU.Files.XmlDeserialize<References>(Path.Combine(folder, name + "_References.xml"));
             this.Transducers = r.Transducers;
         }
 

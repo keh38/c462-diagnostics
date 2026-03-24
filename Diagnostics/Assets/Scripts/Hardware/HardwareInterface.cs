@@ -6,6 +6,7 @@ using System.Text;
 using UnityEngine;
 
 using KLib;
+using KLibU;
 
 public class HardwareInterface : MonoBehaviour
 {
@@ -54,6 +55,7 @@ public class HardwareInterface : MonoBehaviour
     public static string ErrorMessage { get { return _instance._errorMessage; } }
     public static void AcknowledgeError() { _instance._errorAcknowledged = true; }
     public static LEDController LED { get { return _instance._ledController; } }
+    public static bool LockWindowInCenter { get { return _instance._hardwareConfig.LockWindowInCenter; } }
     public static void CleanUp() => _instance._CleanUp();
     public static bool Yield() => _instance._Yield();
     public static void Resume() => _instance._Resume();
@@ -100,7 +102,7 @@ public class HardwareInterface : MonoBehaviour
         string configFile = Path.Combine(configFolder, "HardwareConfiguration.xml");
         if (File.Exists(configFile))
         {
-            _hardwareConfig = FileIO.XmlDeserialize<HardwareConfiguration>(Path.Combine(configFolder, "HardwareConfiguration.xml"));
+            _hardwareConfig = Files.XmlDeserialize<HardwareConfiguration>(Path.Combine(configFolder, "HardwareConfiguration.xml"));
         }
         else
         {

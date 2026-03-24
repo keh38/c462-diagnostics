@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using KLib;
+using KLibU;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -53,7 +54,7 @@ public class TurandotPanel : MonoBehaviour
 
     private void ApplyScript(string name)
     {
-        var script = FileIO.XmlDeserialize<Turandot.Schedules.Script>(FileLocations.ConfigFile("TScript", name));
+        var script = Files.XmlDeserialize<Turandot.Schedules.Script>(FileLocations.ConfigFile("TScript", name));
         script.Apply(FileLocations.ProtocolFolder);
     }
 

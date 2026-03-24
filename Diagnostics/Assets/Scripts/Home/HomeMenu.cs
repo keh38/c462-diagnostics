@@ -6,9 +6,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-using KLib;
+using KLibU;
 using KLibU.Net;
-using KLib.MSGraph;
 using KLib.Signals;
 using KLib.Signals.Waveforms;
 using System;
@@ -119,16 +118,16 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 
     private async void ConnectToCloud()
     {
-        MSGraphClient.RestartPath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
-        if (!MSGraphClient.IsReady)
-        {
-            await Task.Run(() => MSGraphClient.Initialize("Diagnostics"));
-        }
+        //MSGraphClient.RestartPath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+        //if (!MSGraphClient.IsReady)
+        //{
+        //    await Task.Run(() => MSGraphClient.Initialize("Diagnostics"));
+        //}
 
-        if (_oneDriveIcon != null)
-        {
-            _oneDriveIcon.color = OneDrivePanel.GetStatusColor(MSGraphClient.GetConnectionStatus());
-        }
+        //if (_oneDriveIcon != null)
+        //{
+        //    _oneDriveIcon.color = OneDrivePanel.GetStatusColor(MSGraphClient.GetConnectionStatus());
+        //}
     }
 
     void EnableMenu(bool enabled)

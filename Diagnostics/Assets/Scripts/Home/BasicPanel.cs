@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using BasicMeasurements;
 using KLib;
+using KLibU;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -49,7 +50,7 @@ public class BasicPanel : MonoBehaviour
         else if (fileType == "LDL")
         {
             var configPath = Path.Combine(FileLocations.ConfigFile("LDL", _listBox.SelectedText));
-            var config = FileIO.XmlDeserialize<BasicMeasurementConfiguration>(configPath) as LDL.LDLMeasurementSettings;
+            var config = Files.XmlDeserialize<BasicMeasurementConfiguration>(configPath) as LDL.LDLMeasurementSettings;
             if (config.HapticStimulus != null && config.HapticStimulus.Source != LDL.Haptics.HapticSource.NONE)
             {
                 SceneManager.LoadScene("LDL_Haptics");
@@ -67,7 +68,7 @@ public class BasicPanel : MonoBehaviour
 
     private void ApplyScript(string name)
     {
-        var script = FileIO.XmlDeserialize<Turandot.Schedules.Script>(FileLocations.ConfigFile("TScript", name));
+        var script = Files.XmlDeserialize<Turandot.Schedules.Script>(FileLocations.ConfigFile("TScript", name));
         script.Apply(FileLocations.ProtocolFolder);
     }
 

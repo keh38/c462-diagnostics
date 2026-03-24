@@ -211,7 +211,7 @@ namespace Turandot.Scripts
             get
             {
                 _log.Trim();
-                return KLib.FileIO.JSONSerializeToString(_log);
+                return KLibU.Files.JSONSerializeToString(_log);
             }
         }
 
@@ -225,7 +225,7 @@ namespace Turandot.Scripts
                 {
                     if (i.Log != null)
                     {
-                        json = KLib.FileIO.JSONStringAdd(json, i.Name, i.Log.JSONString);
+                        json = KLibU.Files.JSONStringAdd(json, i.Name, i.Log.JSONString);
                     }
                 }
 

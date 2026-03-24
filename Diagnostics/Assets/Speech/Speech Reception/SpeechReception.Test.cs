@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Xml.Serialization;
 using KLib;
+using KLibU;
 using KLib.Expressions;
 using KLib.TypeConverters;
 using Newtonsoft.Json;
@@ -260,19 +261,19 @@ namespace SpeechReception
 
             string historyFile = Path.Combine(FileLocations.SubjectMetaFolder, TestType + "_History.xml");
             if (File.Exists(historyFile))
-                history = FileIO.XmlDeserialize<ListHistory>(historyFile);
+                history = Files.XmlDeserialize<ListHistory>(historyFile);
             else
             {
                 history = new ListHistory();
                 history.Order = KMath.Permute(NumListsAvailable);
                 history.LastCompleted = -1;
-                FileIO.XmlSerialize(history, historyFile);
+                Files.XmlSerialize(history, historyFile);
             }
 
             if (excluded.Length > 0)
             {
                 history.Order = KMath.SetDiff(history.Order, excluded);
-                FileIO.XmlSerialize(history, historyFile);
+                Files.XmlSerialize(history, historyFile);
                 NumListsAvailable = history.Order.Length;
                 UnityEngine.Debug.Log("excluded " + Expressions.ToVectorString(excluded) + " from " + TestType + " history");
             }
@@ -323,13 +324,13 @@ namespace SpeechReception
 
             string historyFile = Path.Combine(FileLocations.SubjectMetaFolder, TestType + "_History.xml");
             if (File.Exists(historyFile))
-                history = FileIO.XmlDeserialize<ListHistory>(historyFile);
+                history = Files.XmlDeserialize<ListHistory>(historyFile);
             else
             {
                 history = new ListHistory();
                 history.Order = KMath.Permute(NumListsAvailable);
                 history.LastCompleted = -1;
-                FileIO.XmlSerialize(history, historyFile);
+                Files.XmlSerialize(history, historyFile);
             }
 
             listIndex = history.LastCompleted + 1;

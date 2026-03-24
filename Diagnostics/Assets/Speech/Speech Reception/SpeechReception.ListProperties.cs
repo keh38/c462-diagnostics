@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms.Design;
 using System.Xml.Serialization;
 using ExtensionMethods;
+using KLibU;
 using KLib;
 using KLib.Expressions;
 using KLib.Signals.Calibration;
@@ -138,7 +139,7 @@ namespace SpeechReception
 
         public List<string> GetClosedSetResponses()
         {
-            var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(TestSource));
+            var listDescription = Files.XmlDeserialize<ListDescription>(GetListDescriptionPath(TestSource));
             return listDescription.sentences.Select(o => o.whole).ToList().Unique();
         }
 
@@ -149,7 +150,7 @@ namespace SpeechReception
 
         public void ApplySequence()
         {
-            var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(TestSource));
+            var listDescription = Files.XmlDeserialize<ListDescription>(GetListDescriptionPath(TestSource));
             float[] snr = null;
 
             AnyFiniteSNR = false;
@@ -177,7 +178,7 @@ namespace SpeechReception
             TestSource = testSource;
             TestEar = testEar;
 
-            var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(TestSource));
+            var listDescription = Files.XmlDeserialize<ListDescription>(GetListDescriptionPath(TestSource));
             Title = listDescription.title;
 
             AnyFiniteSNR = false;
@@ -185,7 +186,7 @@ namespace SpeechReception
 
         public int GetItemCount()
         {
-            var listDescription = FileIO.XmlDeserialize<ListDescription>(GetListDescriptionPath(TestSource));
+            var listDescription = Files.XmlDeserialize<ListDescription>(GetListDescriptionPath(TestSource));
             return Sequence.RepeatsPerBlock * Sequence.NumBlocks * (Sequence.choose > 0 ? Sequence.choose : listDescription.sentences.Count);
         }
 

@@ -11,6 +11,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 using KLib;
+using KLibU;
 using KLib.Expressions;
 using KLibU.Net;
 using KLib.Signals.Waveforms;
@@ -107,7 +108,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
         else
         {
             var fn = FileLocations.ConfigFile("LDL", _configName);
-            _settings = FileIO.XmlDeserialize<BasicMeasurementConfiguration>(fn) as LDLMeasurementSettings;
+            _settings = Files.XmlDeserialize<BasicMeasurementConfiguration>(fn) as LDLMeasurementSettings;
             InitializeMeasurement();
             Begin();
         }
@@ -167,8 +168,8 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
             subjectID = GameManager.Subject
         };
 
-        string json = FileIO.JSONStringAdd("", "info", KLib.FileIO.JSONSerializeToString(header));
-        json = KLib.FileIO.JSONStringAdd(json, "params", KLib.FileIO.JSONSerializeToString(_settings));
+        string json = Files.JSONStringAdd("", "info", KLibU.Files.JSONSerializeToString(header));
+        json = KLibU.Files.JSONStringAdd(json, "params", KLibU.Files.JSONSerializeToString(_settings));
         json += Environment.NewLine;
 
         File.WriteAllText(_dataPath, json);
@@ -666,8 +667,8 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
             _data.LDLgram = null;
         }
 
-//        File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
-        KLib.Utilities.AppendToJsonFile(_dataPath, FileIO.JSONSerializeToString(_data));
+//        File.AppendAllText(_dataPath, Files.JSONSerializeToString(_data));
+        KLib.Utilities.AppendToJsonFile(_dataPath, Files.JSONSerializeToString(_data));
     }
 
     void UpdateLDLGram()
@@ -738,7 +739,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 
     private void SaveState()
     {
-        FileIO.JSONSerialize(_state, _stateFile);
+        Files.JSONSerialize(_state, _stateFile);
     }
 
     private HapticsMeasurementState RestoreState()
@@ -747,7 +748,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 
         try
         {
-            s = FileIO.JSONDeserialize<HapticsMeasurementState>(_stateFile);
+            s = Files.JSONDeserialize<HapticsMeasurementState>(_stateFile);
         }
         catch (System.Exception ex)
         {

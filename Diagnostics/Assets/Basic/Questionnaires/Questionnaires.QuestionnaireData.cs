@@ -16,12 +16,9 @@ namespace Questionnaires
 
         public QuestionnaireData(Questionnaire questionnaire)
         {
-            Debug.Log("hello");
             Name = questionnaire.Title;
-            Debug.Log("it's me");
             foreach (Question q in questionnaire.Questions)
             {
-                Debug.Log($"add a question: {q.Prompt}");
                 responses.Add(new Response(q.Prompt));
             }
         }

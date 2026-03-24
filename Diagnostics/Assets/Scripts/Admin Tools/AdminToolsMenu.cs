@@ -7,7 +7,6 @@ using UnityEngine.UI;
 
 using KLib;
 using KLibU.Net;
-using KLib.MSGraph;
 
 public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
 {
@@ -31,7 +30,7 @@ public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
 
     IEnumerator Start()
     {
-        _cloudIcon.color = OneDrivePanel.GetStatusColor(MSGraphClient.GetConnectionStatus(out string details));
+        _cloudIcon.color = OneDrivePanel.GetStatusColor();// MSGraphClient.GetConnectionStatus(out string details));
         if (!HardwareInterface.IsReady && !HardwareInterface.ErrorAcknowledged)
         {
             HardwareInterface.AcknowledgeError();

@@ -2,13 +2,10 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-#if UNITY_METRO && !UNITY_EDITOR
-using LegacySystem.IO;
-#else
 using System.IO;
-#endif
 
 using KLib;
+using KLibU;
 using KLib.Signals;
 using KLib.Signals.Waveforms;
 
@@ -25,12 +22,12 @@ namespace Audiograms
 
         public static ANSI_dBHL GetTable()
         {
-            return FileIO.XmlDeserializeFromTextAsset<ANSI_dBHL>("ANSI_dBHL");
+            return Files.XmlDeserializeFromTextAsset<ANSI_dBHL>("ANSI_dBHL");
         }
 
         public static ANSI_dBHL GetTable(string transducer)
         {
-            return FileIO.XmlDeserializeFromTextAsset<ANSI_dBHL>($"ANSI_dBHL_{transducer}");
+            return Files.XmlDeserializeFromTextAsset<ANSI_dBHL>($"ANSI_dBHL_{transducer}");
         }
 
         public float HL_To_SPL(float freq)

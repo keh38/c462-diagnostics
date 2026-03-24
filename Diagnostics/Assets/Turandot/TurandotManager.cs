@@ -15,6 +15,7 @@ using Turandot.Schedules;
 using Turandot.Scripts;
 using UnityEngine.Video;
 using KLib;
+using KLibU;
 using KLib.Expressions;
 using KLibU.Net;
 using NUnit.Framework;
@@ -120,13 +121,13 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
             configName = parts[0];
             localName = FileLocations.ConfigFile("Turandot", configName);
-            _params = KLib.FileIO.XmlDeserialize<Parameters>(localName);
+            _params = KLibU.Files.XmlDeserialize<Parameters>(localName);
             _paramFile = Path.GetFileName(localName);
             _state = new TurandotState(GameManager.Project, GameManager.Subject, configName);
 
             if (parts.Length > 1)
             {
-                var args = FileIO.JSONDeserializeFromString<ScriptArguments>(parts[1]);
+                var args = Files.JSONDeserializeFromString<ScriptArguments>(parts[1]);
                 ApplyScriptArguments(args);
             }
 
@@ -348,7 +349,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         _state.Save();
 
         string localName = Path.Combine(Application.persistentDataPath, "scldump.json");
-        File.WriteAllText(localName, KLib.FileIO.JSONSerializeToString(_state.MasterSCL));
+        File.WriteAllText(localName, KLibU.Files.JSONSerializeToString(_state.MasterSCL));
 
         if (_params.schedule.mode == Mode.Sequence || _params.schedule.mode == Mode.CS)
         {
@@ -399,7 +400,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         {
             _state.CurrentBlockSCL = _state.MasterSCL.FindAll(o => o.block == _blockNum + 1);
             string localName = Path.Combine(Application.persistentDataPath, "scldump.json");
-            File.WriteAllText(localName, KLib.FileIO.JSONSerializeToString(_state.CurrentBlockSCL));
+            File.WriteAllText(localName, KLibU.Files.JSONSerializeToString(_state.CurrentBlockSCL));
 
             if (_blockNum == 0)
             {
@@ -456,7 +457,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
                 return;
             }
             ShowFinishPanel();
-    }
+        }
     }
 
     private void ShowFinishPanel(string message = "")
@@ -558,9 +559,9 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             }
         }
 
-        string json = KLib.FileIO.JSONStringAdd("", "info", KLib.FileIO.JSONSerializeToString(header));
-        json = KLib.FileIO.JSONStringAdd(json, "params", KLib.FileIO.JSONSerializeToString(_params));
-        json = KLib.FileIO.JSONStringAdd(json, "data", $"[{Environment.NewLine}]");
+        string json = KLibU.Files.JSONStringAdd("", "info", KLibU.Files.JSONSerializeToString(header));
+        json = KLibU.Files.JSONStringAdd(json, "params", KLibU.Files.JSONSerializeToString(_params));
+        json = KLibU.Files.JSONStringAdd(json, "data", $"[{Environment.NewLine}]");
         //json += Environment.NewLine;
 
         File.WriteAllText(_mainDataFile, json);
@@ -770,7 +771,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         _data.result = _engine.Result;
         _data.reactionTime = _engine.ReactionTime;
         _data.properties.AddRange(_params.GetPostTrialProperties(_data.properties));
-        KLib.FileIO.AppendTextFile(_mainDataFile, _data.ToJSONString(_engine.GetEventsAsJSON()));
+        KLibU.Files.AppendTextFile(_mainDataFile, _data.ToJSONString(_engine.GetEventsAsJSON()));
         
         HTS_Server.SendRequest("Turandot", "State:Finished");
 
@@ -784,7 +785,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             string json = "";
             foreach (AdaptiveTrack at in _params.adapt.tracks)
             {
-                json += KLib.FileIO.JSONStringAdd(json, at.name, KLib.FileIO.JSONSerializeToString(at.History));
+                json += KLibU.Files.JSONStringAdd(json, at.name, KLibU.Files.JSONSerializeToString(at.History));
             }
             string blockDataFile = _mainDataFile.Replace(".json", "-Block" + _params.adapt.BlockNumber + ".json");
             File.WriteAllText(blockDataFile, json);
@@ -834,10 +835,10 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
                     GameManager.AddMetric(at.storeThresholdAs, final.Find(f => f.name == at.name).threshold.ToString());
                 }
             }
-            string json = KLib.FileIO.JSONStringAdd("", "trackResults", KLib.FileIO.JSONSerializeToString(_params.adapt.Results));
+            string json = KLibU.Files.JSONStringAdd("", "trackResults", KLibU.Files.JSONSerializeToString(_params.adapt.Results));
             File.AppendAllText(_mainDataFile, json);
 
-            json = KLib.FileIO.JSONStringAdd("", "finalResults", KLib.FileIO.JSONSerializeToString(final));
+            json = KLibU.Files.JSONStringAdd("", "finalResults", KLibU.Files.JSONSerializeToString(final));
             File.AppendAllText(_mainDataFile, json);
 
             _isRunning = false;

@@ -1,4 +1,5 @@
 using KLib;
+using KLibU;
 using KLibU.Net;
 using System;
 using System.Collections;
@@ -135,7 +136,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         else
         {
             var fn = FileLocations.ConfigFile("SpeechTest", _configName);
-            _settings = FileIO.XmlDeserialize<SpeechTest>(fn);
+            _settings = Files.XmlDeserialize<SpeechTest>(fn);
             InitializeMeasurement();
             Begin();
         }
@@ -616,7 +617,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
             responsePath += "-" + _recordPanel.NumAttempts;
         }
 
-        string json = FileIO.JSONStringAdd("", "info", FileIO.JSONSerializeToString(r));
+        string json = Files.JSONStringAdd("", "info", Files.JSONSerializeToString(r));
         File.WriteAllText($"{responsePath}.json", json);
 
         KLib.Wave.WaveFile.Write(_recordPanel.Data, (uint)r.Fs, 16, $"{responsePath}.wav");
@@ -652,9 +653,9 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
             subjectID = GameManager.Subject
         };
 
-        string json = FileIO.JSONStringAdd("", "info", KLib.FileIO.JSONSerializeToString(header));
-        json = FileIO.JSONStringAdd(json, "data", KLib.FileIO.JSONSerializeToString(_srData));
-        json = FileIO.JSONStringAdd(json, "log", KLib.FileIO.JSONSerializeToString(_log.Trim()));
+        string json = Files.JSONStringAdd("", "info", KLibU.Files.JSONSerializeToString(header));
+        json = Files.JSONStringAdd(json, "data", KLibU.Files.JSONSerializeToString(_srData));
+        json = Files.JSONStringAdd(json, "log", KLibU.Files.JSONSerializeToString(_log.Trim()));
         json += Environment.NewLine;
 
         File.WriteAllText(_dataPath, json);
@@ -724,9 +725,9 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
                 string historyFile = Path.Combine(FileLocations.SubjectMetaFolder, _settings.TestSource + "_History.xml");
                 if (File.Exists(historyFile))
                 {
-                    var history = FileIO.XmlDeserialize<ListHistory>(historyFile);
+                    var history = Files.XmlDeserialize<ListHistory>(historyFile);
                     history.LastCompleted = _srList.listIndex;
-                    FileIO.XmlSerialize(history, historyFile);
+                    Files.XmlSerialize(history, historyFile);
                 }
             }
 
@@ -1032,7 +1033,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         else
         {
             var response = new SpeechReception.Data.Response(_srList.sentences[_qnum].whole, _srList.sentences[_qnum].words, _srList.sentences[_qnum].SNR, false, "");
-            FileIO.AppendTextFile(_dataPath, FileIO.JSONSerializeToString(response));
+            Files.AppendTextFile(_dataPath, Files.JSONSerializeToString(response));
         }
         _responseAccepted = true;
     }
@@ -1055,7 +1056,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         if (IPC.Instance.Use) IPC.Instance.SendCommand("Response", _qnum.ToString());
 
         yield return new WaitForSeconds(1.0f);
-        FileIO.AppendTextFile(_dataPath, FileIO.JSONSerializeToString(_tentativeResponse));
+        Files.AppendTextFile(_dataPath, Files.JSONSerializeToString(_tentativeResponse));
 
         commonUI.IncrementProgressBar();
         ResponseAcquired();

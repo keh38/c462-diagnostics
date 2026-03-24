@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 using KLib;
+using KLibU;
 using KLibU.Net;
 using KLib.Signals;
 using KLib.Signals.Waveforms;
@@ -57,7 +58,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
         if (!string.IsNullOrEmpty(GameManager.DataForNextScene))
         {
-            var param = FileIO.XmlDeserialize<InteractiveSettings>(FileLocations.ConfigFile("Interactive", GameManager.DataForNextScene));
+            var param = Files.XmlDeserialize<InteractiveSettings>(FileLocations.ConfigFile("Interactive", GameManager.DataForNextScene));
             param.ShowSliders = true;
             ApplyParameters(param);
 

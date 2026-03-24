@@ -30,7 +30,7 @@ namespace KLib.Signals.Calibration
             DeviceCorrections dc = new DeviceCorrections();
             if (File.Exists(path))
             {
-                dc = KLib.FileIO.XmlDeserialize<DeviceCorrections>(path);
+                dc = KLibU.Files.XmlDeserialize<DeviceCorrections>(path);
             }
             return dc;
         }

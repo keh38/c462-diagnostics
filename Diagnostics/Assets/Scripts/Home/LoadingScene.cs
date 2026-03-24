@@ -1,4 +1,5 @@
 using KLib;
+using KLibU;
 using System.Collections;
 using System.IO;
 using UnityEngine;
@@ -23,11 +24,12 @@ public class LoadingScene : MonoBehaviour
             }
         }
 
-        if (nextScene == "Lobby")
+        if (HardwareInterface.LockWindowInCenter)
         {
             yield return null;
             WindowManager.InitializeWindow(Screen.width, Screen.height);
         }
+
 #else
         nextScene = "Lobby";
 #endif

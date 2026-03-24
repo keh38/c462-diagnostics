@@ -5,7 +5,7 @@ using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
 
-using KLib.Network;
+using KLibU.Legacy.Network;
 
 public class IntercomReceiver : MonoBehaviour
 {
@@ -91,7 +91,7 @@ public class IntercomReceiver : MonoBehaviour
         //_address = NetworkUtils.FindServerAddress();
 
         _listener = new KTcpListener();
-        _listener.StartListener(_ipEndPoint, bigEndian: false);
+        _listener.StartListener(_ipEndPoint, bigEndian:false);
 
         // create thread for reading UDP messages
         _readThreadTCP = new Thread(new ThreadStart(TCPServer));

@@ -52,7 +52,7 @@ public class PlayPanel : MonoBehaviour
 
     private void CreateDemoList()
     {
-//        _demos = FileIO.XmlDeserializeFromTextAsset<List<DemoDescription>>("demos");
+//        _demos = Files.XmlDeserializeFromTextAsset<List<DemoDescription>>("demos");
     }
 
 }

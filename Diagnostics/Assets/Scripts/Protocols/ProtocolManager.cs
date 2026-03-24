@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 using Protocols;
 
 using KLib;
-using System.Diagnostics.Eventing.Reader;
+using KLibU;
 using HTS.Unity.Tcp;
 using KLibU.Net;
 using System.Net;
@@ -73,7 +73,7 @@ public class ProtocolManager : MonoBehaviour
 
         string protocolPath = Path.Combine(FileLocations.ProtocolFolder, $"{protocolName}.xml");
         
-        _protocol = FileIO.XmlDeserialize<Protocol>(protocolPath);
+        _protocol = Files.XmlDeserialize<Protocol>(protocolPath);
         _history = null;
         
         var fileList = Directory.GetFiles(FileLocations.SubjectFolder, $"{GameManager.Subject}-{protocolName}-History-*.json").ToList();
@@ -81,7 +81,7 @@ public class ProtocolManager : MonoBehaviour
         {
             fileList.Sort((x, y) => File.GetCreationTime(y).CompareTo(File.GetCreationTime(x)));
 
-            _history = FileIO.JSONDeserialize<ProtocolHistory>(fileList[0]);
+            _history = Files.JSONDeserialize<ProtocolHistory>(fileList[0]);
             if (_history.Matches(_protocol) && !_history.Finished)
             {
                 _historyPath = fileList[0];
@@ -121,15 +121,24 @@ public class ProtocolManager : MonoBehaviour
         var nextTest = _history.Data[_nextTestIndex];
         GameManager.DataForNextScene = nextTest.Settings;
 
+        if (nextTest.Scene == "Questionnaire")
+        {
+            SceneManager.LoadScene("Questionnaire");
+            return;
+        }
+
         if (nextTest.Scene == "Turandot")
         {
             SceneManager.LoadScene("Turandot");
+            return;
         }
-        else if (nextTest.Scene == "TScript")
+        
+        if (nextTest.Scene == "TScript")
         {
-            var script = FileIO.XmlDeserialize<Turandot.Schedules.Script>(FileLocations.ConfigFile("TScript", nextTest.Settings));
+            var script = Files.XmlDeserialize<Turandot.Schedules.Script>(FileLocations.ConfigFile("TScript", nextTest.Settings));
             script.Apply(FileLocations.ProtocolFolder);
             _FinishTest("none");
+            return;
         }
     }
 
@@ -140,7 +149,7 @@ public class ProtocolManager : MonoBehaviour
         _history.Data[_nextTestIndex].DataFile = datafile;
         _nextTestIndex++;
       
-        FileIO.JSONSerialize(_history, _historyPath);
+        Files.JSONSerialize(_history, _historyPath);
 
         if (_history.Finished)
         {
@@ -176,6 +185,7 @@ public class ProtocolManager : MonoBehaviour
             HardwareInterface.Resume();
             WindowManager.BringToFront();
 
+            _notification = runMeasurementsPayload.Notification;
             GameManager.SetSubject($"{runMeasurementsPayload.Project}/{runMeasurementsPayload.Subject}");
             _InitializeProtocol(runMeasurementsPayload.ListFile);
         }
@@ -193,7 +203,22 @@ public class ProtocolManager : MonoBehaviour
     private IEnumerator StartProtocolNextFrame()
     {
         yield return null;
-        _StartProtocol(resume: false);
+
+        _history = new ProtocolHistory(_protocol);
+        _nextTestIndex = 0;
+        _historyPath = Path.Combine(
+            FileLocations.SubjectFolder,
+            $"{GameManager.Subject}-{_protocolName}-History-{DateTime.Now.ToString("yyyyMMdd_HHmmss")}.json");
+
+        _active = true;
+        if (_protocol.FullAuto)
+        {
+            _Advance();
+        }
+        else
+        {
+            SceneManager.LoadScene("Protocol");
+        }
     }
 
     private void _SendNotification(NotificationDescriptor notification)

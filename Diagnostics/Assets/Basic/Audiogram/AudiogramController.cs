@@ -12,6 +12,7 @@ using UnityEngine.UI;
 
 using Audiograms;
 using KLib;
+using KLibU;
 using KLibU.Net;
 using KLib.Signals;
 using KLib.Signals.Enumerations;
@@ -129,7 +130,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         else
         {
             var fn = FileLocations.ConfigFile("Audiogram", _configName);
-            _settings = FileIO.XmlDeserialize<BasicMeasurementConfiguration>(fn) as AudiogramMeasurementSettings;
+            _settings = Files.XmlDeserialize<BasicMeasurementConfiguration>(fn) as AudiogramMeasurementSettings;
             InitializeMeasurement();
             Begin();
         }
@@ -196,8 +197,8 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             subjectID = GameManager.Subject
         };
 
-        string json = FileIO.JSONStringAdd("", "info", KLib.FileIO.JSONSerializeToString(header));
-        json = KLib.FileIO.JSONStringAdd(json, "params", KLib.FileIO.JSONSerializeToString(_settings));
+        string json = Files.JSONStringAdd("", "info", KLibU.Files.JSONSerializeToString(header));
+        json = KLibU.Files.JSONStringAdd(json, "params", KLibU.Files.JSONSerializeToString(_settings));
         json += Environment.NewLine;
 
         File.WriteAllText(_dataPath, json);
@@ -321,9 +322,9 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(false);
 
-        KLib.Utilities.AppendToJsonFile(_dataPath, FileIO.JSONSerializeToString(_data));
-        KLib.Utilities.AppendToJsonFile(_dataPath, FileIO.JSONSerializeToString(_buttonLog.Trim()));
-//        File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
+        KLib.Utilities.AppendToJsonFile(_dataPath, Files.JSONSerializeToString(_data));
+        KLib.Utilities.AppendToJsonFile(_dataPath, Files.JSONSerializeToString(_buttonLog.Trim()));
+//        File.AppendAllText(_dataPath, Files.JSONSerializeToString(_data));
         _data.audiogramData.Save();
 
         // Delete state file
@@ -908,7 +909,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
     private void SaveState()
     {
         var state = new { State = _state, Data = _data };
-        FileIO.JSONSerialize(state, _stateFile);
+        Files.JSONSerialize(state, _stateFile);
     }
 
     private ProcedureData RestoreState(bool discard)
@@ -934,7 +935,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         {
             Debug.Log($"error restoring state: {ex.Message}");
         }
-        FileIO.CloseBinarySerialization();
+        Files.CloseBinarySerialization();
         return d;
     }
 

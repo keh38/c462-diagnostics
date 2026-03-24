@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
+using KLibU;
+
 namespace KLib.Signals.Calibration
 {
     [Serializable]
@@ -38,7 +40,7 @@ namespace KLib.Signals.Calibration
             if (!File.Exists(fn))
                 throw new Exception($"Calibration not found: {Path.GetFileNameWithoutExtension(fn)}");
 
-            return FileIO.XmlDeserialize<AcousticCalibration>(fn);
+            return Files.XmlDeserialize<AcousticCalibration>(fn);
         }
 
         public static AcousticCalibration ReadCFTSCalibrationFile(string filename)

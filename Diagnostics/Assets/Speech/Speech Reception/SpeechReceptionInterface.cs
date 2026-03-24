@@ -192,7 +192,7 @@ public class SpeechReceptionInterface : MonoBehaviour
                 string[] parts = f.Split('.');
                 if (parts.Length == 3)
                 {
-                    var test = FileIO.XmlDeserialize<SpeechReception.Test>(f);
+                    var test = Files.XmlDeserialize<SpeechReception.Test>(f);
                     result.tests.Add(parts[1]);
                 }
             }
@@ -213,7 +213,7 @@ public class SpeechReceptionInterface : MonoBehaviour
             _state.level = level;
             _state.testSNRs = snrs;
             _customizations.Set(_speechList.TestType, _level, snrs);
-            FileIO.XmlSerialize(_customizations, DataFileLocations.SubjectCustomSpeechPath);
+            Files.XmlSerialize(_customizations, DataFileLocations.SubjectCustomSpeechPath);
         }
         catch (Exception ex)
         {
@@ -267,7 +267,7 @@ public class SpeechReceptionInterface : MonoBehaviour
         {
             var configPath = DataFileLocations.ConfigFile("CustomizeSpeech", name);
 
-            _speechTest = FileIO.XmlDeserialize<Test>(configPath);
+            _speechTest = Files.XmlDeserialize<Test>(configPath);
             _speechList = _speechTest.Lists[0];
             _speechFilenameFormat = _speechList.file;
 
@@ -395,7 +395,7 @@ public class SpeechReceptionInterface : MonoBehaviour
     {
         _state.masker = _speechList.masker.Source;
 
-        SpeechReception.References r = new SpeechReception.References(FileIO.CombinePaths(DataFileLocations.SpeechWavFolder, "Maskers"), _speechList.masker.Source);
+        SpeechReception.References r = new SpeechReception.References(Files.CombinePaths(DataFileLocations.SpeechWavFolder, "Maskers"), _speechList.masker.Source);
         _maxMaskerLevel = Mathf.Floor(r.GetReference(_transducer, "dBSPL"));
 
         _state.maxMaskerLevel = _maxMaskerLevel;
@@ -438,7 +438,7 @@ public class SpeechReceptionInterface : MonoBehaviour
         Debug.Log(_curItem + ": " + wavfile);
         Debug.Log("Level =" + _level + "; SNR = " + _currentSNR);
 
-        WWW www = new WWW("file:///" + FileIO.CombinePaths(DataFileLocations.SpeechWavFolder, _speechList.TestType, wavfile));
+        WWW www = new WWW("file:///" + Files.CombinePaths(DataFileLocations.SpeechWavFolder, _speechList.TestType, wavfile));
         //WWW www = new WWW("file:///" + System.IO.Path.Combine(DataFileLocations.SpeechWavFolder, wavfile));
         while (!www.isDone)
             yield return null;
@@ -623,7 +623,7 @@ public class SpeechReceptionInterface : MonoBehaviour
 
         Debug.Log(_qnum + ": " + wavfile);
 
-        WWW www = new WWW("file:///" + FileIO.CombinePaths(DataFileLocations.SpeechWavFolder, _speechTest.TestType, wavfile));
+        WWW www = new WWW("file:///" + Files.CombinePaths(DataFileLocations.SpeechWavFolder, _speechTest.TestType, wavfile));
         //WWW www = new WWW("file:///" + System.IO.Path.Combine(DataFileLocations.SpeechWavFolder, wavfile));
         while (!www.isDone)
             yield return null;
@@ -725,12 +725,12 @@ public class SpeechReceptionInterface : MonoBehaviour
         {
             if (_speechList.listIndex >= 0)
             {
-                string historyFile = FileIO.CombinePaths(DataFileLocations.SubjectMetaFolder, _speechList.TestType + "_History.xml");
+                string historyFile = Files.CombinePaths(DataFileLocations.SubjectMetaFolder, _speechList.TestType + "_History.xml");
                 if (File.Exists(historyFile))
                 {
-                    var history = FileIO.XmlDeserialize<ListHistory>(historyFile);
+                    var history = Files.XmlDeserialize<ListHistory>(historyFile);
                     history.LastCompleted = _speechList.listIndex;
-                    FileIO.XmlSerialize(history, historyFile);
+                    Files.XmlSerialize(history, historyFile);
                 }
             }
         }

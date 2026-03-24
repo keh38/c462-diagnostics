@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 
 using KLib;
+using KLibU;
 using KLib.Signals;
 using KLib.Signals.Waveforms;
 
@@ -175,7 +176,7 @@ namespace Audiograms
 
         public void Save(string path)
         {
-            FileIO.XmlSerialize(this, path);
+            Files.XmlSerialize(this, path);
         }
 
         public static AudiogramData Load()
@@ -198,7 +199,7 @@ namespace Audiograms
         {
             if (File.Exists(path))
             {
-                return FileIO.XmlDeserialize<AudiogramData>(path);
+                return Files.XmlDeserialize<AudiogramData>(path);
             }
             return null;
         }

@@ -60,6 +60,7 @@
             label7 = new System.Windows.Forms.Label();
             numPixelsNumeric = new KLib.Controls.KNumericBox();
             ledTypeComboBox = new System.Windows.Forms.ComboBox();
+            lockCheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)dataGridView).BeginInit();
             SuspendLayout();
             // 
@@ -346,7 +347,7 @@
             // windowedCheckBox
             // 
             windowedCheckBox.AutoSize = true;
-            windowedCheckBox.Location = new System.Drawing.Point(90, 519);
+            windowedCheckBox.Location = new System.Drawing.Point(90, 509);
             windowedCheckBox.Name = "windowedCheckBox";
             windowedCheckBox.Size = new System.Drawing.Size(105, 19);
             windowedCheckBox.TabIndex = 18;
@@ -363,7 +364,7 @@
             widthNumeric.FloatValue = 0F;
             widthNumeric.IntValue = 0;
             widthNumeric.IsInteger = true;
-            widthNumeric.Location = new System.Drawing.Point(90, 544);
+            widthNumeric.Location = new System.Drawing.Point(90, 534);
             widthNumeric.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
             widthNumeric.MaxCoerce = false;
             widthNumeric.MaximumSize = new System.Drawing.Size(20000, 23);
@@ -389,7 +390,7 @@
             heightNumeric.FloatValue = 0F;
             heightNumeric.IntValue = 0;
             heightNumeric.IsInteger = true;
-            heightNumeric.Location = new System.Drawing.Point(179, 544);
+            heightNumeric.Location = new System.Drawing.Point(179, 534);
             heightNumeric.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
             heightNumeric.MaxCoerce = false;
             heightNumeric.MaximumSize = new System.Drawing.Size(20000, 23);
@@ -409,7 +410,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new System.Drawing.Point(159, 548);
+            label6.Location = new System.Drawing.Point(159, 538);
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(14, 15);
             label6.TabIndex = 21;
@@ -463,11 +464,23 @@
             ledTypeComboBox.TabIndex = 24;
             ledTypeComboBox.SelectedIndexChanged += ledTypeComboBox_SelectedIndexChanged;
             // 
+            // lockCheckBox
+            // 
+            lockCheckBox.AutoSize = true;
+            lockCheckBox.Location = new System.Drawing.Point(90, 566);
+            lockCheckBox.Name = "lockCheckBox";
+            lockCheckBox.Size = new System.Drawing.Size(100, 19);
+            lockCheckBox.TabIndex = 25;
+            lockCheckBox.Text = "Lock in center";
+            lockCheckBox.UseVisualStyleBackColor = true;
+            lockCheckBox.CheckedChanged += lockCheckBox_CheckedChanged;
+            // 
             // ConfigForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(613, 661);
+            Controls.Add(lockCheckBox);
             Controls.Add(ledTypeComboBox);
             Controls.Add(label7);
             Controls.Add(numPixelsNumeric);
@@ -537,5 +550,6 @@
         private System.Windows.Forms.Label label7;
         private KLib.Controls.KNumericBox numPixelsNumeric;
         private System.Windows.Forms.ComboBox ledTypeComboBox;
+        private System.Windows.Forms.CheckBox lockCheckBox;
     }
 }

@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 using KLib;
+using KLibU;
 using KLibU.Net;
 using System.Threading.Tasks;
 using HTS.Unity.Tcp;
@@ -26,7 +27,6 @@ public class HTS_Server : MonoBehaviour
     private bool _remoteConnected = false;
     private IPEndPoint _remoteEndPoint = null;
 
-    private const int BeaconPort = 10002;
     private KTcpListener _beaconListener = null;
 
     // Make singleton
@@ -84,7 +84,7 @@ public class HTS_Server : MonoBehaviour
         var payload = new RemoteMessagePayload
         {
             Target = target,
-            Data = FileIO.JSONSerializeToString(data)
+            Data = Files.JSONSerializeToString(data)
         };
         SendRequest(command, payload);
     }
@@ -156,9 +156,9 @@ public class HTS_Server : MonoBehaviour
         Debug.Log("started HTS TCP server on " + _ipEndPoint.ToString());
 
         _beaconListener = new KTcpListener();
-        _beaconListener.StartListener(new IPEndPoint(IPAddress.Loopback, BeaconPort));
+        _beaconListener.StartListener(new IPEndPoint(IPAddress.Loopback, HTSProtocol.BeaconPort));
         StartCoroutine(BeaconServer());
-        Debug.Log($"Beacon server started on port {BeaconPort}");
+        Debug.Log($"Beacon server started on port {HTSProtocol.BeaconPort}");
 
         var discoveryBeacon = gameObject.AddComponent<NetworkDiscoveryBeacon>();
         discoveryBeacon.StartBroadcasting(
@@ -276,6 +276,7 @@ public class HTS_Server : MonoBehaviour
                     Debug.Log($"Connection accepted from {incomingEndPoint}");
                     _remoteConnected = true;
                     _remoteEndPoint = incomingEndPoint;
+                    WindowManager.BringToFront();
                     OnControllerConnected?.Invoke(this, EventArgs.Empty);
                 }
                 break;

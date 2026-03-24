@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 
 using KLib;
+using KLibU;
 
 namespace KLib.Signals.Waveforms
 {
@@ -37,7 +38,7 @@ namespace KLib.Signals.Waveforms
 
             if (File.Exists(path))
             {
-                ufr = FileIO.XmlDeserialize<UserFileReferences>(refPath);
+                ufr = Files.XmlDeserialize<UserFileReferences>(refPath);
             }
             return ufr;
         }

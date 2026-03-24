@@ -10,6 +10,7 @@ using UnityEngine.UI;
 
 using Audiograms;
 using KLib;
+using KLibU;
 using KLib.Expressions;
 using KLibU.Net;
 
@@ -112,7 +113,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         else
         {
             var fn = FileLocations.ConfigFile("Digits", _configName);
-            _settings = FileIO.XmlDeserialize<BasicMeasurementConfiguration>(fn) as DigitsTestSettings;
+            _settings = Files.XmlDeserialize<BasicMeasurementConfiguration>(fn) as DigitsTestSettings;
             InitializeMeasurement();
             Begin();
         }
@@ -192,10 +193,10 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
             subjectID = GameManager.Subject
         };
 
-        string json = FileIO.JSONStringAdd("", "info", KLib.FileIO.JSONSerializeToString(header));
-        json = FileIO.JSONStringAdd(json, "params", KLib.FileIO.JSONSerializeToString(_settings));
-        json = FileIO.JSONStringAdd(json, "data", KLib.FileIO.JSONSerializeToString(_data));
-        json = FileIO.JSONStringAdd(json, "log", KLib.FileIO.JSONSerializeToString(_log.Trim()));
+        string json = Files.JSONStringAdd("", "info", KLibU.Files.JSONSerializeToString(header));
+        json = Files.JSONStringAdd(json, "params", KLibU.Files.JSONSerializeToString(_settings));
+        json = Files.JSONStringAdd(json, "data", KLibU.Files.JSONSerializeToString(_data));
+        json = Files.JSONStringAdd(json, "log", KLibU.Files.JSONSerializeToString(_log.Trim()));
         json += Environment.NewLine;
 
         var filepath = _dataPath.Replace(".json", $"-{_data.name}.json");

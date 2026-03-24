@@ -34,7 +34,7 @@ namespace Digits
 
             if (File.Exists(StateFile))
             {
-                var savedState = KLib.FileIO.XmlDeserialize<TestStatus>(StateFile);
+                var savedState = KLibU.Files.XmlDeserialize<TestStatus>(StateFile);
                 inProgress = savedState.configName == this.configName;
             }
 
@@ -45,7 +45,7 @@ namespace Digits
         {
             if (File.Exists(StateFile))
             {
-                var savedState = KLib.FileIO.XmlDeserialize<TestStatus>(StateFile);
+                var savedState = KLibU.Files.XmlDeserialize<TestStatus>(StateFile);
                 return savedState;
             }
             else
@@ -56,7 +56,7 @@ namespace Digits
 
         public void Save()
         {
-            KLib.FileIO.XmlSerialize(this, StateFile);
+            KLibU.Files.XmlSerialize(this, StateFile);
         }
 
         private static string StateFile

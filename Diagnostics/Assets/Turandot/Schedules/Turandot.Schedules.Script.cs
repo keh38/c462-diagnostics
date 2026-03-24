@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using KLib.Signals;
+using KLibU;
 using KLib;
 using KLib.Expressions;
 using KLib.TypeConverters;
@@ -229,7 +230,7 @@ namespace Turandot.Schedules
         {
             List<ProtocolEntry> entries = new List<ProtocolEntry>();
 
-            string serializedArgs = FileIO.JSONSerializeToString(args, Newtonsoft.Json.Formatting.None);
+            string serializedArgs = Files.JSONSerializeToString(args, Newtonsoft.Json.Formatting.None);
 
             foreach (string configFile in ConfigFiles)
             {
@@ -251,7 +252,7 @@ namespace Turandot.Schedules
             protocol.Title = name;
             protocol.FullAuto = true;
             protocol.Tests.AddRange(entries);
-            FileIO.XmlSerialize(protocol, Path.Combine(folder, $"{name}.xml"));
+            Files.XmlSerialize(protocol, Path.Combine(folder, $"{name}.xml"));
         }
     }
 }

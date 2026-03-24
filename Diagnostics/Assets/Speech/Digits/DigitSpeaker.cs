@@ -45,7 +45,7 @@ public class DigitSpeaker : MonoBehaviour
 
     IEnumerator GetClips()
     {
-        DigitsWavManifest manifest = KLib.FileIO.XmlDeserializeFromTextAsset<DigitsWavManifest>("Digit Manifests/DigitsWavManifest_" + speakerID.ToString());
+        DigitsWavManifest manifest = KLibU.Files.XmlDeserializeFromTextAsset<DigitsWavManifest>("Digit Manifests/DigitsWavManifest_" + speakerID.ToString());
 
         foreach (string fn in manifest.wavfiles)
         {

@@ -10,6 +10,7 @@ using UnityEngine.UI;
 
 using Audiograms;
 using KLib;
+using KLibU;
 using KLibU.Net;
 
 using BasicMeasurements;
@@ -105,8 +106,8 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
             subjectID = GameManager.Subject
         };
 
-        string json = FileIO.JSONStringAdd("", "info", KLib.FileIO.JSONSerializeToString(header));
-        json = KLib.FileIO.JSONStringAdd(json, "params", KLib.FileIO.JSONSerializeToString(_settings));
+        string json = Files.JSONStringAdd("", "info", KLibU.Files.JSONSerializeToString(header));
+        json = KLibU.Files.JSONStringAdd(json, "params", KLibU.Files.JSONSerializeToString(_settings));
         json += Environment.NewLine;
 
         File.WriteAllText(_dataPath, json);
@@ -259,7 +260,7 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
         switch (request.Command)
         {
             case "Initialize":
-                _settings = FileIO.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as AudiogramMeasurementSettings;
+                _settings = Files.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as AudiogramMeasurementSettings;
                 InitializeMeasurement();
                 return TcpMessage.Ok();
             case "StartSynchronizing":

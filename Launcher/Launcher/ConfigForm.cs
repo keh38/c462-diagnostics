@@ -64,6 +64,7 @@ namespace Launcher
             windowedCheckBox.Checked = _config.RunWindowed;
             widthNumeric.IntValue = _config.ScreenWidth;
             heightNumeric.IntValue = _config.ScreenHeight;
+            lockCheckBox.Checked = _config.LockWindowInCenter;
 
             _ignoreEvents = false;
         }
@@ -493,6 +494,14 @@ namespace Launcher
             }
         }
 
+        private void lockCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!_ignoreEvents)
+            {
+                _config.LockWindowInCenter = lockCheckBox.Checked;
+            }
+        }
+
         private void numPixelsNumeric_ValueChanged(object sender, EventArgs e)
         {
             if (!_ignoreEvents)
@@ -509,5 +518,6 @@ namespace Launcher
             }
 
         }
+
     }
 }

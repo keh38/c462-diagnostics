@@ -35,7 +35,7 @@ namespace SpeechReception
         public void Save()
         {
             foreach (var t in tests) t.MakeListsSerializable(true);
-            KLib.FileIO.XmlSerialize(this, StateFile);
+            KLibU.Files.XmlSerialize(this, StateFile);
         }
 
         public void Finish()
@@ -50,7 +50,7 @@ namespace SpeechReception
 
             if (File.Exists(StateFile))
             {
-                var savedState = KLib.FileIO.XmlDeserialize<TestPlan>(StateFile);
+                var savedState = KLibU.Files.XmlDeserialize<TestPlan>(StateFile);
                 inProgress = 
                     !savedState.IsFinished &&
                     savedState.name == this.name &&
@@ -65,7 +65,7 @@ namespace SpeechReception
         {
             if (File.Exists(StateFile))
             {
-                var savedState = KLib.FileIO.XmlDeserialize<TestPlan>(StateFile);
+                var savedState = KLibU.Files.XmlDeserialize<TestPlan>(StateFile);
 
                 return savedState;
             }

@@ -8,6 +8,7 @@ using UnityEngine;
 using Newtonsoft.Json;
 using ProtoBuf;
 
+using KLibU;
 using KLib.Signals.Calibration;
 using KLib.Signals.Enumerations;
 using KLib.Signals.Modulations;
@@ -272,7 +273,7 @@ namespace KLib.Signals
 
         public Channel Clone()
         {
-            return FileIO.XmlDeserializeFromString<Channel>(FileIO.XmlSerializeToString(this));
+            return Files.XmlDeserializeFromString<Channel>(Files.XmlSerializeToString(this));
 //            return Channel.FromProtoBuf(this.ToProtoBuf());
         }
 

@@ -4,6 +4,7 @@ using System.IO;
 using UnityEngine;
 
 using KLib;
+using KLibU;
 
 public class GameManager : MonoBehaviour
 {
@@ -153,7 +154,7 @@ public class GameManager : MonoBehaviour
 
         if (File.Exists(FileLocations.ConfigFile("Project.Settings")))
         {
-            _projectSettings = FileIO.XmlDeserialize<Project.Settings>(FileLocations.ConfigFile("Project.Settings"));
+            _projectSettings = Files.XmlDeserialize<Project.Settings>(FileLocations.ConfigFile("Project.Settings"));
         }
         else
         {
@@ -162,7 +163,7 @@ public class GameManager : MonoBehaviour
 
         if (File.Exists(FileLocations.SubjectMetadataPath))
         {
-            _subjectMetadata = FileIO.XmlDeserialize<SubjectMetadata>(FileLocations.SubjectMetadataPath);
+            _subjectMetadata = Files.XmlDeserialize<SubjectMetadata>(FileLocations.SubjectMetadataPath);
         }
         else
         {
@@ -220,7 +221,7 @@ public class GameManager : MonoBehaviour
         {
             Directory.CreateDirectory(FileLocations.SubjectMetaFolder);
         }
-        FileIO.XmlSerialize(_subjectMetadata, FileLocations.SubjectMetadataPath);
+        Files.XmlSerialize(_subjectMetadata, FileLocations.SubjectMetadataPath);
     }
 
     #endregion

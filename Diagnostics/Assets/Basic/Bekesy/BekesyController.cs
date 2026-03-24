@@ -12,6 +12,7 @@ using UnityEngine.UI;
 //using Audiograms;
 using Bekesy;
 using KLib;
+using KLibU;
 using KLibU.Net;
 using KLib.Signals;
 using KLib.Signals.Waveforms;
@@ -104,7 +105,7 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         else
         {
             var fn = FileLocations.ConfigFile("Bekesy", _configName);
-            _settings = FileIO.XmlDeserialize<BasicMeasurementConfiguration>(fn) as BekesyMeasurementSettings;
+            _settings = Files.XmlDeserialize<BasicMeasurementConfiguration>(fn) as BekesyMeasurementSettings;
             InitializeMeasurement();
             Begin();
         }
@@ -140,8 +141,8 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
             subjectID = GameManager.Subject
         };
 
-        string json = FileIO.JSONStringAdd("", "info", KLib.FileIO.JSONSerializeToString(header));
-        json = KLib.FileIO.JSONStringAdd(json, "params", KLib.FileIO.JSONSerializeToString(_settings));
+        string json = Files.JSONStringAdd("", "info", KLibU.Files.JSONSerializeToString(header));
+        json = KLibU.Files.JSONStringAdd(json, "params", KLibU.Files.JSONSerializeToString(_settings));
         json += Environment.NewLine;
 
         File.WriteAllText(_dataPath, json);
@@ -410,7 +411,7 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(false);
 
-        File.AppendAllText(_dataPath, FileIO.JSONSerializeToString(_data));
+        File.AppendAllText(_dataPath, Files.JSONSerializeToString(_data));
         //_data.audiogramData.Save();
 
         string status = abort ? "Measurement aborted" : "Measurement finished";

@@ -6,8 +6,6 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
-using KLib.MSGraph;
-
 public class SyncPanel : MonoBehaviour
 {
     [SerializeField] private Toggle _logsToggle;
@@ -46,30 +44,31 @@ public class SyncPanel : MonoBehaviour
 
     private IEnumerator UploadLogs()
     {
-        string remoteFolder = $"{GameManager.Project}/Subjects/{GameManager.Subject}";
-        Debug.Log($"Uploading logs to '{remoteFolder}'");
-        KLib.KLogger.Log.FlushLog();
+        yield return null;
+        //string remoteFolder = $"{GameManager.Project}/Subjects/{GameManager.Subject}";
+        //Debug.Log($"Uploading logs to '{remoteFolder}'");
+        //KLibU.KLogger.Log.FlushLog();
 
-        var folder = Path.Combine(Application.persistentDataPath, "Logs");
-        var appLogList = Directory.GetFiles(folder, "*.log");
+        //var folder = Path.Combine(Application.persistentDataPath, "Logs");
+        //var appLogList = Directory.GetFiles(folder, "*.log");
 
-        folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "EPL", "Logs");
-        var streamerLogList = Directory.GetFiles(folder, "EPLib.Audio.*.log");
+        //folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "EPL", "Logs");
+        //var streamerLogList = Directory.GetFiles(folder, "EPLib.Audio.*.log");
 
-        var logList = new List<string>();
-        logList.AddRange(appLogList);
-        logList.AddRange(streamerLogList);
+        //var logList = new List<string>();
+        //logList.AddRange(appLogList);
+        //logList.AddRange(streamerLogList);
   
-        _progressBar.Label.text = "Uploading logs...";
+        //_progressBar.Label.text = "Uploading logs...";
 
-        for (int k = 0; k < logList.Count; k++)
-        {
-            Debug.Log(logList[k]);
-            _progressBar.SetProgress(k + 1, logList.Count);
-            MSGraphClient.UploadFile(remoteFolder, logList[k]);
-            yield return null;
-        }
+        //for (int k = 0; k < logList.Count; k++)
+        //{
+        //    Debug.Log(logList[k]);
+        //    _progressBar.SetProgress(k + 1, logList.Count);
+        //    MSGraphClient.UploadFile(remoteFolder, logList[k]);
+        //    yield return null;
+        //}
 
-        _logsToggle.SetIsOnWithoutNotify(false);
+        //_logsToggle.SetIsOnWithoutNotify(false);
     }
 }
