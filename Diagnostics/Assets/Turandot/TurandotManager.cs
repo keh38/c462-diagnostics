@@ -453,12 +453,10 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             if (ProtocolManager.IsActive)
             {
                 ProtocolManager.FinishTest(_mainDataFile);
+                return;
             }
-            else
-            {
-                ShowFinishPanel();
-            }
-        }
+            ShowFinishPanel();
+    }
     }
 
     private void ShowFinishPanel(string message = "")

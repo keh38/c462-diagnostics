@@ -463,6 +463,17 @@ public class HTS_Server : MonoBehaviour
                 Debug.Log($"ReceiveFile complete: {largeFilePayload.Filename}");
                 break;
 
+            case "RunMeasurements":
+                var runMeasurementsPayload = request.GetPayload<RunMeasurementsPayload>();
+                bool protocolStarted = ProtocolManager.StartProtocol(runMeasurementsPayload);
+                if (!protocolStarted)
+                {
+                    _tcpListener.WriteResponse(TcpMessage.Error("Failed to start protocol"));
+                    break;
+                }
+                _tcpListener.WriteResponse(TcpMessage.Ok());
+                break;
+
             default:
                 if (_currentScene != null)
                 {

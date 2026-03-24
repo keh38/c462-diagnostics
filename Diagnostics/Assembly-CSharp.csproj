@@ -179,8 +179,8 @@
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.Adaptation.cs" />
     <Compile Include="Assets\Basic\LDL\Haptics\LDL.HapticStimulus.cs" />
     <Compile Include="Assets\Speech\Speech Reception\TypeConverters\ClosedSetConverter.cs" />
-    <Compile Include="Assets\Speech\Speech Reception\SpeechReception.ClosedSetData.cs" />
     <Compile Include="Assets\Scripts\KLib\Utilities\WindowManager.cs" />
+    <Compile Include="Assets\Speech\Speech Reception\SpeechReception.ClosedSetData.cs" />
     <Compile Include="Assets\Basic\TypeConverters\HapticStimulusConverter.cs" />
     <Compile Include="Assets\Pupillometry\Pupillometry.DynamicRangeData.cs" />
     <Compile Include="Assets\Audiometer\Audiometer.UDPPacket.cs" />

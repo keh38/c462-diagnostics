@@ -9,6 +9,10 @@ using Protocols;
 
 using KLib;
 using System.Diagnostics.Eventing.Reader;
+using HTS.Unity.Tcp;
+using KLibU.Net;
+using System.Net;
+using System.Collections;
 
 public class ProtocolManager : MonoBehaviour
 {
@@ -19,6 +23,8 @@ public class ProtocolManager : MonoBehaviour
 
     private bool _active = false;
     private int _nextTestIndex = 0;
+
+    NotificationDescriptor _notification;
 
     private DateTime _lastTime = DateTime.MinValue;
 
@@ -57,6 +63,7 @@ public class ProtocolManager : MonoBehaviour
     public static void StartProtocol(bool resume) { instance._StartProtocol(resume); }
     public static void Advance() { instance._Advance(); }
     public static void FinishTest(string datafile) { instance._FinishTest(datafile); }
+    public static bool StartProtocol(RunMeasurementsPayload runMeasurementsPayload) { return instance._StartProtocol(runMeasurementsPayload); }
 
     private bool _InitializeProtocol(string protocolName)
     {
@@ -88,6 +95,7 @@ public class ProtocolManager : MonoBehaviour
 
     private void _StartProtocol(bool resume)
     {
+        _notification = null;
         if (!resume || _history == null)
         {
             _history = new ProtocolHistory(_protocol);
@@ -134,25 +142,67 @@ public class ProtocolManager : MonoBehaviour
       
         FileIO.JSONSerialize(_history, _historyPath);
 
-        if (!_history.Finished)
+        if (_history.Finished)
         {
-            if (_protocol.FullAuto)
+            if (_notification != null)
             {
-                _Advance();
+                _SendNotification(_notification);
+                SceneManager.LoadScene("Lobby");
+                return;
             }
-            else if (_protocol.Tests[_nextTestIndex].AutoAdvance)
-            {
-                _Advance();
-            }
-            else
-            {
-                SceneManager.LoadScene("Protocol");
-            }
-        }
-        else
-        {
+
             SceneManager.LoadScene("Home");
+            return;
         }
 
+        if (_protocol.FullAuto)
+        {
+            _Advance();
+            return;
+        }
+        if (_protocol.Tests[_nextTestIndex].AutoAdvance)
+        {
+            _Advance();
+            return;
+        }
+
+        SceneManager.LoadScene("Protocol");
+    }
+
+    private bool _StartProtocol(RunMeasurementsPayload runMeasurementsPayload)
+    {
+        try
+        {
+            HardwareInterface.Resume();
+            WindowManager.BringToFront();
+
+            GameManager.SetSubject($"{runMeasurementsPayload.Project}/{runMeasurementsPayload.Subject}");
+            _InitializeProtocol(runMeasurementsPayload.ListFile);
+        }
+        catch (Exception ex)
+        {
+            Debug.Log($"error initializing protocol: {ex.Message}");
+
+            SceneManager.LoadScene("Lobby");
+            return false;
+        }
+        StartCoroutine(StartProtocolNextFrame());   
+        return true;
+    }
+
+    private IEnumerator StartProtocolNextFrame()
+    {
+        yield return null;
+        _StartProtocol(resume: false);
+    }
+
+    private void _SendNotification(NotificationDescriptor notification)
+    {
+        var gameEndPoint = new IPEndPoint(
+            IPAddress.Parse(notification.Address),
+            notification.Port);
+
+        // Fire and forget — the Game's listener just needs the knock.
+        KTcpClient.SendRequest(gameEndPoint, TcpMessage.Request(notification.Command));  // "MeasurementsComplete"
     }
 }

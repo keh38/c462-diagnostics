@@ -101,6 +101,8 @@ namespace HTS.Unity.Tcp
     [JsonObject]
     public class RunMeasurementsPayload
     {
+        public string Project { get; set; }
+        public string Subject { get; set; }
         public string ListFile { get; set; }
         public NotificationDescriptor Notification { get; set; }
     }

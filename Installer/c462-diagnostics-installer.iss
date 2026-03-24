@@ -10,7 +10,8 @@
 [Setup]
 AppName=Hearing Test Suite
 AppVerName=Hearing Test Suite V{#semanticVersion}
-DefaultDirName={commonpf}\EPL\Hearing Test Suite\V{#SemanticVersion()}
+DefaultDirName={commonpf}\EPL\Hearing Test Suite\
+
 OutputDir=Output
 DefaultGroupName=EPL
 AllowNoIcons=yes
