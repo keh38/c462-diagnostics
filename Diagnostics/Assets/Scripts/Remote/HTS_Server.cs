@@ -26,6 +26,9 @@ public class HTS_Server : MonoBehaviour
     private bool _remoteConnected = false;
     private IPEndPoint _remoteEndPoint = null;
 
+    private const int BeaconPort = 10002;
+    private KTcpListener _beaconListener = null;
+
     // Make singleton
     private static HTS_Server _instance;
     private static HTS_Server instance
@@ -151,7 +154,12 @@ public class HTS_Server : MonoBehaviour
 
         StartCoroutine(TCPServer());
         Debug.Log("started HTS TCP server on " + _ipEndPoint.ToString());
-        
+
+        _beaconListener = new KTcpListener();
+        _beaconListener.StartListener(new IPEndPoint(IPAddress.Loopback, BeaconPort));
+        StartCoroutine(BeaconServer());
+        Debug.Log($"Beacon server started on port {BeaconPort}");
+
         var discoveryBeacon = gameObject.AddComponent<NetworkDiscoveryBeacon>();
         discoveryBeacon.StartBroadcasting(
             name: $"HEARING.TEST.SUITE",
@@ -169,6 +177,12 @@ public class HTS_Server : MonoBehaviour
         }
 
         Debug.Log("stopped HTS TCP listener");
+
+        if (_beaconListener != null)
+        {
+            _beaconListener.CloseListener();
+            _beaconListener = null;
+        }
     }
 
     void OnDestroy()
@@ -194,6 +208,36 @@ public class HTS_Server : MonoBehaviour
             }
             yield return null;
         }
+    }
+
+    IEnumerator BeaconServer()
+    {
+        while (!_stopServer)
+        {
+            if (_beaconListener.Pending())
+            {
+                try
+                {
+                    _beaconListener.AcceptTcpClient();
+                    _beaconListener.ReadRequest();  // content ignored
+                    _beaconListener.WriteResponse(TcpMessage.Ok(new EndpointPayload
+                    {
+                        Address = _ipEndPoint.Address.ToString(),
+                        Port = _ipEndPoint.Port
+                    }));
+                    _beaconListener.CloseTcpClient();
+                }
+                catch (Exception ex)
+                {
+                    Debug.Log($"Beacon server error: {ex.Message}");
+                }
+            }
+            yield return null;
+        }
+
+        _beaconListener.CloseListener();
+        _beaconListener = null;
+        Debug.Log("Beacon server stopped");
     }
 
     void ProcessMessage()

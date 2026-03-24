@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Loading Scene.unity
+    guid: 2d60e44b3b2ba894aaa8b2f0d64a7378
+  - enabled: 1
     path: Assets/Scenes/Home.unity
     guid: 2b6633176a9a74e47b5f8f97f565b362
   - enabled: 1
@@ -53,6 +56,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Speech/Speech Reception/SpeechReception.unity
     guid: e3d58c57524cf894dbf132ccdf819f9f
+  - enabled: 1
+    path: Assets/Scenes/Lobby.unity
+    guid: 95ac4e130deceba4ca5ea5c0ecf64c0a
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 28be48df767d2434681ec999065f06dc, type: 3}
   m_UseUCBPForAssetBundles: 0

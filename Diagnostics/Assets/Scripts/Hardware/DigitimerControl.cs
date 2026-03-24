@@ -17,6 +17,34 @@ public class DigitimerControl : MonoBehaviour
         }
     }
 
+    public void CloseHandle()
+    {
+        CleanUp();
+    }
+
+    public void OpenHandle()
+    {
+        Initialize();
+    }
+
+    public bool VerifyTriggersDisabled()
+    {
+        bool allDisabled = true;
+        if (_d128 != null)
+        {
+            foreach (var device in _d128.Devices)
+            {
+                if (_d128[device].Enable == EnableState.Enabled)
+                {
+                    Debug.Log($"Warning: Digitimer {device} is still enabled.");
+                    allDisabled = false;
+                }
+            }
+        }
+        return allDisabled;
+    }
+
+
     public bool Initialize()
     {
         bool success = false;

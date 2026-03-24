@@ -83,11 +83,35 @@ namespace HTS.Unity.Tcp
         public System.DateTime LastModified { get; set; }
     }
 
+    [JsonObject]
     public class BufferedFilePayload
     {
         public string Filename { get; set; }
         public long NumBuffers { get; set; }
         public int BufferSize { get; set; }
     }
+
+    [JsonObject]
+    public class EndpointPayload
+    {
+        public string Address { get; set; }
+        public int Port { get; set; }
+    }
+
+    [JsonObject]
+    public class RunMeasurementsPayload
+    {
+        public string ListFile { get; set; }
+        public NotificationDescriptor Notification { get; set; }
+    }
+
+    [JsonObject]
+    public class NotificationDescriptor
+    {
+        public string Address { get; set; }
+        public int Port { get; set; }
+        public string Command { get; set; }
+    }
+
 
 }

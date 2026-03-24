@@ -58,14 +58,14 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 #endif
 
         _versionLabel.text = "V" + Application.version;
+
+        EnableMenu(false);
         yield return null;
+
+        _subjectPanel.SubjectChangedEvent.AddListener(OnSubjectChanged);
 
         if (!GameManager.Initialized)
         {
-            EnableMenu(false);
-            //_message.text = "Starting up...";
-            yield return null;
-
             KLogger.Create(
                 Path.Combine(Application.persistentDataPath, "Logs", Application.productName + ".log"),
                 retainDays: 14)
@@ -73,27 +73,20 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 
             Debug.Log($"Started V{Application.version}");
             
-            _subjectPanel.SubjectChangedEvent.AddListener(OnSubjectChanged);
-
-            _message.text = "";
-            EnableMenu(true);
-
-            HardwareInterface.Initialize();
-            IntercomReceiver.Initialize();
-
             HTS_Server.StartServer();
 
             StartCoroutine(InitializeHardware());
 
             GameManager.Initialized = true;
         }
+        EnableMenu(true);
 
         HTS_Server.SetCurrentScene("Home", this);
         HTS_Server.OnSubjectChanged += HandleSubjectChanged;
         HTS_Server.OnControllerConnected += HandleControllerConnected;
         HTS_Server.OnControllerDisconnected += HandleControllerDisconnected;
 
-        ConnectToCloud();
+        //ConnectToCloud();
 
         if (!string.IsNullOrEmpty(GameManager.Subject))
         {
@@ -108,6 +101,7 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 
     private void OnDisable()
     {
+        _subjectPanel.SubjectChangedEvent.RemoveListener(OnSubjectChanged);
         HTS_Server.OnSubjectChanged -= HandleSubjectChanged;
         HTS_Server.OnControllerConnected -= HandleControllerConnected;
         HTS_Server.OnControllerDisconnected -= HandleControllerDisconnected;

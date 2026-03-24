@@ -26,34 +26,46 @@ public class IntercomReceiver : MonoBehaviour
 
     private Queue<float[]> _audioQueue = new Queue<float[]>();
     private int _bytesPerBuffer;
-        
+
     #region SINGLETON CREATION
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void Bootstrap()
+    {
+        if (_instance != null) return;
+
+        var prefab = Resources.Load<GameObject>("Intercom Receiver");
+        var go = Instantiate(prefab);
+        DontDestroyOnLoad(go);
+        // _instance gets set in Awake as usual
+    }
     // Singleton
     private static IntercomReceiver _instance;
-    private static IntercomReceiver instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                GameObject gobj = GameObject.Find("Intercom Receiver");
-                _instance = gobj.GetComponent<IntercomReceiver>();
-                DontDestroyOnLoad(gobj);
-            }
-            return _instance;
-        }
-    }
-    #endregion
-
-    #region PUBLIC STATIC ACCESSORS
-    public static void Initialize() { instance._Init(); }
-    public static void CleanUp() { instance.StopServers(); }
     #endregion
 
     private void OnDestroy()
     {
-        //Debug.Log("Destroy intercom");
-        //StopServers();
+        if (_instance == this)
+        {
+            Debug.Log("Destroy intercom");
+            StopServers();
+        }
+    }
+
+    private void Awake()
+    {
+        // Guard against duplicates (e.g. if Bootstrap already ran)
+        if (_instance != null && _instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        _instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    private void Start()
+    {
+        _Init();
     }
 
     private bool _Init()
