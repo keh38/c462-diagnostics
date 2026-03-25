@@ -1,13 +1,10 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 using Newtonsoft.Json;
 using ProtoBuf;
 
-using OrderedPropertyGrid;
-using KLib.TypeConverters;
 
 namespace KLib.Signals.Modulations
 {
@@ -17,17 +14,14 @@ namespace KLib.Signals.Modulations
 	public class SinusoidalAM : AM
     {
         [ProtoMember(1, IsRequired = true)]
-        [PropertyOrder(0)]
         public float Frequency_Hz { get; set; }
         private bool ShouldSerializeFrequency_Hz() { return false; }
 
         [ProtoMember(2, IsRequired = true)]
-        [PropertyOrder(1)]
         public float Depth { get; set; }
         private bool ShouldSerializeDepth() { return false; }
 
         [ProtoMember(3, IsRequired = true)]
-        [PropertyOrder(2)]
         public float Phase_cycles { get; set; }
         private bool ShouldSerializePhase_cycles() { return false; }
 
@@ -51,7 +45,6 @@ namespace KLib.Signals.Modulations
         }
 
         [ProtoIgnore]
-        [Browsable(false)]
         public float CurrentPhase { get { return _phase; } }
 
         public override List<string> GetSweepableParams()
@@ -216,7 +209,6 @@ namespace KLib.Signals.Modulations
         }
 
         [ProtoIgnore]
-        [Browsable(false)]
         public override float LevelCorrection
         {
             get

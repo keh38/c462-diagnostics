@@ -1,7 +1,6 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Xml.Serialization;
 
 using Newtonsoft.Json;
@@ -21,15 +20,12 @@ namespace Turandot.Cues
     {
         public int color = 0xFFFFFF;
 
-        [Category("Action")]
         public bool BeginVisible { get; set; }
         private bool ShouldSerializeBeginVisible() { return false; }
 
-        [Category("Action")]
         public bool EndVisible { get; set; }
         private bool ShouldSerializeEndVisible() { return false; }
 
-        [ReadOnly(true)]
         public string Target { get; set; }
         //private bool ShouldSerializeTarget() { return false; }
 
@@ -46,42 +42,36 @@ namespace Turandot.Cues
         [XmlIgnore]
         [ProtoIgnore]
         [JsonIgnore]
-        [Browsable(false)]
         virtual public string Name
         {
             get { return "LED"; }
         }
 
         [JsonIgnore]
-        [Browsable(false)]
         public float A
         {
             get { return ((color & 0xFF000000) >> 24) / 255f; }
         }
 
         [JsonIgnore]
-        [Browsable(false)]
         public float R
         {
             get { return ((color & 0xFF0000) >> 16) / 255f; }
         }
 
         [JsonIgnore]
-        [Browsable(false)]
         public float G
         {
             get { return ((color & 0x00FF00) >> 8) / 255f; }
         }
 
         [JsonIgnore]
-        [Browsable(false)]
         public float B
         {
             get { return (color & 0xFF) / 255f; }
         }
 
         [JsonIgnore]
-        [Browsable(false)]
         virtual public bool IsSequenceable
         {
             get { return false; }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+using System;
 using System.Xml.Serialization;
 
 namespace Pupillometry
@@ -20,7 +19,6 @@ namespace Pupillometry
 
 
         //[Category("Appearance")]
-        [DisplayName("Target Color")]
         [XmlIgnore]
         public System.Drawing.Color TargetWindowsColor
         {
@@ -29,10 +27,8 @@ namespace Pupillometry
         }
         private bool ShouldSerializeTargetWindowsColor() { return false; }
 
-        [Browsable(false)]
         public int TargetColor { set; get; }
 
-        [DisplayName("Background Color")]
         [XmlIgnore]
         public System.Drawing.Color BackgroundWindowsColor
         {
@@ -41,7 +37,6 @@ namespace Pupillometry
         }
         private bool ShouldSerializeBackgroundWindowsColor() { return false; }
 
-        [Browsable(false)]
         public int BackgroundColor { set; get; }
 
         public string CalibrationType { get; set; }

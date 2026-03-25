@@ -1,7 +1,6 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 using Newtonsoft.Json;
 using ProtoBuf;
@@ -9,48 +8,34 @@ using ProtoBuf;
 using KLib.Signals.Calibration;
 using KLib.Signals.Enumerations;
 
-using OrderedPropertyGrid;
 
 namespace KLib.Signals.Waveforms
 {
     [Serializable]
     [ProtoContract]
     [JsonObject(MemberSerialization.OptIn)]
-    [TypeConverter(typeof(DigitimerConverter))]
     public class Digitimer : Waveform
     {
         public enum DemandSource { Internal, External};
 
         [ProtoMember(1, IsRequired = true)]
         [JsonProperty]
-        [PropertyOrder(1)]
-        [DisplayName("Pulse rate")]
-        [Description("Pulse rate in pulse per second (pps)")]
         public float PulseRate_Hz { get; set; }
         private bool ShouldSerializePulseRate_Hz() { return false; }
 
         [ProtoMember(2, IsRequired = true)]
         [JsonProperty]
-        [PropertyOrder(2)]
-        [DisplayName("Mode")]
-        [Description("")]
-        [TypeConverter(typeof(DigitimerModeConverter))]
         public float PulseMode { get; set; }
         private bool ShouldSerializePulseMode() { return false; }
 
         [ProtoMember(3, IsRequired = true)]
         [JsonProperty]
-        [PropertyOrder(3)]
-        [DisplayName("Polarity")]
-        [TypeConverter(typeof(DigitimerPolarityConverter))]
         public float PulsePolarity { get; set; }
         private bool ShouldSerializePulsePolarity() { return false; }
 
         private float _width;
         [ProtoMember(4, IsRequired = true)]
         [JsonProperty]
-        [PropertyOrder(4)]
-        [Description("Pulse width in us (50-2000)")]
         public float Width
         {
             get { return _width; }
@@ -68,8 +53,6 @@ namespace KLib.Signals.Waveforms
         private float _recovery;
         [ProtoMember(5, IsRequired = true)]
         [JsonProperty]
-        [PropertyOrder(5)]
-        [Description("Duration of recovery phase as % of pulse width (10-100)")]
         public float Recovery
         {
             get { return _recovery; }
@@ -87,8 +70,6 @@ namespace KLib.Signals.Waveforms
         private float _dwell;
         [ProtoMember(6, IsRequired = true)]
         [JsonProperty]
-        [PropertyOrder(6)]
-        [Description("Interphase gap in us (1 to 990 in steps of 10)")]
         public float Dwell
         {
             get { return _dwell; }
@@ -103,15 +84,12 @@ namespace KLib.Signals.Waveforms
 
         [ProtoMember(7, IsRequired = true)]
         [JsonProperty]
-        [PropertyOrder(7)]
         public DemandSource Source { get; set; }
         private bool ShouldSerializeSource() { return false; }
 
         private float _demand;
         [ProtoMember(8, IsRequired = true)]
         [JsonProperty]
-        [PropertyOrder(8)]
-        [Description("Pulse amplitude (0-1000 mA)")]
         public float Demand
         {
             get { return _demand; }

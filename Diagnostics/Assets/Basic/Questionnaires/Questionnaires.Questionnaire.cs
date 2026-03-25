@@ -1,8 +1,6 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Xml.Serialization;
 using Turandot.Screen;
 using UnityEngine;
@@ -14,17 +12,13 @@ namespace Questionnaires
     [System.Serializable]
     public class Questionnaire : BasicMeasurementConfiguration
     {
-        [Category("Appearance")]
         public string Title { get; set; }
         private bool ShouldSerializeTitle() { return false; }
 
-        [Category("Appearance")]
-        [DisplayName("Question font size")]
         public int FontSize { get; set; }
         private bool ShouldSerializeFontSize() { return false; }
 
-        [Category("Content")]
-        [Editor(typeof(QuestionCollectionEditor), typeof(System.Drawing.Design.UITypeEditor))]
+        //[Editor(typeof(QuestionCollectionEditor), typeof(System.Drawing.Design.UITypeEditor))]
         public List<Question> Questions { get; set; }
         private bool ShouldSerializeQuestions {  get; set; }
 
@@ -42,18 +36,18 @@ namespace Questionnaires
         }
     }
 
-    public class QuestionCollectionEditor : CollectionEditor
-    {
-        public QuestionCollectionEditor(Type type) : base(type) { }
+    //public class QuestionCollectionEditor : CollectionEditor
+    //{
+    //    public QuestionCollectionEditor(Type type) : base(type) { }
 
-        protected override string GetDisplayText(object value)
-        {
-            Question item = new Question();
-            item = (Question)value;
+    //    protected override string GetDisplayText(object value)
+    //    {
+    //        Question item = new Question();
+    //        item = (Question)value;
 
-            return base.GetDisplayText(item.Prompt);
-        }
-    }
+    //        return base.GetDisplayText(item.Prompt);
+    //    }
+    //}
 
 
 }

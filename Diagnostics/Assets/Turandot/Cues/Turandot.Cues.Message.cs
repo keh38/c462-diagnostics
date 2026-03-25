@@ -1,9 +1,7 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.Design;
-using System.Drawing.Design;
+//using System.Drawing.Design;
 using System.Xml.Serialization;
 
 using Newtonsoft.Json;
@@ -17,8 +15,7 @@ namespace Turandot.Cues
     {
         public enum Icon { None, Right, Wrong, Warning}
 
-        [Category("Appearance")]
-        [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
+        //[Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
         public string Text { get; set; }
         private bool ShouldSerializeText() { return false; }
 

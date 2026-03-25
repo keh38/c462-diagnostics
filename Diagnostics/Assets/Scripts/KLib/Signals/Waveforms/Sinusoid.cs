@@ -1,7 +1,6 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 using Newtonsoft.Json;
 using ProtoBuf;
@@ -14,7 +13,6 @@ namespace KLib.Signals.Waveforms
     [Serializable]
 	[ProtoContract]
 	[JsonObject(MemberSerialization.OptIn)]
-    [TypeConverter(typeof(SinusoidConverter))]
     public class Sinusoid : Waveform
     {
         [ProtoMember(1, IsRequired = true)]
@@ -26,8 +24,6 @@ namespace KLib.Signals.Waveforms
 
         [ProtoMember(2, IsRequired = true)]
         [JsonProperty]
-        [DisplayName("Phase")]
-        [Description("Phase in cycles")]
         public float Phase_cycles { get; set; }
         private bool ShouldSerializePhase_cycles() { return false; }
 

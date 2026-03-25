@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
@@ -8,7 +8,6 @@ using ProtoBuf;
 
 using KLib.Signals.Calibration;
 using KLib.Signals.Enumerations;
-using System.ComponentModel;
 
 namespace KLib.Signals
 {
@@ -18,7 +17,6 @@ namespace KLib.Signals
         Total_power,
         Spectrum_level,
     }
-    [TypeConverter(typeof(LevelUnitsConverter))]
     public enum LevelUnits
     {
         Volts,

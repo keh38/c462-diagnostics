@@ -1,8 +1,7 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 using Newtonsoft.Json;
 using ProtoBuf;
@@ -15,16 +14,12 @@ namespace Turandot.Screen
     [JsonObject(MemberSerialization.OptOut)]
     public class ProgressBarLayout : CueLayout
     {
-        [Category("Appearance")]
         public int Width { get; set; }
         private bool ShouldSerializeWidth() { return false; }
 
-        [Category("Appearance")]
         public int Height { get; set; }
         private bool ShouldSerializeHeight() { return false; }
 
-        [Category("Appearance")]
-        [DisplayName("Color")]
         [XmlIgnore]
         public System.Drawing.Color WindowsColor
         {
@@ -33,7 +28,6 @@ namespace Turandot.Screen
         }
         private bool ShouldSerializeWindowsColor() { return false; }
 
-        [Browsable(false)]
         public int Color { set; get; }
 
         public ProgressBarLayout()

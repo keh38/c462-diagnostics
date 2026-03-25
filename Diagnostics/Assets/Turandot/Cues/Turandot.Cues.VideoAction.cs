@@ -1,7 +1,6 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
@@ -14,7 +13,6 @@ namespace Turandot.Cues
     [JsonObject(MemberSerialization.OptOut)]
     public class VideoAction : Cue
     {
-        [Category("Content")]
         public string Filename { get; set; }
         private bool ShouldSerializeFilename() { return false; }
 

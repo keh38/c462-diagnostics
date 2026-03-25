@@ -1,13 +1,10 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using KLib.Signals;
 using KLibU;
 using KLib;
 using KLib.Expressions;
-using KLib.TypeConverters;
-using OrderedPropertyGrid;
 using Unity.VisualScripting;
 using System.IO;
 using UnityEngine;
@@ -33,73 +30,35 @@ namespace Turandot.Schedules
         }
     }
 
-    [TypeConverter(typeof(SortableTypeConverter))]
     public class Script
     {
-        [Category("Bookkeeping")]
-        [DisplayName("Script name")]
-        [Description("Name of this script")]
-        [PropertyOrder(0)]
         public string Name { get; set; }
         private bool ShouldSerializeName() { return false; }
 
-        [Category("Bookkeeping")]
-        [DisplayName("Protocol name")]
-        [Description("Root name of generated protocol files")]
-        [PropertyOrder(1)]
         public string ProtocolRootName { get; set; }
         private bool ShouldSerializeProtocolRootName() { return false; }
 
-        [Category("Bookkeeping")]
-        [DisplayName("Single output")]
-        [Description("Generate single output protocol file")]
-        [PropertyOrder(2)]
         public bool SingleProtocolFile { get; set; }
         private bool ShouldSerializeSingleProtocolFile() { return false; }
 
-        [Category("Bookkeeping")]
-        [DisplayName("Config files")]
-        [Description("List of Turandot config files (just the central part of the name")]
-        [PropertyOrder(3)]
-        public BindingList<string> ConfigFiles { get; set; }
+        public List<string> ConfigFiles { get; set; }
         private bool ShouldSerializeConfigFiles() { return false; }
 
-        [Category("Sequence")]
-        [DisplayName("Ears")]
-        [Description("Ears to test")]
-        [PropertyOrder(1)]
         public TestedEars TestedEars { get; set; }
 
         private bool ShouldSerializeTestedEars() { return false; }
-        [Category("Sequence")]
-        [PropertyOrder(2)]
-        [Browsable(false)]
         public string Groups { get; set; }
         private bool ShouldSerializeGroups() { return false; }
 
-        [Category("Sequence")]
-        [DisplayName("Dimension")]
-        [Description("Sequence dimension along which to split")]
-        [PropertyOrder(3)]
         public VarDimension Dim { get; set; }
         private bool ShouldSerializeDim() { return false; }
 
-        [Category("Sequence")]
-        [Description("Value expression")]
-        [PropertyOrder(4)]
         public string Expression { get; set; }
         private bool ShouldSerializeExpression() { return false; }
 
-        [Category("Sequence")]
-        [Description("Order in which values are distributed across split")]
-        [PropertyOrder(5)]
         public Order Order { get; set; }
         private bool ShouldSerializeOrder() { return false; }
 
-        [Category("Sequence")]
-        [DisplayName("Split after")]
-        [Description("Number of items per split")]
-        [PropertyOrder(6)]
         public int SplitAfter { get; set; }
         private bool ShouldSerializeSplitAfter() { return false; }
 
@@ -108,7 +67,7 @@ namespace Turandot.Schedules
             Name = "Untitled";
             ProtocolRootName = "";
             SingleProtocolFile = false;
-            ConfigFiles = new BindingList<string>();
+            ConfigFiles = new List<string>();
             TestedEars = TestedEars.None;
             Groups = "";
             Dim = VarDimension.X;

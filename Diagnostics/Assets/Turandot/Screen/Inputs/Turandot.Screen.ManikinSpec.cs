@@ -1,8 +1,6 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 
@@ -16,30 +14,23 @@ namespace Turandot.Screen
     {
         public string Name { get; set; }
 
-        [Category("Appearance")]
         private bool ShouldSerializeName() { return false; }
 
-        [Category("Appearance")]
         public string Label { get; set; }
         private bool ShouldSerializeLabel() { return false; }
 
-        [Category("Appearance")]
         public string Image { get; set; }
         private bool ShouldSerializeImage() { return false; }
 
-        [Category("Behavior")]
         public float StartPosition { get; set; }
         private bool ShouldSerializeStartPosition() { return false; }
 
-        [Category("Behavior")]
         public bool RandomizeStartPosition { get; set; }
         private bool ShouldSerializeRandomizeStartPosition() { return false; }
 
-        [Category("Behavior")]
         public float MinStartPosition { get; set; } 
         private bool ShouldSerializeMinStartPosition() { return false; }
 
-        [Category("Behavior")]
         public float MaxStartPosition { get; set; }
         private bool ShouldSerializeMaxStartPosition() { return false; }
 
@@ -73,18 +64,18 @@ namespace Turandot.Screen
         }
     }
 
-    public class ManikinCollectionEditor : CollectionEditor
-    {
-        public ManikinCollectionEditor(Type type) : base(type)
-        {
-        }
+    //public class ManikinCollectionEditor : CollectionEditor
+    //{
+    //    public ManikinCollectionEditor(Type type) : base(type)
+    //    {
+    //    }
 
-        protected override string GetDisplayText(object value)
-        {
-            ManikinSpec item = new ManikinSpec();
-            item = (ManikinSpec)value;
+    //    protected override string GetDisplayText(object value)
+    //    {
+    //        ManikinSpec item = new ManikinSpec();
+    //        item = (ManikinSpec)value;
 
-            return base.GetDisplayText(item.Name);
-        }
-    }
+    //        return base.GetDisplayText(item.Name);
+    //    }
+    //}
 }

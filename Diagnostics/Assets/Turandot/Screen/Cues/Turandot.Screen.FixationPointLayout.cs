@@ -1,7 +1,6 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Xml.Serialization;
 
 using Newtonsoft.Json;
@@ -17,16 +16,12 @@ namespace Turandot.Screen
     {
         public enum Style { Cross,Circle}
 
-        [Category("Appearance")]
         public Style Shape { get; set; }
         private bool ShouldSerializeShape() { return false; }
 
-        [Category("Appearance")]
         public int Size { get; set; }
         private bool ShouldSerializeSize() { return false; }
 
-        [Category("Appearance")]
-        [DisplayName("Color")]
         [XmlIgnore]
         public System.Drawing.Color WindowsColor
         {
@@ -35,11 +30,9 @@ namespace Turandot.Screen
         }
         private bool ShouldSerializeWindowsColor() { return false; }
 
-        [Browsable(false)]
         public int Color { set; get; }
 
 
-        [Category("Appearance")]
         public int BarWidth { get; set; }
         private bool ShouldSerializeBarWidth() { return false; }
 

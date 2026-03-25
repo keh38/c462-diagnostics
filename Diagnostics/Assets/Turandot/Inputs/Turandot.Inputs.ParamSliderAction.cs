@@ -1,8 +1,7 @@
-﻿ using UnityEngine;
+ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Xml.Serialization;
 
@@ -30,48 +29,36 @@ namespace Turandot.Inputs
         public float shrinkFactor = 0;
         public bool showButton = true;
 
-        [Category("Appearance")]
         public string Label { set; get; }
         private bool ShouldSerializeLabel() { return false; }
 
-        [Category("Appearance")]
         public string MinLabel { set; get; }
         private bool ShouldSerializeMinLabel() { return false; }
 
-        [Category("Appearance")]
         public string MaxLabel { set; get; }
         private bool ShouldSerializeMaxLabel() { return false; }
 
-        [Category("Appearance")]
         public int FontSize { set; get; }
         private bool ShouldSerializeFontSize() { return false; }
 
-        [Category("Behavior")]
-        [Description("Hides the slider fill")]
         public bool ThumbOnly { set; get; }
         private bool ShouldSerializeThumbOnly() { return false; }
 
-        [Category("Behavior")]
         public bool BarClickable { set; get; }
         private bool ShouldSerializeBarClickable() { return false; }
 
-        [Category("Behavior")]
         public bool ThumbTogglesSound { set; get; }
         private bool ShouldSerializeThumbTogglesSound() { return false; }
 
-        [Category("Scale")]
         public float Min { set; get; }
         private bool ShouldSerializeMin() { return false; }
 
-        [Category("Scale")]
         public float Max { set; get; }
         private bool ShouldSerializeMax() { return false; }
 
-        [Category("Scale")]
         public SliderScale Scale { set; get; }
         private bool ShouldSerializeScale() { return false; }
 
-        [Category("Parameter")]
         public float StartValue { get; set; }
         private bool ShouldSerializeStartValue() { return false; }
 
@@ -88,8 +75,6 @@ namespace Turandot.Inputs
 
         // https://www.codeproject.com/Articles/9517/PropertyGrid-and-Drop-Down-properties
         private string _channel;
-        [Category("Parameter")]
-        [TypeConverter(typeof(ChannelConverter))]
         public string Channel
         {
             get
@@ -125,8 +110,6 @@ namespace Turandot.Inputs
         private bool ShouldSerializeChannel() { return false; }
 
         private string _parameter;
-        [Category("Parameter")]
-        [TypeConverter(typeof(PropertyConverter))]
         public string Property
         {
             get
@@ -165,39 +148,6 @@ namespace Turandot.Inputs
                 ContextItems._listOfProperties = validProperties[0].properties.ToArray();
             }
             ContextItems._validProperties = validProperties;
-        }
-
-        public class ChannelConverter : StringConverter
-        {
-            public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
-            {
-                //true means show a combobox
-                return true;
-            }
-
-            public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
-            {
-                //true will limit to list. false will show the list, 
-                //but allow free-form entry
-                return true;
-            }
-
-            public override System.ComponentModel.TypeConverter.StandardValuesCollection
-                   GetStandardValues(ITypeDescriptorContext context)
-            {
-                return new StandardValuesCollection(ContextItems._listOfChannels);
-            }
-        }
-
-        public class PropertyConverter : StringConverter
-        {
-            public override bool GetStandardValuesSupported(ITypeDescriptorContext context) { return true; }
-            public override bool GetStandardValuesExclusive(ITypeDescriptorContext context) { return true; }
-            public override System.ComponentModel.TypeConverter.StandardValuesCollection
-                   GetStandardValues(ITypeDescriptorContext context)
-            {
-                return new StandardValuesCollection(ContextItems._listOfProperties);
-            }
         }
 
 

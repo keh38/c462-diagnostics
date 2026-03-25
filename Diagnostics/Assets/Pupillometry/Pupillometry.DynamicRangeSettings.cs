@@ -1,58 +1,38 @@
-﻿using System;
-using System.ComponentModel;
+using System;
 using System.Xml.Serialization;
 
 namespace Pupillometry
 {
     public class DynamicRangeSettings
     {
-        [DisplayName("(Name)")]
         public string Name { get; set; }
         private bool ShouldSerializeName() { return false; }
 
-        [Description("Duration of baseline period before stimulation (seconds)")]
         public float PrestimulusBaseline { get; set; }
         private bool ShouldSerializePrestimulusBaseline() { return false; }
 
-        [Description("Duration of baseline period after stimulation (seconds)")]
         public float PoststimulusBaseline { get; set; }
         private bool ShouldSerializePoststimulusBaseline() { return false; }
 
-        [Description("Duration of light modulation cycle (seconds)")]
         public float StimulusPeriod { get; set; }
         private bool ShouldSerializeStimulusPeriod() { return false; }
 
-        [Description("Number of light modulation cycles")]
         public int NumRepetitions { get; set; }
         private bool ShouldSerializeNumRepetitions() { return false; }
 
-        [Category("LED Intensity")]
-        [DisplayName("Min")]
-        [Description("Minimum intensity of LEDs if present (0-1)")]
         public float MinLEDIntensity { get; set; }
         private bool ShouldSerializeMinLEDIntensity() { return false; }
 
-        [Category("LED Intensity")]
-        [DisplayName("Max")]
-        [Description("Maximum intensity of LEDs if present (0-1)")]
         public float MaxLEDIntensity { get; set; }
         private bool ShouldSerializeMaxLEDIntensity() { return false; }
 
-        [DisplayName("Fixation size")]
-        [Description("Fixation point size in pixels")]
         public int FixationPointSize { get; set; }
         private bool ShouldSerializeFixationPointSize() { return false; }
 
-        [Category("Screen Intensity")]
-        [DisplayName("Min")]
-        [Description("Minimum screen intensity")]
         public float MinScreenIntensity { get; set; }
         private bool ShouldSerializeMinScreenIntensity() { return false; }
 
 
-        [Category("Screen Intensity")]
-        [DisplayName("Max")]
-        [Description("Maximum screen intensity")]
         public float MaxScreenIntensity { get; set; }
         private bool ShouldSerializeMaxScreenIntensity() { return false; }
 

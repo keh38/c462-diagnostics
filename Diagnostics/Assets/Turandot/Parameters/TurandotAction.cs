@@ -1,11 +1,8 @@
 using System;
-using System.ComponentModel;
 
 using Newtonsoft.Json;
-using OrderedPropertyGrid;
 
 using KLib.Signals;
-using KLib.TypeConverters;
 
 namespace Turandot
 {
@@ -13,31 +10,20 @@ namespace Turandot
     /// Represents an action with state, channel, property, value, and operation.
     /// </summary>
     [JsonObject(MemberSerialization.OptOut)]
-    [TypeConverter(typeof(SortableTypeConverter))]
     public class TurandotAction
     {
-        [Category("Action")]
-        [PropertyOrder(0)]
         public string State { get; set; }
         private bool ShouldSerializeState() { return false; }
 
-        [Category("Action")]
-        [PropertyOrder(1)]
         public string Channel { get; set; }
         private bool ShouldSerializeChannel() { return false; }
 
-        [Category("Action")]
-        [PropertyOrder(2)]
         public string Property { get; set; }
         private bool ShouldSerializeProperty() { return false; }
 
-        [Category("Action")]
-        [PropertyOrder(3)]
         public ActionOperation Operation { get; set; }
         private bool ShouldSerializeOperation() { return false; }
 
-        [Category("Action")]
-        [PropertyOrder(4)]
         public float Value { get; set; }
         private bool ShouldSerializeValue() { return false; }
 

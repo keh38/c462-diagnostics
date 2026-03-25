@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Xml.Serialization;
 
 using Newtonsoft.Json;
@@ -15,13 +14,9 @@ namespace Turandot.Screen
     [JsonObject(MemberSerialization.OptOut)]
     public class VideoLayout : CueLayout
     {
-        [Category("Layout")]
-        [Description("Horizontal width of the image as fraction of the screen size")]
         public float Width { get; set; }
         private bool ShouldSerializeWidth() { return false; }
 
-        [Category("Layout")]
-        [Description("Verticalheight of the image as fraction of the screen size")]
         public float Height { get; set; }
         private bool ShouldSerializeHeight() { return false; }
 

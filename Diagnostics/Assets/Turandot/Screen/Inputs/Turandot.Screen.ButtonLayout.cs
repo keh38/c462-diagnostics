@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
@@ -13,27 +12,21 @@ namespace Turandot.Screen
     {
         public enum ButtonStyle { Rectangle, Circle};
 
-        [Category("Design")]
         public string Label { set; get; }
         private bool ShouldSerializeLabel() { return false; }
 
-        [Category("Appearance")]
         public int Width { get; set; }
         private bool ShouldSerializeWidth() { return false; }
 
-        [Category("Appearance")]
         public int Height { get; set; }
         private bool ShouldSerializeHeight() { return false; }
         
-        [Category("Appearance")]
         public ButtonStyle Style { get; set; }
         private bool ShouldSerializeStyle() { return false; }
 
-        [Category("Appearance")]
         public int FontSize { get; set; }
         private bool ShouldSerializeFontSize() { return false; }
 
-        [Category("Behavior")]
         public KeyCode KeyCode { get; set; }
         private bool ShouldSerializeKeyCode() { return false; }
 

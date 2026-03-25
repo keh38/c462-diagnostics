@@ -1,9 +1,7 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.Design;
-using System.Drawing.Design;
+//using System.Drawing.Design;
 using System.Xml.Serialization;
 
 using Newtonsoft.Json;
@@ -15,8 +13,7 @@ namespace Turandot.Cues
     [JsonObject(MemberSerialization.OptOut)]
     public class TextBoxAction : Cue
     {
-        [Category("Appearance")]
-        [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
+        //[Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
         public string Markdown { get; set; }
         private bool ShouldSerializeMarkdown() { return false; }
 
