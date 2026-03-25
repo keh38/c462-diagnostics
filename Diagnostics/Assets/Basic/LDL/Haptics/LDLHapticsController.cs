@@ -2,28 +2,25 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
 
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-using KLib;
+using C462.Shared.Protocol.DTOs;
+
 using KLibU;
 using KLib.Expressions;
 using KLibU.Net;
 using KLib.Signals.Waveforms;
 using KLib.Signals;
 
+using BasicMeasurements;
+
 using LDL;
 using LDL.Haptics;
 
-using BasicMeasurements;
-using System.Linq;
-using HTS.Unity.Tcp;
-using Audiograms;
 
 public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 {

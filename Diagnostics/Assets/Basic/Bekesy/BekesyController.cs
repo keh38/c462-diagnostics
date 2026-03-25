@@ -1,17 +1,14 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-//using Audiograms;
-using Bekesy;
-using KLib;
+using C462.Shared.Protocol.DTOs;   
+
 using KLibU;
 using KLibU.Net;
 using KLib.Signals;
@@ -19,7 +16,7 @@ using KLib.Signals.Waveforms;
 using UnityEngine.EventSystems;
 
 using BasicMeasurements;
-using HTS.Unity.Tcp;
+using Bekesy;
 
 public class BekesyController : MonoBehaviour, IRemoteControllable
 {

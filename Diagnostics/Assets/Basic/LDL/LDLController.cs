@@ -2,25 +2,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
 
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-using KLib;
 using KLibU;
 using KLibU.Net;
 using KLib.Signals.Waveforms;
 using KLib.Signals;
-using LDL;
+
+using C462.Shared.Protocol.DTOs;
 
 using BasicMeasurements;
-using KLib.Wave;
-using HTS.Unity.Tcp;
-//using Audiograms;
+using LDL;
 
 public class LDLController : MonoBehaviour, IRemoteControllable
 {

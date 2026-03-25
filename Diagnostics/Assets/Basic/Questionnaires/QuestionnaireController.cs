@@ -9,14 +9,13 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-using KLib;
+using C462.Shared.Protocol.DTOs;
+
 using KLibU;
 using KLibU.Net;
-using Questionnaires;
 
 using BasicMeasurements;
-using HTS.Unity.Tcp;
-using Audiograms;
+using Questionnaires;
 
 public class QuestionnaireController : MonoBehaviour, IRemoteControllable
 {

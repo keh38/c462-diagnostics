@@ -31,7 +31,7 @@ public class LoadingScene : MonoBehaviour
         }
 
 #else
-        nextScene = "Lobby";
+        //nextScene = "Lobby";
 #endif
 
         Application.runInBackground = true;

@@ -2,26 +2,25 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
 
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+using Newtonsoft.Json;
+
 using Audiograms;
+
+using C462.Shared.Protocol.DTOs;
+
 using KLib;
 using KLibU;
 using KLibU.Net;
 using KLib.Signals;
-using KLib.Signals.Enumerations;
 using KLib.Signals.Waveforms;
 
 using BasicMeasurements;
-using Newtonsoft.Json;
-using HTS.Unity.Tcp;
-using Unity.VisualScripting;
 
 public class AudiogramController : MonoBehaviour, IRemoteControllable
 {

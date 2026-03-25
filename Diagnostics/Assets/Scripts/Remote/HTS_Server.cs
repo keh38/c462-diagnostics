@@ -12,11 +12,11 @@ using KLibU;
 using KLibU.Net;
 using System.Threading.Tasks;
 using HTS.Unity.Tcp;
+using C462.Shared.Protocol;
+using C462.Shared.Protocol.DTOs;
 
 public class HTS_Server : MonoBehaviour
 {
-    private bool _listenerReady = false;
-
     private KTcpListener _tcpListener = null;
     private bool _stopServer;
     private IPEndPoint _ipEndPoint;

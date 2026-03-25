@@ -1,21 +1,22 @@
-using KLib;
-using KLibU;
-using KLibU.Net;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+using C462.Shared.Protocol.DTOs;
+
+using KLib;
+using KLibU;
+using KLibU.Net;
+
 using ExtensionMethods;
 using SpeechReception;
-using UnityEngine.Networking;
-using HTS.Unity.Tcp;
-
-using KLib.Expressions;
 
 public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 {

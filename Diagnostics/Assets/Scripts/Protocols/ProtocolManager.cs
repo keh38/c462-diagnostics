@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Net;
 using System.IO;
 using System.Linq;
 
@@ -7,12 +9,10 @@ using UnityEngine.SceneManagement;
 
 using Protocols;
 
-using KLib;
 using KLibU;
-using HTS.Unity.Tcp;
 using KLibU.Net;
-using System.Net;
-using System.Collections;
+
+using C462.Shared.Protocol.DTOs;
 
 public class ProtocolManager : MonoBehaviour
 {

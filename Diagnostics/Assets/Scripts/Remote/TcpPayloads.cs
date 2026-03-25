@@ -3,27 +3,6 @@ using Newtonsoft.Json;
 namespace HTS.Unity.Tcp
 {
     [JsonObject]
-    public class ConnectionRequestPayload
-    {
-        public string Address { get; set; }
-        public int Port { get; set; }
-    }
-
-    [JsonObject]
-    public class ConnectionResponsePayload
-    {
-        public string HostName { get; set; }
-        public string VersionNumber { get; set; }
-        public string SceneName { get; set; }
-    }
-
-    [JsonObject]
-    public class ChangeScenePayload
-    {
-        public string SceneName { get; set; }
-    }
-
-    [JsonObject]
     public class RecordPayload
     {
         public string Path { get; set; }
@@ -43,13 +22,6 @@ namespace HTS.Unity.Tcp
     }
 
     [JsonObject]
-    public class TextFilePayload
-    {
-        public string Filename { get; set; }
-        public string Content { get; set; }
-    }
-
-    [JsonObject]
     public class ErrorPayload
     {
         public string Message { get; set; }
@@ -59,14 +31,6 @@ namespace HTS.Unity.Tcp
     public class FilenamePayload
     {
         public string Filename { get; set; }
-    }
-
-    [JsonObject]
-    public class TransferFilePayload
-    {
-        public string Folder { get; set; }
-        public string Filename { get; set; }
-        public string Content { get; set; }
     }
 
     [JsonObject]
@@ -90,30 +54,4 @@ namespace HTS.Unity.Tcp
         public long NumBuffers { get; set; }
         public int BufferSize { get; set; }
     }
-
-    [JsonObject]
-    public class EndpointPayload
-    {
-        public string Address { get; set; }
-        public int Port { get; set; }
-    }
-
-    [JsonObject]
-    public class RunMeasurementsPayload
-    {
-        public string Project { get; set; }
-        public string Subject { get; set; }
-        public string ListFile { get; set; }
-        public NotificationDescriptor Notification { get; set; }
-    }
-
-    [JsonObject]
-    public class NotificationDescriptor
-    {
-        public string Address { get; set; }
-        public int Port { get; set; }
-        public string Command { get; set; }
-    }
-
-
 }

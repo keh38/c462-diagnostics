@@ -2,22 +2,22 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-using Audiograms;
+using C462.Shared.Protocol.DTOs;
+
 using KLib;
 using KLibU;
 using KLib.Expressions;
 using KLibU.Net;
 
 using BasicMeasurements;
-using DigitsTest;
 using Digits;
-using HTS.Unity.Tcp;
+using DigitsTest;
 
 public class DigitsTestController : MonoBehaviour, IRemoteControllable
 {
