@@ -7,7 +7,6 @@ using System.IO;
 using KLib;
 using KLibU;
 using KLib.Signals;
-using KLib.Signals.Waveforms;
 
 using Newtonsoft.Json;
 using ProtoBuf;
@@ -88,7 +87,7 @@ namespace Audiograms
 
         public AudiogramData ReplaceNaNWithMax(string transducer)
         {
-            var cal = KLib.Signals.Calibration.CalibrationFactory.Load(LevelUnits.dB_SPL_noLDL, transducer, "");
+            var cal = KLib.Signals.CalibrationFactory.Load(LevelUnits.dB_SPL_noLDL, transducer, "");
 
             foreach (var a in audiograms)
             {

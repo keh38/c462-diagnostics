@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 
 using KLib.Signals;
-using KLib.Signals.Waveforms;
 
 namespace Turandot.Scripts
 {

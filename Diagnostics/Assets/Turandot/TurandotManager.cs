@@ -9,7 +9,6 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Text;
 
-using KLib.Signals.Waveforms;
 using Turandot;
 using Turandot.Schedules;
 using Turandot.Scripts;

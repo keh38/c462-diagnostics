@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 
 using KLib.Signals;
-using KLib.Signals.Calibration;
 
 public class DigitSpeaker : MonoBehaviour
 {

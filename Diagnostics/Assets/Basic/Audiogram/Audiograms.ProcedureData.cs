@@ -10,7 +10,6 @@ using System.IO;
 
 using KLib;
 using KLib.Signals;
-using KLib.Signals.Waveforms;
 
 using Newtonsoft.Json;
 using ProtoBuf;

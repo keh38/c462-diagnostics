@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 
 using KLib.Signals;
-using KLib.Signals.Waveforms;
 using Noise = KLib.Signals.Noise;
 
 namespace Turandot.Scripts

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 using ExtensionMethods;
-using KLib.Signals.Calibration;
 using KLib.Signals;
 using SpeechReception;
 using System.IO;

@@ -7,7 +7,6 @@ using System.IO;
 using KLib;
 using KLibU;
 using KLib.Signals;
-using KLib.Signals.Waveforms;
 
 using Newtonsoft.Json;
 using ProtoBuf;

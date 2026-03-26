@@ -10,7 +10,6 @@ using System.IO;
 
 using ExtensionMethods;
 using KLib;
-using KLib.Signals.Calibration;
 using KLib.Signals;
 using SpeechReception;
 //using SRI.Messages;

@@ -91,7 +91,6 @@
     <Compile Include="Assets\Scripts\Remote\Legacy\KLib.Network.KTcpListener.cs" />
     <Compile Include="Assets\Basic\Questionnaires\Questionnaires.QuestionnaireData.cs" />
     <Compile Include="Assets\Basic\Audiogram\AudiogramButtonLog.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Modulations\SinusoidalAM.cs" />
     <Compile Include="Assets\Scripts\Home\ConfigPanel.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotPupillometer.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotInputMonitor.cs" />
@@ -105,7 +104,6 @@
     <Compile Include="Assets\Turandot\Scripts\TurandotVideo.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.ParamSliderAction.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\MenuButtonControl.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Calibration\References.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotFixationPoint.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotSecondaryAudio.cs" />
     <Compile Include="Assets\Basic\Bekesy\Bekesy.TrackLog.cs" />
@@ -116,7 +114,6 @@
     <Compile Include="Assets\Basic\LDL\TextSizeAnimator.cs" />
     <Compile Include="Assets\Scripts\Home\BasicPanel.cs" />
     <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.ManikinSpec.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\ToneCloud.cs" />
     <Compile Include="Assets\Basic\LDL\Haptics\LDL.HapticsSeqVar.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Wave\KLib.Wave.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.CatchInterval.cs" />
@@ -131,10 +128,8 @@
     <Compile Include="Assets\Turandot\Cues\Turandot.Cues.ProgressBarAction.cs" />
     <Compile Include="Assets\Basic\Bekesy\Bekesy.TrackData.cs" />
     <Compile Include="Assets\Unity UI Controls\Scripts\_Demo Scripts\DemoProgressBar.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Calibration\AcousticCalibration.cs" />
     <Compile Include="Assets\Speech\Speech Reception\SpeechReception.Data.cs" />
     <Compile Include="Assets\Basic\LDL\LDLMeasurementSettings.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Filters\BPFilter.cs" />
     <Compile Include="Assets\Speech\Digits\Digits.Instructions.cs" />
     <Compile Include="Assets\Basic\LDL\Haptics\LDLHapticsData.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.Keypad.cs" />
@@ -144,7 +139,6 @@
     <Compile Include="Assets\Prefabs\SliderPanel.cs" />
     <Compile Include="Assets\Basic\LDL\Haptics\LDL.HapticSliderSettings.cs" />
     <Compile Include="Assets\Scripts\Game Management\SubjectMetadata.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Modulations\AMFactory.cs" />
     <Compile Include="Assets\Speech\Speech Reception\SpeechReceptionInterface.cs" />
     <Compile Include="Assets\Basic\Questionnaires\QuestionnaireChecklist.cs" />
     <Compile Include="Assets\Basic\LDL\LDLSliderPanel.cs" />
@@ -179,7 +173,6 @@
     <Compile Include="Assets\Speech\Digits\Prefabs\Keypad.cs" />
     <Compile Include="Assets\Scripts\Home\TurandotPanel.cs" />
     <Compile Include="Assets\Scripts\Remote\Legacy\KLib.Network.NetworkDiscoveryServer.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\MovingRippleNoise.cs" />
     <Compile Include="Assets\Pupillometry\Pupillometry.DynamicRangeSettings.cs" />
     <Compile Include="Assets\Speech\Speech Reception\SpeechReception.Masker.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.XboxLink.cs" />
@@ -201,7 +194,6 @@
     <Compile Include="Assets\Turandot\Cues\Turandot.Cues.Cue.cs" />
     <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.ParamSliderLayout.cs" />
     <Compile Include="Assets\Basic\Bekesy\BekesyMeasurementSettings.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\Noise.cs" />
     <Compile Include="Assets\Scripts\Protocols\Protocol.cs" />
     <Compile Include="Assets\Prefabs\MessageBox.cs" />
     <Compile Include="Assets\Turandot\Parameters\Turandot.TermType.cs" />
@@ -221,7 +213,6 @@
     <Compile Include="Assets\Calibration\CalibrationController.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotCueMessage.cs" />
     <Compile Include="Assets\Turandot\Screen\Cues\Turandot.Screen.ProgressBarLayout.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\UserFileReferences.cs" />
     <Compile Include="Assets\Turandot\Schedules\Adaptation\Turandot.Schedules.AdaptHistory.cs" />
     <Compile Include="Assets\Turandot\Screen\Inputs\Turandot.Screen.ManikinLayout.cs" />
     <Compile Include="Assets\Scripts\Home\PlayPanel.cs" />
@@ -234,7 +225,6 @@
     <Compile Include="Assets\Scripts\Menu Tools\TitleBarControl.cs" />
     <Compile Include="Assets\Scripts\Game Management\AppState.cs" />
     <Compile Include="Assets\Speech\Speech Reception\SpeechReception.ClosedSet.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\BinauralProperties.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.InputOperator.cs" />
     <Compile Include="Assets\Scripts\Protocols\ProtocolData.cs" />
     <Compile Include="Assets\Speech\Speech Reception\SpeechReceptionBluetoothKeepAlive.cs" />
@@ -244,10 +234,8 @@
     <Compile Include="Assets\Turandot\Inputs\Turandot.Inputs.Button.cs" />
     <Compile Include="Assets\Speech\Digits\Digits.Trial.cs" />
     <Compile Include="Assets\Basic\LDL\LDL.LoudnessDiscomfortData.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\Waveform.cs" />
     <Compile Include="Assets\Scripts\Game Management\Project.Settings.cs" />
     <Compile Include="Assets\Scripts\KLib\Signals\Wave\KLib.Wave.WaveChunk.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Modulations\AM.cs" />
     <Compile Include="Assets\Scripts\Protocols\ProtocolManager.cs" />
     <Compile Include="Assets\Turandot\Schedules\Turandot.Schedules.Mode.cs" />
     <Compile Include="Assets\Basic\Audiogram\Audiograms.TrackData.cs" />
@@ -268,7 +256,6 @@
     <Compile Include="Assets\Audiometer\AudiometerController.cs" />
     <Compile Include="Assets\Speech\Speech Reception\SpeechReception.MatrixTest.cs" />
     <Compile Include="Assets\Turandot\Parameters\Turandot.Instructions.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\FM.cs" />
     <Compile Include="Assets\Scripts\Home\HomeMenu.cs" />
     <Compile Include="Assets\Basic\LDL\SliderAnimator.cs" />
     <Compile Include="Assets\Turandot\Parameters\TurandotAction.cs" />
@@ -278,9 +265,7 @@
     <Compile Include="Assets\Prefabs\QuestionBox.cs" />
     <Compile Include="Assets\Turandot\Interactive\UDPPacket.cs" />
     <Compile Include="Assets\Turandot\Cues\Turandot.Cues.FixationPointAction.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Calibration\DeviceCorrections.cs" />
     <Compile Include="Assets\Turandot\Inputs\Turandot.InputEvent.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Filters\IIRFilter.cs" />
     <Compile Include="Assets\Speech\Speech Reception\SpeechReception.Sequence.cs" />
     <Compile Include="Assets\Turandot\Scripts\InstructionPanel.cs" />
     <Compile Include="Assets\Turandot\Cues\Turandot.Cues.VideoAction.cs" />
@@ -320,7 +305,6 @@
     <Compile Include="Assets\Turandot\Parameters\Turandot.Termination.cs" />
     <Compile Include="Assets\Scripts\Home\ProtocolPanel.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotInputCategorizer.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Waveforms\Sinusoid.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotState.cs" />
     <Compile Include="Assets\Scripts\Hardware\HardwareConfiguration.cs" />
     <Compile Include="Assets\Unity UI Controls\Scripts\ListItem Scripts\ListBoxLineItem.cs" />
@@ -361,10 +345,8 @@
     <Compile Include="Assets\Speech\Speech Reception\SpeechReception.TestLog.cs" />
     <Compile Include="Assets\Turandot\Inputs\ChecklistItem.cs" />
     <Compile Include="Assets\Speech\Digits\DigitsWavManifest.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Calibration\CalibrationData.cs" />
     <Compile Include="Assets\Pupillometry\GazeCalibrationLog.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotCueController.cs" />
-    <Compile Include="Assets\Scripts\KLib\Signals\Calibration\CalibrationFactory.cs" />
     <Compile Include="Assets\Basic\LDL\Haptics\LDL.HapticsTestCondition.cs" />
     <Compile Include="Assets\Scripts\Menu Tools\ButtonStyle.cs" />
     <Compile Include="Assets\Basic\LDL\LDL.TestCondition.cs" />

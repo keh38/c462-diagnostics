@@ -9,7 +9,6 @@ using UnityEngine.UI;
 using KLibU;
 using KLibU.Net;
 using KLib.Signals;
-using KLib.Signals.Waveforms;
 using System;
 
 public class HomeMenu : MonoBehaviour, IRemoteControllable

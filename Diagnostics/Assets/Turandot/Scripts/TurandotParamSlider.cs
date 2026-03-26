@@ -6,7 +6,6 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 using KLib.Signals;
-using KLib.Signals.Waveforms;
 using Turandot.Inputs;
 using Turandot.Screen;
 using Input = Turandot.Inputs.Input;
