@@ -43,7 +43,6 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
     private void InitializeStimulusGeneration()
     {
         _signalManager = new SignalManager();
-        _signalManager.AdapterMap = HardwareInterface.AdapterMap;
 
         var toneChannel = new Channel()
         {
@@ -87,7 +86,7 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
         _signalManager.AddChannel(rightNoise);
 
         var audioConfig = AudioSettings.GetConfiguration();
-        _signalManager.Initialize(audioConfig.sampleRate, audioConfig.dspBufferSize);
+        _signalManager.Initialize(audioConfig.sampleRate, audioConfig.dspBufferSize, SessionContext.Signal);
 
         _audioInitialized = true;
     }

@@ -27,6 +27,7 @@ public class LDLLevelSlider : MonoBehaviour
     private bool _firstMove;
 
     private SignalManager _signalManager;
+    private AudioConfiguration _audioConfig;
     private Channel _myChannel;
     private bool _audioInitialized = false;
 
@@ -55,9 +56,8 @@ public class LDLLevelSlider : MonoBehaviour
         _minLevel = minLevel;
         _modDepth_pct = modDepth;
 
-        var audioConfig = AudioSettings.GetConfiguration();
-        _signalManager = new SignalManager(audioConfig.sampleRate, audioConfig.dspBufferSize);
-        _signalManager.AdapterMap = HardwareInterface.AdapterMap;
+        _audioConfig = AudioSettings.GetConfiguration();
+        _signalManager = new SignalManager();
 
         _signalManager.AddChannel(ch);
 
@@ -124,10 +124,10 @@ public class LDLLevelSlider : MonoBehaviour
         _myChannel.Laterality = _settings.ear;
 
         _paramSetter(_settings.start);
-        _signalManager.Initialize();
+        _signalManager.Initialize(_audioConfig.sampleRate, _audioConfig.dspBufferSize, SessionContext.Signal);
         _signalManager.StartPaused();
 
-        _settings.max = Mathf.Min(_settings.max, _myChannel.GetMaxLevel());
+        _settings.max = Mathf.Min(_settings.max, _myChannel.GetMaxLevel(SessionContext.Signal));
         _slider.value = (_settings.start - _settings.min) / (_settings.max - _settings.min);
         _settings.isMaxed = false;
         _slider.enabled = true;

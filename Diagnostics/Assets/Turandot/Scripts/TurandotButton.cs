@@ -142,7 +142,7 @@ namespace Turandot.Scripts
             //}
 
 #endif
-            if (_layout.KeyCode != KeyCode.None && UnityEngine.Input.GetKeyDown(_layout.KeyCode))
+            if ((KeyCode)_layout.KeyCode != KeyCode.None && UnityEngine.Input.GetKeyDown((KeyCode) _layout.KeyCode))
             {
                 _value = true;
             }

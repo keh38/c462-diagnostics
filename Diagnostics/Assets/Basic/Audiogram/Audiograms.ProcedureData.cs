@@ -12,11 +12,9 @@ using KLib;
 using KLib.Signals;
 
 using Newtonsoft.Json;
-using ProtoBuf;
 
 namespace Audiograms
 {
-    [ProtoContract(ImplicitFields=ImplicitFields.AllPublic)]
     [JsonObject(MemberSerialization.OptOut)]
     public class ProcedureData
     {

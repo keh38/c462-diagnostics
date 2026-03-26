@@ -61,6 +61,8 @@ public class LoadingScene : MonoBehaviour
 
     private IEnumerator InitializeHardware()
     {
+        SessionContext.Initialize(HardwareInterface.AdapterMap);
+
         yield break;
         //yield return new WaitForSeconds(1);
 

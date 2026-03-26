@@ -165,10 +165,8 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         AudioSettings.GetDSPBufferSize(out int bufferLength, out int numBuffers);
 
         _sigMan = new SignalManager();
-        _sigMan.AdapterMap = AdapterMap.DefaultStereoMap();
-        _sigMan.AdapterMap.AudioTransducer = "HD280";
         _sigMan.AddChannel(ch);
-        _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
+        _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength, SessionContext.Signal);
         _sigMan.StartPaused();
 
         _audioInitialized = true;
@@ -235,8 +233,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
         AudioSettings.GetDSPBufferSize(out int bufferLength, out int numBuffers);
 
-        _sigMan.AdapterMap = HardwareInterface.AdapterMap;
-        _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength);
+        _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength, SessionContext.Signal);
         _sigMan.StartPaused();
 
         //HardwareInterface.Digitimer?.EnableDevices(_sigMan.GetDigitimerChannels());

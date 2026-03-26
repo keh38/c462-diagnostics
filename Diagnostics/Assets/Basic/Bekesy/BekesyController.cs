@@ -58,12 +58,11 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
     private string _configName;
 
     private SignalManager _signalManager;
+    private AudioConfiguration _audioConfig;
     private Action<float> _levelSetter;
 
     private InputAction _abortAction;
     
-    Audiograms.ANSI_dBHL dBHL_table;
-
     private void Awake()
     {
         _abortAction = _actions.FindAction("Abort");
@@ -82,7 +81,6 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         HTS_Server.SetCurrentScene(_mySceneName, this);
 
         _title.text = "";
-        dBHL_table = Audiograms.ANSI_dBHL.GetTable();
 
 #if HACKING
         Application.targetFrameRate = 60;
@@ -166,9 +164,8 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
 
     private void InitializeStimulusGeneration()
     {
-        var audioConfig = AudioSettings.GetConfiguration();
+        _audioConfig = AudioSettings.GetConfiguration();
         _signalManager = new SignalManager();
-        _signalManager.AdapterMap = HardwareInterface.AdapterMap;
 
         var signalChannel = new Channel()
         {
@@ -190,8 +187,8 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         };
 
         _signalManager.AddChannel(signalChannel);
-        _signalManager.Initialize(audioConfig.sampleRate, audioConfig.dspBufferSize);
-        _deltaTime = (float)audioConfig.dspBufferSize / audioConfig.sampleRate;
+        _signalManager.Initialize(_audioConfig.sampleRate, _audioConfig.dspBufferSize, SessionContext.Signal);
+        _deltaTime = (float)_audioConfig.dspBufferSize / _audioConfig.sampleRate;
 
         _levelSetter = signalChannel.GetParamSetter("Level");
     }
@@ -296,13 +293,14 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         fm.ModFreq_Hz = _currentTrack.Freq_Hz * _settings.ModDepth / 100f;
         fm.ModFreq_Hz = _settings.ModRate;
 
-        _currentLevel = _settings.StartLevel + dBHL_table.HL_To_SPL(_currentTrack.Freq_Hz);
+        // FIX ME: add transducer
+        _currentLevel = _settings.StartLevel + ANSI_dBHL.HL_To_SPL(_currentTrack.Freq_Hz, 0, SessionContext.Signal.Transducer);
         _levelSetter(_currentLevel);
 
-        _signalManager.Initialize();
+        _signalManager.Initialize(_audioConfig.sampleRate, _audioConfig.dspBufferSize, SessionContext.Signal);
         _signalManager.StartPaused();
 
-        _maxLevel = _signalManager["Signal"].GetMaxLevel();
+        _maxLevel = _signalManager["Signal"].GetMaxLevel(SessionContext.Signal);
         _levelOverRange = false;
         _direction = 0;
         _lastDirection = 0;
@@ -332,7 +330,7 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         _data.audiogram.Set(
             _currentTrack.ear,
             _currentTrack.Freq_Hz,
-            dBHL_table.SPL_To_HL(_currentTrack.Freq_Hz, threshold),
+            ANSI_dBHL.SPL_To_HL(_currentTrack.Freq_Hz, threshold, SessionContext.Signal.Transducer),
             threshold);
 
         StartNextStimulusCondition();

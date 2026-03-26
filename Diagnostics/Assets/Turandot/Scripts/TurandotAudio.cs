@@ -81,8 +81,7 @@ namespace Turandot.Scripts
                 _sigMan.Name = name;
                 // TURANDOT FIX 
                 //_sigMan.MaxLevelMargin = maxLevelMargin;
-                _sigMan.AdapterMap = HardwareInterface.AdapterMap;;
-                _sigMan.Initialize(AudioSettings.outputSampleRate, npts);
+                _sigMan.Initialize(AudioSettings.outputSampleRate, npts, SessionContext.Signal);
                 _sigMan.StartPaused();
                 _isi = _sigMan.Channels[0].Gate.Period_ms / 1000f;
             }
@@ -107,7 +106,7 @@ namespace Turandot.Scripts
                 AudioSettings.GetDSPBufferSize(out npts, out nbuf);
 
                 _sigMan.Name = name;
-                _sigMan.Initialize(AudioSettings.outputSampleRate, npts);
+                _sigMan.Initialize(AudioSettings.outputSampleRate, npts, SessionContext.Signal);
                 _sigMan.StartPaused();
                 _isi = _sigMan.Channels[0].Gate.Active ? _sigMan.Channels[0].Gate.Period_ms / 1000f : float.PositiveInfinity;
             }

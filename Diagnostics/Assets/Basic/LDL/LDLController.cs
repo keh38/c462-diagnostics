@@ -15,8 +15,12 @@ using KLib.Signals;
 using C462.Shared;
 using C462.Shared.Protocol.DTOs;
 
+using Audiograms;
+
 using BasicMeasurements;
 using LDL;
+
+using MeasurementState = LDL.MeasurementState;
 
 public class LDLController : MonoBehaviour, IRemoteControllable
 {
@@ -368,9 +372,9 @@ public class LDLController : MonoBehaviour, IRemoteControllable
 
         if (_settings.LevelUnits == LevelUnits.dB_SL)
         {
-            Audiograms.AudiogramData audiogram = Audiograms.AudiogramData.Load();
-            Audiograms.Audiogram agramLeft = audiogram.Get(AudiogramTestEar.Left);
-            Audiograms.Audiogram agramRight = audiogram.Get(AudiogramTestEar.Right);
+            AudiogramData audiogram = Audiograms.AudiogramData.Load(FileLocations.AudiogramPath);
+            Audiogram agramLeft = audiogram.Get(AudiogramTestEar.Left);
+            Audiogram agramRight = audiogram.Get(AudiogramTestEar.Right);
 
 
             List<float> agramFreqs = new List<float>(audiogram.Get_Frequency_Hz());
@@ -483,7 +487,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
     void FinishData()
     {
         _data.testConditions = _state.testConditions;
-        Audiograms.AudiogramData audiograms = Audiograms.AudiogramData.Load();
+        AudiogramData audiograms = AudiogramData.Load(FileLocations.AudiogramPath);
 
         // 1. Create "LDL Audiogram"
         if (_data.LDLgram != null)
@@ -534,8 +538,9 @@ public class LDLController : MonoBehaviour, IRemoteControllable
             }
         }
         _data.LDLgram.Save(FileLocations.LDLPath);
+        SessionContext.SetLDL(FileLocations.LDLPath);
 
-//        File.AppendAllText(_dataPath, Files.JSONSerializeToString(_data));
+        //        File.AppendAllText(_dataPath, Files.JSONSerializeToString(_data));
         KLib.Utilities.AppendToJsonFile(_dataPath, Files.JSONSerializeToString(_data));
     }
 

@@ -2,11 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
-using ProtoBuf;
 namespace SpeechReception
 {
     [System.Serializable]
-    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public class Response
     {
         public string test;

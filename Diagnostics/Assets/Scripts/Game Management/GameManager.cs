@@ -178,12 +178,17 @@ public class GameManager : MonoBehaviour
             };
             _SaveSubjectMetadata();
         }
+
+        SessionContext.SetTransducer(_subjectMetadata.Transducer);
+        SessionContext.SetAudiogram(FileLocations.AudiogramPath);
+        SessionContext.SetLDL(FileLocations.LDLPath);
     }
 
     private void _SetTransducer(string transducer)
     {
         _subjectMetadata.Transducer = transducer;
         _SaveSubjectMetadata();
+        SessionContext.SetTransducer(_subjectMetadata.Transducer);
     }
 
     private Color _GetBackgroundColor()

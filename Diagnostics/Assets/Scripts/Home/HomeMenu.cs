@@ -109,6 +109,8 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
     {
         yield return new WaitForSeconds(1);
 
+        SessionContext.Initialize(HardwareInterface.AdapterMap);
+
         if (!HardwareInterface.IsReady && !HardwareInterface.ErrorAcknowledged)
         {
             SceneManager.LoadScene("Admin Tools");

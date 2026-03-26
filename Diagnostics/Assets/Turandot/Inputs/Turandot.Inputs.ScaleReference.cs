@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using System.Xml.Serialization;
 
 using Newtonsoft.Json;
-using ProtoBuf;
 
 namespace Turandot.Inputs
 {
-    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     [JsonObject(MemberSerialization.OptOut)]
     public class ScaleReference
     {

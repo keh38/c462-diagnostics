@@ -110,10 +110,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         _engine.ClearScreen();
 
         Expressions.Metrics = GameManager.Metrics;
-        Expressions.Audiogram = Audiograms.AudiogramData.Load();
-        var ldl = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
-        if (ldl != null) ldl.ReplaceNaNWithMax(GameManager.Transducer);
-        Expressions.LDL = ldl;
+        Expressions.Audiogram = SessionContext.Signal.Audiogram;
+        Expressions.LDL = SessionContext.Signal.LDL;
 
         string localName = "";
         if (!_isRemote)
@@ -140,17 +138,17 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     private void HandleSubjectChanged(object sender, EventArgs e)
     {
         Expressions.Metrics = GameManager.Metrics;
-        Expressions.Audiogram = Audiograms.AudiogramData.Load();
-        var ldl = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
-        if (ldl != null) ldl.ReplaceNaNWithMax(GameManager.Transducer);
-        Expressions.LDL = ldl;
+        Expressions.Audiogram = SessionContext.Signal.Audiogram;
+        Expressions.LDL = SessionContext.Signal.LDL;
     }
 
     private bool ApplyParameters()
     {
         try
         {
-            _params.ApplyDefaultWavFolder(GameManager.Project);
+            _params.ApplyDefaultWavFolder(
+                FileLocations.LocalResourceFolder(GameManager.Project, "Wav Files"),
+                FileLocations.UserWavFolder);
 
             _engine.DestroyObjects();
             _engine.Initialize(_params);
@@ -548,7 +546,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         }    
         
         var header = new Turandot.FileHeader();
-        header.Initialize(_mainDataFile, _paramFile);
+        header.Initialize(Application.productName, Application.version, _mainDataFile, _paramFile);
         header.audioSamplingRate = AudioSettings.outputSampleRate;
         AudioSettings.GetDSPBufferSize(out header.audioBufferLength, out header.audioNumBuffers);
         if (_params.screen.ApplyCustomScreenColor)

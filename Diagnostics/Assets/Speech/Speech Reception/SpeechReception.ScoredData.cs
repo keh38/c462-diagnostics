@@ -8,31 +8,20 @@ using System.IO;
 #endif
 
 using Newtonsoft.Json;
-using ProtoBuf;
 
 namespace SpeechReception
 {
     [System.Serializable]
-    [ProtoContract(ImplicitFields=ImplicitFields.AllPublic)]
     public class ScoredData
     {
-        [ProtoMember(1, IsRequired = true)]
         public string date;
-        [ProtoMember(2, IsRequired = true)]
         public int QuickSINA;
-        [ProtoMember(3, IsRequired = true)]
         public int QuickSINB;
-        [ProtoMember(4, IsRequired = true)]
         public int QuickSINC;
-        [ProtoMember(5, IsRequired = true)]
         public int QuickSIND;
-        [ProtoMember(6, IsRequired = true)]
         public int QuickSINTotal;
-        [ProtoMember(7, IsRequired = true)]
         public int stratum;
-        [ProtoMember(8, IsRequired = true)]
         public int groupNum;
-        [ProtoMember(9, IsRequired = true)]
         public float avgSNR;
 
         public ScoredData()
@@ -46,7 +35,6 @@ namespace SpeechReception
         }
 
         [JsonIgnore]
-        [ProtoIgnore]
         public bool IsValid
         {
             get

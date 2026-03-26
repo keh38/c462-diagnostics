@@ -3,11 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 using Newtonsoft.Json;
-using ProtoBuf;
 
 namespace Bekesy
-{ 
-    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+{
     [JsonObject(MemberSerialization.OptOut)]
     public class TrackLog
     {
@@ -29,7 +27,6 @@ namespace Bekesy
             Clear();
         }
 
-        [ProtoIgnore]
         [JsonIgnore]
         public int Length { get { return _index; } }
 

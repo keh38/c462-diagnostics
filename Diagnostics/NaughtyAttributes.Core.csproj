@@ -598,6 +598,10 @@
       <HintPath>Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="C462.Turandot">
+      <HintPath>Assets\Plugins\C462.Turandot.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="unityplastic">
       <HintPath>Library\PackageCache\com.unity.collab-proxy@50ac96531b63\Lib\Editor\unityplastic.dll</HintPath>
       <Private>False</Private>
@@ -644,10 +648,6 @@
     </Reference>
     <Reference Include="protobuf-net">
       <HintPath>Library\PackageCache\com.epl.klib@64f6bfb308cb\Runtime\Plugins\protobuf-net.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Design">
-      <HintPath>Assets\Plugins\System.Design.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="D128NET">

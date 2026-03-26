@@ -27,6 +27,7 @@ public class LDLHapticsLevelSlider : MonoBehaviour
     private bool _firstMove;
 
     private SignalManager _signalManager;
+    private AudioConfiguration _audioConfig;
     private Channel _myChannel;
     private Channel _myHaptic;
     private bool _audioInitialized = false;
@@ -59,9 +60,8 @@ public class LDLHapticsLevelSlider : MonoBehaviour
         _myHaptic = haptic;
         _myHaptic.Name = $"{this.name}Haptic";
 
-        var audioConfig = AudioSettings.GetConfiguration();
-        _signalManager = new SignalManager(audioConfig.sampleRate, audioConfig.dspBufferSize);
-        _signalManager.AdapterMap = HardwareInterface.AdapterMap;
+        _audioConfig = AudioSettings.GetConfiguration();
+        _signalManager = new SignalManager();
 
         _signalManager.AddChannel(_myChannel);
         _signalManager.AddChannel(_myHaptic);
@@ -132,11 +132,11 @@ public class LDLHapticsLevelSlider : MonoBehaviour
         SetHapticParameters(test.propValPairs);
 
         _paramSetter(_settings.start);
-        _signalManager.Initialize();
+        _signalManager.Initialize(_audioConfig.sampleRate, _audioConfig.dspBufferSize, SessionContext.Signal);
         HardwareInterface.Digitimer?.EnableDevices(_signalManager.GetDigitimerChannels());
         _signalManager.StartPaused();
 
-        _settings.max = Mathf.Min(_settings.max, _myChannel.GetMaxLevel());
+        _settings.max = Mathf.Min(_settings.max, _myChannel.GetMaxLevel(SessionContext.Signal));
         _slider.value = (_settings.start - _settings.min) / (_settings.max - _settings.min);
         _settings.isMaxed = false;
         _slider.enabled = true;

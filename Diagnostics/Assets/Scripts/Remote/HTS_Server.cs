@@ -564,6 +564,9 @@ public class HTS_Server : MonoBehaviour
         var folder = FileLocations.SubjectMetaFolder;
         var filePath = Path.Combine(folder, filePayload.Filename);
         File.WriteAllText(filePath, filePayload.Content);
+
+        SessionContext.SetAudiogram(FileLocations.AudiogramPath);
+        SessionContext.SetLDL(FileLocations.LDLPath);
     }
 
     private void RunInstaller(string filename)

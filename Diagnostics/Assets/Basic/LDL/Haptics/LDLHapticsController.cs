@@ -19,6 +19,8 @@ using C462.Shared;
 
 using BasicMeasurements;
 
+using Audiograms;
+
 using LDL;
 using LDL.Haptics;
 
@@ -80,10 +82,8 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
         HTS_Server.SetCurrentScene(_mySceneName, this);
 
         Expressions.Metrics = GameManager.Metrics;
-        Expressions.Audiogram = Audiograms.AudiogramData.Load();
-        var ldl = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
-        if (ldl != null) ldl.ReplaceNaNWithMax(GameManager.Transducer);
-        Expressions.LDL = ldl;
+        Expressions.Audiogram = SessionContext.Signal.Audiogram;
+        Expressions.LDL = SessionContext.Signal.LDL;
 
         _title.text = "";
 
@@ -504,9 +504,9 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 
         if (_settings.LevelUnits == LevelUnits.dB_SL)
         {
-            Audiograms.AudiogramData audiogram = Audiograms.AudiogramData.Load();
-            Audiograms.Audiogram agramLeft = audiogram.Get(AudiogramTestEar.Left);
-            Audiograms.Audiogram agramRight = audiogram.Get(AudiogramTestEar.Right);
+            AudiogramData audiogram = Audiograms.AudiogramData.Load(FileLocations.AudiogramPath);
+            Audiogram agramLeft = audiogram.Get(AudiogramTestEar.Left);
+            Audiogram agramRight = audiogram.Get(AudiogramTestEar.Right);
 
             List<float> agramFreqs = new List<float>(audiogram.Get_Frequency_Hz());
 
@@ -671,7 +671,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 
     void UpdateLDLGram()
     {
-        Audiograms.AudiogramData audiograms = Audiograms.AudiogramData.Load();
+        AudiogramData audiograms = AudiogramData.Load(FileLocations.LDLPath);
 
         // 1. Create "LDL Audiogram"
         if (_data.LDLgram != null)
@@ -733,6 +733,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
             }
         }
         _data.LDLgram.Save(FileLocations.LDLPath);
+        SessionContext.SetLDL(FileLocations.LDLPath);
     }
 
     private void SaveState()

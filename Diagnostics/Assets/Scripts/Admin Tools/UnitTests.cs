@@ -49,10 +49,9 @@ public class UnitTests : MonoBehaviour
         };
 
         var config = AudioSettings.GetConfiguration();
-        _signalManager = new SignalManager(config.sampleRate, config.dspBufferSize);
-        _signalManager.AdapterMap = AdapterMap.DefaultStereoMap("HD280");
+        _signalManager = new SignalManager();
         _signalManager.AddChannel(channel);
-        _signalManager.Initialize();
+        _signalManager.Initialize(config.sampleRate, config.dspBufferSize, SessionContext.Signal);
 
         _audioInitialized = true;
     }

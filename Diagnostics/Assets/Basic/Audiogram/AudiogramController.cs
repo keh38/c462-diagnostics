@@ -55,13 +55,13 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
 
     ProcedureData _data = new ProcedureData();
     SignalManager _signalManager;
+    int _sampleRate;
+    int _bufferLength;
 
     private bool _doSimulation = false;
 
     float airBoneGap = 15; // assumed ABG
     float interauralAtten = 35; // measured by JPW in New York
-
-    ANSI_dBHL dBHL_table;
 
     TrackData _currentTrack;
     float _stimulusTime;
@@ -147,10 +147,9 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
 
         _stateFile = Path.Combine(FileLocations.SubjectFolder, $"{_mySceneName}.bin");
 
-        dBHL_table = ANSI_dBHL.GetTable();
         SetReactionTimeLimits();
 
-        AudiogramData extantData = AudiogramData.Load();
+        AudiogramData extantData = AudiogramData.Load(FileLocations.AudiogramPath);
         if (extantData != null)
         {
             _data.audiogramData = extantData;
@@ -324,7 +323,8 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         KLib.Utilities.AppendToJsonFile(_dataPath, Files.JSONSerializeToString(_data));
         KLib.Utilities.AppendToJsonFile(_dataPath, Files.JSONSerializeToString(_buttonLog.Trim()));
 //        File.AppendAllText(_dataPath, Files.JSONSerializeToString(_data));
-        _data.audiogramData.Save();
+        _data.audiogramData.Save(FileLocations.AudiogramPath);
+        SessionContext.SetAudiogram(FileLocations.AudiogramPath);
 
         // Delete state file
         if (File.Exists(_stateFile) && _state.IsCompleted)
@@ -505,11 +505,12 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             _signalManager["Signal"].Waveform = new Noise();
         }
 
-        _signalManager.Initialize();
+        _signalManager.Initialize(_sampleRate, _bufferLength, SessionContext.Signal);
         _signalManager.StartPaused();
 
-        float maxSPL = _signalManager["Signal"].GetMaxLevel();
-        float maxHL = dBHL_table.SPL_To_HL(freq, maxSPL);
+        float maxSPL = _signalManager["Signal"].GetMaxLevel(SessionContext.Signal);
+        // FIX ME: add transducer
+        float maxHL = ANSI_dBHL.SPL_To_HL(freq, maxSPL, SessionContext.Signal.Transducer);
 
         startHL = Mathf.Min(startHL, maxHL);
 
@@ -557,7 +558,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             _currentStimulusCondition.Laterality,
             freq,
             _currentTrack.thresholdHL,
-            _currentTrack.thresholdHL + dBHL_table.HL_To_SPL(freq));
+            _currentTrack.thresholdHL + ANSI_dBHL.HL_To_SPL(freq, 0, SessionContext.Signal.Transducer));
 
         _state.SetCompleted(_currentStimulusCondition, _currentTrack.thresholdHL);
         SaveState();
@@ -809,7 +810,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         // 500-ms steps
         float waitTime = 0.5f * Mathf.Round(UnityEngine.Random.Range(_settings.MinISI, _settings.MaxISI) * 2);
 
-        _signalManager["Signal"].Level.Value = level + dBHL_table.HL_To_SPL(freq);
+        _signalManager["Signal"].Level.Value = level + ANSI_dBHL.HL_To_SPL(freq, 0, SessionContext.Signal.Transducer);
 
         //float vol_dB = noiseGen.IsPlaying ? 0 : volumeControl.SetAttenuation(_signalManager.MinAtten());
         //_signalManager.SetMasterVolume(vol_dB);
@@ -857,7 +858,6 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
     {
         var audioConfig = AudioSettings.GetConfiguration();
         _signalManager = new SignalManager();
-        _signalManager.AdapterMap = HardwareInterface.AdapterMap;
 
         var signalChannel = new Channel()
         {
@@ -878,15 +878,16 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             }
         };
 
-        int npts = (int)Mathf.Ceil(AudioSettings.outputSampleRate * _settings.ToneDuration / 1000);
+        _bufferLength = (int)Mathf.Ceil(AudioSettings.outputSampleRate * _settings.ToneDuration / 1000);
         if (_settings.NumPips > 1)
         {
             signalChannel.Gate.Period_ms = _settings.IPI_ms;
-            npts = (int)Mathf.Ceil(AudioSettings.outputSampleRate * 0.001f * ((_settings.NumPips - 1) * _settings.IPI_ms + _settings.ToneDuration));
+            _bufferLength = (int)Mathf.Ceil(AudioSettings.outputSampleRate * 0.001f * ((_settings.NumPips - 1) * _settings.IPI_ms + _settings.ToneDuration));
         }
+        _sampleRate = audioConfig.sampleRate;
 
         _signalManager.AddChannel(signalChannel);
-        _signalManager.Initialize(audioConfig.sampleRate, npts);
+        _signalManager.Initialize(_sampleRate, _bufferLength, SessionContext.Signal);
 
         // Initialize masker channel
         //noise.filter.shape = FilterShape.Band_pass;

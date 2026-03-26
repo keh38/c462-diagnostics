@@ -165,6 +165,20 @@ public static class FileLocations
         return Path.Combine(DataRoot, project, "pmd.bin");
     }
 
+    public static string GetCalibrationFolder(string transducer)
+    {
+        var localCalFolder = LocalResourceFolder("Calibration");
+
+        var calFilePath = Directory.EnumerateFiles(localCalFolder).FirstOrDefault(f => Path.GetFileName(f).StartsWith(transducer, StringComparison.InvariantCultureIgnoreCase));
+
+        if (calFilePath != null)
+        {
+            return localCalFolder;
+        }
+
+        return Path.Combine(BasicResourcesFolder, "Calibration");
+    }
+
     public static string TinnitusMatchHistoryFile { get { return Path.Combine(SubjectFolder, "meta", "tmh.json"); } }
 
     // Paths to project manager file
@@ -181,7 +195,6 @@ public static class FileLocations
 
     // Speech test wav file folder
     public static readonly string BasicResourcesFolder = @"C:\Users\Public\Music\{4CF46EAB-0304-4429-9666-035ADFDB847F}\{18AE38D6-5684-4966-9047-C49547486142}";
-    //public static readonly string CalibrationFolder = Path.Combine(BasicResourcesFolder, "Calibration");
 
     // Speech test wav file folder
     public static readonly string SpeechWavFolder = @"C:/Users/Public/Music/{4CF46EAB-0304-4429-9666-035ADFDB847F}/{26766E8C-CF81-47D3-A998-C974848F67C0}";

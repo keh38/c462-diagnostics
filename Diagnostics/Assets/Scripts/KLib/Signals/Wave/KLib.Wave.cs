@@ -14,7 +14,6 @@ using System.Xml.Serialization;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using ProtoBuf;
 
 namespace KLib.Wave
 {
