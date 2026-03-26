@@ -21,6 +21,8 @@ using KLibU.Net;
 using NUnit.Framework;
 using System.Xml.Linq;
 
+using C462.Shared;
+
 public class TurandotManager : MonoBehaviour, IRemoteControllable
 {
     [SerializeField] private Camera _camera;
@@ -187,7 +189,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     {
         if (_params.schedule.families.Count == 0) return;
 
-        if (args.laterality != KLib.Signals.Laterality.None)
+        if (args.laterality != Laterality.None)
         {
             var earVar = _params.schedule.families[0].variables.Find(x => x.property == "Ear");
             if (earVar != null)
@@ -572,7 +574,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     void OnGUI()
     {
         Event e = Event.current;
-        if (e.control && e.keyCode == KeyCode.A && !_waitingForResponse)
+        if (e.control && e.keyCode == UnityEngine.KeyCode.A && !_waitingForResponse)
         {
             if (_isRunning)
             {

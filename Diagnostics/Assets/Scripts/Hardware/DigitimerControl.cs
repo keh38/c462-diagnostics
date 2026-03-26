@@ -88,7 +88,7 @@ public class DigitimerControl : MonoBehaviour
         return success;
     }
 
-    public bool EnableDevice(int deviceNum, KLib.Signals.Waveforms.Digitimer digitimer)
+    public bool EnableDevice(int deviceNum, KLib.Signals.Digitimer digitimer)
     {
         if (_d128 == null) return false;
 

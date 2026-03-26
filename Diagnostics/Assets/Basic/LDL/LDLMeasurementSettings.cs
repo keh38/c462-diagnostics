@@ -7,6 +7,7 @@ using KLib.Signals;
 using BasicMeasurements;
 using LDL.Haptics;
 
+using C462.Shared;
 
 namespace LDL
 {

@@ -5,7 +5,9 @@ using System.Linq;
 using System.Text;
 
 using KLib;
-using KLib.Signals.Enumerations;
+using KLib.Signals;
+
+using C462.Shared;
 
 namespace KLib.Signals.Calibration
 {

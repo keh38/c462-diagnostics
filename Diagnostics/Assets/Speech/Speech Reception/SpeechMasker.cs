@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 using ExtensionMethods;
 using KLib.Signals.Calibration;
-using KLib.Signals.Enumerations;
+using KLib.Signals;
 using SpeechReception;
 using System.IO;
 
@@ -29,7 +29,7 @@ public class SpeechMasker : MonoBehaviour
     private int _numBabblers = 1;
     private float _maxLevel;
 
-    public IEnumerator Initialize(Masker masker, float level, string transducer, LevelUnits units, TestEar testEar)
+    public IEnumerator Initialize(Masker masker, float level, string transducer, SpeechReception.LevelUnits units, TestEar testEar)
     {
         _source = masker.Source;
 
@@ -103,7 +103,8 @@ public class SpeechMasker : MonoBehaviour
 
         if (seed > 0)
         {
-            KLib.KMath.Seed = seed;
+            // FIX ME
+            //KLib.KMath.Seed = seed;
         }
 
         int[] randomOrder = KLib.KMath.Permute(_speechFiles.Count);

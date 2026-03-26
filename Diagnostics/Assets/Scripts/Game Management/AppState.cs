@@ -5,6 +5,8 @@ using System.IO;
 using KLib;
 using KLibU;
 
+using C462.Shared;
+
 [Serializable]
 public class AppState
 {

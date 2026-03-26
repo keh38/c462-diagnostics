@@ -3,13 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 
 using Newtonsoft.Json;
-using ProtoBuf;
 
-using KLib.Signals;
+using C462.Shared;
 
 namespace Bekesy
 {
-    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     [JsonObject(MemberSerialization.OptOut)]
     public class TrackData
     {

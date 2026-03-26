@@ -6,7 +6,6 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 using KLib.Signals;
-using KLib.Signals.Enumerations;
 using KLib.Signals.Waveforms;
 using Turandot.Inputs;
 using Turandot.Screen;
@@ -103,7 +102,7 @@ namespace Turandot.Scripts
                 _sigMan = audio.SigMan;
 
                 //Debug.Log($"wtf {_action.Channel} {_action.Property}");
-                //_noise = _sigMan[_action.channel].waveform as Noise;
+                //_noise = _sigMan[_action.channel].Waveform as Noise;
 
                 //_setFilters = _noise != null && _action.parameter == "Frequency";
                 //_paramSetter = _sigMan[_action.channel].ParamSetter(_setFilters ? "CF" : _action.parameter);

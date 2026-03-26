@@ -5,9 +5,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using ProtoBuf;
 
-using KLib.Signals.Calibration;
-using KLib.Signals.Enumerations;
-using KLib.Signals.Filters;
+using C462.Shared;
 
 namespace KLib.Signals.Waveforms
 {
@@ -114,17 +112,17 @@ namespace KLib.Signals.Waveforms
                 case "CF_Hz":
                     SetCF(value);
                     //                    _bpFilter.SetProperties(filter.CF, filter.GetLinearBW());
-                    ComputeReferences(_channel.level, samplingRate_Hz, out _ref_dB, out _maxLevel);
+                    ComputeReferences(_channel.Level, samplingRate_Hz, out _ref_dB, out _maxLevel);
                     break;
 
                 case "BW":
                     SetBW(value);
-                    ComputeReferences(_channel.level, samplingRate_Hz, out _ref_dB, out _maxLevel);
+                    ComputeReferences(_channel.Level, samplingRate_Hz, out _ref_dB, out _maxLevel);
                     break;
 
                 case "Shape":
                     SetShape((FilterShape) value);
-                    ComputeReferences(_channel.level, samplingRate_Hz, out _ref_dB, out _maxLevel);
+                    ComputeReferences(_channel.Level, samplingRate_Hz, out _ref_dB, out _maxLevel);
                     break;
             }
 
@@ -149,14 +147,14 @@ namespace KLib.Signals.Waveforms
             }
 
             _curIndex = 0;
-            CreateToken(_channel.gate.NMax);
+            CreateToken(_channel.Gate.NMax);
 
             if (_sweepableFilter)
             {
                 ComputeSweepableReferences();
                 UpdateSweptReferences(filter.CF);
             }
-            else ComputeReferences(_channel.level, samplingRate_Hz, out _ref_dB, out _maxLevel);
+            else ComputeReferences(_channel.Level, samplingRate_Hz, out _ref_dB, out _maxLevel);
         }
 
         public void SetCF(float cf)
@@ -177,7 +175,7 @@ namespace KLib.Signals.Waveforms
         public void SetFilter(float cf, float bw)
         {
             filter.Set(filter.bandwidthMethod, cf, bw);
-            ComputeReferences(_channel.level, samplingRate_Hz, out _ref_dB, out _maxLevel);
+            ComputeReferences(_channel.Level, samplingRate_Hz, out _ref_dB, out _maxLevel);
         }
 
         private void CreateToken(int nmax)
@@ -215,7 +213,7 @@ namespace KLib.Signals.Waveforms
                 }
             }
 
-            if (filter.brickwall && (filter.shape != FilterShape.None || (precompensate && (_channel.level.Units == LevelUnits.dB_SPL || _channel.level.Units == LevelUnits.dB_SPL_noLDL))))
+            if (filter.brickwall && (filter.shape != FilterShape.None || (precompensate && (_channel.Level.Units == LevelUnits.dB_SPL || _channel.Level.Units == LevelUnits.dB_SPL_noLDL))))
             {
                 ApplyFilter();
             }
@@ -287,11 +285,11 @@ namespace KLib.Signals.Waveforms
             float df = samplingRate_Hz / n;
             float[] w = filter.GetWeights(df, n / 2);
 
-            if (precompensate && _channel.level.Units == LevelUnits.dB_SPL)
+            if (precompensate && _channel.Level.Units == LevelUnits.dB_SPL)
             {
                 float[] freq = new float[n / 2];
                 for (int k = 0; k < freq.Length; k++) freq[k] = k * df;
-                _channel.level.Cal.GetAmplitudesInterp(freq, w);
+                _channel.Level.Cal.GetAmplitudesInterp(freq, w);
             }
 
             alglib.complex[] z = new alglib.complex[n];
@@ -342,7 +340,7 @@ namespace KLib.Signals.Waveforms
 
                 filter.Set(filter.bandwidthMethod, _cf[k], filter.BW);
                 filter.CF = _cf[k];
-                ComputeReferences(_channel.level, samplingRate_Hz, out _ref_vs_cf[k], out _max_vs_cf[k]);
+                ComputeReferences(_channel.Level, samplingRate_Hz, out _ref_vs_cf[k], out _max_vs_cf[k]);
             }
 
             filter.Set(filter.bandwidthMethod, original_cf, filter.BW);

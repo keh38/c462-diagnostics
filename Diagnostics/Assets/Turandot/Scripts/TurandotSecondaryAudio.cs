@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 
 using KLib.Signals;
-using KLib.Signals.Enumerations;
 using KLib.Signals.Waveforms;
+using Noise = KLib.Signals.Noise;
 
 namespace Turandot.Scripts
 {
@@ -38,10 +38,10 @@ namespace Turandot.Scripts
                 _noise = null;
 
 
-                var ch = _sigMan.channels.Find(o => o.waveform is Noise);
+                var ch = _sigMan.Channels.Find(o => o.Waveform is Noise);
                 if (ch != null)
                 {
-                    _noise = ch.waveform as Noise;
+                    _noise = ch.Waveform as Noise;
                     if (_noise != null && _noise.filter.shape != FilterShape.None && _noise.filter.unityFilter)
                     {
                         audioSource.bypassEffects = false;

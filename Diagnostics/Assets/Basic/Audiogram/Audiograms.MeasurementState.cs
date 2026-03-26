@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
 
-using ProtoBuf;
-using KLib.Signals.Enumerations;
-using KLib.Signals;
-using Microsoft.Graph;
 using UnityEngine;
+
+using C462.Shared;
 
 namespace Audiograms
 {
-    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public class StimulusCondition
     {
         public float Frequency { get; set; }
@@ -40,7 +37,6 @@ namespace Audiograms
         }
     }
 
-    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public class MeasurementState
     {
         public List<StimulusCondition> stimulusConditions;
@@ -90,16 +86,12 @@ namespace Audiograms
             return sc;
         }
 
-        [ProtoIgnore]
         public int NumStimulusConditions { get { return stimulusConditions.Count; } }
 
-        [ProtoIgnore]
         public int NumCompleted { get { return stimulusConditions.FindAll(x => x.Completed).Count; } }
 
-        [ProtoIgnore]
         public bool IsCompleted { get { return stimulusConditions.FindAll(x => !x.Completed).Count == 0; } }
 
-        [ProtoIgnore]
         public int PercentComplete { get { return Mathf.RoundToInt(100f * NumCompleted / NumStimulusConditions); } }
     }
 }

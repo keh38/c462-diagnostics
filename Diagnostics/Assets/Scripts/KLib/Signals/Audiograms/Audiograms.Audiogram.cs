@@ -8,13 +8,17 @@ using KLib;
 using Newtonsoft.Json;
 using ProtoBuf;
 
+using C462.Shared;
+
+//using KMath = KLib.KMath;
+
 namespace Audiograms
 {
     [ProtoContract(ImplicitFields=ImplicitFields.AllPublic)]
     [JsonObject(MemberSerialization.OptOut)]
     public class Audiogram
     {
-        public Ear ear;
+        public AudiogramTestEar ear;
         public float[] Frequency_Hz;
         public float[] Threshold_dBHL;
         public float[] Threshold_dBSPL;
@@ -22,7 +26,7 @@ namespace Audiograms
 
         public Audiogram() { }
 
-        public Audiogram(Ear ear)
+        public Audiogram(AudiogramTestEar ear)
         {
             this.ear = ear;
         }
@@ -126,7 +130,9 @@ namespace Audiograms
                 }   
                 return StimulusSpecificThresholds["BBN"];
             }
-            return KMath.Interp1(Frequency_Hz, Threshold_dBSPL, Freq_Hz);
+            // FIX ME: this is a hack to avoid interpolation for now, but it should be fixed to allow interpolation
+            return 0;
+            //return KMath.Interp1(Frequency_Hz, Threshold_dBSPL, Freq_Hz);
         }
         
         public float GetHL(float Freq_Hz)
@@ -135,7 +141,9 @@ namespace Audiograms
             {
                 return StimulusSpecificThresholds["BBN"];
             }
-            return KMath.Interp1(Frequency_Hz, Threshold_dBHL, Freq_Hz);
+            // FIX ME: this is a hack to avoid interpolation for now, but it should be fixed to allow interpolation
+            return 0;
+            //return KMath.Interp1(Frequency_Hz, Threshold_dBHL, Freq_Hz);
         }
         
         public float GetMeanThreshold(float minFreq, float maxFreq)

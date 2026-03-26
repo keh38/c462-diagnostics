@@ -3,13 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 
 using Newtonsoft.Json;
+using C462.Shared;
 
 namespace LDL
 {
     [JsonObject(MemberSerialization.OptOut)]
     public class SliderSettings
     {
-        public KLib.Signals.Laterality ear;
+        public Laterality ear;
         public float Freq_Hz;
         public string var;
         public float min;

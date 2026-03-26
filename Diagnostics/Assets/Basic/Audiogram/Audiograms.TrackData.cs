@@ -4,17 +4,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
-using KLib;
-using KLib.Signals;
-using KLib.Signals.Enumerations;
-using KLib.Signals.Waveforms;
+using C462.Shared;
 
 using Newtonsoft.Json;
-using ProtoBuf;
 
 namespace Audiograms
 {
-    [ProtoContract(ImplicitFields=ImplicitFields.AllPublic)]
     [JsonObject(MemberSerialization.OptOut)]
     public class TrackData
     {

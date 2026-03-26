@@ -1,14 +1,12 @@
 using System.Collections.Generic;
 
-using KLib.Signals.Modulations;
-using KLib.Signals.Waveforms;
+using KLib.Signals;
 
 using Newtonsoft.Json;
+using C462.Shared;  
 
 namespace LDL.Haptics
 {
-    public enum HapticSource { NONE, Vibration, TENS}
-
     [JsonObject(MemberSerialization.OptOut)]
     public class HapticStimulus
     {

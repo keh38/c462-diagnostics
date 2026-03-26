@@ -11,6 +11,8 @@ using UnityEngine;
 using Protocols;
 using System.Text;
 
+using C462.Shared;
+
 namespace Turandot.Schedules
 {
     public enum TestedEars { None, Left, Right, Both}

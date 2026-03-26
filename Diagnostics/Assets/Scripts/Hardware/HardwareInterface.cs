@@ -8,6 +8,8 @@ using UnityEngine;
 using KLib;
 using KLibU;
 
+using C462.Shared;
+
 public class HardwareInterface : MonoBehaviour
 {
     [SerializeField] private ClockSynchronizer _clockSynchronizer;

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 
 using KLib.Signals;
-using KLib.Signals.Enumerations;
 using KLib.Signals.Waveforms;
 
 namespace Turandot.Scripts
@@ -86,7 +85,7 @@ namespace Turandot.Scripts
                 _sigMan.AdapterMap = HardwareInterface.AdapterMap;;
                 _sigMan.Initialize(AudioSettings.outputSampleRate, npts);
                 _sigMan.StartPaused();
-                _isi = _sigMan.channels[0].gate.Period_ms / 1000f;
+                _isi = _sigMan.Channels[0].Gate.Period_ms / 1000f;
             }
 
             _log.Clear();
@@ -111,7 +110,7 @@ namespace Turandot.Scripts
                 _sigMan.Name = name;
                 _sigMan.Initialize(AudioSettings.outputSampleRate, npts);
                 _sigMan.StartPaused();
-                _isi = _sigMan.channels[0].gate.Active ? _sigMan.channels[0].gate.Period_ms / 1000f : float.PositiveInfinity;
+                _isi = _sigMan.Channels[0].Gate.Active ? _sigMan.Channels[0].Gate.Period_ms / 1000f : float.PositiveInfinity;
             }
         }
 

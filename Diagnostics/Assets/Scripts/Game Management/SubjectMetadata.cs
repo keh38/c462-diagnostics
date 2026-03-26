@@ -6,6 +6,8 @@ using System.Xml.Serialization;
 using KLib;
 using KLib.Signals;
 
+using C462.Shared;
+
 [System.Serializable]
 public class SubjectMetadata
 {

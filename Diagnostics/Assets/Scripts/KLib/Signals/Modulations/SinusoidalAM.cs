@@ -36,7 +36,7 @@ namespace KLib.Signals.Modulations
         
         public SinusoidalAM(float frequency_Hz, float depth)
         {
-            _shape = Enumerations.AMShape.Sinusoidal;
+            _shape = AMShape.Sinusoidal;
             _shortName = "SAM";
 
             this.Frequency_Hz = _lastFreq = frequency_Hz;

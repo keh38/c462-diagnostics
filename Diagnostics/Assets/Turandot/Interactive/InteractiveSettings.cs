@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using KLib.Signals;
-using KLib.Signals.Waveforms;
+using C462.Shared;
 
 using Turandot.Inputs;
 
@@ -38,25 +38,25 @@ namespace Turandot.Interactive
             var ch = new Channel()
             {
                 Name = "Audio",
-                Modality = KLib.Signals.Enumerations.Modality.Audio,
+                Modality = KLib.Signals.Modality.Audio,
                 Laterality = Laterality.Diotic,
                 Location = "Site 1",
-                waveform = new Sinusoid()
+                Waveform = new Sinusoid()
                 {
                     Frequency_Hz = 500
                 },
-                modulation = new KLib.Signals.Modulations.SinusoidalAM()
+                Modulation = new KLib.Signals.SinusoidalAM()
                 {
                     Frequency_Hz = 40,
                     Depth = 1
                 },
-                gate = new Gate()
+                Gate = new Gate()
                 {
                     Active = true,
-                    Duration_ms = 250,
+                    Width_ms = 250,
                     Period_ms = 1000
                 },
-                level = new Level()
+                Level = new Level()
                 {
                     Units = LevelUnits.dB_SPL,
                     Value = 50

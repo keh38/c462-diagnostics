@@ -7,6 +7,8 @@ using Newtonsoft.Json;
 using KLib.Signals;
 using System;
 
+using C462.Shared;
+
 namespace LDL.Haptics
 {
     [JsonObject(MemberSerialization.OptOut)]

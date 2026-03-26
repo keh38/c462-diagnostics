@@ -13,8 +13,9 @@ using C462.Shared.Protocol.DTOs;
 using KLibU;
 using KLib.Expressions;
 using KLibU.Net;
-using KLib.Signals.Waveforms;
 using KLib.Signals;
+
+using C462.Shared;
 
 using BasicMeasurements;
 
@@ -417,25 +418,25 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
     {
         var ch = new Channel()
         {
-            Modality = KLib.Signals.Enumerations.Modality.Audio,
+            Modality = KLib.Signals.Modality.Audio,
             Laterality = Laterality.Diotic,
-            waveform = new FM()
+            Waveform = new FM()
             {
                 Carrier_Hz = 500,
                 Depth_Hz = 500 * _settings.ModDepth_pct / 100f,
                 ModFreq_Hz = 5,
                 Phase_cycles = 0
             },
-            level = new Level()
+            Level = new Level()
             {
                 Units = _settings.LevelUnits == LevelUnits.dB_SPL ? LevelUnits.dB_SPL_noLDL : _settings.LevelUnits,
                 Value = 75f
             },
-            gate = new Gate()
+            Gate = new Gate()
             {
                 Active = true,
                 Delay_ms = _settings.ToneDelay,
-                Duration_ms = _settings.ToneDuration,
+                Width_ms = _settings.ToneDuration,
                 Period_ms = _settings.ISI_ms
             }
         };
@@ -445,22 +446,22 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
         {
             haptic = new Channel()
             {
-                Modality = KLib.Signals.Enumerations.Modality.Haptic,
+                Modality = KLib.Signals.Modality.Haptic,
                 Location = _settings.HapticStimulus.Location,
-                waveform = new Sinusoid()
+                Waveform = new Sinusoid()
                 {
                     Frequency_Hz = _settings.HapticStimulus.Vibration.Frequency_Hz
                 },
-                level = new Level()
+                Level = new Level()
                 {
                     Units = LevelUnits.Volts,
                     Value = _settings.HapticStimulus.Level
                 },
-                gate = new Gate()
+                Gate = new Gate()
                 {
                     Active = true,
                     Delay_ms = _settings.HapticStimulus.Delay_ms,
-                    Duration_ms = _settings.HapticStimulus.Duration_ms,
+                    Width_ms = _settings.HapticStimulus.Duration_ms,
                     Period_ms = _settings.ISI_ms
                 }
             };
@@ -469,9 +470,9 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
         {
             haptic = new Channel()
             {
-                Modality = KLib.Signals.Enumerations.Modality.Electric,
+                Modality = KLib.Signals.Modality.Electric,
                 Location = _settings.HapticStimulus.Location,
-                waveform = new Digitimer()
+                Waveform = new Digitimer()
                 {
                     PulseRate_Hz = _settings.HapticStimulus.TENS.PulseRate_Hz,
                     PulseMode = _settings.HapticStimulus.TENS.PulseMode,
@@ -482,12 +483,12 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
                     Source = Digitimer.DemandSource.Internal,
                     Demand = _settings.HapticStimulus.TENS.Demand
                 },
-                gate = new Gate()
+                Gate = new Gate()
                 {
                     Active = true,
                     Ramp_ms = 0,
                     Delay_ms = _settings.HapticStimulus.Delay_ms,
-                    Duration_ms = _settings.HapticStimulus.Duration_ms,
+                    Width_ms = _settings.HapticStimulus.Duration_ms,
                     Period_ms = _settings.ISI_ms
                 }
             };
@@ -504,8 +505,8 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
         if (_settings.LevelUnits == LevelUnits.dB_SL)
         {
             Audiograms.AudiogramData audiogram = Audiograms.AudiogramData.Load();
-            Audiograms.Audiogram agramLeft = audiogram.Get(Audiograms.Ear.Left);
-            Audiograms.Audiogram agramRight = audiogram.Get(Audiograms.Ear.Right);
+            Audiograms.Audiogram agramLeft = audiogram.Get(AudiogramTestEar.Left);
+            Audiograms.Audiogram agramRight = audiogram.Get(AudiogramTestEar.Right);
 
             List<float> agramFreqs = new List<float>(audiogram.Get_Frequency_Hz());
 
@@ -583,7 +584,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
         _sliderPanel.HideLockInButton();
 
 #if !UNITY_EDITOR
-        HardwareInterface.VolumeManager.SetMasterVolume(1, VolumeManager.VolumeUnit.Scalar);
+        //HardwareInterface.VolumeManager.SetMasterVolume(1, VolumeManager.VolumeUnit.Scalar);
 #endif
 
         if (_curGroup.Count > 0 && !_doSimulation)
@@ -710,7 +711,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
                 }
             }
 
-            Audiograms.Ear ear = tc.ear == Laterality.Left ? Audiograms.Ear.Left : Audiograms.Ear.Right;
+            var ear = tc.ear == Laterality.Left ? AudiogramTestEar.Left : AudiogramTestEar.Right;
             float current = _data.LDLgram.Get(ear).GetThreshold(tc.Freq_Hz);
             if (_settings.LevelUnits == LevelUnits.dB_SL)
             {

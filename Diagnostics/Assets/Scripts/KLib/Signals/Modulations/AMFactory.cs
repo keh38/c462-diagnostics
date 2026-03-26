@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using KLib.Signals.Enumerations;
+using KLib.Signals;
 
 namespace KLib.Signals.Modulations
 {

@@ -12,7 +12,8 @@ using UnityEngine.UI;
 using KLib;
 using KLibU.Net;
 using KLib.Signals;
-using KLib.Signals.Waveforms;
+
+using C462.Shared;
 
 public class CalibrationController : MonoBehaviour, IRemoteControllable
 {
@@ -47,11 +48,11 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
         var toneChannel = new Channel()
         {
             Name = "ToneLeft",
-            Modality = KLib.Signals.Enumerations.Modality.Audio,
+            Modality = KLib.Signals.Modality.Audio,
             Laterality = Laterality.Left,
             active = false,
-            waveform = new Sinusoid(),
-            level = new Level()
+            Waveform = new Sinusoid(),
+            Level = new Level()
             {
                 Units = LevelUnits.dB_Vrms,
                 Value = -40
@@ -61,11 +62,11 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
         var noiseChannel = new Channel()
         {
             Name = "NoiseLeft",
-            Modality = KLib.Signals.Enumerations.Modality.Audio,
+            Modality = KLib.Signals.Modality.Audio,
             Laterality = Laterality.Binaural,
-            waveform = new Noise(),
+            Waveform = new Noise(),
             active = false,
-            level = new Level()
+            Level = new Level()
             {
                 Units = LevelUnits.dB_Vrms,
                 Value = -40
@@ -124,8 +125,8 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
 
         string chName = $"Tone{ear}";
 
-        (_signalManager[chName].waveform as Sinusoid).Frequency_Hz = freq;
-        _signalManager[chName].level.Value = level;
+        (_signalManager[chName].Waveform as Sinusoid).Frequency_Hz = freq;
+        _signalManager[chName].Level.Value = level;
         _signalManager[chName].SetActive(true);
     }
 
@@ -138,13 +139,13 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
 
         string chName = $"Noise{ear}";
 
-        _signalManager[chName].level.Value = level;
+        _signalManager[chName].Level.Value = level;
         _signalManager[chName].SetActive(true);
     }
 
     void Stop()
     {
-        foreach (var channel in _signalManager.channels)
+        foreach (var channel in _signalManager.Channels)
         {
             channel.SetActive(false);
         }

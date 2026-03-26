@@ -6,7 +6,6 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 
 using KLib.Signals;
-using KLib.Signals.Waveforms;
 
 using LDL;
 
@@ -100,7 +99,7 @@ public class LDLLevelSlider : MonoBehaviour
                 var fm = new FM();
                 fm.Carrier_Hz = _settings.Freq_Hz;
                 fm.Depth_Hz = _settings.Freq_Hz * _modDepth_pct / 100f;
-                _myChannel.waveform = fm;
+                _myChannel.Waveform = fm;
             }
             else
             {
@@ -108,18 +107,18 @@ public class LDLLevelSlider : MonoBehaviour
                 {
                     filter = new FilterSpec()
                     {
-                        shape = KLib.Signals.Enumerations.FilterShape.Band_pass,
+                        shape = KLib.Signals.FilterShape.Band_pass,
                         CF = _settings.Freq_Hz,
                         BW = _bandWidth,
-                        bandwidthMethod = KLib.Signals.Enumerations.BandwidthMethod.Octaves
+                        bandwidthMethod = KLib.Signals.BandwidthMethod.Octaves
                     }
                 };
-                _myChannel.waveform = wf;
+                _myChannel.Waveform = wf;
             }
         }
         else
         {
-            _myChannel.waveform = new Noise();
+            _myChannel.Waveform = new Noise();
         }
 
         _myChannel.Laterality = _settings.ear;

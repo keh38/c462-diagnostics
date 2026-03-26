@@ -12,11 +12,12 @@ using C462.Shared.Protocol.DTOs;
 using KLibU;
 using KLibU.Net;
 using KLib.Signals;
-using KLib.Signals.Waveforms;
 using UnityEngine.EventSystems;
 
 using BasicMeasurements;
 using Bekesy;
+
+using C462.Shared;
 
 public class BekesyController : MonoBehaviour, IRemoteControllable
 {
@@ -154,11 +155,11 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         {
             if (_settings.TestEar != Audiograms.TestEar.Right)
             {
-                _data.tracks.Add(new Bekesy.TrackData(KLib.Signals.Laterality.Left, f));
+                _data.tracks.Add(new Bekesy.TrackData(Laterality.Left, f));
             }
             if (_settings.TestEar != Audiograms.TestEar.Left)
             {
-                _data.tracks.Add(new Bekesy.TrackData(KLib.Signals.Laterality.Right, f));
+                _data.tracks.Add(new Bekesy.TrackData(Laterality.Right, f));
             }
         }
     }
@@ -172,17 +173,17 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         var signalChannel = new Channel()
         {
             Name = "Signal",
-            Modality = KLib.Signals.Enumerations.Modality.Audio,
+            Modality = KLib.Signals.Modality.Audio,
             Laterality = Laterality.Diotic,
-            waveform = new FM(),
-            level = new Level()
+            Waveform = new FM(),
+            Level = new Level()
             {
                 Units = LevelUnits.dB_SPL
             },
-            gate = new Gate()
+            Gate = new Gate()
             {
                 Active = !_settings.Continuous,
-                Duration_ms = _settings.ToneDuration,
+                Width_ms = _settings.ToneDuration,
                 Ramp_ms = _settings.Ramp,
                 Period_ms = _settings.IPI_ms
             }
@@ -283,7 +284,7 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
 
         _signalManager["Signal"].Laterality = _currentTrack.ear;
 
-        var fm = (_signalManager["Signal"].waveform as FM);
+        var fm = (_signalManager["Signal"].Waveform as FM);
 
         if (_settings.ModRate == 0)
         {

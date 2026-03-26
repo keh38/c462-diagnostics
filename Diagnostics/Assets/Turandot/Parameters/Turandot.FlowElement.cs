@@ -74,8 +74,8 @@ namespace Turandot
         {
             if (sigMan["Test"] != null)
             {
-                _delay = sigMan["Test"].gate.Delay_ms;
-                _isi = sigMan["Ref1"].gate.Delay_ms - _delay;
+                _delay = sigMan["Test"].Gate.Delay_ms;
+                _isi = sigMan["Ref1"].Gate.Delay_ms - _delay;
             }
         }
 

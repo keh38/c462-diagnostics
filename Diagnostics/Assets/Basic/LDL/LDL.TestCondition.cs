@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 using Newtonsoft.Json;
 
-using KLib.Signals;
+using C462.Shared;
 
 namespace LDL
 {

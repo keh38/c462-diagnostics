@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-
+using C462.Shared;
 namespace KLib
 {
     public enum LEDType { RGBW, RGB }

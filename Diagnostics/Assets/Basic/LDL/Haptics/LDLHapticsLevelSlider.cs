@@ -6,7 +6,6 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 
 using KLib.Signals;
-using KLib.Signals.Waveforms;
 
 using LDL;
 using LDL.Haptics;
@@ -106,7 +105,7 @@ public class LDLHapticsLevelSlider : MonoBehaviour
                 var fm = new FM();
                 fm.Carrier_Hz = _settings.Freq_Hz;
                 fm.Depth_Hz = _settings.Freq_Hz * _modDepth_pct / 100f;
-                _myChannel.waveform = fm;
+                _myChannel.Waveform = fm;
             }
             else
             {
@@ -114,18 +113,18 @@ public class LDLHapticsLevelSlider : MonoBehaviour
                 {
                     filter = new FilterSpec()
                     {
-                        shape = KLib.Signals.Enumerations.FilterShape.Band_pass,
+                        shape = KLib.Signals.FilterShape.Band_pass,
                         CF = _settings.Freq_Hz,
                         BW = _bandWidth,
-                        bandwidthMethod = KLib.Signals.Enumerations.BandwidthMethod.Octaves
+                        bandwidthMethod = KLib.Signals.BandwidthMethod.Octaves
                     }
                 };
-                _myChannel.waveform = wf;
+                _myChannel.Waveform = wf;
             }
         }
         else
         {
-            _myChannel.waveform = new Noise();
+            _myChannel.Waveform = new Noise();
         }
 
         _myChannel.Laterality = _settings.ear;
@@ -165,21 +164,21 @@ public class LDLHapticsLevelSlider : MonoBehaviour
                     _myHaptic.SetParameter("Gate.Duration_ms", pair.value);
                     break;
                 case "Frequency_Hz":
-                    if (_myHaptic.waveform is Digitimer)
+                    if (_myHaptic.Waveform is Digitimer)
                     {
                         _myHaptic.SetParameter("Digitimer.PulseRate_Hz", pair.value);
                     }
-                    else if (_myHaptic.waveform is Sinusoid)
+                    else if (_myHaptic.Waveform is Sinusoid)
                     {
                         _myHaptic.SetParameter("Sinusoid.Frequency_Hz", pair.value);
                     }
                     break;
                 case "Level":
-                    if (_myHaptic.waveform is Digitimer)
+                    if (_myHaptic.Waveform is Digitimer)
                     {
                         _myHaptic.SetParameter("Digitimer.Demand_mA", pair.value);
                     }
-                    else if (_myHaptic.waveform is Sinusoid)
+                    else if (_myHaptic.Waveform is Sinusoid)
                     {
                         _myHaptic.SetParameter("Level", pair.value);
                     }

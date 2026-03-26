@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-using KLib.Signals.Enumerations;
+using KLib.Signals;
 
 namespace ExtensionMethods
 {
@@ -67,14 +67,14 @@ namespace ExtensionMethods
             return balance;
         }
 
-        //public static Laterality ToLaterality(this Audiograms.Ear ear)
+        //public static Laterality ToLaterality(this AudiogramTestEar ear)
         //{
-        //    return ear == Audiograms.Ear.Left ? Laterality.Left : Laterality.Right;
+        //    return ear == AudiogramTestEar.Left ? Laterality.Left : Laterality.Right;
         //}
 
-        //public static Audiograms.Ear ToEar(this Laterality laterality)
+        //public static AudiogramTestEar ToEar(this Laterality laterality)
         //{
-        //    return laterality == Laterality.Left ? Audiograms.Ear.Left : Audiograms.Ear.Right;
+        //    return laterality == Laterality.Left ? AudiogramTestEar.Left : AudiogramTestEar.Right;
         //}
 
         //public static float ToBalance(this Laterality laterality)

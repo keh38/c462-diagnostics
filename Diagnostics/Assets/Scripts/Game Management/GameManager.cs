@@ -6,6 +6,8 @@ using UnityEngine;
 using KLib;
 using KLibU;
 
+using C462.Shared;
+
 public class GameManager : MonoBehaviour
 {
     private AppState _appState = new AppState();
@@ -172,7 +174,7 @@ public class GameManager : MonoBehaviour
                 ID = subject,
                 Project = project,
                 Transducer = _projectSettings.DefaultTransducer,
-                Laterality = KLib.Signals.Laterality.Binaural
+                Laterality = Laterality.Binaural
             };
             _SaveSubjectMetadata();
         }

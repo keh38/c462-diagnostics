@@ -3,6 +3,8 @@ using System.Xml.Serialization;
 
 using Newtonsoft.Json;
 
+using C462.Shared;
+
 namespace BasicMeasurements
 {
     [XmlInclude(typeof(Audiograms.AudiogramMeasurementSettings))]

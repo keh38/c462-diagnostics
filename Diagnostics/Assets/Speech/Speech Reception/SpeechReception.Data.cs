@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using KLib.Signals.Enumerations;
+using KLib.Signals;
 using Newtonsoft.Json;
 
 namespace SpeechReception

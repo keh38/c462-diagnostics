@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using ProtoBuf;
 
 using KLib.Signals.Calibration;
-using KLib.Signals.Enumerations;
+using KLib.Signals;
 
 namespace KLib.Signals.Waveforms
 {
@@ -151,12 +151,12 @@ namespace KLib.Signals.Waveforms
             T = N * dt;
 
             _channel = channel;
-            if (_channel.level.Cal == null)
+            if (_channel.Level.Cal == null)
             {
             //    throw new ApplicationException("Null calibration data");
             }
 
-            _calib = _channel.level.Cal;
+            _calib = _channel.Level.Cal;
         }
 
         virtual public float GetMaxLevel(Level level, float Fs)

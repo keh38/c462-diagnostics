@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 
 using Audiograms;
-using KLib.Signals.Enumerations;
+using C462.Shared;
 
 namespace KLib.Signals.Calibration
 {

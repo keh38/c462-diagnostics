@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using ProtoBuf;
 
 using KLib.Signals.Calibration;
-using KLib.Signals.Enumerations;
+using KLib.Signals;
 
 namespace KLib.Signals.Waveforms
 {

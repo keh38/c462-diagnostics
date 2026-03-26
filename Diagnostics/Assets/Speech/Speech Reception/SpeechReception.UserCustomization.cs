@@ -1,4 +1,4 @@
-﻿using KLib.Signals.Enumerations;
+﻿using KLib.Signals;
 
 namespace SpeechReception
 {

@@ -6,6 +6,8 @@ using System.Text.RegularExpressions;
 
 using UnityEngine;
 
+using C462.Shared;
+
 namespace KLib.Expressions
 {
     //public class PropVal
@@ -560,15 +562,15 @@ namespace KLib.Expressions
             switch (ear.ToUpper())
             {
                 case "L": case "1":
-                    return data.Get(Audiograms.Ear.Left).GetThreshold(freq);
+                    return data.Get(AudiogramTestEar.Left).GetThreshold(freq);
 
                 case "R": case "2":
-                    return data.Get(Audiograms.Ear.Right).GetThreshold(freq);
+                    return data.Get(AudiogramTestEar.Right).GetThreshold(freq);
 
                 case "B": case "3":
                     // Corrected from old code: was Right+Right, now Left+Right
-                    return 0.5f * (data.Get(Audiograms.Ear.Left).GetThreshold(freq)
-                                 + data.Get(Audiograms.Ear.Right).GetThreshold(freq));
+                    return 0.5f * (data.Get(AudiogramTestEar.Left).GetThreshold(freq)
+                                 + data.Get(AudiogramTestEar.Right).GetThreshold(freq));
 
                 default:
                     throw new ExpressionException(

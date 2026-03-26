@@ -10,9 +10,9 @@ using UnityEngine.UI;
 
 using KLibU;
 using KLibU.Net;
-using KLib.Signals.Waveforms;
 using KLib.Signals;
 
+using C462.Shared;
 using C462.Shared.Protocol.DTOs;
 
 using BasicMeasurements;
@@ -336,25 +336,25 @@ public class LDLController : MonoBehaviour, IRemoteControllable
     {
         var ch = new Channel()
         {
-            Modality = KLib.Signals.Enumerations.Modality.Audio,
+            Modality = KLib.Signals.Modality.Audio,
             Laterality = Laterality.Diotic,
-            waveform = new FM()
+            Waveform = new FM()
             {
                 Carrier_Hz = 500,
                 Depth_Hz = 500 * _settings.ModDepth_pct / 100f,
                 ModFreq_Hz = 5,
                 Phase_cycles = 0
             },
-            level = new Level()
+            Level = new Level()
             {
                 Units = _settings.LevelUnits == LevelUnits.dB_SPL ? LevelUnits.dB_SPL_noLDL : _settings.LevelUnits,
                 Value = 75f
             },
-            gate = new Gate()
+            Gate = new Gate()
             {
                 Active = true,
                 Delay_ms = 0,
-                Duration_ms = _settings.ToneDuration,
+                Width_ms = _settings.ToneDuration,
                 Period_ms = _settings.ISI_ms
             }
         };
@@ -369,8 +369,8 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         if (_settings.LevelUnits == LevelUnits.dB_SL)
         {
             Audiograms.AudiogramData audiogram = Audiograms.AudiogramData.Load();
-            Audiograms.Audiogram agramLeft = audiogram.Get(Audiograms.Ear.Left);
-            Audiograms.Audiogram agramRight = audiogram.Get(Audiograms.Ear.Right);
+            Audiograms.Audiogram agramLeft = audiogram.Get(AudiogramTestEar.Left);
+            Audiograms.Audiogram agramRight = audiogram.Get(AudiogramTestEar.Right);
 
 
             List<float> agramFreqs = new List<float>(audiogram.Get_Frequency_Hz());
@@ -411,7 +411,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         _sliderPanel.HideLockInButton();
 
 #if !UNITY_EDITOR
-        HardwareInterface.VolumeManager.SetMasterVolume(1, VolumeManager.VolumeUnit.Scalar);
+        //HardwareInterface.VolumeManager.SetMasterVolume(1, VolumeManager.VolumeUnit.Scalar);
 #endif
 
         if (_curGroup.Count > 0 && !_doSimulation)
@@ -519,7 +519,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
                 }
             }
 
-            Audiograms.Ear ear = tc.ear == Laterality.Left ? Audiograms.Ear.Left : Audiograms.Ear.Right;
+            var ear = tc.ear == Laterality.Left ? AudiogramTestEar.Left : AudiogramTestEar.Right;
             if (_settings.LevelUnits == LevelUnits.dB_SL)
             {
                 float thresh_SPL = audiograms.Get(ear).GetThreshold(tc.Freq_Hz);

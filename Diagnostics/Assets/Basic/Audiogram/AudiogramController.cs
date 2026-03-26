@@ -12,13 +12,13 @@ using Newtonsoft.Json;
 
 using Audiograms;
 
+using C462.Shared;
 using C462.Shared.Protocol.DTOs;
 
 using KLib;
 using KLibU;
 using KLibU.Net;
 using KLib.Signals;
-using KLib.Signals.Waveforms;
 
 using BasicMeasurements;
 
@@ -498,11 +498,11 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             fm.Carrier_Hz = freq;
             fm.Depth_Hz = freq * _settings.ModDepth / 100f;
             fm.ModFreq_Hz = _settings.ModRate;
-            _signalManager["Signal"].waveform = fm;
+            _signalManager["Signal"].Waveform = fm;
         }
         else
         {
-            _signalManager["Signal"].waveform = new Noise();
+            _signalManager["Signal"].Waveform = new Noise();
         }
 
         _signalManager.Initialize();
@@ -738,7 +738,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         _currentTrack.AddReversal(_currentReversal);
     }
 
-    IEnumerator FindMaskedThreshold(Ear ear, float freq, float originalThreshold)
+    IEnumerator FindMaskedThreshold(AudiogramTestEar ear, float freq, float originalThreshold)
     {
         //commonUI.ShowPrompt("Press the radio as soon as you hear a sound");
 
@@ -809,7 +809,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         // 500-ms steps
         float waitTime = 0.5f * Mathf.Round(UnityEngine.Random.Range(_settings.MinISI, _settings.MaxISI) * 2);
 
-        _signalManager["Signal"].level.Value = level + dBHL_table.HL_To_SPL(freq);
+        _signalManager["Signal"].Level.Value = level + dBHL_table.HL_To_SPL(freq);
 
         //float vol_dB = noiseGen.IsPlaying ? 0 : volumeControl.SetAttenuation(_signalManager.MinAtten());
         //_signalManager.SetMasterVolume(vol_dB);
@@ -817,7 +817,8 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         yield return new WaitForSeconds(_volumeWaitTime); // the volume seems to take a finite time to get switched. (Duh.)
         _volumeWaitTime = 0.5f;
 
-        _audioSource.clip = _signalManager.CreateClip();
+        //FIX ME
+        //_audioSource.clip = _signalManager.CreateClip();
 
         _buttonPressed = false;
         _soundDetected = false;
@@ -861,17 +862,17 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         var signalChannel = new Channel()
         {
             Name = "Signal",
-            Modality = KLib.Signals.Enumerations.Modality.Audio,
+            Modality = KLib.Signals.Modality.Audio,
             Laterality = Laterality.Diotic,
-            waveform = new FM(),
-            level = new Level()
+            Waveform = new FM(),
+            Level = new Level()
             {
                 Units = LevelUnits.dB_SPL
             },
-            gate = new Gate()
+            Gate = new Gate()
             {
                 Active = true,
-                Duration_ms = _settings.ToneDuration,
+                Width_ms = _settings.ToneDuration,
                 Period_ms = 0,
                 Ramp_ms = _settings.Ramp
             }
@@ -880,7 +881,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         int npts = (int)Mathf.Ceil(AudioSettings.outputSampleRate * _settings.ToneDuration / 1000);
         if (_settings.NumPips > 1)
         {
-            signalChannel.gate.Period_ms = _settings.IPI_ms;
+            signalChannel.Gate.Period_ms = _settings.IPI_ms;
             npts = (int)Mathf.Ceil(AudioSettings.outputSampleRate * 0.001f * ((_settings.NumPips - 1) * _settings.IPI_ms + _settings.ToneDuration));
         }
 

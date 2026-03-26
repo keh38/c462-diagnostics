@@ -12,10 +12,13 @@ using KLib;
 using KLibU;
 using KLibU.Net;
 using KLib.Signals;
-using KLib.Signals.Waveforms;
 
 using Turandot.Inputs;
 using Turandot.Interactive;
+
+using C462.Shared;
+
+using UDPPacket = Turandot.Interactive.UDPPacket;
 
 public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 {
@@ -95,7 +98,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     void OnGUI()
     {
         Event e = Event.current;
-        if (e.control && e.keyCode == KeyCode.A && !_quitPanelShowing)
+        if (e.control && e.keyCode == UnityEngine.KeyCode.A && !_quitPanelShowing)
         {
             _sliderArea.SetActive(false);
             _quitPanelShowing = true;
@@ -139,21 +142,21 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         var ch = new Channel()
         {
             Name = "Audio",
-            Modality = KLib.Signals.Enumerations.Modality.Audio,
+            Modality = KLib.Signals.Modality.Audio,
             Laterality = Laterality.Diotic,
             Location = "Site 2",
-            waveform = new Sinusoid()
+            Waveform = new Sinusoid()
             {
                 Frequency_Hz = 500
             },
-            gate = new Gate()
+            Gate = new Gate()
             {
                 Active = true,
                 Delay_ms = 100,
-                Duration_ms = 500,
+                Width_ms = 500,
                 Period_ms = 1000
             },
-            level = new Level()
+            Level = new Level()
             {
                 Units = LevelUnits.dB_attenuation,
                 Value = -20
@@ -177,7 +180,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
         if (properties.Count == 0) return;
 
-        var groups = _sigMan.channels.Select(x => x.Name).ToList();
+        var groups = _sigMan.Channels.Select(x => x.Name).ToList();
 
         _sliderPanels = new List<SliderPanel>();
         _sliders = new List<ParameterSlider>();

@@ -1,10 +1,9 @@
 using UnityEngine;
 
-using KLib.Signals;
-using KLib.Signals.Waveforms;
-using KLib.Signals.Calibration;
-using KLib.Signals.Waveforms;
 using KLib;
+using KLib.Signals;
+
+using C462.Shared;
 
 public class UnitTests : MonoBehaviour
 {
@@ -36,13 +35,13 @@ public class UnitTests : MonoBehaviour
         {
             active = true,
             Name = "File",
-            Modality = KLib.Signals.Enumerations.Modality.Audio,
+            Modality = KLib.Signals.Modality.Audio,
             Laterality = Laterality.Left,
-            waveform = new UserFile()
+            Waveform = new UserFile()
             {
                 fileName = @"C:\Users\kehan\OneDrive\Documents\EPL\HTS\Projects\Scratch\Resources\Wav Files\measure_50_1.wav"
             },
-            level = new Level()
+            Level = new Level()
             {
                 Units = LevelUnits.dB_SPL,
                 Value = 30

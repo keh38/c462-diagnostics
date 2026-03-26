@@ -12,6 +12,8 @@ using KLib.Signals.Waveforms;
 using Newtonsoft.Json;
 using ProtoBuf;
 
+using C462.Shared;
+
 namespace Audiograms
 {
     [ProtoContract(ImplicitFields=ImplicitFields.AllPublic)]
@@ -23,34 +25,34 @@ namespace Audiograms
 
         public void Initialize(float[] Frequency_Hz)
         {
-            audiograms.Add(new Audiogram(Ear.Left));
-            audiograms.Add(new Audiogram(Ear.Right));
+            audiograms.Add(new Audiogram(AudiogramTestEar.Left));
+            audiograms.Add(new Audiogram(AudiogramTestEar.Right));
 
-            audiograms.Find(a => a.ear == Ear.Left).Initialize(Frequency_Hz);
-            audiograms.Find(a => a.ear == Ear.Right).Initialize(Frequency_Hz);
+            audiograms.Find(a => a.ear == AudiogramTestEar.Left).Initialize(Frequency_Hz);
+            audiograms.Find(a => a.ear == AudiogramTestEar.Right).Initialize(Frequency_Hz);
         }
 
         public void Append(float[] Frequency_Hz)
         {
-            audiograms.Find(a => a.ear == Ear.Left).Append(Frequency_Hz);
-            audiograms.Find(a => a.ear == Ear.Right).Append(Frequency_Hz);
+            audiograms.Find(a => a.ear == AudiogramTestEar.Left).Append(Frequency_Hz);
+            audiograms.Find(a => a.ear == AudiogramTestEar.Right).Append(Frequency_Hz);
         }
 
         public void Clear(float[] Frequency_Hz)
         {
-            audiograms.Find(a => a.ear == Ear.Left).Initialize(Frequency_Hz);
-            audiograms.Find(a => a.ear == Ear.Right).Initialize(Frequency_Hz);
+            audiograms.Find(a => a.ear == AudiogramTestEar.Left).Initialize(Frequency_Hz);
+            audiograms.Find(a => a.ear == AudiogramTestEar.Right).Initialize(Frequency_Hz);
         }
 
-        public void Set(KLib.Signals.Laterality laterality, float Frequency_Hz, float ThresholdHL, float ThresholdSPL)
+        public void Set(Laterality laterality, float Frequency_Hz, float ThresholdHL, float ThresholdSPL)
         {
-            var ear = (laterality == Laterality.Left) ? Ear.Left : Ear.Right;
+            var ear = (laterality == Laterality.Left) ? AudiogramTestEar.Left : AudiogramTestEar.Right;
             Set(ear, Frequency_Hz, ThresholdHL, ThresholdSPL);
         }
 
         //public void Set(KLib.Signals.Laterality laterality, string stimulusType, float ThresholdSPL)
         //{
-        //    var ear = (laterality == Laterality.Left) ? Ear.Left : Ear.Right;
+        //    var ear = (laterality == Laterality.Left) ? AudiogramTestEar.Left : AudiogramTestEar.Right;
         //    Set(ear, stimulusType, ThresholdSPL);
         //}
 
@@ -59,17 +61,17 @@ namespace Audiograms
         //    audiograms.Find(a => a.ear == ear).Set(stimulusType, ThresholdSPL);
         //}
 
-        public void Set(Ear ear, float Frequency_Hz, float ThresholdHL, float ThresholdSPL)
+        public void Set(AudiogramTestEar ear, float Frequency_Hz, float ThresholdHL, float ThresholdSPL)
         {
             audiograms.Find(a => a.ear == ear).Set(Frequency_Hz, ThresholdHL, ThresholdSPL);
         }
 
-        public void Insert(Ear ear, float Frequency_Hz, float ThresholdSPL)
+        public void Insert(AudiogramTestEar ear, float Frequency_Hz, float ThresholdSPL)
         {
             audiograms.Find(o => o.ear == ear).Insert(Frequency_Hz, ThresholdSPL);
         }
 
-        public Audiogram Get(Ear ear)
+        public Audiogram Get(AudiogramTestEar ear)
         {
             return audiograms.Find(a => a.ear == ear);
         }
@@ -138,7 +140,7 @@ namespace Audiograms
         {
             List<float> freq = new List<float>();
 
-            foreach (Ear e in new Ear[] { Ear.Left, Ear.Right })
+            foreach (var e in new AudiogramTestEar[] { AudiogramTestEar.Left, AudiogramTestEar.Right })
             {
                 foreach (float fnew in Get(e).Frequency_Hz)
                 {
@@ -156,8 +158,8 @@ namespace Audiograms
         {
             string output = "Freq(Hz), Left (dB SPL), Right (dB SPL)\n";
 
-            Audiogram left = Get(Ear.Left);
-            Audiogram right = Get(Ear.Right);
+            Audiogram left = Get(AudiogramTestEar.Left);
+            Audiogram right = Get(AudiogramTestEar.Right);
 
             for (int k=0; k<audiograms[0].Frequency_Hz.Length; k++)
             {

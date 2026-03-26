@@ -7,6 +7,8 @@ using KLibU;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+using C462.Shared;
+
 public class BasicPanel : MonoBehaviour
 {
     [SerializeField] private DropDownListControl _dropDown; 
@@ -51,7 +53,7 @@ public class BasicPanel : MonoBehaviour
         {
             var configPath = Path.Combine(FileLocations.ConfigFile("LDL", _listBox.SelectedText));
             var config = Files.XmlDeserialize<BasicMeasurementConfiguration>(configPath) as LDL.LDLMeasurementSettings;
-            if (config.HapticStimulus != null && config.HapticStimulus.Source != LDL.Haptics.HapticSource.NONE)
+            if (config.HapticStimulus != null && config.HapticStimulus.Source != HapticSource.NONE)
             {
                 SceneManager.LoadScene("LDL_Haptics");
             }
