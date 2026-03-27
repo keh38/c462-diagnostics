@@ -52,6 +52,8 @@ public class LoadingScene : MonoBehaviour
         HTS_Server.SetCurrentScene("Loading", null);
 
         yield return StartCoroutine(InitializeHardware());
+
+        SessionContext.Initialize(HardwareInterface.AdapterMap);
         GameManager.Initialized = true;
 
         yield return new WaitForSeconds(1);
@@ -61,8 +63,6 @@ public class LoadingScene : MonoBehaviour
 
     private IEnumerator InitializeHardware()
     {
-        SessionContext.Initialize(HardwareInterface.AdapterMap);
-
         yield break;
         //yield return new WaitForSeconds(1);
 

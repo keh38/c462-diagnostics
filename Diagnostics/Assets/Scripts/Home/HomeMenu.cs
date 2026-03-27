@@ -60,6 +60,8 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
         EnableMenu(false);
         yield return null;
 
+        SessionContext.Initialize(HardwareInterface.AdapterMap);
+
         _subjectPanel.SubjectChangedEvent.AddListener(OnSubjectChanged);
 
         if (!GameManager.Initialized)
@@ -108,8 +110,6 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
     private IEnumerator InitializeHardware()
     {
         yield return new WaitForSeconds(1);
-
-        SessionContext.Initialize(HardwareInterface.AdapterMap);
 
         if (!HardwareInterface.IsReady && !HardwareInterface.ErrorAcknowledged)
         {

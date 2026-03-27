@@ -111,7 +111,7 @@ public static class FileLocations
     {
         if (resourceType == "Calibration")
         {
-            var calFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EPL", "HTS", "Calibrations");
+            var calFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EPL", "C462.Shared", "Calibration");
             if (!Directory.Exists(calFolder))
             {
                 Directory.CreateDirectory(calFolder);

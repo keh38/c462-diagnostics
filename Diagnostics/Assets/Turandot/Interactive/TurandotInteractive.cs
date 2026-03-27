@@ -137,41 +137,6 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         _quitPanel.SetActive(true);
     }
 
-    private void CreateDefaultSignalManager()
-    {
-        var ch = new Channel()
-        {
-            Name = "Audio",
-            Modality = KLib.Signals.Modality.Audio,
-            Laterality = Laterality.Diotic,
-            Location = "Site 2",
-            Waveform = new Sinusoid()
-            {
-                Frequency_Hz = 500
-            },
-            Gate = new Gate()
-            {
-                Active = true,
-                Delay_ms = 100,
-                Width_ms = 500,
-                Period_ms = 1000
-            },
-            Level = new Level()
-            {
-                Units = LevelUnits.dB_attenuation,
-                Value = -20
-            }
-        };
-        AudioSettings.GetDSPBufferSize(out int bufferLength, out int numBuffers);
-
-        _sigMan = new SignalManager();
-        _sigMan.AddChannel(ch);
-        _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength, SessionContext.Signal);
-        _sigMan.StartPaused();
-
-        _audioInitialized = true;
-    }
-
     private void InitializeSliders(List<ParameterSliderProperties> properties)
     {
         _sliderArea.GetComponent<FlowLayout>().Clear();
@@ -203,6 +168,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
             var gobj = GameObject.Instantiate(_sliderPrefab, panelObj.transform);
             var slider = gobj.GetComponent<ParameterSlider>();
             slider.Initialize(prop);
+
             slider.Setter = _sigMan.GetParamSetter(prop.FullParameterName);
             slider.Setter?.Invoke(prop.StartValue);
 
@@ -230,6 +196,13 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         _audioInitialized = false;
 
         _sigMan = settings.SigMan;
+
+        KLib.Signals.Sinusoid sinusoid = _sigMan.Channels[0].Waveform as KLib.Signals.Sinusoid;
+        Debug.Log($"is sinusoid = {sinusoid != null}");
+        sinusoid = settings.SigMan.Channels[0].Waveform as KLib.Signals.Sinusoid;
+        Debug.Log($"is sinusoid = {sinusoid != null}");
+        Debug.Log(settings.SigMan.Channels[0].Waveform.GetType().Name);
+        Debug.Log(_sigMan.Channels[0].Waveform.GetType().Name);
 
         AudioSettings.GetDSPBufferSize(out int bufferLength, out int numBuffers);
 
@@ -320,6 +293,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
                 StopStreaming();
                 return TcpMessage.Ok();
             case "SetParams":
+                Debug.Log(request.Payload);
                 var settings = request.GetPayload<InteractiveSettings>();
                 SetParams(settings);
                 return TcpMessage.Ok();
