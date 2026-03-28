@@ -195,14 +195,9 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     {
         _audioInitialized = false;
 
-        _sigMan = settings.SigMan;
 
-        KLib.Signals.Sinusoid sinusoid = _sigMan.Channels[0].Waveform as KLib.Signals.Sinusoid;
-        Debug.Log($"is sinusoid = {sinusoid != null}");
-        sinusoid = settings.SigMan.Channels[0].Waveform as KLib.Signals.Sinusoid;
-        Debug.Log($"is sinusoid = {sinusoid != null}");
-        Debug.Log(settings.SigMan.Channels[0].Waveform.GetType().Name);
-        Debug.Log(_sigMan.Channels[0].Waveform.GetType().Name);
+        //_sigMan = settings.SigMan;
+
 
         AudioSettings.GetDSPBufferSize(out int bufferLength, out int numBuffers);
 
@@ -293,7 +288,6 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
                 StopStreaming();
                 return TcpMessage.Ok();
             case "SetParams":
-                Debug.Log(request.Payload);
                 var settings = request.GetPayload<InteractiveSettings>();
                 SetParams(settings);
                 return TcpMessage.Ok();
