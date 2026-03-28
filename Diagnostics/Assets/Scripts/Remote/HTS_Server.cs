@@ -285,7 +285,7 @@ public class HTS_Server : MonoBehaviour
             case "SetDataRoot":
                 _tcpListener.WriteResponse(TcpMessage.Ok());
                 string dataRoot = request.GetPayload<string>();
-                FileLocations.SetDataRoot(dataRoot);
+                SharedFileLocations.SetProjectRootFolder(dataRoot);
                 break;
 
             case "Disconnect":
@@ -314,7 +314,7 @@ public class HTS_Server : MonoBehaviour
             case "CreateProject":
                 string projectName = request.GetPayload<string>();
                 _tcpListener.WriteResponse(TcpMessage.Ok());
-                FileLocations.CreateProjectFolder(projectName);
+                SharedFileLocations.CreateHtsProjectFolder(projectName);
                 break;
 
             case "GetCurrentSceneName":
@@ -326,12 +326,12 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "GetProjectList":
-                _tcpListener.WriteResponse(TcpMessage.Ok(FileLocations.EnumerateProjects()));
+                _tcpListener.WriteResponse(TcpMessage.Ok(SharedFileLocations.EnumerateHtsProjects()));
                 break;
 
             case "GetSubjectList":
                 string projectToEnumerate = request.GetPayload<string>();
-                _tcpListener.WriteResponse(TcpMessage.Ok(FileLocations.EnumerateSubjects(projectToEnumerate)));
+                _tcpListener.WriteResponse(TcpMessage.Ok(SharedFileLocations.EnumerateHtsSubjects(projectToEnumerate)));
                 break;
 
             case "SetSubjectInfo":
@@ -428,7 +428,7 @@ public class HTS_Server : MonoBehaviour
 
             case "FileExists":
                 var filename = request.GetPayload<string>();
-                var fullpath = Path.Combine(FileLocations.ProjectFolder, "Resources", filename);
+                var fullpath = Path.Combine(SharedFileLocations.HtsProjectFolder, "Resources", filename);
                 if (File.Exists(fullpath))
                 {
                     var fileInfo = new FileInformationPayload()
@@ -448,7 +448,7 @@ public class HTS_Server : MonoBehaviour
                 var largeFilePayload = request.GetPayload<BufferedFilePayload>();
                 _tcpListener.WriteResponse(TcpMessage.Ok()); // signal ready
 
-                var destPath = Path.Combine(FileLocations.ProjectFolder, largeFilePayload.Filename);
+                var destPath = Path.Combine(SharedFileLocations.HtsProjectFolder, largeFilePayload.Filename);
                 Directory.CreateDirectory(Path.GetDirectoryName(destPath));
 
                 using (var fs = new FileStream(destPath, FileMode.Create, FileAccess.Write))
@@ -550,7 +550,7 @@ public class HTS_Server : MonoBehaviour
 
     private void ReceiveFile(TransferFilePayload filePayload)
     {
-        var folder = FileLocations.LocalResourceFolder(filePayload.Folder);
+        var folder = SharedFileLocations.ResourceFolder(filePayload.Folder);
         if (!Directory.Exists(folder))
         {
             Directory.CreateDirectory(folder);
@@ -565,8 +565,8 @@ public class HTS_Server : MonoBehaviour
         var filePath = Path.Combine(folder, filePayload.Filename);
         File.WriteAllText(filePath, filePayload.Content);
 
-        SessionContext.SetAudiogram(FileLocations.AudiogramPath);
-        SessionContext.SetLDL(FileLocations.LDLPath);
+        SessionContext.SetAudiogram(SharedFileLocations.AudiogramPath);
+        SessionContext.SetLDL(SharedFileLocations.LDLPath);
     }
 
     private void RunInstaller(string filename)

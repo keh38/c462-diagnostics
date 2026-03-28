@@ -9,6 +9,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+using C462.Shared;
 using C462.Shared.Protocol.DTOs;
 
 using KLibU;
@@ -80,7 +81,7 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
         }
         else
         {
-            var fn = FileLocations.ConfigFile("Questionnaire", _configName);
+            var fn = SharedFileLocations.GetConfigFile("Questionnaire", _configName);
             _questionnaire = Files.XmlDeserialize<BasicMeasurementConfiguration>(fn) as Questionnaire;
 
             InitializeMeasurement();
@@ -102,7 +103,7 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
         while (true)
         {
             string fileStem = $"{fileStemStart}-Run{GameManager.GetNextRunNumber(_mySceneName):000}";
-            fileStem = Path.Combine(FileLocations.SubjectFolder, fileStem);
+            fileStem = Path.Combine(SharedFileLocations.HtsSubjectFolder, fileStem);
             _dataPath = fileStem + ".json";
             if (!File.Exists(_dataPath))
             {

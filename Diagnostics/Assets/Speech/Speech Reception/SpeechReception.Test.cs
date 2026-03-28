@@ -7,6 +7,8 @@ using KLibU;
 using KLib.Expressions;
 using Newtonsoft.Json;
 
+using C462.Shared;
+
 namespace SpeechReception
 {
     public enum TestEar { SubjectDefault, Left, Right, Binaural}
@@ -280,7 +282,7 @@ namespace SpeechReception
         {
             References references = null;
 
-            string refPath = Path.Combine(FileLocations.LocalResourceFolder("Calibration"), TestSource + "_References.xml");
+            string refPath = Path.Combine(SharedFileLocations.ResourceFolder("Calibration"), TestSource + "_References.xml");
             if (File.Exists(refPath))
             {
                 var r = new References(refPath);
@@ -292,7 +294,7 @@ namespace SpeechReception
 
             if (references == null)
             {
-                refPath = Path.Combine(FileLocations.SpeechWavFolder, TestSource, TestSource + "_References.xml");
+                refPath = Path.Combine(SharedFileLocations.SpeechWavFolder, TestSource, TestSource + "_References.xml");
                 references = new References(refPath);
             }
 

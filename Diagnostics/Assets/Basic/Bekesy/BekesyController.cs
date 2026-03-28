@@ -100,7 +100,7 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         }
         else
         {
-            var fn = FileLocations.ConfigFile("Bekesy", _configName);
+            var fn = SharedFileLocations.GetConfigFile("Bekesy", _configName);
             _settings = Files.XmlDeserialize<BasicMeasurementConfiguration>(fn) as BekesyMeasurementSettings;
             InitializeMeasurement();
             Begin();
@@ -122,7 +122,7 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         while (true)
         {
             string fileStem = $"{fileStemStart}-Run{GameManager.GetNextRunNumber(_mySceneName):000}";
-            fileStem = Path.Combine(FileLocations.SubjectFolder, fileStem);
+            fileStem = Path.Combine(SharedFileLocations.HtsSubjectFolder, fileStem);
             _dataPath = fileStem + ".json";
             if (!File.Exists(_dataPath))
             {

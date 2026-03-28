@@ -9,6 +9,8 @@ using KLib.Expressions;
 using Newtonsoft.Json;
 using Unity.VisualScripting;
 
+using C462.Shared;
+
 namespace SpeechReception
 {
     [JsonObject(MemberSerialization.OptOut)]
@@ -163,12 +165,12 @@ namespace SpeechReception
             string fileName = $"SpeechList.{Name}.xml";
 
             // Check first for project-specific list
-            string listDescriptionPath = Path.Combine(FileLocations.LocalResourceFolder("ConfigFiles"), fileName);
+            string listDescriptionPath = Path.Combine(SharedFileLocations.ResourceFolder("ConfigFiles"), fileName);
 
             if (!File.Exists(listDescriptionPath))
             {
                 // otherwise use the default list installed with the speech test material
-                listDescriptionPath = Path.Combine(FileLocations.SpeechWavFolder, testSource, fileName);
+                listDescriptionPath = Path.Combine(SharedFileLocations.SpeechWavFolder, testSource, fileName);
             }
 
             return listDescriptionPath;

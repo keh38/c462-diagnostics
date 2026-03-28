@@ -11,6 +11,10 @@ using KLib;
 using KLibU;
 using KLibU.Net;
 
+using C462.Shared;
+
+using KeyCode = UnityEngine.KeyCode;
+
 public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 {
     [SerializeField] private Camera _camera;
@@ -74,7 +78,7 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
         _fixationPoint.sizeDelta = new Vector2(_settings.FixationPointSize, _settings.FixationPointSize);
 
         string fn = $"{GameManager.Subject}-PupilDR-{DateTime.Now.ToString("yyyy-MM-dd_HHmmss")}.json";
-        _dataPath = Path.Combine(FileLocations.SubjectFolder, fn);
+        _dataPath = Path.Combine(SharedFileLocations.HtsSubjectFolder, fn);
 
         float approxDuration = 10;
         int npts = Mathf.RoundToInt(approxDuration * 100);

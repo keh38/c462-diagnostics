@@ -7,6 +7,8 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 
+using C462.Shared;
+
 public class ProtocolPanel : MonoBehaviour
 {
     [SerializeField] private ListBoxControl _listBox;
@@ -40,7 +42,7 @@ public class ProtocolPanel : MonoBehaviour
 
     private void FillListBox()
     {
-        var files = Directory.GetFiles(FileLocations.LocalResourceFolder("Protocols"), $"*.xml");
+        var files = Directory.GetFiles(SharedFileLocations.ResourceFolder("Protocols"), $"*.xml");
         foreach (var i in _listBox.Items)
         {
             i.Destroy();

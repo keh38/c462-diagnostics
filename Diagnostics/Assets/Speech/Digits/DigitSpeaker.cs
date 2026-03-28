@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 
 using KLib.Signals;
+using C462.Shared;
 
 public class DigitSpeaker : MonoBehaviour
 {
@@ -48,7 +49,7 @@ public class DigitSpeaker : MonoBehaviour
 
         foreach (string fn in manifest.wavfiles)
         {
-            WWW www = new WWW("file:///" + Path.Combine(FileLocations.BasicResourcesFolder, "Digits", speakerID.ToString(), fn));
+            WWW www = new WWW("file:///" + Path.Combine(SharedFileLocations.BasicResourcesFolder, "Digits", speakerID.ToString(), fn));
             while (!www.isDone)
                 yield return null;
 
@@ -61,7 +62,7 @@ public class DigitSpeaker : MonoBehaviour
     {
         SpeechReception.References references = null;
 
-        string refPath = Path.Combine(FileLocations.LocalResourceFolder("Calibration"), "Digits_References.xml");
+        string refPath = Path.Combine(SharedFileLocations.ResourceFolder("Calibration"), "Digits_References.xml");
         Debug.Log(refPath);
         if (File.Exists(refPath))
         {
@@ -76,7 +77,7 @@ public class DigitSpeaker : MonoBehaviour
 
         if (references == null)
         {
-            references = new SpeechReception.References(Path.Combine(FileLocations.BasicResourcesFolder, "Digits"), "Digits");
+            references = new SpeechReception.References(Path.Combine(SharedFileLocations.BasicResourcesFolder, "Digits"), "Digits");
         }
 
         return references.GetReference(transducer, units);

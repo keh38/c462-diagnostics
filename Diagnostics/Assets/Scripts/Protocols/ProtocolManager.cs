@@ -12,6 +12,7 @@ using Protocols;
 using KLibU;
 using KLibU.Net;
 
+using C462.Shared;
 using C462.Shared.Protocol.DTOs;
 
 public class ProtocolManager : MonoBehaviour
@@ -71,12 +72,12 @@ public class ProtocolManager : MonoBehaviour
 
         _protocolName = protocolName;
 
-        string protocolPath = Path.Combine(FileLocations.ProtocolFolder, $"{protocolName}.xml");
+        string protocolPath = Path.Combine(SharedFileLocations.HtsProtocolFolder, $"{protocolName}.xml");
         
         _protocol = Files.XmlDeserialize<Protocol>(protocolPath);
         _history = null;
         
-        var fileList = Directory.GetFiles(FileLocations.SubjectFolder, $"{GameManager.Subject}-{protocolName}-History-*.json").ToList();
+        var fileList = Directory.GetFiles(SharedFileLocations.HtsSubjectFolder, $"{GameManager.Subject}-{protocolName}-History-*.json").ToList();
         if (fileList.Count > 0)
         {
             fileList.Sort((x, y) => File.GetCreationTime(y).CompareTo(File.GetCreationTime(x)));
@@ -101,7 +102,7 @@ public class ProtocolManager : MonoBehaviour
             _history = new ProtocolHistory(_protocol);
             _nextTestIndex = 0;
             _historyPath = Path.Combine(
-                FileLocations.SubjectFolder,
+                SharedFileLocations.HtsSubjectFolder,
                 $"{GameManager.Subject}-{_protocolName}-History-{DateTime.Now.ToString("yyyyMMdd_HHmmss")}.json");
         }
 
@@ -135,8 +136,8 @@ public class ProtocolManager : MonoBehaviour
         
         if (nextTest.Scene == "TScript")
         {
-            var script = Files.XmlDeserialize<Turandot.Schedules.Script>(FileLocations.ConfigFile("TScript", nextTest.Settings));
-            script.Apply(FileLocations.ProtocolFolder);
+            var script = Files.XmlDeserialize<Turandot.Schedules.Script>(SharedFileLocations.GetConfigFile("TScript", nextTest.Settings));
+            script.Apply(SharedFileLocations.HtsProtocolFolder);
             _FinishTest("none");
             return;
         }
@@ -207,7 +208,7 @@ public class ProtocolManager : MonoBehaviour
         _history = new ProtocolHistory(_protocol);
         _nextTestIndex = 0;
         _historyPath = Path.Combine(
-            FileLocations.SubjectFolder,
+            SharedFileLocations.HtsSubjectFolder,
             $"{GameManager.Subject}-{_protocolName}-History-{DateTime.Now.ToString("yyyyMMdd_HHmmss")}.json");
 
         _active = true;

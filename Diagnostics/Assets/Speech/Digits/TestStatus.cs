@@ -3,6 +3,8 @@ using System.IO;
 
 using UnityEngine;
 
+using C462.Shared;
+
 namespace Digits
 {
     public class TestStatus
@@ -61,7 +63,7 @@ namespace Digits
 
         private static string StateFile
         {
-            get { return Path.Combine(FileLocations.SubjectFolder, "DigitsState.xml"); }
+            get { return Path.Combine(SharedFileLocations.HtsSubjectFolder, "DigitsState.xml"); }
         }
 
     }

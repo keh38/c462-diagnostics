@@ -7,6 +7,8 @@ using KLib.Signals;
 using SpeechReception;
 using System.IO;
 
+using C462.Shared;
+
 public class SpeechMasker : MonoBehaviour 
 {
     private List<AudioSource> _speakers = new List<AudioSource>();
@@ -83,7 +85,7 @@ public class SpeechMasker : MonoBehaviour
 
         Debug.Log(clipName);
 
-        WWW www = new WWW("file:///" + Path.Combine(FileLocations.SpeechWavFolder, "Maskers", clipName));
+        WWW www = new WWW("file:///" + Path.Combine(SharedFileLocations.SpeechWavFolder, "Maskers", clipName));
         while (!www.isDone)
             yield return null;
 
@@ -122,7 +124,7 @@ public class SpeechMasker : MonoBehaviour
 
             _speakers[k].enabled = false;
 
-            WWW www = new WWW("file:///" + Path.Combine(FileLocations.SpeechWavFolder, "Maskers", _speechFiles[randomOrder[k]]));
+            WWW www = new WWW("file:///" + Path.Combine(SharedFileLocations.SpeechWavFolder, "Maskers", _speechFiles[randomOrder[k]]));
             while (!www.isDone)
                 yield return null;
 
@@ -135,7 +137,7 @@ public class SpeechMasker : MonoBehaviour
     {
         if (units == "dBatten") return 0;
 
-        SpeechReception.References r = new SpeechReception.References(Path.Combine(FileLocations.SpeechWavFolder, "Maskers"), source);
+        SpeechReception.References r = new SpeechReception.References(Path.Combine(SharedFileLocations.SpeechWavFolder, "Maskers"), source);
         return r.GetReference(transducer, units);
     }
 

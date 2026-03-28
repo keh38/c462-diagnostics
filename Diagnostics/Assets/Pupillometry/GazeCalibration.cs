@@ -11,6 +11,10 @@ using KLibU;
 using KLibU.Net;
 using Pupillometry;
 
+using C462.Shared;
+
+using KeyCode = UnityEngine.KeyCode;
+
 public class GazeCalibration : MonoBehaviour, IRemoteControllable
 {
     [SerializeField] private Image _target;
@@ -57,7 +61,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
             GetComponent<Camera>().backgroundColor = KLib.ColorTranslator.ColorFromARGB(_settings.BackgroundColor);
 
             string fn = $"{GameManager.Subject}-GazeCalibration-{DateTime.Now.ToString("yyyy-MM-dd_HHmmss")}.json";
-            _dataPath = Path.Combine(FileLocations.SubjectFolder, fn);
+            _dataPath = Path.Combine(SharedFileLocations.HtsSubjectFolder, fn);
 
             var header = new BasicMeasurementFileHeader()
             {

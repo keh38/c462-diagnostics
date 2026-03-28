@@ -6,6 +6,8 @@ using KLibU;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+using C462.Shared;
+
 public class TurandotPanel : MonoBehaviour
 {
     [SerializeField] private DropDownListControl _dropDown; 
@@ -54,15 +56,15 @@ public class TurandotPanel : MonoBehaviour
 
     private void ApplyScript(string name)
     {
-        var script = Files.XmlDeserialize<Turandot.Schedules.Script>(FileLocations.ConfigFile("TScript", name));
-        script.Apply(FileLocations.ProtocolFolder);
+        var script = Files.XmlDeserialize<Turandot.Schedules.Script>(SharedFileLocations.GetConfigFile("TScript", name));
+        script.Apply(SharedFileLocations.HtsProtocolFolder);
     }
 
     private void FillListBox(string fileType)
     {
         var prefix = GetPrefix(fileType);
 
-        var files = Directory.GetFiles(FileLocations.LocalResourceFolder("Config Files"), $"{prefix}.*.xml");
+        var files = Directory.GetFiles(SharedFileLocations.ResourceFolder("Config Files"), $"{prefix}.*.xml");
         foreach (var i in _listBox.Items)
         {
             i.Destroy();

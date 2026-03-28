@@ -178,7 +178,7 @@ public class SpeechReceptionInterface : MonoBehaviour
 
     public SRI.Messages.Resources EnumerateResources()
     {
-        string configFolder = DataFileLocations.LocalResourceFolder(SubjectManager.Instance.Project, "Config Files");
+        string configFolder = DataSharedFileLocations.ResourceFolder(SubjectManager.Instance.Project, "Config Files");
         if (!Directory.Exists(configFolder)) return null;
 
         var result = new SRI.Messages.Resources();
@@ -264,7 +264,7 @@ public class SpeechReceptionInterface : MonoBehaviour
 
         try
         {
-            var configPath = DataFileLocations.ConfigFile("CustomizeSpeech", name);
+            var configPath = DataSharedFileLocations.GetConfigFile("CustomizeSpeech", name);
 
             _speechTest = Files.XmlDeserialize<Test>(configPath);
             _speechList = _speechTest.Lists[0];
@@ -394,7 +394,7 @@ public class SpeechReceptionInterface : MonoBehaviour
     {
         _state.masker = _speechList.masker.Source;
 
-        SpeechReception.References r = new SpeechReception.References(Files.CombinePaths(DataFileLocations.SpeechWavFolder, "Maskers"), _speechList.masker.Source);
+        SpeechReception.References r = new SpeechReception.References(Files.CombinePaths(DataSharedFileLocations.SpeechWavFolder, "Maskers"), _speechList.masker.Source);
         _maxMaskerLevel = Mathf.Floor(r.GetReference(_transducer, "dBSPL"));
 
         _state.maxMaskerLevel = _maxMaskerLevel;
@@ -437,8 +437,8 @@ public class SpeechReceptionInterface : MonoBehaviour
         Debug.Log(_curItem + ": " + wavfile);
         Debug.Log("Level =" + _level + "; SNR = " + _currentSNR);
 
-        WWW www = new WWW("file:///" + Files.CombinePaths(DataFileLocations.SpeechWavFolder, _speechList.TestType, wavfile));
-        //WWW www = new WWW("file:///" + System.IO.Path.Combine(DataFileLocations.SpeechWavFolder, wavfile));
+        WWW www = new WWW("file:///" + Files.CombinePaths(DataSharedFileLocations.SpeechWavFolder, _speechList.TestType, wavfile));
+        //WWW www = new WWW("file:///" + System.IO.Path.Combine(DataSharedFileLocations.SpeechWavFolder, wavfile));
         while (!www.isDone)
             yield return null;
 
@@ -622,8 +622,8 @@ public class SpeechReceptionInterface : MonoBehaviour
 
         Debug.Log(_qnum + ": " + wavfile);
 
-        WWW www = new WWW("file:///" + Files.CombinePaths(DataFileLocations.SpeechWavFolder, _speechTest.TestType, wavfile));
-        //WWW www = new WWW("file:///" + System.IO.Path.Combine(DataFileLocations.SpeechWavFolder, wavfile));
+        WWW www = new WWW("file:///" + Files.CombinePaths(DataSharedFileLocations.SpeechWavFolder, _speechTest.TestType, wavfile));
+        //WWW www = new WWW("file:///" + System.IO.Path.Combine(DataSharedFileLocations.SpeechWavFolder, wavfile));
         while (!www.isDone)
             yield return null;
 

@@ -128,7 +128,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         }
         else
         {
-            var fn = FileLocations.ConfigFile("Audiogram", _configName);
+            var fn = SharedFileLocations.GetConfigFile("Audiogram", _configName);
             _settings = Files.XmlDeserialize<BasicMeasurementConfiguration>(fn) as AudiogramMeasurementSettings;
             InitializeMeasurement();
             Begin();
@@ -145,11 +145,11 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
 
         InitDataFile();
 
-        _stateFile = Path.Combine(FileLocations.SubjectFolder, $"{_mySceneName}.bin");
+        _stateFile = Path.Combine(SharedFileLocations.HtsSubjectFolder, $"{_mySceneName}.bin");
 
         SetReactionTimeLimits();
 
-        AudiogramData extantData = AudiogramData.Load(FileLocations.AudiogramPath);
+        AudiogramData extantData = AudiogramData.Load(SharedFileLocations.AudiogramPath);
         if (extantData != null)
         {
             _data.audiogramData = extantData;
@@ -180,7 +180,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         while (true)
         {
             string fileStem = $"{fileStemStart}-Run{GameManager.GetNextRunNumber("Audiogram"):000}";
-            fileStem = Path.Combine(FileLocations.SubjectFolder, fileStem);
+            fileStem = Path.Combine(SharedFileLocations.HtsSubjectFolder, fileStem);
             _dataPath = fileStem + ".json";
             if (!File.Exists(_dataPath))
             {
@@ -323,8 +323,8 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         KLib.Utilities.AppendToJsonFile(_dataPath, Files.JSONSerializeToString(_data));
         KLib.Utilities.AppendToJsonFile(_dataPath, Files.JSONSerializeToString(_buttonLog.Trim()));
 //        File.AppendAllText(_dataPath, Files.JSONSerializeToString(_data));
-        _data.audiogramData.Save(FileLocations.AudiogramPath);
-        SessionContext.SetAudiogram(FileLocations.AudiogramPath);
+        _data.audiogramData.Save(SharedFileLocations.AudiogramPath);
+        SessionContext.SetAudiogram(SharedFileLocations.AudiogramPath);
 
         // Delete state file
         if (File.Exists(_stateFile) && _state.IsCompleted)

@@ -9,6 +9,7 @@ using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+using C462.Shared;
 using C462.Shared.Protocol.DTOs;
 
 using KLib;
@@ -136,7 +137,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         }
         else
         {
-            var fn = FileLocations.ConfigFile("SpeechTest", _configName);
+            var fn = SharedFileLocations.GetConfigFile("SpeechTest", _configName);
             _settings = Files.XmlDeserialize<SpeechTest>(fn);
             InitializeMeasurement();
             Begin();
@@ -178,7 +179,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         {
             _runNumber = GameManager.GetNextRunNumber("Speech");
             fileStem = $"{fileStemStart}-Run{_runNumber:000}";
-            var existingFiles = Directory.GetFiles(FileLocations.SubjectFolder, fileStem + "*.json");
+            var existingFiles = Directory.GetFiles(SharedFileLocations.HtsSubjectFolder, fileStem + "*.json");
             if (existingFiles==null || existingFiles.Length == 0)
             {
                 break;
@@ -189,7 +190,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         {
             listName = $"-{listName}";
         }
-        _dataPath = Path.Combine(FileLocations.SubjectFolder, $"{fileStem}-{testName}{listName}.json");
+        _dataPath = Path.Combine(SharedFileLocations.HtsSubjectFolder, $"{fileStem}-{testName}{listName}.json");
 
         return _dataPath;
     }
@@ -444,7 +445,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         if (f != null)
         {
             var instructionsPath = Path.Combine(
-                FileLocations.LocalResourceFolder("Config Files"),
+                SharedFileLocations.ResourceFolder("Config Files"),
                 $"Instructions.{f.Name}.md");
             value = File.ReadAllText(instructionsPath);
         }
@@ -494,7 +495,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
         //Debug.Log(_qnum + ": " + wavfile);
 
-        string filePath = Path.Combine(FileLocations.SpeechWavFolder, _settings.TestSource, wavfile);
+        string filePath = Path.Combine(SharedFileLocations.SpeechWavFolder, _settings.TestSource, wavfile);
 
         // On Windows, you often need "file:///" prefix for local files when using UnityWebRequest,
         // although using System.Uri is more robust across platforms.
@@ -812,7 +813,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
                 break;
 
             case "ResponseAccepted":
-                string jsonPath = Path.Combine(FileLocations.SubjectFolder, $"{_provisionalResponse.file}.json");
+                string jsonPath = Path.Combine(SharedFileLocations.HtsSubjectFolder, $"{_provisionalResponse.file}.json");
                 HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(jsonPath)}:{File.ReadAllText(jsonPath)}");
 
                 string wavPath = jsonPath.Replace(".json", ".wav");

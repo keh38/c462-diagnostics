@@ -9,6 +9,8 @@ using Turandot.Screen;
 using Unity.VisualScripting;
 using UnityEngine.Video;
 
+using C462.Shared;
+
 namespace Turandot.Scripts
 {
     public class TurandotVideo : TurandotCue
@@ -45,7 +47,7 @@ namespace Turandot.Scripts
 
             if (!string.IsNullOrEmpty(_videoAction.Filename))
             {
-                string videoPath = Path.Combine(FileLocations.LocalResourceFolder("Videos"), _videoAction.Filename);
+                string videoPath = Path.Combine(SharedFileLocations.ResourceFolder("Videos"), _videoAction.Filename);
                 _player.url = videoPath;
                 _player.Play();
             }

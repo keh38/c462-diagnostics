@@ -8,6 +8,8 @@ using Turandot.Cues;
 using Turandot.Screen;
 using Unity.VisualScripting;
 
+using C462.Shared;
+
 namespace Turandot.Scripts
 {
     public class TurandotImage : TurandotCue
@@ -41,7 +43,7 @@ namespace Turandot.Scripts
 
             if (!string.IsNullOrEmpty(_imageAction.Filename))
             {
-                string imagePath = Path.Combine(FileLocations.LocalResourceFolder("Images"), _imageAction.Filename);
+                string imagePath = Path.Combine(SharedFileLocations.ResourceFolder("Images"), _imageAction.Filename);
 
                 var texture = new Texture2D(10, 10);
                 texture.LoadImage(File.ReadAllBytes(imagePath));

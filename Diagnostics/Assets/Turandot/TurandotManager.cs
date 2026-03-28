@@ -119,7 +119,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             var parts = configName.Split(':', 2);
 
             configName = parts[0];
-            localName = FileLocations.ConfigFile("Turandot", configName);
+            localName = SharedFileLocations.GetConfigFile("Turandot", configName);
             _params = KLibU.Files.XmlDeserialize<Parameters>(localName);
             _paramFile = Path.GetFileName(localName);
             _state = new TurandotState(GameManager.Project, GameManager.Subject, configName);
@@ -147,8 +147,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         try
         {
             _params.ApplyDefaultWavFolder(
-                FileLocations.LocalResourceFolder(GameManager.Project, "Wav Files"),
-                FileLocations.UserWavFolder);
+                SharedFileLocations.ResourceFolder("Wav Files"),
+                SharedFileLocations.UserWavFolder);
 
             _engine.DestroyObjects();
             _engine.Initialize(_params);
@@ -432,7 +432,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         if (_params.trialLogOption == TrialLogOption.Upload)
         {
-            var trialFiles = Directory.EnumerateFiles(FileLocations.SubjectFolder, Path.GetFileName(_mainDataFile).Replace(".json", "-Block*-Trial*.json")).ToList();
+            var trialFiles = Directory.EnumerateFiles(SharedFileLocations.HtsSubjectFolder, Path.GetFileName(_mainDataFile).Replace(".json", "-Block*-Trial*.json")).ToList();
             foreach (var trialFile in trialFiles)
             {
                 HTS_Server.SendRequest("Turandot", $"ReceiveData:{Path.GetFileName(trialFile)}:{File.ReadAllText(trialFile)}");
@@ -537,7 +537,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         while (true)
         {
             _fileStem = $"{fileStemStart}-Run{GameManager.GetNextRunNumber("Turandot"):000}";
-            _fileStem = Path.Combine(FileLocations.SubjectFolder, _fileStem);
+            _fileStem = Path.Combine(SharedFileLocations.HtsSubjectFolder, _fileStem);
             _mainDataFile = _fileStem + ".json";
             if (!File.Exists(_mainDataFile))
             {

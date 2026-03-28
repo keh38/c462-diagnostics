@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 using KLib;
 using KLibU.Net;
+using C462.Shared;
 
 public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
 {
@@ -126,22 +127,10 @@ public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
 
     private List<string> EnumerateResources()
     {
-        var resourceFolders = new List<string>()
-            {
-                "Config Files",
-                "Images",
-                "MATLAB",
-                "Plugins",
-                "Protocols",
-                "Schedules",
-                "Videos",
-                "Wav Files"
-            };
-
         List<string> resources = new List<string>();
 
-        string rootResourceFolder = Path.Combine(FileLocations.ProjectFolder, "Resources");
-        foreach (var resourceFolder in resourceFolders)
+        string rootResourceFolder = SharedFileLocations.HtsResourcesFolder;
+        foreach (var resourceFolder in SharedFileLocations.HtsProjectResourceFolders)
         {
             string folder = Path.Combine(Path.Combine(rootResourceFolder, resourceFolder));
             if (!Directory.Exists(folder))
@@ -164,7 +153,6 @@ public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
         switch (request.Command)
         {
             case "StartResourceSync":
-                FileLocations.SetDataRoot();
                 _message.text = "Syncing resources";
                 return TcpMessage.Ok();
             case "EndResourceSync":
@@ -175,7 +163,7 @@ public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
                 return TcpMessage.Ok(fileList);
             case "DeleteFile":
                 var data = request.GetPayload<string>();
-                var fullpath = Path.Combine(FileLocations.ProjectFolder, "Resources", data);
+                var fullpath = Path.Combine(SharedFileLocations.HtsProjectFolder, "Resources", data);
                 File.Delete(fullpath);
                 return TcpMessage.Ok();
             default:

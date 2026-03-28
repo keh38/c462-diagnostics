@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
+using C462.Shared;
+
 public class SubjectPanel : MonoBehaviour
 {
     [SerializeField] private DropDownListControl projectDropDown;
@@ -36,7 +38,7 @@ public class SubjectPanel : MonoBehaviour
 
         subjectDropDown.Clear();
 
-        FileLocations.CheckFolderStructure();
+        SharedFileLocations.CheckHtsFolderStructure();
         FillProjectDropDown();
     }
 
@@ -99,7 +101,7 @@ public class SubjectPanel : MonoBehaviour
 
     private void FillProjectDropDown()
     {
-        var projects = FileLocations.EnumerateProjects();
+        var projects = SharedFileLocations.EnumerateHtsProjects();
 
         projectDropDown.Clear();
         for (int k = 0; k < projects.Count; k++)
@@ -112,7 +114,7 @@ public class SubjectPanel : MonoBehaviour
 
     private void FillSubjectDropDown()
     {
-        var subjects = FileLocations.EnumerateSubjects(_selectedProject);
+        var subjects = SharedFileLocations.EnumerateHtsSubjects(_selectedProject);
 
         subjectDropDown.Clear();
         subjectDropDown.AddItem(0, "Create new subject...");

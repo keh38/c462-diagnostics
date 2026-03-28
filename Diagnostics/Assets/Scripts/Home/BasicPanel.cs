@@ -51,7 +51,7 @@ public class BasicPanel : MonoBehaviour
         }
         else if (fileType == "LDL")
         {
-            var configPath = Path.Combine(FileLocations.ConfigFile("LDL", _listBox.SelectedText));
+            var configPath = Path.Combine(SharedFileLocations.GetConfigFile("LDL", _listBox.SelectedText));
             var config = Files.XmlDeserialize<BasicMeasurementConfiguration>(configPath) as LDL.LDLMeasurementSettings;
             if (config.HapticStimulus != null && config.HapticStimulus.Source != HapticSource.NONE)
             {
@@ -70,15 +70,15 @@ public class BasicPanel : MonoBehaviour
 
     private void ApplyScript(string name)
     {
-        var script = Files.XmlDeserialize<Turandot.Schedules.Script>(FileLocations.ConfigFile("TScript", name));
-        script.Apply(FileLocations.ProtocolFolder);
+        var script = Files.XmlDeserialize<Turandot.Schedules.Script>(SharedFileLocations.GetConfigFile("TScript", name));
+        script.Apply(SharedFileLocations.HtsProtocolFolder);
     }
 
     private void FillListBox(string fileType)
     {
         var prefix = GetPrefix(fileType);
 
-        var files = Directory.GetFiles(FileLocations.LocalResourceFolder("Config Files"), $"{prefix}.*.xml");
+        var files = Directory.GetFiles(SharedFileLocations.ResourceFolder("Config Files"), $"{prefix}.*.xml");
         foreach (var i in _listBox.Items)
         {
             i.Destroy();

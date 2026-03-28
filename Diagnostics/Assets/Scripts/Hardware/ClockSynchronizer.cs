@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
+using C462.Shared;
+
 [RequireComponent(typeof(SyncPulseDetector))]
 public class ClockSynchronizer : MonoBehaviour
 {
@@ -119,7 +121,7 @@ public class ClockSynchronizer : MonoBehaviour
         }
         else
         {
-            _logPath = Path.Combine(FileLocations.SubjectFolder, logPath.Replace(".json", "-AudioSync.log"));
+            _logPath = Path.Combine(SharedFileLocations.HtsSubjectFolder, logPath.Replace(".json", "-AudioSync.log"));
         }
         LogFile = _logPath;
 

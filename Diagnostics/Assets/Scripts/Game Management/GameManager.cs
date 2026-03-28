@@ -101,7 +101,7 @@ public class GameManager : MonoBehaviour
     public static List<string> EnumerateTransducers()
     {
         var transducers = new List<string>();
-        var localCalFolder = Path.Combine(FileLocations.BasicResourcesFolder, "Calibration");
+        var localCalFolder = Path.Combine(SharedFileLocations.BasicResourcesFolder, "Calibration");
         foreach (string path in Directory.GetFiles(localCalFolder))
         {
             var fn = Path.GetFileNameWithoutExtension(path);
@@ -152,11 +152,12 @@ public class GameManager : MonoBehaviour
             Debug.Log($"Subject changed to '{_appState.subject}'");
 
         }
-        FileLocations.SetSubject(_appState.project, _appState.subject);
+        SharedFileLocations.SetHtsSubject(_appState.project, _appState.subject);
 
-        if (File.Exists(FileLocations.ConfigFile("Project.Settings")))
+        var projectSettingsPath = SharedFileLocations.GetConfigFile("Project", "Settings");
+		if (File.Exists(projectSettingsPath))
         {
-            _projectSettings = Files.XmlDeserialize<Project.Settings>(FileLocations.ConfigFile("Project.Settings"));
+            _projectSettings = Files.XmlDeserialize<Project.Settings>(projectSettingsPath);
         }
         else
         {
@@ -180,8 +181,8 @@ public class GameManager : MonoBehaviour
         }
 
         SessionContext.SetTransducer(_subjectMetadata.Transducer);
-        SessionContext.SetAudiogram(FileLocations.AudiogramPath);
-        SessionContext.SetLDL(FileLocations.LDLPath);
+        SessionContext.SetAudiogram(SharedFileLocations.AudiogramPath);
+        SessionContext.SetLDL(SharedFileLocations.LDLPath);
     }
 
     private void _SetTransducer(string transducer)

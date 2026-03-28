@@ -98,7 +98,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         }
         else
         {
-            var fn = FileLocations.ConfigFile("LDL", _configName);
+            var fn = SharedFileLocations.GetConfigFile("LDL", _configName);
             _settings = Files.XmlDeserialize<BasicMeasurementConfiguration>(fn) as LDLMeasurementSettings;
             InitializeMeasurement();
             Begin();
@@ -111,14 +111,14 @@ public class LDLController : MonoBehaviour, IRemoteControllable
 
         InitDataFile();
 
-        _stateFile = Path.Combine(FileLocations.SubjectFolder, $"{_mySceneName}.bin");
+        _stateFile = Path.Combine(SharedFileLocations.HtsSubjectFolder, $"{_mySceneName}.bin");
 
         // Need to delete the existing LDL, otherwise it will be loaded and used to constrain the 
         // max output level, making it impossible ever to exceed the original LDL.
-        if (File.Exists(FileLocations.LDLPath))
+        if (File.Exists(SharedFileLocations.LDLPath))
         {
-            _data.LDLgram = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
-            File.Delete(FileLocations.LDLPath);
+            _data.LDLgram = Audiograms.AudiogramData.Load(SharedFileLocations.LDLPath);
+            File.Delete(SharedFileLocations.LDLPath);
         }
 
         CreatePlan();
@@ -133,7 +133,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         while (true)
         {
             string fileStem = $"{fileStemStart}-Run{GameManager.GetNextRunNumber(_mySceneName):000}";
-            fileStem = Path.Combine(FileLocations.SubjectFolder, fileStem);
+            fileStem = Path.Combine(SharedFileLocations.HtsSubjectFolder, fileStem);
             _dataPath = fileStem + ".json";
             if (!File.Exists(_dataPath))
             {
@@ -372,7 +372,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
 
         if (_settings.LevelUnits == LevelUnits.dB_SL)
         {
-            AudiogramData audiogram = Audiograms.AudiogramData.Load(FileLocations.AudiogramPath);
+            AudiogramData audiogram = Audiograms.AudiogramData.Load(SharedFileLocations.AudiogramPath);
             Audiogram agramLeft = audiogram.Get(AudiogramTestEar.Left);
             Audiogram agramRight = audiogram.Get(AudiogramTestEar.Right);
 
@@ -415,7 +415,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         _sliderPanel.HideLockInButton();
 
 #if !UNITY_EDITOR
-        //HardwareInterface.VolumeManager.SetMasterVolume(1, VolumeManager.VolumeUnit.Scalar);
+        HardwareInterface.VolumeManager.SetMasterVolume(1, KLib.VolumeManager.VolumeUnit.Scalar);
 #endif
 
         if (_curGroup.Count > 0 && !_doSimulation)
@@ -487,7 +487,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
     void FinishData()
     {
         _data.testConditions = _state.testConditions;
-        AudiogramData audiograms = AudiogramData.Load(FileLocations.AudiogramPath);
+        AudiogramData audiograms = AudiogramData.Load(SharedFileLocations.AudiogramPath);
 
         // 1. Create "LDL Audiogram"
         if (_data.LDLgram != null)
@@ -537,8 +537,8 @@ public class LDLController : MonoBehaviour, IRemoteControllable
                 _data.LDLgram.Set(ear, tc.Freq_Hz, float.NaN, LDL_SPL);
             }
         }
-        _data.LDLgram.Save(FileLocations.LDLPath);
-        SessionContext.SetLDL(FileLocations.LDLPath);
+        _data.LDLgram.Save(SharedFileLocations.LDLPath);
+        SessionContext.SetLDL(SharedFileLocations.LDLPath);
 
         //        File.AppendAllText(_dataPath, Files.JSONSerializeToString(_data));
         KLib.Utilities.AppendToJsonFile(_dataPath, Files.JSONSerializeToString(_data));

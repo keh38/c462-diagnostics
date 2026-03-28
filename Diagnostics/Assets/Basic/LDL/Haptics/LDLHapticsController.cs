@@ -105,7 +105,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
         }
         else
         {
-            var fn = FileLocations.ConfigFile("LDL", _configName);
+            var fn = SharedFileLocations.GetConfigFile("LDL", _configName);
             _settings = Files.XmlDeserialize<BasicMeasurementConfiguration>(fn) as LDLMeasurementSettings;
             InitializeMeasurement();
             Begin();
@@ -121,16 +121,16 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 
             InitDataFile();
 
-            _stateFile = Path.Combine(FileLocations.SubjectFolder, $"{_mySceneName}.bin");
+            _stateFile = Path.Combine(SharedFileLocations.HtsSubjectFolder, $"{_mySceneName}.bin");
 
             CreatePlan();
 
             // Need to delete the existing LDL, otherwise it will be loaded and used to constrain the 
             // max output level, making it impossible ever to exceed the original LDL.
-            if (_settings.HapticStimulus.SaveLDLGram && File.Exists(FileLocations.LDLPath))
+            if (_settings.HapticStimulus.SaveLDLGram && File.Exists(SharedFileLocations.LDLPath))
             {
-                _data.LDLgram = Audiograms.AudiogramData.Load(FileLocations.LDLPath);
-                File.Delete(FileLocations.LDLPath);
+                _data.LDLgram = Audiograms.AudiogramData.Load(SharedFileLocations.LDLPath);
+                File.Delete(SharedFileLocations.LDLPath);
             }
 
             _progressBar.maxValue = _state.NumConditions;
@@ -151,7 +151,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
         while (true)
         {
             string fileStem = $"{fileStemStart}-Run{GameManager.GetNextRunNumber(_mySceneName):000}";
-            fileStem = Path.Combine(FileLocations.SubjectFolder, fileStem);
+            fileStem = Path.Combine(SharedFileLocations.HtsSubjectFolder, fileStem);
             _dataPath = fileStem + ".json";
             if (!File.Exists(_dataPath))
             {
@@ -504,7 +504,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 
         if (_settings.LevelUnits == LevelUnits.dB_SL)
         {
-            AudiogramData audiogram = Audiograms.AudiogramData.Load(FileLocations.AudiogramPath);
+            AudiogramData audiogram = Audiograms.AudiogramData.Load(SharedFileLocations.AudiogramPath);
             Audiogram agramLeft = audiogram.Get(AudiogramTestEar.Left);
             Audiogram agramRight = audiogram.Get(AudiogramTestEar.Right);
 
@@ -671,7 +671,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 
     void UpdateLDLGram()
     {
-        AudiogramData audiograms = AudiogramData.Load(FileLocations.LDLPath);
+        AudiogramData audiograms = AudiogramData.Load(SharedFileLocations.LDLPath);
 
         // 1. Create "LDL Audiogram"
         if (_data.LDLgram != null)
@@ -732,8 +732,8 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
                 }
             }
         }
-        _data.LDLgram.Save(FileLocations.LDLPath);
-        SessionContext.SetLDL(FileLocations.LDLPath);
+        _data.LDLgram.Save(SharedFileLocations.LDLPath);
+        SessionContext.SetLDL(SharedFileLocations.LDLPath);
     }
 
     private void SaveState()

@@ -12,6 +12,7 @@ using Audiograms;
 using KLib;
 using KLibU;
 using KLibU.Net;
+using C462.Shared;
 
 using BasicMeasurements;
 
@@ -91,7 +92,7 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
         while (true)
         {
             string fileStem = $"{fileStemStart}-Run{GameManager.GetNextRunNumber(_mySceneName):000}";
-            fileStem = Path.Combine(FileLocations.SubjectFolder, fileStem);
+            fileStem = Path.Combine(SharedFileLocations.HtsSubjectFolder, fileStem);
             _dataPath = fileStem + ".json";
             if (!File.Exists(_dataPath))
             {

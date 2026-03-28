@@ -10,6 +10,8 @@ using Turandot.Screen;
 using JimmysUnityUtilities;
 //using UnityEngine.UIElements;
 
+using C462.Shared;
+
 namespace Turandot.Scripts
 {
     public class TurandotManikinSlider : MonoBehaviour
@@ -44,7 +46,7 @@ namespace Turandot.Scripts
 
             if (!string.IsNullOrEmpty(manikinSpec.Image))
             {
-                string imagePath = Path.Combine(FileLocations.LocalResourceFolder("Images"), manikinSpec.Image);
+                string imagePath = Path.Combine(SharedFileLocations.ResourceFolder("Images"), manikinSpec.Image);
 
                 var texture = new Texture2D(10, 10);
                 texture.LoadImage(File.ReadAllBytes(imagePath));

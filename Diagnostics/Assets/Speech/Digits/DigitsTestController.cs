@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+using C462.Shared;
 using C462.Shared.Protocol.DTOs;
 
 using KLib;
@@ -112,7 +113,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         }
         else
         {
-            var fn = FileLocations.ConfigFile("Digits", _configName);
+            var fn = SharedFileLocations.GetConfigFile("Digits", _configName);
             _settings = Files.XmlDeserialize<BasicMeasurementConfiguration>(fn) as DigitsTestSettings;
             InitializeMeasurement();
             Begin();
@@ -150,7 +151,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         while (true)
         {
             string fileStem = $"{fileStemStart}-Run{GameManager.GetNextRunNumber(_mySceneName):000}";
-            fileStem = Path.Combine(FileLocations.SubjectFolder, fileStem);
+            fileStem = Path.Combine(SharedFileLocations.HtsSubjectFolder, fileStem);
             _dataPath = fileStem + ".json";
             if (!File.Exists(_dataPath))
             {
@@ -251,7 +252,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
             ));
         }
 
-        if (_settings.BlockOrder == BlockOrder.Sequential)
+        if (_settings.BlockOrder == DigitsTest.BlockOrder.Sequential)
         {
             foreach (float snr in _settings.SNR)
             {
@@ -271,7 +272,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
             for (int k = 0; k < _settings.NumTestBlocksPerCondition; k++)
             {
                 float[] SNRs = Expressions.Evaluate(_settings.SNR);
-                if (_settings.BlockOrder != BlockOrder.Sequential)
+                if (_settings.BlockOrder != DigitsTest.BlockOrder.Sequential)
                 {
                     SNRs = KMath.Permute(SNRs);
                 }
