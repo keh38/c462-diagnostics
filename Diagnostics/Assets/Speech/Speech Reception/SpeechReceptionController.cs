@@ -179,7 +179,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         {
             _runNumber = GameManager.GetNextRunNumber("Speech");
             fileStem = $"{fileStemStart}-Run{_runNumber:000}";
-            var existingFiles = Directory.GetFiles(SharedFileLocations.HtsSubjectFolder, fileStem + "*.json");
+            var existingFiles = Directory.GetFiles(SharedFileLocations.HtsSubjectDataFolder, fileStem + "*.json");
             if (existingFiles==null || existingFiles.Length == 0)
             {
                 break;
@@ -190,7 +190,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
         {
             listName = $"-{listName}";
         }
-        _dataPath = Path.Combine(SharedFileLocations.HtsSubjectFolder, $"{fileStem}-{testName}{listName}.json");
+        _dataPath = Path.Combine(SharedFileLocations.HtsSubjectDataFolder, $"{fileStem}-{testName}{listName}.json");
 
         return _dataPath;
     }
@@ -662,11 +662,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
         File.WriteAllText(_dataPath, json);
 
-        HTS_Server.SendRequest("ReceiveData", _mySceneName, new TextFilePayload
-        {
-            Filename = Path.GetFileName(_dataPath),
-            Content = File.ReadAllText(_dataPath)
-        });
+        HTS_Server.SendDataFile(_mySceneName, _dataPath);
     }
 
     public void ResponseAcquired()
@@ -813,8 +809,8 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
                 break;
 
             case "ResponseAccepted":
-                string jsonPath = Path.Combine(SharedFileLocations.HtsSubjectFolder, $"{_provisionalResponse.file}.json");
-                HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(jsonPath)}:{File.ReadAllText(jsonPath)}");
+                string jsonPath = Path.Combine(SharedFileLocations.HtsSubjectDataFolder, $"{_provisionalResponse.file}.json");
+                HTS_Server.SendDataFile(_mySceneName, jsonPath);
 
                 string wavPath = jsonPath.Replace(".json", ".wav");
                 HTS_Server.SendBufferedFile(wavPath);

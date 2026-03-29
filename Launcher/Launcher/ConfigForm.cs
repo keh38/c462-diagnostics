@@ -14,6 +14,8 @@ using System.Windows.Forms;
 
 using D128NET;
 using KLib;
+using KLib.IO;
+using C462.Shared;
 
 using Serilog;
 
@@ -39,7 +41,7 @@ namespace Launcher
             _config = null;
             if (File.Exists(FileLocations.HardwareConfigFile))
             {
-                _config = KFile.XmlDeserialize<HardwareConfiguration>(FileLocations.HardwareConfigFile);
+                _config = Files.XmlDeserialize<HardwareConfiguration>(FileLocations.HardwareConfigFile);
             }
             if (_config == null)
             {
@@ -149,7 +151,7 @@ namespace Launcher
 
         private void saveButton_Click(object sender, EventArgs e)
         {
-            KFile.XmlSerialize(_config, FileLocations.HardwareConfigFile);
+            Files.XmlSerialize(_config, FileLocations.HardwareConfigFile);
         }
 
         private void comPortDropDown_SelectedIndexChanged(object sender, EventArgs e)

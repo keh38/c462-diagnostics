@@ -24,7 +24,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="KLib.Controls" Version="1.0.0" />
+    <PackageReference Include="KLib.Controls" Version="1.5.1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Serilog" Version="4.2.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
@@ -39,6 +39,9 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\Diagnostics\Library\ScriptAssemblies\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="C462.Shared">
+      <HintPath>..\..\..\c462-shared\C462.Turandot\bin\Debug\netstandard2.0\C462.Shared.dll</HintPath>
     </Reference>
     <Reference Include="CoreAudio">
       <HintPath>..\..\..\..\KLib\Framework\CoreAudio.dll</HintPath>

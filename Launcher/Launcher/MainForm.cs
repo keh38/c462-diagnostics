@@ -18,10 +18,12 @@ using CoreAudio.Interfaces;
 
 using D128NET;
 using KLib;
+using KLib.IO;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
 using static System.Windows.Forms.DataFormats;
 using System.Runtime.InteropServices;
+using C462.Shared;
 
 namespace Launcher
 {
@@ -45,9 +47,9 @@ namespace Launcher
             versionLabel.Text = GetVersion();
             statusTextBox.Text = "Starting..." + Environment.NewLine;
 
-            if (!Directory.Exists(FileLocations.RootFolder))
+            if (!Directory.Exists(SharedFileLocations.SharedFolder))
             {
-                Directory.CreateDirectory(FileLocations.RootFolder);
+                Directory.CreateDirectory(SharedFileLocations.SharedFolder);
             }
 
             var commandLineArgs = Environment.GetCommandLineArgs().ToList();
@@ -117,7 +119,7 @@ namespace Launcher
                 .MinimumLevel.ControlledBy(logLevel)
                 .WriteTo.Console()
                 .WriteTo.File(
-                    Path.Combine(FileLocations.RootFolder, "Logs", "HTSLauncher-.txt"),
+                    Path.Combine(SharedFileLocations.SharedFolder, "Logs", "HTSLauncher-.txt"),
                     rollingInterval: RollingInterval.Day,
                     retainedFileCountLimit: 30,
                     flushToDiskInterval: TimeSpan.FromSeconds(30),
@@ -346,7 +348,7 @@ namespace Launcher
                     if (d128.Devices.Contains(id))
                     {
                         d128[id].Limit = (int)(max * 10);
-                        d128[id].Source = DemandSource.External;
+                        d128[id].Source = D128NET.DemandSource.External;
                     }
                     else
                     {
@@ -381,7 +383,7 @@ namespace Launcher
             HardwareConfiguration config = null;
             if (File.Exists(FileLocations.HardwareConfigFile))
             {
-                config = KFile.XmlDeserialize<HardwareConfiguration>(FileLocations.HardwareConfigFile);
+                config = Files.XmlDeserialize<HardwareConfiguration>(FileLocations.HardwareConfigFile);
             }
             if (config == null)
             {

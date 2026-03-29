@@ -122,7 +122,7 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         while (true)
         {
             string fileStem = $"{fileStemStart}-Run{GameManager.GetNextRunNumber(_mySceneName):000}";
-            fileStem = Path.Combine(SharedFileLocations.HtsSubjectFolder, fileStem);
+            fileStem = Path.Combine(SharedFileLocations.HtsSubjectDataFolder, fileStem);
             _dataPath = fileStem + ".json";
             if (!File.Exists(_dataPath))
             {
@@ -293,7 +293,6 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         fm.ModFreq_Hz = _currentTrack.Freq_Hz * _settings.ModDepth / 100f;
         fm.ModFreq_Hz = _settings.ModRate;
 
-        // FIX ME: add transducer
         _currentLevel = _settings.StartLevel + ANSI_dBHL.HL_To_SPL(_currentTrack.Freq_Hz, 0, SessionContext.Signal.Transducer);
         _levelSetter(_currentLevel);
 
@@ -411,13 +410,7 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         //_data.audiogramData.Save();
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
-
-        HTS_Server.SendRequest("ReceiveData", _mySceneName, new TextFilePayload
-        {
-            Filename = Path.GetFileName(_dataPath),
-            Content = File.ReadAllText(_dataPath)
-        });
-
+        HTS_Server.SendDataFile(_mySceneName, _dataPath);
         HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
 
         if (_localAbort)

@@ -61,7 +61,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
             GetComponent<Camera>().backgroundColor = KLib.ColorTranslator.ColorFromARGB(_settings.BackgroundColor);
 
             string fn = $"{GameManager.Subject}-GazeCalibration-{DateTime.Now.ToString("yyyy-MM-dd_HHmmss")}.json";
-            _dataPath = Path.Combine(SharedFileLocations.HtsSubjectFolder, fn);
+            _dataPath = Path.Combine(SharedFileLocations.HtsSubjectDataFolder, fn);
 
             var header = new BasicMeasurementFileHeader()
             {
@@ -126,7 +126,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
     {
         _data.Trim();
         File.AppendAllText(_dataPath, Files.JSONSerializeToString(_data));
-        HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+        HTS_Server.SendDataFile(_mySceneName, _dataPath);
     }
 
     void SendSyncLog()
@@ -134,7 +134,7 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
         var logPath = HardwareInterface.ClockSync.LogFile;
         if (!string.IsNullOrEmpty(logPath))
         {
-            HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
+            HTS_Server.SendDataFile(_mySceneName, logPath);
         }
     }
 

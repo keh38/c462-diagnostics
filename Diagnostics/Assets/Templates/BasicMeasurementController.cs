@@ -92,7 +92,7 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
         while (true)
         {
             string fileStem = $"{fileStemStart}-Run{GameManager.GetNextRunNumber(_mySceneName):000}";
-            fileStem = Path.Combine(SharedFileLocations.HtsSubjectFolder, fileStem);
+            fileStem = Path.Combine(SharedFileLocations.HtsSubjectDataFolder, fileStem);
             _dataPath = fileStem + ".json";
             if (!File.Exists(_dataPath))
             {
@@ -193,7 +193,7 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
         HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
-        HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{File.ReadAllText(_dataPath)}");
+        HTS_Server.SendDataFile(_mySceneName, _dataPath);
 
         if (_localAbort)
         {

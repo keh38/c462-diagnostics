@@ -425,17 +425,17 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         var audioFile = _mainDataFile.Replace(".json", ".audio.json");
         _engine.WriteAudioLogFile(audioFile);
 
-        HTS_Server.SendRequest("Turandot", $"ReceiveData:{Path.GetFileName(_mainDataFile)}:{File.ReadAllText(_mainDataFile)}");
-        HTS_Server.SendRequest("Turandot", $"ReceiveData:{Path.GetFileName(audioFile)}:{File.ReadAllText(audioFile)}");
+        HTS_Server.SendDataFile("Turandot", _mainDataFile);
+        HTS_Server.SendDataFile("Turandot", audioFile);
         HTS_Server.SendRequest("Turandot", "Finished:");
         Debug.Log("send finish");
 
         if (_params.trialLogOption == TrialLogOption.Upload)
         {
-            var trialFiles = Directory.EnumerateFiles(SharedFileLocations.HtsSubjectFolder, Path.GetFileName(_mainDataFile).Replace(".json", "-Block*-Trial*.json")).ToList();
+            var trialFiles = Directory.EnumerateFiles(SharedFileLocations.HtsSubjectDataFolder, Path.GetFileName(_mainDataFile).Replace(".json", "-Block*-Trial*.json")).ToList();
             foreach (var trialFile in trialFiles)
             {
-                HTS_Server.SendRequest("Turandot", $"ReceiveData:{Path.GetFileName(trialFile)}:{File.ReadAllText(trialFile)}");
+                HTS_Server.SendDataFile("Turandot", trialFile);
             }
         }
 
@@ -537,7 +537,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         while (true)
         {
             _fileStem = $"{fileStemStart}-Run{GameManager.GetNextRunNumber("Turandot"):000}";
-            _fileStem = Path.Combine(SharedFileLocations.HtsSubjectFolder, _fileStem);
+            _fileStem = Path.Combine(SharedFileLocations.HtsSubjectDataFolder, _fileStem);
             _mainDataFile = _fileStem + ".json";
             if (!File.Exists(_mainDataFile))
             {

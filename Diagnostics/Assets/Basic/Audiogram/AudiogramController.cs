@@ -180,7 +180,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         while (true)
         {
             string fileStem = $"{fileStemStart}-Run{GameManager.GetNextRunNumber("Audiogram"):000}";
-            fileStem = Path.Combine(SharedFileLocations.HtsSubjectFolder, fileStem);
+            fileStem = Path.Combine(SharedFileLocations.HtsSubjectDataFolder, fileStem);
             _dataPath = fileStem + ".json";
             if (!File.Exists(_dataPath))
             {
@@ -322,7 +322,6 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
 
         KLib.Utilities.AppendToJsonFile(_dataPath, Files.JSONSerializeToString(_data));
         KLib.Utilities.AppendToJsonFile(_dataPath, Files.JSONSerializeToString(_buttonLog.Trim()));
-//        File.AppendAllText(_dataPath, Files.JSONSerializeToString(_data));
         _data.audiogramData.Save(SharedFileLocations.AudiogramPath);
         SessionContext.SetAudiogram(SharedFileLocations.AudiogramPath);
 
@@ -337,11 +336,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
 
-        HTS_Server.SendRequest("ReceiveData", _mySceneName, new TextFilePayload
-        {
-            Filename = Path.GetFileName(_dataPath),
-            Content = File.ReadAllText(_dataPath)
-        });
+        HTS_Server.SendDataFile(_mySceneName, _dataPath);
 
         HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
 
@@ -384,7 +379,6 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
                 return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
                 StartCoroutine(BeginNextFrame());
-                Begin();
                 return TcpMessage.Ok();
             case "Abort":
                 _stopMeasurement = true;
@@ -509,7 +503,6 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         _signalManager.StartPaused();
 
         float maxSPL = _signalManager["Signal"].GetMaxLevel(SessionContext.Signal);
-        // FIX ME: add transducer
         float maxHL = ANSI_dBHL.SPL_To_HL(freq, maxSPL, SessionContext.Signal.Transducer);
 
         startHL = Mathf.Min(startHL, maxHL);
@@ -818,8 +811,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         yield return new WaitForSeconds(_volumeWaitTime); // the volume seems to take a finite time to get switched. (Duh.)
         _volumeWaitTime = 0.5f;
 
-        //FIX ME
-        //_audioSource.clip = _signalManager.CreateClip();
+        _audioSource.clip = CreateClip();
 
         _buttonPressed = false;
         _soundDetected = false;
@@ -841,6 +833,20 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             if (_stopMeasurement) yield break;
         }
         _soundDetected = _currentResponseTime >= _settings.MinValidResponseTime && _currentResponseTime <= _settings.MaxValidResponseTime;
+    }
+
+    private AudioClip CreateClip()
+    {
+        _signalManager.ResetSweepables();
+
+        float[] data = new float[_signalManager.Noutputs * _bufferLength];
+        _signalManager.Synthesize(data);
+
+        AudioClip clip = AudioClip.Create("clip", _bufferLength, _signalManager.Noutputs, _sampleRate, false);
+
+        clip.SetData(data, 0);
+
+        return clip;
     }
 
     IEnumerator Simulate(float level)

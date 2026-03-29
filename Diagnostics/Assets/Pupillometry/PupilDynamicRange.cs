@@ -78,7 +78,7 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
         _fixationPoint.sizeDelta = new Vector2(_settings.FixationPointSize, _settings.FixationPointSize);
 
         string fn = $"{GameManager.Subject}-PupilDR-{DateTime.Now.ToString("yyyy-MM-dd_HHmmss")}.json";
-        _dataPath = Path.Combine(SharedFileLocations.HtsSubjectFolder, fn);
+        _dataPath = Path.Combine(SharedFileLocations.HtsSubjectDataFolder, fn);
 
         float approxDuration = 10;
         int npts = Mathf.RoundToInt(approxDuration * 100);
@@ -192,7 +192,7 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 
         string status = _stopMeasurement ? "Measurement aborted" : "Measurement finished";
         HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
-        HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(_dataPath)}:{json}");
+        HTS_Server.SendDataFile(_mySceneName, _dataPath);
     }
 
     void OnGUI()
@@ -230,7 +230,7 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
                 var logPath = HardwareInterface.ClockSync.LogFile;
                 if (!string.IsNullOrEmpty(logPath))
                 {
-                    HTS_Server.SendRequest(_mySceneName, $"ReceiveData:{Path.GetFileName(logPath)}:{File.ReadAllText(logPath)}");
+                    HTS_Server.SendDataFile(_mySceneName, logPath);
                 }
                 return TcpMessage.Ok();
             default:

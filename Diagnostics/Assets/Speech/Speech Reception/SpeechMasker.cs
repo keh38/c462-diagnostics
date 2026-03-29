@@ -104,8 +104,7 @@ public class SpeechMasker : MonoBehaviour
 
         if (seed > 0)
         {
-            // FIX ME
-            //KLib.KMath.Seed = seed;
+            RandomF.SetSeed(seed);
         }
 
         int[] randomOrder = KLib.KMath.Permute(_speechFiles.Count);

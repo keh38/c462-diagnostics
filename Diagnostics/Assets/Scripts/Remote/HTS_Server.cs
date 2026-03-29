@@ -61,6 +61,7 @@ public class HTS_Server : MonoBehaviour
     public static bool RemoteConnected { get { return instance._remoteConnected; } }
     public static string MyAddress { get { return instance._address.Equals("localhost") ? "127.0.0.1" : instance._address; } }
     public static IPAddress RemoteAddress { get { return instance._remoteEndPoint.Address; } }
+    public static bool IsLocalConnection { get { return RemoteConnected && (IPAddress.IsLoopback(instance._remoteEndPoint.Address) || instance._remoteEndPoint.Address.ToString().Equals("127.0.0.1") || _instance._remoteEndPoint.Address.ToString().Equals(_instance._address)); } }
     public static void SetCurrentScene(string name, IRemoteControllable controllableScene)
     {
         instance._currentSceneName = name;
@@ -71,6 +72,7 @@ public class HTS_Server : MonoBehaviour
             KTcpClient.SendRequest(instance._remoteEndPoint, TcpMessage.Request("ChangedScene", changeScenePayload));
         }
     }
+
     public static TcpMessage SendRequest(string command, object payload)
     {
         if (instance._remoteEndPoint == null)
@@ -90,11 +92,20 @@ public class HTS_Server : MonoBehaviour
         SendRequest(command, payload);
     }
 
-    //public static void SendRequest(string command, string target, string data = "")
-    //{
-    //    var payload = new RemoteMessagePayload { Target = target, Data = data };
-    //    SendRequest(command, payload);
-    //}
+    public static void SendDataFile(string sceneName, string path)
+    {
+        if (IsLocalConnection)
+        {
+            return;
+        }
+
+        SendRequest("ReceiveData", sceneName, new TextFilePayload
+        {
+            Filename = Path.GetFileName(path),
+            Content = File.ReadAllText(path)
+        });
+    }
+
     public static void SendRequest(string target, string command)
     {
         if (instance._remoteEndPoint == null)

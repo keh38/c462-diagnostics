@@ -151,7 +151,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         while (true)
         {
             string fileStem = $"{fileStemStart}-Run{GameManager.GetNextRunNumber(_mySceneName):000}";
-            fileStem = Path.Combine(SharedFileLocations.HtsSubjectFolder, fileStem);
+            fileStem = Path.Combine(SharedFileLocations.HtsSubjectDataFolder, fileStem);
             _dataPath = fileStem + ".json";
             if (!File.Exists(_dataPath))
             {
@@ -203,11 +203,7 @@ public class DigitsTestController : MonoBehaviour, IRemoteControllable
         var filepath = _dataPath.Replace(".json", $"-{_data.name}.json");
         File.WriteAllText(filepath, json);
 
-        HTS_Server.SendRequest("ReceiveData", _mySceneName, new TextFilePayload
-        {
-            Filename = Path.GetFileName(filepath),
-            Content = File.ReadAllText(filepath)
-        });
+        HTS_Server.SendDataFile(_mySceneName, filepath);
     }
 
     private void CreatePlan()
