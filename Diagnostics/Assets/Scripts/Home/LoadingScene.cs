@@ -5,6 +5,8 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+using C462.Shared;
+
 public class LoadingScene : MonoBehaviour
 {
     [SerializeField] private TMPro.TMP_Text _versionLabel;
@@ -27,7 +29,7 @@ public class LoadingScene : MonoBehaviour
         if (HardwareInterface.LockWindowInCenter)
         {
             yield return null;
-            WindowManager.InitializeWindow(Screen.width, Screen.height);
+            WindowManager.InitializeWindow(Screen.resolution.width, Screen.resolution.height, Screen.width, Screen.height);
         }
 
 #else

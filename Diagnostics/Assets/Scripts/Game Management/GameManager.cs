@@ -164,9 +164,9 @@ public class GameManager : MonoBehaviour
             _projectSettings = new Project.Settings();
         }
 
-        if (File.Exists(FileLocations.SubjectMetadataPath))
+        if (File.Exists(SharedFileLocations.SubjectMetadataPath))
         {
-            _subjectMetadata = Files.XmlDeserialize<SubjectMetadata>(FileLocations.SubjectMetadataPath);
+            _subjectMetadata = Files.XmlDeserialize<SubjectMetadata>(SharedFileLocations.SubjectMetadataPath);
         }
         else
         {
@@ -226,11 +226,11 @@ public class GameManager : MonoBehaviour
 
     private void _SaveSubjectMetadata()
     {
-        if (!Directory.Exists(FileLocations.SubjectMetaFolder))
+        if (!Directory.Exists(SharedFileLocations.SubjectMetaFolder))
         {
-            Directory.CreateDirectory(FileLocations.SubjectMetaFolder);
+            Directory.CreateDirectory(SharedFileLocations.SubjectMetaFolder);
         }
-        Files.XmlSerialize(_subjectMetadata, FileLocations.SubjectMetadataPath);
+        Files.XmlSerialize(_subjectMetadata, SharedFileLocations.SubjectMetadataPath);
     }
 
     #endregion

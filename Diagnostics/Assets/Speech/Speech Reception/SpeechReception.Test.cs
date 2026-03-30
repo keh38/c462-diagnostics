@@ -196,7 +196,7 @@ namespace SpeechReception
 
             var excluded = Expressions.EvaluateToInt(Exclude);
 
-            string historyFile = Path.Combine(FileLocations.SubjectMetaFolder, TestType + "_History.xml");
+            string historyFile = Path.Combine(SharedFileLocations.SubjectMetaFolder, TestType + "_History.xml");
             if (File.Exists(historyFile))
                 history = Files.XmlDeserialize<ListHistory>(historyFile);
             else
@@ -259,7 +259,7 @@ namespace SpeechReception
         {
             ListHistory history = null;
 
-            string historyFile = Path.Combine(FileLocations.SubjectMetaFolder, TestType + "_History.xml");
+            string historyFile = Path.Combine(SharedFileLocations.SubjectMetaFolder, TestType + "_History.xml");
             if (File.Exists(historyFile))
                 history = Files.XmlDeserialize<ListHistory>(historyFile);
             else

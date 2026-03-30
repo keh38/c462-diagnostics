@@ -2,9 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO.Ports;
-using Unity.VisualScripting;
+
 using UnityEngine;
-using UnityEngine.Device;
+
+using C462.Shared;
 
 public class LEDController : MonoBehaviour
 {
@@ -15,9 +16,9 @@ public class LEDController : MonoBehaviour
 
     public bool IsInitialized { get; private set; }
 
-    public KLib.LEDType LEDType { get; private set; }
+    public LEDType LEDType { get; private set; }
 
-    public bool Initialize(string comPort, KLib.LEDType ledType, int numPixels, float gamma)
+    public bool Initialize(string comPort, LEDType ledType, int numPixels, float gamma)
     {
         bool success = false;
 
@@ -61,7 +62,7 @@ public class LEDController : MonoBehaviour
         return success;
     }
 
-    private void SetNumPixels(KLib.LEDType ledType, int numPixels)
+    private void SetNumPixels(LEDType ledType, int numPixels)
     {
         if (_serialPort == null) return;
 

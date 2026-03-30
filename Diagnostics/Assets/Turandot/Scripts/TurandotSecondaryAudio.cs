@@ -41,7 +41,7 @@ namespace Turandot.Scripts
                 if (ch != null)
                 {
                     _noise = ch.Waveform as Noise;
-                    if (_noise != null && _noise.Filter.Shape != FilterShape.None && _noise.Filter.UnityFilter)
+                    if (_noise != null && _noise.Filter.Shape != FilterShape.None)
                     {
                         audioSource.bypassEffects = false;
                         _setFilters = true;

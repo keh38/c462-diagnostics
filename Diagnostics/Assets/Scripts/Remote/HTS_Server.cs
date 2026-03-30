@@ -572,7 +572,7 @@ public class HTS_Server : MonoBehaviour
 
     private void ReceiveAudiogram(TextFilePayload filePayload)
     {
-        var folder = FileLocations.SubjectMetaFolder;
+        var folder = SharedFileLocations.SubjectMetaFolder;
         var filePath = Path.Combine(folder, filePayload.Filename);
         File.WriteAllText(filePath, filePayload.Content);
 

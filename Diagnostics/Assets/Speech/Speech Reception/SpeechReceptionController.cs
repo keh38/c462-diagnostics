@@ -198,7 +198,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
     private void CreatePlan()
     {
         Debug.Log("Create Plan");
-        var customizations = UserCustomizations.Initialize(FileLocations.SubjectCustomSpeechPath, GameManager.Subject);
+        var customizations = UserCustomizations.Initialize(SharedFileLocations.SubjectCustomSpeechPath, GameManager.Subject);
         _plan = new TestPlan()
         {
             name = _settings.TestName,
@@ -720,7 +720,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
 
             if (_srList.listIndex >= 0)
             {
-                string historyFile = Path.Combine(FileLocations.SubjectMetaFolder, _settings.TestSource + "_History.xml");
+                string historyFile = Path.Combine(SharedFileLocations.SubjectMetaFolder, _settings.TestSource + "_History.xml");
                 if (File.Exists(historyFile))
                 {
                     var history = Files.XmlDeserialize<ListHistory>(historyFile);

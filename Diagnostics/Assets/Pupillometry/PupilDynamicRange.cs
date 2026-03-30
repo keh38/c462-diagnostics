@@ -132,7 +132,7 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
 
         if (_useLEDs)
         {
-            if (HardwareInterface.LED.LEDType == KLib.LEDType.RGBW)
+            if (HardwareInterface.LED.LEDType == LEDType.RGBW)
             {
                 HardwareInterface.LED.SetWhiteDynamically(ledIntensity);
             }

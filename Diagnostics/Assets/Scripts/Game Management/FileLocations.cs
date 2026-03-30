@@ -29,9 +29,4 @@ public static class FileLocations
     // Paths to project manager file
     public static string ProjectStatePath { get { return Path.Combine(SharedFileLocations.HtsSubjectFolder, "meta", "ps.json"); } }
 
-    // Paths to subject manager files
-    public static string SubjectMetaFolder { get { return Path.Combine(SharedFileLocations.HtsSubjectFolder, "meta"); } }
-    public static string SubjectMetadataPath { get { return Path.Combine(SubjectMetaFolder, "smd.xml"); } }
-    public static string SubjectCustomSpeechPath { get { return Path.Combine(SubjectMetaFolder + "speech.xml"); } }
-
 }
