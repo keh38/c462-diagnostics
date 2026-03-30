@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 
 using KLib.Signals;
@@ -7,8 +7,6 @@ namespace Turandot.Scripts
 {
     public class TurandotAudio : MonoBehaviour
     {
-        //public AudioHighPassFilter hpFilter;
-        //public AudioLowPassFilter lpFilter;
         public AudioSource audioSource;
 
         public delegate void TimeOutDelegate(string source);
@@ -61,14 +59,12 @@ namespace Turandot.Scripts
                     throw _sigMan.LastException;
 
                 if (!_killAudio) OnTimeOut(name);
-
             }
         }
 
         public void Initialize(SignalManager sigMan)
         {
             _sigMan = sigMan;
-            //_transducer = transducer;
             _isRunning = false;
 
             if (_sigMan != null)
@@ -79,10 +75,7 @@ namespace Turandot.Scripts
                 audioSource.bypassEffects = true;
 
                 _sigMan.Name = name;
-                // TURANDOT FIX 
-                //_sigMan.MaxLevelMargin = maxLevelMargin;
                 _sigMan.Initialize(AudioSettings.outputSampleRate, npts, SessionContext.Signal);
-                _sigMan.StartPaused();
                 _isi = _sigMan.Channels[0].Gate.Period_ms / 1000f;
             }
 
@@ -99,7 +92,7 @@ namespace Turandot.Scripts
 
             if (_sigMan != null)
             {
-                if (_sigMan.Synth)
+                if (_sigMan.IsActive)
                     throw new System.Exception("Still synthesizing!");
 
                 int npts, nbuf;
@@ -107,7 +100,6 @@ namespace Turandot.Scripts
 
                 _sigMan.Name = name;
                 _sigMan.Initialize(AudioSettings.outputSampleRate, npts, SessionContext.Signal);
-                _sigMan.StartPaused();
                 _isi = _sigMan.Channels[0].Gate.Active ? _sigMan.Channels[0].Gate.Period_ms / 1000f : float.PositiveInfinity;
             }
         }
@@ -125,7 +117,7 @@ namespace Turandot.Scripts
                     _timeOut = _sigMan.GetMinTime(1f);
                 }
 
-                if (timeOut>=0 && _isi > 0 && !float.IsInfinity(_isi))
+                if (timeOut >= 0 && _isi > 0 && !float.IsInfinity(_isi))
                 {
                     _timeOut = Mathf.Round(timeOut / _isi) * _isi;
                 }
@@ -134,12 +126,14 @@ namespace Turandot.Scripts
 
                 _sigMan.SetTimeout(_timeOut);
                 _sigMan.ResetSweepables();
+
                 if (start)
                 {
-                    _sigMan.Unpause();
+                    _sigMan.Activate();
                 }
+
                 _isRunning = true;
-                _name = name; // for debugging purposes: can't access 'name' from OnAudioFilterRead() 
+                _name = name;
             }
             else
             {
@@ -154,6 +148,7 @@ namespace Turandot.Scripts
 
             if (_sigMan != null)
             {
+                _sigMan.Deactivate();
                 HardwareInterface.Digitimer?.DisableDevices(_sigMan.GetDigitimerChannels());
             }
         }
@@ -186,7 +181,7 @@ namespace Turandot.Scripts
                     _stimTimes[_numStimTimes] = AudioSettings.dspTime + _sigMan.LoopOffset;
                     _numStimTimes++;
                 }
-                
+
                 if (_resumeAudio)
                 {
                     Gate.RampUp(data);
@@ -203,12 +198,12 @@ namespace Turandot.Scripts
                         _isRunning = false;
                     }
                 }
+
                 if (_killAudio)
                 {
                     Deactivate();
                 }
             }
         }
-
     }
 }
