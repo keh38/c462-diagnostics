@@ -111,12 +111,12 @@ public class LDLHapticsLevelSlider : MonoBehaviour
             {
                 var wf = new Noise()
                 {
-                    filter = new FilterSpec()
+                    Filter = new FilterSpec()
                     {
-                        shape = KLib.Signals.FilterShape.Band_pass,
+                        Shape = KLib.Signals.FilterShape.Band_pass,
                         CF = _settings.Freq_Hz,
                         BW = _bandWidth,
-                        bandwidthMethod = KLib.Signals.BandwidthMethod.Octaves
+                        BandMode = KLib.Signals.BandMode.Octaves
                     }
                 };
                 _myChannel.Waveform = wf;
@@ -134,7 +134,6 @@ public class LDLHapticsLevelSlider : MonoBehaviour
         _paramSetter(_settings.start);
         _signalManager.Initialize(_audioConfig.sampleRate, _audioConfig.dspBufferSize, SessionContext.Signal);
         HardwareInterface.Digitimer?.EnableDevices(_signalManager.GetDigitimerChannels());
-        _signalManager.StartPaused();
 
         _settings.max = Mathf.Min(_settings.max, _myChannel.GetMaxLevel(SessionContext.Signal));
         _slider.value = (_settings.start - _settings.min) / (_settings.max - _settings.min);
@@ -148,11 +147,11 @@ public class LDLHapticsLevelSlider : MonoBehaviour
     {
         if (propValPairs.Count == 0)
         {
-            _myHaptic.active = false;
+            _myHaptic.Active = false;
             return;
         }
 
-        _myHaptic.active = true;
+        _myHaptic.Active = true;
         foreach (PropValPair pair in propValPairs)
         {
             switch (pair.variable)
@@ -191,7 +190,7 @@ public class LDLHapticsLevelSlider : MonoBehaviour
     {
         if (_isActive)
         {
-            _signalManager.Unpause();
+            _signalManager.Resume();
         }
     }
 

@@ -146,10 +146,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     {
         try
         {
-            _params.ApplyDefaultWavFolder(
-                SharedFileLocations.ResourceFolder("Wav Files"),
-                SharedFileLocations.UserWavFolder);
-
             _engine.DestroyObjects();
             _engine.Initialize(_params);
             _progressBar = _engine.FindProgressBar();

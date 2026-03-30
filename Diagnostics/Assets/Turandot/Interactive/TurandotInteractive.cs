@@ -202,7 +202,6 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         AudioSettings.GetDSPBufferSize(out int bufferLength, out int numBuffers);
 
         _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength, SessionContext.Signal);
-        _sigMan.StartPaused();
 
         //HardwareInterface.Digitimer?.EnableDevices(_sigMan.GetDigitimerChannels());
 
@@ -251,7 +250,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         {
             string name = parts[0];
             bool value = float.Parse(parts[1]) > 0;
-            _sigMan[name].active = value;
+            _sigMan[name].Active = value;
             _sliderPanels.Find(x => x.ChannelName == name).SetChannelActive(value);
         }
     }
@@ -259,7 +258,7 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     private void StartStreaming()
     {
         HardwareInterface.Digitimer?.EnableDevices(_sigMan.GetDigitimerChannels());
-        _sigMan.Unpause();
+        _sigMan.Activate();
     }
 
     private void StopStreaming()

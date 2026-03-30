@@ -183,6 +183,7 @@ public class GameManager : MonoBehaviour
         SessionContext.SetTransducer(_subjectMetadata.Transducer);
         SessionContext.SetAudiogram(SharedFileLocations.AudiogramPath);
         SessionContext.SetLDL(SharedFileLocations.LDLPath);
+        SessionContext.SetWavFolder(Path.Combine(SharedFileLocations.HtsResourcesFolder, "Wav Files"));
     }
 
     private void _SetTransducer(string transducer)

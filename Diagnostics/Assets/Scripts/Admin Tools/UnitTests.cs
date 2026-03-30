@@ -33,13 +33,13 @@ public class UnitTests : MonoBehaviour
 
         var channel = new Channel()
         {
-            active = true,
+            Active = true,
             Name = "File",
             Modality = KLib.Signals.Modality.Audio,
             Laterality = Laterality.Left,
             Waveform = new UserFile()
             {
-                fileName = @"C:\Users\kehan\OneDrive\Documents\EPL\HTS\Projects\Scratch\Resources\Wav Files\measure_50_1.wav"
+                Filename = @"C:\Users\kehan\OneDrive\Documents\EPL\HTS\Projects\Scratch\Resources\Wav Files\measure_50_1.wav"
             },
             Level = new Level()
             {

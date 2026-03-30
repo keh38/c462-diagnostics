@@ -297,7 +297,6 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         _levelSetter(_currentLevel);
 
         _signalManager.Initialize(_audioConfig.sampleRate, _audioConfig.dspBufferSize, SessionContext.Signal);
-        _signalManager.StartPaused();
 
         _maxLevel = _signalManager["Signal"].GetMaxLevel(SessionContext.Signal);
         _levelOverRange = false;
@@ -312,7 +311,7 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
         _prompt.gameObject.SetActive(false);
         _button.gameObject.SetActive(true);
 
-        _signalManager.Unpause();
+        _signalManager.Activate();
         _trackActive = true;
     }
 

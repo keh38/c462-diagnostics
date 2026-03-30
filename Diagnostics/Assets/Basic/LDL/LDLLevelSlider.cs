@@ -105,12 +105,12 @@ public class LDLLevelSlider : MonoBehaviour
             {
                 var wf = new Noise()
                 {
-                    filter = new FilterSpec()
+                    Filter = new FilterSpec()
                     {
-                        shape = KLib.Signals.FilterShape.Band_pass,
+                        Shape = KLib.Signals.FilterShape.Band_pass,
                         CF = _settings.Freq_Hz,
                         BW = _bandWidth,
-                        bandwidthMethod = KLib.Signals.BandwidthMethod.Octaves
+                        BandMode = KLib.Signals.BandMode.Octaves
                     }
                 };
                 _myChannel.Waveform = wf;
@@ -125,7 +125,6 @@ public class LDLLevelSlider : MonoBehaviour
 
         _paramSetter(_settings.start);
         _signalManager.Initialize(_audioConfig.sampleRate, _audioConfig.dspBufferSize, SessionContext.Signal);
-        _signalManager.StartPaused();
 
         _settings.max = Mathf.Min(_settings.max, _myChannel.GetMaxLevel(SessionContext.Signal));
         _slider.value = (_settings.start - _settings.min) / (_settings.max - _settings.min);
@@ -146,7 +145,7 @@ public class LDLLevelSlider : MonoBehaviour
     {
         if (_isActive)
         {
-            _signalManager.Unpause();
+            _signalManager.Resume();
         }
     }
 

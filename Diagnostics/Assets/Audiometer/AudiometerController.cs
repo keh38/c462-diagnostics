@@ -111,7 +111,7 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
             //Name = $"Channel{number}{laterality}",
             Modality = KLib.Signals.Modality.Audio,
             Laterality = laterality,
-            active = (channel.Continuous && (channel.Routing == "Binaural" || channel.Routing == laterality.ToString())),
+            Active = (channel.Continuous && (channel.Routing == "Binaural" || channel.Routing == laterality.ToString())),
             Waveform = new FM()
             {
                 Carrier_Hz = channel.Freq,
@@ -152,16 +152,16 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
             bool value = parts[2].ToLower().Equals("true");
 
             _settings.Channels[chNum].Continuous = value;
-            _signalManager.Channels[2*chNum].active = value && _settings.Channels[chNum].Routing != "Right";
-            _signalManager.Channels[2*chNum + 1].active = value && _settings.Channels[chNum].Routing != "Left";
+            _signalManager.Channels[2*chNum].Active = value && _settings.Channels[chNum].Routing != "Right";
+            _signalManager.Channels[2*chNum + 1].Active = value && _settings.Channels[chNum].Routing != "Left";
         }
         else if (prop == "Routing")
         {
             _settings.Channels[chNum].Routing = parts[2];
             if (_settings.Channels[chNum].Continuous)
             {
-                _signalManager.Channels[2 * chNum].active = _settings.Channels[chNum].Routing != "Right";
-                _signalManager.Channels[2 * chNum + 1].active = _settings.Channels[chNum].Routing != "Left";
+                _signalManager.Channels[2 * chNum].Active = _settings.Channels[chNum].Routing != "Right";
+                _signalManager.Channels[2 * chNum + 1].Active = _settings.Channels[chNum].Routing != "Left";
             }
         }
         else if (prop == "Freq")

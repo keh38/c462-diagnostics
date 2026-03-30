@@ -500,14 +500,13 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         }
 
         _signalManager.Initialize(_sampleRate, _bufferLength, SessionContext.Signal);
-        _signalManager.StartPaused();
 
         float maxSPL = _signalManager["Signal"].GetMaxLevel(SessionContext.Signal);
         float maxHL = ANSI_dBHL.SPL_To_HL(freq, maxSPL, SessionContext.Signal.Transducer);
 
         startHL = Mathf.Min(startHL, maxHL);
 
-        _signalManager.Unpause();
+        _signalManager.Activate();
 
         if (_currentStimulusCondition.NumTries == 1)
         {

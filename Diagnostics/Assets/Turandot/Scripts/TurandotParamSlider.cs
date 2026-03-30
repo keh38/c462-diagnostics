@@ -159,7 +159,8 @@ namespace Turandot.Scripts
                     _slider.SetValueWithoutNotify((_value - _minVal) / _range);
                 }
 
-                if (_action.ThumbTogglesSound) _sigMan.StartPaused();
+                if (!_action.ThumbTogglesSound) 
+                    _sigMan.Activate();
 
                 _paramSetter?.Invoke(_value);
                 _log.Add(Time.timeSinceLevelLoad, _value);
@@ -215,7 +216,7 @@ namespace Turandot.Scripts
             }
             if (_action.ThumbTogglesSound)
             {
-                _sigMan.Unpause();
+                _sigMan.Resume();
             }
         }
 

@@ -55,6 +55,16 @@ public static class SessionContext
         Signal.LDL = ldl;
     }
 
+    public static void SetWavFolder(string folder)
+    {
+        if (Signal == null)
+        {
+            Debug.LogError("SessionContext not initialized. Call Initialize() before setting Wav Folder.");
+            return;
+        }
+        Signal.WavFolder = folder;  
+    }
+
     //public static void Clear()
     //{
     //    Signal = null;

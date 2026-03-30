@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 
 using KLib.Signals;
+using System.Linq;
 
 namespace Turandot.Scripts
 {
@@ -169,6 +170,7 @@ namespace Turandot.Scripts
             if ((_isRunning || _resumeAudio) && !_sigMan.TimedOut)
             {
                 var wasStarted = _sigMan.Synthesize(data);
+
                 if (wasStarted)
                 {
                     _log.Add(AudioSettings.dspTime, "activated");

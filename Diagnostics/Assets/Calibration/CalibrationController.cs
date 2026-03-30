@@ -49,7 +49,7 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
             Name = "ToneLeft",
             Modality = KLib.Signals.Modality.Audio,
             Laterality = Laterality.Left,
-            active = false,
+            Active = false,
             Waveform = new Sinusoid(),
             Level = new Level()
             {
@@ -64,7 +64,7 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
             Modality = KLib.Signals.Modality.Audio,
             Laterality = Laterality.Binaural,
             Waveform = new Noise(),
-            active = false,
+            Active = false,
             Level = new Level()
             {
                 Units = LevelUnits.dB_Vrms,

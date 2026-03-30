@@ -41,12 +41,12 @@ namespace Turandot.Scripts
                 if (ch != null)
                 {
                     _noise = ch.Waveform as Noise;
-                    if (_noise != null && _noise.filter.shape != FilterShape.None && _noise.filter.unityFilter)
+                    if (_noise != null && _noise.Filter.Shape != FilterShape.None && _noise.Filter.UnityFilter)
                     {
                         audioSource.bypassEffects = false;
                         _setFilters = true;
-                        hpFilter.cutoffFrequency = _noise.filter.CF * Mathf.Pow(2, -_noise.filter.BW / 2);
-                        lpFilter.cutoffFrequency = _noise.filter.CF * Mathf.Pow(2, _noise.filter.BW / 2);
+                        hpFilter.cutoffFrequency = _noise.Filter.CF * Mathf.Pow(2, -_noise.Filter.BW / 2);
+                        lpFilter.cutoffFrequency = _noise.Filter.CF * Mathf.Pow(2, _noise.Filter.BW / 2);
                     }
                 }
                 
@@ -69,8 +69,8 @@ namespace Turandot.Scripts
 
                 if (_setFilters)
                 {
-                    hpFilter.cutoffFrequency = _noise.filter.CF * Mathf.Pow(2, -_noise.filter.BW / 2);
-                    lpFilter.cutoffFrequency = _noise.filter.CF * Mathf.Pow(2, _noise.filter.BW / 2);
+                    hpFilter.cutoffFrequency = _noise.Filter.CF * Mathf.Pow(2, -_noise.Filter.BW / 2);
+                    lpFilter.cutoffFrequency = _noise.Filter.CF * Mathf.Pow(2, _noise.Filter.BW / 2);
                 }
             }
         }
