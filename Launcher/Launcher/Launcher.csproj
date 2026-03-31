@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
@@ -24,15 +24,15 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="C462.Shared.UI" Version="1.0.0" />
     <PackageReference Include="KLib.Controls" Version="1.5.1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Serilog" Version="4.2.0" />
+    <PackageReference Include="Serilog" Version="4.3.1" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageReference Include="SerilogTraceListener" Version="3.2.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="8.0.1" />
-    <PackageReference Include="System.IO.Ports" Version="9.0.4" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
     <PackageReference Include="System.Threading.Channels" Version="8.0.0" />
   </ItemGroup>
@@ -40,14 +40,8 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\Diagnostics\Library\ScriptAssemblies\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="C462.Shared">
-      <HintPath>..\..\..\c462-shared\C462.Turandot\bin\Debug\netstandard2.0\C462.Shared.dll</HintPath>
-    </Reference>
     <Reference Include="CoreAudio">
       <HintPath>..\..\..\..\KLib\Framework\CoreAudio.dll</HintPath>
-    </Reference>
-    <Reference Include="D128NET">
-      <HintPath>..\..\..\c462-digitimer\D128NET\bin\x64\Debug\D128NET.dll</HintPath>
     </Reference>
     <Reference Include="KLib">
       <HintPath>..\..\..\..\klib\Library\net8\KLib.dll</HintPath>

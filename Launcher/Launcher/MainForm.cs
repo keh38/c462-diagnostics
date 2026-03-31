@@ -14,16 +14,13 @@ using System.Windows.Forms;
 using Serilog;
 
 using CoreAudio;
-using CoreAudio.Interfaces;
 
 using D128NET;
+using C462.Shared;
 using KLib;
 using KLib.IO;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
-using static System.Windows.Forms.DataFormats;
-using System.Runtime.InteropServices;
-using C462.Shared;
 
 namespace Launcher
 {
@@ -381,9 +378,9 @@ namespace Launcher
         private HardwareConfiguration ReadConfiguration()
         {
             HardwareConfiguration config = null;
-            if (File.Exists(FileLocations.HardwareConfigFile))
+            if (File.Exists(SharedFileLocations.HardwareConfigFile))
             {
-                config = Files.XmlDeserialize<HardwareConfiguration>(FileLocations.HardwareConfigFile);
+                config = Files.XmlDeserialize<HardwareConfiguration>(SharedFileLocations.HardwareConfigFile);
             }
             if (config == null)
             {
