@@ -60,8 +60,6 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
         EnableMenu(false);
         yield return null;
 
-        SessionContext.Initialize(HardwareInterface.AdapterMap);
-
         _subjectPanel.SubjectChangedEvent.AddListener(OnSubjectChanged);
 
         if (!GameManager.Initialized)

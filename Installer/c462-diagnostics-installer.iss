@@ -6,6 +6,10 @@
    Str(Local[0]) + "." + Str(Local[1]) + ((Local[2]>0) ? "." + Str(Local[2]) : "")
     
 #define verStr_ StringChange(SemanticVersion(), '.', '-')
+#define DevRoot GetEnv("DEVROOT")
+#if DevRoot == ""
+    #error "DEVROOT environment variable is not set"
+#endif
 
 [Setup]
 AppName=Hearing Test Suite
@@ -24,11 +28,13 @@ CloseApplications=yes
 RestartApplications=yes
 
 [Files]
+Source: "{#DevRoot}\C462\c462-shared\Installer\Output\C462SharedSubjectSetup.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 Source: "..\Diagnostics\Build\*.*"; DestDir: "{app}"; Flags: replacesameversion recursesubdirs;
 Source: ".\Dependencies\Mono\*.*"; DestDir: "{app}"; Flags: replacesameversion;
 Source: "..\Launcher\Launcher\bin\x64\Release\net8.0-windows\*.*"; DestDir: "{app}\Launcher"; Flags: replacesameversion recursesubdirs;
 Source: "..\CHANGELOG.md"; DestDir: "{app}"; Flags: replacesameversion;
 
+[Run]
 [Icons]
 Name: "{commondesktop}\Hearing Test Suite"; Filename: "{app}\Launcher\HTSLauncher.exe"; IconFilename: "{app}\Launcher\Diagnostics.ico"; IconIndex: 0;
 
@@ -37,11 +43,8 @@ Root: HKLM64; Subkey: "Software\EPL"; Flags: uninsdeletekeyifempty
 Root: HKLM64; Subkey: "Software\EPL\C462"; Flags: uninsdeletekey
 Root: HKLM64; Subkey: "Software\EPL\C462\HTS"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"
 
-;Root: HKCU; Subkey: "SOFTWARE\MEEI\HearingDiagnostics"; ValueType: dword; ValueName: "Screenmanager Is Fullscreen mode_h3981298716"; ValueData: "1"; Flags: uninsdeletevalue;
-;Root: HKCU; Subkey: "SOFTWARE\MEEI\HearingDiagnostics"; ValueType: none; ValueName: "Screenmanager Resolution Width_h182942802"; Flags: deleteValue
-;Root: HKCU; Subkey: "SOFTWARE\MEEI\HearingDiagnostics"; ValueType: none; ValueName: "Screenmanager Resolution Height_h2627697771"; Flags: deleteValue
-
 [Run]
+Filename: "{tmp}\C462SharedSubjectSetup.exe"; Parameters: "/SILENT"; Description: "Installing shared components"; Flags: waituntilterminated
 Filename: "{app}\Launcher\HTSLauncher.exe"; Parameters: "-nodelay"; 
 
 

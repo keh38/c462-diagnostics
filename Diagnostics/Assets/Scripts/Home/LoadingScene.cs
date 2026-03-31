@@ -29,7 +29,7 @@ public class LoadingScene : MonoBehaviour
         if (HardwareInterface.LockWindowInCenter)
         {
             yield return null;
-            WindowManager.InitializeWindow(Screen.resolution.width, Screen.resolution.height, Screen.width, Screen.height);
+            WindowManager.InitializeWindow(Screen.currentResolution.width, Screen.currentResolution.height, Screen.width, Screen.height);
         }
 
 #else
@@ -55,7 +55,6 @@ public class LoadingScene : MonoBehaviour
 
         yield return StartCoroutine(InitializeHardware());
 
-        SessionContext.Initialize(HardwareInterface.AdapterMap);
         GameManager.Initialized = true;
 
         yield return new WaitForSeconds(1);

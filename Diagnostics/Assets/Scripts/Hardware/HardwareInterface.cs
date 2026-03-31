@@ -100,11 +100,10 @@ public class HardwareInterface : MonoBehaviour
         _volumeManager.SetMasterVolume(1.0f, VolumeManager.VolumeUnit.Scalar);
 #endif
 
-        string configFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "EPL", "HTS");
-        string configFile = Path.Combine(configFolder, "HardwareConfiguration.xml");
+        string configFile = SharedFileLocations.HardwareConfigFile;
         if (File.Exists(configFile))
         {
-            _hardwareConfig = Files.XmlDeserialize<HardwareConfiguration>(Path.Combine(configFolder, "HardwareConfiguration.xml"));
+            _hardwareConfig = Files.XmlDeserialize<HardwareConfiguration>(configFile);
         }
         else
         {
@@ -112,6 +111,7 @@ public class HardwareInterface : MonoBehaviour
         }
         _adapterMap = _hardwareConfig.GetSelectedMap();
         Debug.Log($"Adapter map contains {_adapterMap.NumChannels} channels");
+        SessionContext.Initialize(_adapterMap);
 
         _audioReady = true;
         var config = AudioSettings.GetConfiguration();

@@ -577,7 +577,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.Graph">
-      <HintPath>Library\PackageCache\com.epl.klib@80189b8ae54c\Runtime\Plugins\Microsoft.Graph\netstandard2.0\Microsoft.Graph.dll</HintPath>
+      <HintPath>Library\PackageCache\com.epl.klib@ee65a9c3b21c\Runtime\Plugins\Microsoft.Graph\netstandard2.0\Microsoft.Graph.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.YamlDotNet">
@@ -621,7 +621,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Diagnostics.DiagnosticSource">
-      <HintPath>Library\PackageCache\com.epl.klib@80189b8ae54c\Runtime\Plugins\System.Diagnostics.DiagnosticSource\netstandard1.3\System.Diagnostics.DiagnosticSource.dll</HintPath>
+      <HintPath>Library\PackageCache\com.epl.klib@ee65a9c3b21c\Runtime\Plugins\System.Diagnostics.DiagnosticSource\netstandard1.3\System.Diagnostics.DiagnosticSource.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
@@ -629,7 +629,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.Graph.Core">
-      <HintPath>Library\PackageCache\com.epl.klib@80189b8ae54c\Runtime\Plugins\Microsoft.Graph.Core\netstandard1.1\Microsoft.Graph.Core.dll</HintPath>
+      <HintPath>Library\PackageCache\com.epl.klib@ee65a9c3b21c\Runtime\Plugins\Microsoft.Graph.Core\netstandard1.1\Microsoft.Graph.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
@@ -641,7 +641,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="protobuf-net">
-      <HintPath>Library\PackageCache\com.epl.klib@80189b8ae54c\Runtime\Plugins\protobuf-net.dll</HintPath>
+      <HintPath>Library\PackageCache\com.epl.klib@ee65a9c3b21c\Runtime\Plugins\protobuf-net.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="D128NET">
