@@ -132,6 +132,10 @@ public class IntercomReceiver : MonoBehaviour
                     Debug.Log("error processing TCP message: " + ex.Message);
                 }
             }
+            else
+            {
+                Thread.Sleep(10);
+            }
         }
     }
 
@@ -192,6 +196,7 @@ public class IntercomReceiver : MonoBehaviour
                 }
             }
             catch (Exception ex) { }
+            Thread.Sleep(10);
         }
     }
 
@@ -223,6 +228,7 @@ public class IntercomReceiver : MonoBehaviour
                 }
             }
             catch (Exception ex) { }
+            Thread.Sleep(10);
         }
     }
 

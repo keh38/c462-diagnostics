@@ -133,6 +133,7 @@ namespace KLibU.Legacy.Network
                 }
                 catch (Exception ex)
                 {
+                    Thread.Sleep(10);
                     //Debug.Log(ex.Message);
                 }
             }

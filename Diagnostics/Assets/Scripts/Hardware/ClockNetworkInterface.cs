@@ -93,6 +93,10 @@ public class ClockNetworkInterface : MonoBehaviour
                     Debug.Log("error processing TCP message: " + ex.Message);
                 }
             }
+            else
+            {
+                Thread.Sleep(10);
+            }
         }
     }
 
