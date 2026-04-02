@@ -487,6 +487,11 @@ public class HTS_Server : MonoBehaviour
                 _tcpListener.WriteResponse(TcpMessage.Ok());
                 break;
 
+            case "Quit":
+                StartCoroutine(QuitNextFrame());
+                _tcpListener.WriteResponse(TcpMessage.Ok());
+                break;
+
             default:
                 if (_currentScene != null)
                 {
@@ -500,6 +505,13 @@ public class HTS_Server : MonoBehaviour
                 break;
         }
         _tcpListener.CloseTcpClient();
+    }
+
+    private IEnumerator QuitNextFrame()
+    {
+        Debug.Log("Quitting application by remote request...");
+        yield return null;
+        Application.Quit();
     }
 
     public static void SendBufferedFile(string localPath, string remoteFilename)
