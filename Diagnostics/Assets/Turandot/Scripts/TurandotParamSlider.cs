@@ -42,6 +42,7 @@ namespace Turandot.Scripts
 
         private string _result;
         public override string Result { get { return _result; } }
+        public override float Value { get { return _value; } }
 
         private void Awake()
         {

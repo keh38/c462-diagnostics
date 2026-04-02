@@ -24,7 +24,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="C462.Shared.UI" Version="1.0.0" />
+    <PackageReference Include="C462.Shared.UI" Version="1.1.0" />
     <PackageReference Include="KLib.Controls" Version="1.5.1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Serilog" Version="4.3.1" />
@@ -63,7 +63,9 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	
+  <!--<Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if &quot;$(ConfigurationName)&quot; == &quot;Release&quot; (&quot;C:\Program Files (x86)\Inno Setup 6\Compil32.exe&quot; /cc &quot;$(SolutionDir)\..\Installer\c462-diagnostics-installer.iss&quot;)" />
-  </Target>
+  </Target>-->
+	
 </Project>
