@@ -3,6 +3,7 @@
 ### v2.1 (unreleased)
 #### Added
 - option to center/lock on screen with no title bar
+- mechanism for remote control by game
 #### Changed
 - updated to shared libraries
 #### Fixed
