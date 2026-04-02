@@ -1,5 +1,15 @@
 ## Changelog
 
+### v2.1 (unreleased)
+#### Added
+- option to center/lock on screen with no title bar
+#### Changed
+- updated to shared libraries
+#### Fixed
+- Turandot: param slider value can now be used in flag expression
+
+---
+
 ### v2.0.3 (2026-03-19)
 #### Added
 - Turandot: flag/value to script arguments
