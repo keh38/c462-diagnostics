@@ -1,6 +1,6 @@
 ## Changelog
 
-### v2.1 (unreleased)
+### v2.1 (2024-04-03)
 #### Added
 - option to center/lock on screen with no title bar
 - mechanism for remote control by game
