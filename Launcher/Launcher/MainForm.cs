@@ -27,6 +27,7 @@ namespace Launcher
     [SupportedOSPlatform("windows")]
     public partial class MainForm : Form
     {
+        bool _buttonPressAllowed = false;
         bool _configButtonPressed = false;
         bool _launchStarted = false;
         Timer _timer;
@@ -42,12 +43,25 @@ namespace Launcher
         private void MainForm_Load(object sender, EventArgs e)
         {
             versionLabel.Text = GetVersion();
+        }
+
+        private async void MainForm_Shown(object sender, EventArgs e)
+        {
+            var alreadyRunning = CheckForExistingProcess();
+            if (alreadyRunning)
+            {
+                _timer = new Timer();
+                _timer.Interval = 2000;
+                _timer.Tick += Timer_Tick_Quit;
+                _timer.Enabled = true;
+                return;
+            }
+
+            _buttonPressAllowed = true;
             statusTextBox.Text = "Starting..." + Environment.NewLine;
 
-            if (!Directory.Exists(SharedFileLocations.SharedFolder))
-            {
-                Directory.CreateDirectory(SharedFileLocations.SharedFolder);
-            }
+            await StartLogging();
+            Log.Information($"Started {GetVersion()}");
 
             var commandLineArgs = Environment.GetCommandLineArgs().ToList();
             if (commandLineArgs.Contains("-nodelay"))
@@ -62,14 +76,20 @@ namespace Launcher
             _timer.Enabled = true;
         }
 
-        private async void MainForm_Shown(object sender, EventArgs e)
+        private bool CheckForExistingProcess()
         {
-            await StartLogging();
-            Log.Information($"Started {GetVersion()}");
+            if (Process.GetProcessesByName("Hearing Test Suite").Length > 0)
+            {
+                statusTextBox.Text = "Already running." + Environment.NewLine;
+                return true;
+            }
+            return false;
         }
 
         private void MainForm_KeyUp(object sender, KeyEventArgs e)
         {
+            if (!_buttonPressAllowed) return;
+
             if (e.KeyCode == Keys.Enter && !_launchStarted)
             {
                 LaunchUnityApp();
@@ -134,8 +154,15 @@ namespace Launcher
             }
         }
 
+        private void Timer_Tick_Quit(object sender, EventArgs e)
+        {
+            _timer.Enabled = false;
+            Close();
+        }
+
         private void LaunchUnityApp()
         {
+            _buttonPressAllowed = false;
             _launchStarted = true;
 
             string errorMsg = "";
@@ -149,11 +176,15 @@ namespace Launcher
                 Log.Error(ex.Message + Environment.NewLine + ex.StackTrace);
             }
 
-            if (string.IsNullOrEmpty(errorMsg))
+            if (!string.IsNullOrEmpty(errorMsg))
             {
-                statusTextBox.AppendText("Starting Hearing Test Suite..." + Environment.NewLine);
-                Log.Information("Starting HTS");
-                System.Threading.Thread.Sleep(1000);
+                ShowErrorMessage(errorMsg);
+                _buttonPressAllowed = true;
+                return;
+            }
+
+            statusTextBox.AppendText("Starting \"Hearing Test Suite\"..." + Environment.NewLine);
+            Log.Information("Starting SOS");
 
                 var folder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 #if DEBUG
@@ -187,23 +218,39 @@ namespace Launcher
                         }
                     }
 
-                    Process.Start(htsPath, args);
-                }
-                catch (Exception ex)
+                    var process = Process.Start(htsPath, args);
+                    WaitForWindowAsync(process, timeoutMs: 30_000)
+                        .ContinueWith(_ => Close(), TaskScheduler.FromCurrentSynchronizationContext());
+            }
+            catch (Exception ex)
                 {
                     errorMsg = "Error starting app";
                     Log.Error($"Error starting app:{Environment.NewLine}{ex.Message}");
                 }
-            }
 
             if (!string.IsNullOrEmpty(errorMsg))
             {
                 ShowErrorMessage(errorMsg);
+                _buttonPressAllowed = true;
+                return;
             }
-            else
+        }
+
+        private async Task WaitForWindowAsync(Process process, int timeoutMs)
+        {
+            var sw = Stopwatch.StartNew();
+
+            while (sw.ElapsedMilliseconds < timeoutMs)
             {
-                Log.Information("Success!");
-                Close();
+                process.Refresh();
+
+                if (process.HasExited)
+                    break; // game crashed immediately — just close
+
+                if (process.MainWindowHandle != IntPtr.Zero)
+                    break; // window is visible
+
+                await Task.Delay(200);
             }
         }
 
