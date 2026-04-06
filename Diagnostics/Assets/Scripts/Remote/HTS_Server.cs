@@ -609,13 +609,5 @@ public class HTS_Server : MonoBehaviour
 #endif
     }
 
-    private IPEndPoint ParseEndPoint(string address)
-    {
-        var parts = address.Split('/');
-        var port = Int32.Parse(parts[1]);
-
-        return new IPEndPoint(IPAddress.Parse(parts[0]), port);
-    }
-
 #endregion
 }

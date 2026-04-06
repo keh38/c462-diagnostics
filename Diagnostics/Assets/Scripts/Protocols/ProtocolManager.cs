@@ -156,6 +156,7 @@ public class ProtocolManager : MonoBehaviour
         {
             if (_notification != null)
             {
+                WindowManager.GrantForegroundPermission(_notification.ProcessId);
                 _SendNotification(_notification);
                 SceneManager.LoadScene("Lobby");
                 return;
