@@ -1,5 +1,14 @@
 ## Changelog
 
+### v2.1.1 (2026-04-06)
+#### Changed
+- Launcher
+  - do not allow a second instance of the game
+  - wait until splash screen appears before closing
+  - firmware updater
+  
+---
+
 ### v2.1 (2024-04-03)
 #### Added
 - option to center/lock on screen with no title bar

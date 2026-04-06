@@ -2,7 +2,7 @@
 
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING .ISS SCRIPT FILES!
 #define SemanticVersion() \
-   GetVersionComponents("..\Launcher\Launcher\bin\x64\Release\net8.0-windows\HTSLauncher.exe", Local[0], Local[1], Local[2], Local[3]), \
+   GetVersionComponents("..\Launcher\Launcher\bin\Release\net8.0-windows\HTSLauncher.exe", Local[0], Local[1], Local[2], Local[3]), \
    Str(Local[0]) + "." + Str(Local[1]) + ((Local[2]>0) ? "." + Str(Local[2]) : "")
     
 #define verStr_ StringChange(SemanticVersion(), '.', '-')
@@ -31,7 +31,7 @@ RestartApplications=yes
 Source: "{#DevRoot}\C462\c462-shared\Installer\Output\C462SharedSubjectSetup.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 Source: "..\Diagnostics\Build\*.*"; DestDir: "{app}"; Flags: replacesameversion recursesubdirs;
 Source: ".\Dependencies\Mono\*.*"; DestDir: "{app}"; Flags: replacesameversion;
-Source: "..\Launcher\Launcher\bin\x64\Release\net8.0-windows\*.*"; DestDir: "{app}\Launcher"; Flags: replacesameversion recursesubdirs;
+Source: "..\Launcher\Launcher\bin\Release\net8.0-windows\*.*"; DestDir: "{app}\Launcher"; Flags: replacesameversion recursesubdirs;
 Source: "..\CHANGELOG.md"; DestDir: "{app}"; Flags: replacesameversion;
 
 [Run]
