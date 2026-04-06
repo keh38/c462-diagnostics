@@ -54,7 +54,7 @@
             label1.Location = new System.Drawing.Point(344, 30);
             label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(148, 19);
+            label1.Size = new System.Drawing.Size(184, 24);
             label1.TabIndex = 2;
             label1.Text = "Hearing Test Suite";
             label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -65,7 +65,7 @@
             versionLabel.Location = new System.Drawing.Point(399, 61);
             versionLabel.Margin = new System.Windows.Forms.Padding(4, 9, 4, 0);
             versionLabel.Name = "versionLabel";
-            versionLabel.Size = new System.Drawing.Size(38, 15);
+            versionLabel.Size = new System.Drawing.Size(50, 20);
             versionLabel.TabIndex = 3;
             versionLabel.Text = "label2";
             // 
@@ -73,13 +73,13 @@
             // 
             statusTextBox.BackColor = System.Drawing.SystemColors.Control;
             statusTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            statusTextBox.Enabled = false;
             statusTextBox.Location = new System.Drawing.Point(295, 95);
             statusTextBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             statusTextBox.Multiline = true;
             statusTextBox.Name = "statusTextBox";
             statusTextBox.ReadOnly = true;
-            statusTextBox.Size = new System.Drawing.Size(247, 132);
+            statusTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            statusTextBox.Size = new System.Drawing.Size(267, 132);
             statusTextBox.TabIndex = 4;
             // 
             // MainForm
@@ -103,7 +103,6 @@
             FormClosing += MainForm_FormClosing;
             Load += MainForm_Load;
             Shown += MainForm_Shown;
-            KeyUp += MainForm_KeyUp;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();

@@ -1,71 +1,70 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <OutputType>WinExe</OutputType>
-    <AssemblyName>HTSLauncher</AssemblyName>
-    <UseWindowsForms>true</UseWindowsForms>
-    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <FileVersion>2.1.1.0</FileVersion>
-    <AssemblyVersion>2.1.1.0</AssemblyVersion>
-    <Version>2.1.1</Version>
-    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-<PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-</PropertyGroup>  <ItemGroup>
-    <Content Include="Diagnostics.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="C462.Shared.UI" Version="1.1.0" />
-    <PackageReference Include="KLib.Controls" Version="1.5.1" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Serilog" Version="4.3.1" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
-    <PackageReference Include="SerilogTraceListener" Version="3.2.0" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="8.0.1" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
-    <PackageReference Include="System.Threading.Channels" Version="8.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\Diagnostics\Library\ScriptAssemblies\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="CoreAudio">
-      <HintPath>..\..\..\..\KLib\Framework\CoreAudio.dll</HintPath>
-    </Reference>
-    <Reference Include="KLib">
-      <HintPath>..\..\..\..\klib\Library\net8\KLib.dll</HintPath>
-    </Reference>
-    <Reference Include="KLib.Controls">
-      <HintPath>..\..\..\..\klib\Library\net8\KLib.Controls.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Properties\Settings.Designer.cs">
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<OutputType>WinExe</OutputType>
+		<AssemblyName>HTSLauncher</AssemblyName>
+		<UseWindowsForms>true</UseWindowsForms>
+		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+		<FileVersion>2.1.1.0</FileVersion>
+		<AssemblyVersion>2.1.1.0</AssemblyVersion>
+		<Version>2.1.1</Version>
+		<ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+		<PlatformTarget>x64</PlatformTarget>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Content Include="Diagnostics.ico">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 	
-  <!--<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	<ItemGroup>
+		<!--<PackageReference Include="C462.Shared.UI" Version="1.1.0" />-->
+		<PackageReference Include="C462.Shared.UI" Version="1.2.2" />
+		<PackageReference Include="KLib.Controls" Version="1.5.1" />
+		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+		<PackageReference Include="Serilog" Version="4.3.1" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+		<PackageReference Include="SerilogTraceListener" Version="3.2.0" />
+		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="8.0.1" />
+		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+		<PackageReference Include="System.Threading.Channels" Version="8.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!--<Reference Include="C462.Shared">
+		  <HintPath>..\..\..\c462-shared\C462.Shared.UI\bin\Debug\net8.0-windows\C462.Shared.dll</HintPath>
+		</Reference>
+		<Reference Include="C462.Shared.UI">
+		  <HintPath>..\..\..\c462-shared\C462.Shared.UI\bin\Debug\net8.0-windows\C462.Shared.UI.dll</HintPath>
+		</Reference>
+		<Reference Include="D128NET">
+			<HintPath>..\..\..\c462-digitimer\D128NET\bin\x64\Debug\D128NET.dll</HintPath>
+		</Reference>-->
+		<Reference Include="CoreAudio">
+			<HintPath>..\..\..\..\KLib\Framework\CoreAudio.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Properties\Settings.Designer.cs">
+			<DesignTimeSharedInput>True</DesignTimeSharedInput>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Settings.settings</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Properties\Settings.settings">
+			<Generator>SettingsSingleFileGenerator</Generator>
+			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
+		</None>
+	</ItemGroup>
+
+	<!--<Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if &quot;$(ConfigurationName)&quot; == &quot;Release&quot; (&quot;C:\Program Files (x86)\Inno Setup 6\Compil32.exe&quot; /cc &quot;$(SolutionDir)\..\Installer\c462-diagnostics-installer.iss&quot;)" />
   </Target>-->
-	
+
 </Project>

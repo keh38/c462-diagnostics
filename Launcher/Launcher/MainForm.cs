@@ -17,6 +17,8 @@ using CoreAudio;
 
 using D128NET;
 using C462.Shared;
+using C462.Shared.Arduino;
+using C462.Shared.UI;
 using KLib;
 using KLib.IO;
 using System.Runtime.Versioning;
@@ -86,15 +88,17 @@ namespace Launcher
             return false;
         }
 
-        private void MainForm_KeyUp(object sender, KeyEventArgs e)
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (!_buttonPressAllowed) return;
+            if (!_buttonPressAllowed) return true;
 
-            if (e.KeyCode == Keys.Enter && !_launchStarted)
+            if (keyData == Keys.Enter && !_launchStarted)
             {
                 LaunchUnityApp();
+                return true;
             }
-            else if ((e.KeyCode == Keys.F2 || e.KeyCode == Keys.C) && !_configButtonPressed)
+
+            if ((keyData == Keys.F2 || keyData == Keys.C) && !_configButtonPressed)
             {
                 _timer.Enabled = false;
                 _configButtonPressed = true;
@@ -102,16 +106,20 @@ namespace Launcher
                 ShowConfigDialog();
                 _configButtonPressed = false;
                 LaunchUnityApp();
+                return true;
             }
-            else if (e.KeyCode == Keys.Escape)
+
+            if (keyData == Keys.Escape)
             {
                 Close();
             }
+            return true;
         }
 
         private void ShowConfigDialog()
         {
-            var dlg = new ConfigForm();
+            var dlg = new HardwareConfigForm();
+            dlg.Icon = this.Icon;
             dlg.ShowDialog();
         }
 
@@ -160,7 +168,7 @@ namespace Launcher
             Close();
         }
 
-        private void LaunchUnityApp()
+        private async void LaunchUnityApp()
         {
             _buttonPressAllowed = false;
             _launchStarted = true;
@@ -168,7 +176,7 @@ namespace Launcher
             string errorMsg = "";
             try
             {
-                errorMsg = ValidateHardwareSetup();
+                errorMsg = await ValidateHardwareSetup();
             }
             catch (Exception ex)
             {
@@ -219,7 +227,7 @@ namespace Launcher
                     }
 
                     var process = Process.Start(htsPath, args);
-                    WaitForWindowAsync(process, timeoutMs: 30_000)
+                    await WaitForWindowAsync(process, timeoutMs: 30_000)
                         .ContinueWith(_ => Close(), TaskScheduler.FromCurrentSynchronizationContext());
             }
             catch (Exception ex)
@@ -256,11 +264,11 @@ namespace Launcher
 
         private void ShowErrorMessage(string message)
         {
-            statusTextBox.AppendText(message + Environment.NewLine);
+            statusTextBox.AppendText(message);
             statusTextBox.BackColor = Color.FromArgb(228, 192, 192);
         }
 
-        private string ValidateHardwareSetup()
+        private async Task<string> ValidateHardwareSetup()
         {
             statusTextBox.AppendText("Reading configuration..." + Environment.NewLine);
             Log.Information("Reading configuration");
@@ -275,19 +283,19 @@ namespace Launcher
             var errMsg = ValidateSoundCardConfiguration(map.NumChannels);
             if (!string.IsNullOrEmpty(errMsg)) sb.AppendLine(errMsg);
 
-            errMsg = ValidateSyncDevice();
+            errMsg = await ValidateSyncDevice();
             if (!string.IsNullOrEmpty(errMsg)) sb.AppendLine(errMsg);
 
-            errMsg = ValidateLEDDevice();
+            errMsg = await ValidateLEDDevice();
             if (!string.IsNullOrEmpty(errMsg)) sb.AppendLine(errMsg);
 
             errMsg = ValidateDigitimerDevices();
-            if (!string.IsNullOrEmpty(errMsg)) sb.AppendLine(errMsg);
+            if (!string.IsNullOrEmpty(errMsg)) sb.Append(errMsg);
 
             return sb.ToString();
         }
 
-        private string ValidateSyncDevice()
+        private async Task<string> ValidateSyncDevice()
         {
             if (string.IsNullOrEmpty(_config.SyncComPort))
             {
@@ -299,8 +307,8 @@ namespace Launcher
             statusTextBox.AppendText("Checking sync device..." + Environment.NewLine);
             Log.Information("Pinging sync device");
 
-            var firmware = ConfigForm.TestComPort(_config.SyncComPort, 115200, "livin' the dream");
-            if (string.IsNullOrEmpty(firmware))
+            var firmware = await ArduinoDiscoveryService.TestComPortForDeviceType(_config.SyncComPort, ArduinoDeviceType.AudioSync);
+            if (firmware == null)
             {
                 string msg = $"Sync device not responding at: {_config.SyncComPort}";
                 Log.Information(msg);
@@ -316,7 +324,7 @@ namespace Launcher
             return "";
         }
 
-        private string ValidateLEDDevice()
+        private async Task<string> ValidateLEDDevice()
         {
             if (string.IsNullOrEmpty(_config.LEDComPort))
             {
@@ -328,8 +336,8 @@ namespace Launcher
             statusTextBox.AppendText("Checking LED device..." + Environment.NewLine);
             Log.Information("Pinging LED device");
 
-            var firmware = ConfigForm.TestComPort(_config.LEDComPort, 9600, "lightin' the way, big man");
-            if (string.IsNullOrEmpty(firmware))
+            var firmware = await ArduinoDiscoveryService.TestComPortForDeviceType(_config.LEDComPort, ArduinoDeviceType.LEDController);
+            if (firmware == null)
             {
                 string msg = $"LED device not responding at: {_config.LEDComPort}";
                 Log.Information(msg);
