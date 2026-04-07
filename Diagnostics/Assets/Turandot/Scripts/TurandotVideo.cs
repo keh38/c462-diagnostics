@@ -33,7 +33,7 @@ namespace Turandot.Scripts
             float x = _layout.X - _layout.Width / 2;
             float y = _layout.Y - _layout.Height / 2;
 
-            _camera.rect = new Rect(x, y, _layout.Width, _layout.Height); 
+            _camera.rect = new Rect(x, y, _layout.Width, _layout.Height);
         }
 
         public override void Activate(Cue cue)
@@ -49,10 +49,22 @@ namespace Turandot.Scripts
             {
                 string videoPath = Path.Combine(SharedFileLocations.ResourceFolder("Videos"), _videoAction.Filename);
                 _player.url = videoPath;
+                _player.isLooping = true;
+                _player.sendFrameReadyEvents = true;
+                _player.frameReady += FrameReady;
                 _player.Play();
             }
-
         }
 
+        private void FrameReady(VideoPlayer vp, long frameIndex)
+        {
+            _log.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, "VideoFrame", (float)frameIndex);
+        }
+
+        public override void Deactivate()
+        {
+            _player.frameReady -= FrameReady;
+            base.Deactivate();
+        }
     }
 }

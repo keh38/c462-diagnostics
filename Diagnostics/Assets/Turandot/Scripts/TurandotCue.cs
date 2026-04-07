@@ -20,7 +20,7 @@ namespace Turandot.Scripts
         }
 
         Cue _cue = null;
-        CueLog _log = new CueLog();
+        protected CueLog _log = new CueLog();
 
         public void ClearLog()
         {
@@ -33,7 +33,7 @@ namespace Turandot.Scripts
             ShowCue(cue.BeginVisible);
         }
 
-        public void Deactivate()
+        virtual public void Deactivate()
         {
             if (_cue != null)
             {
@@ -45,7 +45,7 @@ namespace Turandot.Scripts
         void ShowCue(bool visible)
         {
             gameObject.SetActive(visible);
-            if (_log != null) _log.Add(Time.timeSinceLevelLoad, visible);
+            _log?.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, "Show", visible ? 1f : 0f);
         }
 /*
         private IEnumerator ShowCueDelayed(float delay_s)

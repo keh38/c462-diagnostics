@@ -77,6 +77,7 @@ namespace Turandot.Scripts
 
                 _sigMan.Name = name;
                 _sigMan.Initialize(AudioSettings.outputSampleRate, npts, SessionContext.Signal);
+                Debug.Log($"{name} -> num chan = {_sigMan.Channels.Count}");
                 _isi = _sigMan.Channels[0].Gate.Period_ms / 1000f;
             }
 

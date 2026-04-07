@@ -1,5 +1,18 @@
 ## Changelog
 
+### v2.1.3 (2026-04-07)
+#### Changed
+- expanded Cue log
+- explcitly log video frame times
+
+---
+
+### v2.1.2 (2026-04-06)
+#### Changed
+- implemented permission logic to allow Game to bring its screen to front
+
+---
+
 ### v2.1.1 (2026-04-06)
 #### Changed
 - Launcher
