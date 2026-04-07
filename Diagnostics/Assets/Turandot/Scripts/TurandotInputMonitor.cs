@@ -59,7 +59,10 @@ namespace Turandot.Scripts
                 _eventValues[k] = _inputEvents[k].Value ? 1 : 0;
             }
 
-            _log.Add(Time.timeSinceLevelLoad, _controlValues, _eventValues);
+            if (_controlValues.Length > 0 || _eventValues.Length > 0)
+            {
+                _log.Add(Time.timeSinceLevelLoad, _controlValues, _eventValues);
+            }
         }
 
         public void PollEvents()
