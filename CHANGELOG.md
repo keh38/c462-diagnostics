@@ -1,5 +1,11 @@
 ## Changelog
 
+### v2.1.4 (unreleased)
+#### Fixed
+- run installer from project Downloads folder
+
+---
+
 ### v2.1.3 (2026-04-07)
 #### Changed
 - expanded Cue log

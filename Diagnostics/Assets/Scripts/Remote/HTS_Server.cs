@@ -595,8 +595,14 @@ public class HTS_Server : MonoBehaviour
     private void RunInstaller(string filename)
     {
         string exePath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            SharedFileLocations.HtsProjectFolder,
             "Downloads", filename);
+
+        if (!File.Exists(exePath))
+        {
+            Debug.LogError($"Installer not found: {exePath}");
+            return;
+        }
 
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
         {
