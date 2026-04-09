@@ -196,14 +196,14 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         _audioInitialized = false;
 
 
-        //_sigMan = settings.SigMan;
+        _sigMan = settings.SigMan;
 
 
         AudioSettings.GetDSPBufferSize(out int bufferLength, out int numBuffers);
 
         _sigMan.Initialize(AudioSettings.outputSampleRate, bufferLength, SessionContext.Signal);
 
-        //HardwareInterface.Digitimer?.EnableDevices(_sigMan.GetDigitimerChannels());
+        HardwareInterface.Digitimer?.EnableDevices(_sigMan.GetDigitimerChannels());
 
         _audioInitialized = true;
     }

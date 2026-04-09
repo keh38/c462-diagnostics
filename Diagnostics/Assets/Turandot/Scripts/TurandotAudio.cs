@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using KLib.Signals;
 using System.Linq;
+using System.Collections;
 
 namespace Turandot.Scripts
 {
@@ -77,7 +78,7 @@ namespace Turandot.Scripts
 
                 _sigMan.Name = name;
                 _sigMan.Initialize(AudioSettings.outputSampleRate, npts, SessionContext.Signal);
-                Debug.Log($"{name} -> num chan = {_sigMan.Channels.Count}");
+
                 _isi = _sigMan.Channels[0].Gate.Period_ms / 1000f;
             }
 
@@ -185,15 +186,9 @@ namespace Turandot.Scripts
                     _numStimTimes++;
                 }
 
-                if (_resumeAudio)
+                if (_killAudio || _pauseAudio)
                 {
-                    Gate.RampUp(data);
-                    _resumeAudio = false;
-                    _isRunning = true;
-                }
-
-                if (_killAudio || _sigMan.TimedOut || _pauseAudio)
-                {
+                    _sigMan.Pause();
                     Gate.RampDown(data);
                     if (_pauseAudio)
                     {
@@ -202,10 +197,23 @@ namespace Turandot.Scripts
                     }
                 }
 
+                if (_sigMan.TimedOut)
+                {
+                    Gate.RampDown(data);
+                }
+
                 if (_killAudio)
                 {
                     Deactivate();
                 }
+
+                if (_resumeAudio)
+                {
+                    Gate.RampUp(data);
+                    _resumeAudio = false;
+                    _isRunning = true;
+                }
+
             }
         }
     }

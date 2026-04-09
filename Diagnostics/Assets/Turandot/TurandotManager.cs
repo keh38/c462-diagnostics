@@ -117,6 +117,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             configName = parts[0];
             localName = SharedFileLocations.GetConfigFile("Turandot", configName);
             _params = KLibU.Files.XmlDeserialize<Parameters>(localName);
+
             _paramFile = Path.GetFileName(localName);
             _state = new TurandotState(GameManager.Project, GameManager.Subject, configName);
 

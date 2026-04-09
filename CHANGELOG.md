@@ -1,8 +1,9 @@
 ## Changelog
 
-### v2.1.4 (unreleased)
+### v2.1.4 (2026-04-09)
 #### Fixed
 - run installer from project Downloads folder
+- Turandot Interactive broken
 
 ---
 
