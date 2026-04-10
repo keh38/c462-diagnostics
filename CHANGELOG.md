@@ -1,5 +1,11 @@
 ## Changelog
 
+### v2.1.6 (2026-04-10)
+#### Fixed
+- only write both channels for audio
+
+---
+
 ### v2.1.5 (2026-04-10)
 #### Changed
 - updated shared libraries to allow isolation of left/right audio channels
