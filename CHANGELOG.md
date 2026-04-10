@@ -1,5 +1,13 @@
 ## Changelog
 
+### v2.1.5 (2026-04-10)
+#### Changed
+- updated shared libraries to allow isolation of left/right audio channels
+#### Added
+- send Disconnect message to HTSController
+
+---
+
 ### v2.1.4 (2026-04-09)
 #### Fixed
 - run installer from project Downloads folder

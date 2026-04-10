@@ -181,6 +181,8 @@ public class HTS_Server : MonoBehaviour
 
     public void StopServer()
     {
+        SendRequest("Disconnect", (object) null);   
+
         _stopServer = true;
         if (_tcpListener != null)
         {
