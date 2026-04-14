@@ -289,6 +289,9 @@ namespace Launcher
             errMsg = await ValidateLEDDevice();
             if (!string.IsNullOrEmpty(errMsg)) sb.AppendLine(errMsg);
 
+            errMsg = await ValidateDigitimerDevice();
+            if (!string.IsNullOrEmpty(errMsg)) sb.AppendLine(errMsg);
+
             errMsg = ValidateDigitimerDevices();
             if (!string.IsNullOrEmpty(errMsg)) sb.Append(errMsg);
 
@@ -346,6 +349,35 @@ namespace Launcher
             else
             {
                 string msg = $"LED device running firmware V{firmware}";
+                statusTextBox.AppendText(msg + Environment.NewLine);
+                Log.Information(msg);
+
+            }
+            return "";
+        }
+
+        private async Task<string> ValidateDigitimerDevice()
+        {
+            if (string.IsNullOrEmpty(_config.DigitimerComPort))
+            {
+                statusTextBox.AppendText("-- No Digitimer trigger device --" + Environment.NewLine);
+                Log.Information("No Digitimer trigger COM port specified");
+                return "";
+            }
+
+            statusTextBox.AppendText("Checking Digitimer trigger device..." + Environment.NewLine);
+            Log.Information("Pinging Digitimer trigger device");
+
+            var firmware = await ArduinoDiscoveryService.TestComPortForDeviceType(_config.LEDComPort, ArduinoDeviceType.DigitimerTrigger);
+            if (firmware == null)
+            {
+                string msg = $"Digitimer trigger device not responding at: {_config.LEDComPort}";
+                Log.Information(msg);
+                return msg;
+            }
+            else
+            {
+                string msg = $"Digitimer trigger device running firmware V{firmware}";
                 statusTextBox.AppendText(msg + Environment.NewLine);
                 Log.Information(msg);
 

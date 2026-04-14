@@ -108,13 +108,12 @@ public class DigitimerControl : MonoBehaviour
 
     public bool DisableDevices(List<KLib.Signals.Channel> channels)
     {
-        bool success = _trigger.DisableTrigger();
-
+        bool success = true;
         foreach (var c in channels)
         {
             if (int.TryParse(c.MyEndpoint.transducer.Substring(("DS8R").Length), out int id))
             {
-                success &= DisableDevice(id);
+                success &= HardwareInterface.Digitimer.DisableDevice(id);
             }
         }
         return success;
@@ -132,6 +131,8 @@ public class DigitimerControl : MonoBehaviour
         _d128[deviceNum].Source = IntToDemandSource((int)digitimer.Source);
         _d128[deviceNum].Demand = (int)(digitimer.Demand * 10);
         _d128[deviceNum].Enable = EnableState.Enabled;
+
+        //Debug.Log($"device {deviceNum} width = {digitimer.Width}");
 
         var result = _d128.SetState();
         if (result != ErrorCode.Success)

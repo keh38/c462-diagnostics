@@ -1,5 +1,11 @@
 ## Changelog
 
+### v2.1.7 (unreleased)
+#### Changed
+- added support for Digitimer trigger enable/disable
+
+---
+
 ### v2.1.6 (2026-04-10)
 #### Fixed
 - only write both channels for audio
