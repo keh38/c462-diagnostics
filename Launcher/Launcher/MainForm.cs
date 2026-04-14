@@ -368,10 +368,10 @@ namespace Launcher
             statusTextBox.AppendText("Checking Digitimer trigger device..." + Environment.NewLine);
             Log.Information("Pinging Digitimer trigger device");
 
-            var firmware = await ArduinoDiscoveryService.TestComPortForDeviceType(_config.LEDComPort, ArduinoDeviceType.DigitimerTrigger);
+            var firmware = await ArduinoDiscoveryService.TestComPortForDeviceType(_config.DigitimerComPort, ArduinoDeviceType.DigitimerTrigger);
             if (firmware == null)
             {
-                string msg = $"Digitimer trigger device not responding at: {_config.LEDComPort}";
+                string msg = $"Digitimer trigger device not responding at: {_config.DigitimerComPort}";
                 Log.Information(msg);
                 return msg;
             }

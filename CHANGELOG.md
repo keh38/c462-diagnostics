@@ -1,6 +1,6 @@
 ## Changelog
 
-### v2.1.7 (unreleased)
+### v2.1.7 (2026-04-14)
 #### Changed
 - added support for Digitimer trigger enable/disable
 
