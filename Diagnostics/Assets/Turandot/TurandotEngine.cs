@@ -217,7 +217,7 @@ public class TurandotEngine : MonoBehaviour
             _deferredLinkTo = "";
             _stateStartTime = Time.timeSinceLevelLoad;
 
-            Debug.Log("State: " + _currentFlowElement.name);
+            //Debug.Log("State: " + _currentFlowElement.name);
             Cursor.visible = !_currentFlowElement.hideCursor;
 
             var timeOut = _currentFlowElement.GetTimeout(_trialType).Value;
@@ -316,7 +316,7 @@ public class TurandotEngine : MonoBehaviour
             if (!nextIsAction) _stateEndReason = whichEvent;
 
             _log.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, HistoryEvent.TermCond, whichEvent);
-            Debug.Log(whichEvent + ": " + term.action);
+            //Debug.Log(whichEvent + ": " + term.action);
 
             if (!string.IsNullOrEmpty(term.result))
             {

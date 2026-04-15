@@ -373,7 +373,7 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "GetTransducers":
-                _tcpListener.WriteResponse(TcpMessage.Ok(GameManager.EnumerateTransducers()));
+                _tcpListener.WriteResponse(TcpMessage.Ok(SharedFileLocations.EnumerateTransducers()));
                 break;
 
             case "GetAdapterMap":

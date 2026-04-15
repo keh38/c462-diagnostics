@@ -135,7 +135,7 @@ public class SubjectPanel : MonoBehaviour
 
     private void FillTransducerDropDown()
     {
-        var transducers = GameManager.EnumerateTransducers();
+        var transducers = SharedFileLocations.EnumerateTransducers();
 
         transducerDropDown.Clear();
         for (int k=0; k<transducers.Count; k++)

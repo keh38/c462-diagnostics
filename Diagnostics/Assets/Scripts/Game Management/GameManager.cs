@@ -98,23 +98,6 @@ public class GameManager : MonoBehaviour
         instance._SaveSubjectMetadata();
     }
 
-    public static List<string> EnumerateTransducers()
-    {
-        var transducers = new List<string>();
-        var localCalFolder = Path.Combine(SharedFileLocations.BasicResourcesFolder, "Calibration");
-        foreach (string path in Directory.GetFiles(localCalFolder))
-        {
-            var fn = Path.GetFileNameWithoutExtension(path);
-            if (!fn.Contains("_") && (GameManager.ProjectSettings.ValidTransducers == null || GameManager.ProjectSettings.ValidTransducers.Count==0 || GameManager.ProjectSettings.ValidTransducers.Contains(fn)))
-            {
-                transducers.Add(fn);
-            }
-        }
-        transducers.Sort();
-
-        return transducers;
-    }
-
     public static int GetNextRunNumber(string measurementType)
     {
         int number = Mathf.Max(1, instance._subjectMetadata.runCounter[measurementType]);

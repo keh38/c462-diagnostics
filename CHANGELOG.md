@@ -1,5 +1,13 @@
 ## Changelog
 
+### v2.1.8 (2026-04-15)
+#### Fixed
+- enumerate transducers from shared folder only
+#### Changed
+- suppress Turandot debug messages
+
+---
+
 ### v2.1.7 (2026-04-14)
 #### Changed
 - added support for Digitimer trigger enable/disable
