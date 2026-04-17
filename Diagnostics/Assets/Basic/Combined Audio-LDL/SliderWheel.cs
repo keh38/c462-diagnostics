@@ -32,24 +32,32 @@ public class SliderWheel : MonoBehaviour
     private int[] _slotAssignment;
     private int _advanceCount = 0;
 
-    private void Start()
+    private void Awake()
     {
         _slotAssignment = new int[] { 0, 1, 2, 3, 4 };
+    }
 
+    public void Initialize()
+    {
         // Snap all sliders to their initial positions immediately
         for (int slot = 0; slot < 5; slot++)
         {
             _sliders[_slotAssignment[slot]].SnapTo(_slotPositions[slot + 1], _slotScales[slot + 1]);
 
             // Hide the two slots that represent not-yet-completed trials
-            if (slot < 2)
+            if (slot < 3)
                 _sliders[_slotAssignment[slot]].SetVisible(false);
         }
     }
 
-    public void Advance()
+    public CombinedLevelSlider GetActiveSlider()
     {
-        StartCoroutine(AdvanceCoroutine());
+        return _sliders[_slotAssignment[2]].LevelSlider; // slot 2 is always the active slot
+    }
+
+    public Coroutine Advance()
+    {
+        return StartCoroutine(AdvanceCoroutine());
     }
 
     private IEnumerator AdvanceCoroutine()
@@ -61,6 +69,8 @@ public class SliderWheel : MonoBehaviour
             _sliders[0].SetVisible(true);
         else if (_advanceCount == 3)
             _sliders[1].SetVisible(true);
+        else if (_advanceCount == 4)
+            _sliders[2].SetVisible(true);
 
         // Now tell every slider where it's going
         for (int slot = 0; slot < 5; slot++)

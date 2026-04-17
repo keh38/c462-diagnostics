@@ -18,10 +18,9 @@ using C462.Shared.Protocol.DTOs;
 using Audiograms;
 
 using BasicMeasurements;
-using LDL;
+using CombinedAudioLDL;
 
-using MeasurementState = LDL.MeasurementState;
-using Turandot.Scripts;
+using MeasurementState = CombinedAudioLDL.MeasurementState;
 
 public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
 {
@@ -38,13 +37,9 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
     [SerializeField] private CombinedLevelSlider _levelSlider;
     [SerializeField] private SliderWheel _sliderWheel;
 
-    //    private LDLSliderPanel _sliderPanel;
-
     private bool _isRemote;
-
     private bool _localAbort = false;
-
-    private CombinedAudioLDLSettings _settings = new CombinedAudioLDLSettings();
+    private bool _audioEnabled = false;
 
     private string _configName;
     private string _dataPath;
@@ -52,22 +47,18 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
 
     private string _stateFile;
     private MeasurementState _state;
-
-    private List<TestCondition> _curGroup = new List<TestCondition>();
-    private LoudnessDiscomfortData _data = new LoudnessDiscomfortData();
+    private AudioLDLData _data = new AudioLDLData();
+    private CombinedAudioLDLSettings _settings = new CombinedAudioLDLSettings();
 
     private InputAction _abortAction;
 
-    private bool _doSimulation = false;
+    private SignalManager _signalManager = new SignalManager();
 
     private void Awake()
     {
         _abortAction = _actions.FindAction("Abort");
         _abortAction.Enable();
-        _abortAction.performed += OnAbortAction;
-
-        //_sliderPanel = _workPanel.GetComponent<LDLSliderPanel>();
-        //_sliderPanel.LockInPressed += OnLockIn;
+        _abortAction.performed += HandleAbortAction;
 
         Application.logMessageReceived += HandleException;
     }
@@ -110,12 +101,9 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         {
             //var fn = SharedFileLocations.GetConfigFile("CombinedAudioLDL", _configName);
             //_settings = Files.XmlDeserialize<BasicMeasurementConfiguration>(fn) as CombinedAudioLDLSettings;
-            //InitializeMeasurement();
-            //Begin();
+            InitializeMeasurement();
+            Begin();
         }
-
-        //_levelSlider.Initialize(2, 2);
-        //_levelSlider.Activate(0, 100);
     }
 
     void InitializeMeasurement()
@@ -125,14 +113,6 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         InitDataFile();
 
         _stateFile = Path.Combine(SharedFileLocations.HtsSubjectFolder, $"{_mySceneName}.bin");
-
-        // Need to delete the existing LDL, otherwise it will be loaded and used to constrain the 
-        // max output level, making it impossible ever to exceed the original LDL.
-        if (File.Exists(SharedFileLocations.LDLPath))
-        {
-            _data.LDLgram = Audiograms.AudiogramData.Load(SharedFileLocations.LDLPath);
-            File.Delete(SharedFileLocations.LDLPath);
-        }
 
         CreatePlan();
 
@@ -156,13 +136,13 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
 
         var header = new BasicMeasurementFileHeader()
         {
-            measurementType = "LDL",
+            measurementType = "CombinedAudioLDL",
             configName = _configName,
             subjectID = GameManager.Subject
         };
 
         string json = Files.JSONStringAdd("", "info", KLibU.Files.JSONSerializeToString(header));
-        json = KLibU.Files.JSONStringAdd(json, "params", KLibU.Files.JSONSerializeToString(_settings));
+        json = Files.JSONStringAdd(json, "params", KLibU.Files.JSONSerializeToString(_settings));
         json += Environment.NewLine;
 
         File.WriteAllText(_dataPath, json);
@@ -172,19 +152,19 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
     {
         _localAbort = false;
 
-        if (_settings.UseDefaultInstructions || !string.IsNullOrEmpty(_settings.InstructionMarkdown))
-        {
-            if (_settings.UseDefaultInstructions)
-            {
-                _settings.InstructionMarkdown = _defaultInstructions.text;
-            }
+        //if (_settings.UseDefaultInstructions || !string.IsNullOrEmpty(_settings.InstructionMarkdown))
+        //{
+        //    if (_settings.UseDefaultInstructions)
+        //    {
+        //        _settings.InstructionMarkdown = _defaultInstructions.text;
+        //    }
 
-            HTS_Server.SendRequest(_mySceneName, "Status:Instructions");
-            ShowInstructions(
-                instructions: _settings.InstructionMarkdown,
-                fontSize: _settings.InstructionFontSize);
-        }
-        else
+        //    HTS_Server.SendRequest(_mySceneName, "Status:Instructions");
+        //    ShowInstructions(
+        //        instructions: _settings.InstructionMarkdown,
+        //        fontSize: _settings.InstructionFontSize);
+        //}
+        //else
         {
             StartMeasurement();
         }
@@ -197,7 +177,7 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
 
         if (File.Exists(_stateFile))
         {
-            Debug.Log("LDL: Previous state exists. Asking whether to resume");
+            Debug.Log("CombinedAudioLDL: Previous state exists. Asking whether to resume");
             HTS_Server.SendRequest(_mySceneName, "Status:Asking to resume");
 
             _questionBox.gameObject.SetActive(true);
@@ -208,10 +188,11 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
             _instructionPanel.gameObject.SetActive(false);
 
             _workPanel.SetActive(true);
-            InitializeSliderPanel();
+            _sliderWheel.Initialize();
+            InitializeStimulusGeneration();
 
             HTS_Server.SendRequest(_mySceneName, "Status:Running measurement");
-            DoNextGroup();
+            DoNextStimulusAsync();
         }
     }
 
@@ -221,7 +202,7 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
 
         if (yes)
         {
-            Debug.Log("LDL: Resuming previous");
+            Debug.Log("CombinedAudioLDL: Resuming previous");
             HTS_Server.SendRequest(_mySceneName, "Status:Resuming previous");
 
             _state = RestoreState();
@@ -229,14 +210,14 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
             _progressBar.value = _state.NumCompleted;
 
             _workPanel.SetActive(true);
-            InitializeSliderPanel();
+            InitializeStimulusGeneration();
 
             HTS_Server.SendRequest(_mySceneName, "Status:Running measurement");
-            DoNextGroup();
+            DoNextStimulusAsync();
         }
         else
         {
-            Debug.Log("LDL: Starting new measurement");
+            Debug.Log("CombinedAudioLDL: Starting new measurement");
             HTS_Server.SendRequest(_mySceneName, "Status:Starting new measurement");
 
             File.Delete(_stateFile);
@@ -244,7 +225,7 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         }
     }
 
-    void OnAbortAction(InputAction.CallbackContext context)
+    void HandleAbortAction(InputAction.CallbackContext context)
     {
         _abortAction.Disable();
 
@@ -265,7 +246,7 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         _quitPanel.SetActive(false);
         _workPanel.SetActive(true);
         _abortAction.Enable();
-        DoNextGroup();
+        DoNextStimulusAsync();
     }
 
     private void ShowInstructions(string instructions, int fontSize)
@@ -277,6 +258,7 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
 
     private void EndRun(bool abort)
     {
+        _progressBar.gameObject.SetActive(false);
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(false);
 
@@ -345,22 +327,38 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         SceneManager.LoadScene(newScene);
     }
 
-    private void InitializeSliderPanel()
+    private void InitializeStimulusGeneration()
     {
+        Waveform wf = null;
+        if (_settings.Bandwidth == 0)
+        {
+            var fm = new FM();
+            fm.Carrier_Hz = 500;
+            fm.Depth_Hz = 500 * _settings.ModDepth_pct / 100f;
+            wf = fm;
+        }
+        else
+        {
+            wf = new Noise()
+            {
+                Filter = new FilterSpec()
+                {
+                    Shape = FilterShape.Band_pass,
+                    CF = 500,
+                    BW = _settings.Bandwidth,
+                    BandMode = BandMode.Octaves
+                }
+            };
+        }
+
         var ch = new Channel()
         {
-            Modality = KLib.Signals.Modality.Audio,
+            Modality = Modality.Audio,
             Laterality = Laterality.Diotic,
-            Waveform = new FM()
-            {
-                Carrier_Hz = 500,
-                Depth_Hz = 500 * _settings.ModDepth_pct / 100f,
-                ModFreq_Hz = 5,
-                Phase_cycles = 0
-            },
+            Waveform = wf,
             Level = new Level()
             {
-                Units = _settings.LevelUnits == LevelUnits.dB_SPL ? LevelUnits.dB_SPL_noLDL : _settings.LevelUnits,
+                Units = LevelUnits.dB_SPL_noLDL,
                 Value = 75f
             },
             Gate = new Gate()
@@ -372,124 +370,111 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
             }
         };
 
-        //_sliderPanel.Initialize(_settings, ch);
+        _signalManager.Channels.Add(ch);
+
+        var config = AudioSettings.GetConfiguration();
+        _signalManager.Initialize(config.sampleRate, config.dspBufferSize, SessionContext.Signal);
     }
 
     private void CreatePlan()
     {
-        _state = new LDL.MeasurementState();
+        _state = new MeasurementState();
 
-        if (_settings.LevelUnits == LevelUnits.dB_SL)
+        for (int k = 0; k < _settings.TestFrequencies.Length; k++)
         {
-            AudiogramData audiogram = Audiograms.AudiogramData.Load(SharedFileLocations.AudiogramPath);
-            Audiogram agramLeft = audiogram.Get(AudiogramTestEar.Left);
-            Audiogram agramRight = audiogram.Get(AudiogramTestEar.Right);
-
-
-            List<float> agramFreqs = new List<float>(audiogram.Get_Frequency_Hz());
-
-            for (int k = 0; k < _settings.TestFrequencies.Length; k++)
-            {
-                int ifreq = agramFreqs.FindIndex(o => o == _settings.TestFrequencies[k]);
-
-                if (!float.IsNaN(agramLeft.Threshold_dBSPL[ifreq]) && !float.IsInfinity(agramLeft.Threshold_dBSPL[ifreq]) && _settings.TestEar != Audiograms.TestEar.Right)
-                {
-                    _state.testConditions.Add(new TestCondition(Laterality.Left, _settings.TestFrequencies[k]));
-                }
-                if (!float.IsNaN(agramRight.Threshold_dBSPL[ifreq]) && !float.IsInfinity(agramRight.Threshold_dBSPL[ifreq]) && _settings.TestEar != Audiograms.TestEar.Left)
-                {
-                    _state.testConditions.Add(new TestCondition(Laterality.Right, _settings.TestFrequencies[k]));
-                }
-            }
-        }
-        else
-        {
-            for (int k = 0; k < _settings.TestFrequencies.Length; k++)
-            {
-                if (_settings.TestEar != Audiograms.TestEar.Right) _state.testConditions.Add(new TestCondition(Laterality.Left, _settings.TestFrequencies[k]));
-                if (_settings.TestEar != Audiograms.TestEar.Left) _state.testConditions.Add(new TestCondition(Laterality.Right, _settings.TestFrequencies[k]));
-            }
+            if (_settings.TestEar != TestEar.Right) _state.testConditions.Add(new TestCondition(Laterality.Left, _settings.TestFrequencies[k]));
+            if (_settings.TestEar != TestEar.Left) _state.testConditions.Add(new TestCondition(Laterality.Right, _settings.TestFrequencies[k]));
         }
 
         _state.CreateRandomTestOrder(_settings.NumRepeats);
     }
 
-    private void DoNextGroup()
+    private void DoNextStimulusAsync()
     {
-        StartCoroutine(NextGroup());
+        StartCoroutine(DoNextStimulus());
     }
 
-    private IEnumerator NextGroup()
+    private IEnumerator DoNextStimulus()
     {
 
 #if !UNITY_EDITOR
         HardwareInterface.VolumeManager.SetMasterVolume(1, KLib.VolumeManager.VolumeUnit.Scalar);
 #endif
 
-        if (_curGroup.Count > 0 && !_doSimulation)
+        UpdateStimulus(_state.testConditions[_state.testIndex]);
+
+        yield return _sliderWheel.Advance();
+
+        _levelSlider = _sliderWheel.GetActiveSlider();
+        _levelSlider.MeasurementLocked = HandleMeasurementLocked;
+        _levelSlider.ParamSetter = _signalManager.Channels[0].Level.GetParamSetter("Level");
+
+        _levelSlider.Initialize(_settings.MinExcursion, _settings.NumReversals);
+
+        _levelSlider.Activate(0, 100);
+        _signalManager.Activate();
+        _audioEnabled = true;
+
+        yield return null;
+    }
+
+    private void UpdateStimulus(TestCondition testCondition)
+    {
+        if (_settings.Bandwidth == 0)
         {
-            //yield return StartCoroutine(_sliderPanel.ShuffleSliderPositions());
+            var fm = _signalManager.Channels[0].Waveform as FM;
+            fm.Carrier_Hz = testCondition.Freq_Hz;
+            fm.Depth_Hz = testCondition.Freq_Hz * _settings.ModDepth_pct / 100f;
         }
-
-        _progressBar.gameObject.SetActive(false);
-        _curGroup.Clear();
-
-        //int numToDo = Mathf.Min(_state.testOrder.Count, _sliderPanel.NumSliders);
-        //for (int k = 0; k < numToDo; k++)
-        //{
-        //    int index = _state.testOrder[k];
-        //    _curGroup.Add(_state.testConditions[index]);
-        //}
-
-        //_sliderPanel.ResetSliders(_curGroup);
-
-        if (_doSimulation)
+        else
         {
-            DoSimulation();
-            yield return new WaitForSeconds(0.5f);
+            var noise = _signalManager.Channels[0].Waveform as Noise;
+            noise.Filter.CF = testCondition.Freq_Hz;
+        }
+        _signalManager.Channels[0].Laterality = testCondition.ear;
+        _signalManager.Channels[0].Level.Value = 0;
+
+        var config = AudioSettings.GetConfiguration();
+        _signalManager.Initialize(config.sampleRate, config.dspBufferSize, SessionContext.Signal);
+    }
+
+    private void HandleMeasurementLocked(SliderMeasurement measurement, float value)
+    {
+        switch (measurement)
+        {
+            case SliderMeasurement.Threshold:
+                _state.testConditions[_state.testIndex].threshold = value;
+                break;
+            case SliderMeasurement.LDL:
+                _state.testConditions[_state.testIndex].LDL = value;
+                StartCoroutine(EndSlider());
+                break;
         }
     }
 
-    private void DoSimulation()
+    private IEnumerator EndSlider()
     {
-        //_sliderPanel.SimulateMove();
-        OnLockIn();
-    }
+        _signalManager.Pause();
+        _audioEnabled = false;
 
-    public void OnLockIn()
-    {
-        StartCoroutine(LockIn());
-    }
+        bool finished = _state.Advance();
 
-    private IEnumerator LockIn()
-    {
-        _progressBar.gameObject.SetActive(true);
-
-        //var sliderSettings = _sliderPanel.GetSliderSettings();
-        //for (int k = 0; k < _curGroup.Count; k++)
-        //{
-        //    _data.sliderSettings.Add(sliderSettings[k].Clone());
-        //    _curGroup[k].discomfortLevel.Add(sliderSettings[k].isMaxed ? float.NaN : sliderSettings[k].end);
-        //    _state.testOrder.RemoveAt(0);
-        //}
         SaveState();
 
         yield return new WaitForSeconds(0.25f);
 
         _progressBar.value = _state.NumCompleted;
         HTS_Server.SendRequest(_mySceneName, $"Progress:{_state.PercentCompleted}");
-        //_sliderPanel.HideLockInButton();
 
         yield return new WaitForSeconds(0.25f);
 
-        if (_state.testOrder.Count > 0)
+        if (!finished)
         {
-            DoNextGroup();
+            DoNextStimulusAsync();
+            yield break;
         }
-        else
-        {
-            EndRun(abort: false);
-        }
+
+        EndRun(abort: false);
     }
 
     void FinishData()
@@ -522,14 +507,14 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         {
             float sum = 0;
             float n = 0;
-            foreach (float level in tc.discomfortLevel)
-            {
-                if (!float.IsNaN(level))
-                {
-                    sum += level;
-                    ++n;
-                }
-            }
+            //foreach (float level in tc.discomfortLevel)
+            //{
+            //    if (!float.IsNaN(level))
+            //    {
+            //        sum += level;
+            //        ++n;
+            //    }
+            //}
 
             var ear = tc.ear == Laterality.Left ? AudiogramTestEar.Left : AudiogramTestEar.Right;
             if (_settings.LevelUnits == LevelUnits.dB_SL)
@@ -604,6 +589,15 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
             ShowFinishPanel("The run was stopped because of an error");
         }
     }
+
+    private void OnAudioFilterRead(float[] data, int channels)
+    {
+        if (_audioEnabled)
+        {
+            _signalManager.Synthesize(data);
+        }
+    }
+
 }
 
 

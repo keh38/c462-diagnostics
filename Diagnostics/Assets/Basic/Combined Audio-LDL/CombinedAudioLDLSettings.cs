@@ -18,6 +18,7 @@ namespace Audiograms
         public Audiograms.TestEar TestEar { get; set; }
         public float[] TestFrequencies { get; set; }
         public int NumRepeats { get; set; }
+        public float MinExcursion { get; set; } 
         public int NumReversals { get; set; }
         public bool Merge { set; get; }
         public bool LogSliderTracks { set; get; }
@@ -51,6 +52,7 @@ namespace Audiograms
             MinLevel = 10;
             LevelUnits = LevelUnits.dB_SPL;
             NumRepeats = 1;
+            MinExcursion = 2.5f;
             NumReversals = 2;
 
             PromptFontSize = 72;

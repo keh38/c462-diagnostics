@@ -6,11 +6,13 @@ public class CombinedSliderAnimator : MonoBehaviour
     private RectTransform _rect;
     private CanvasGroup _canvasGroup;
     private Coroutine _currentAnimation;
+    public CombinedLevelSlider LevelSlider { get; private set; }
 
     private void Awake()
     {
         _rect = GetComponent<RectTransform>();
         _canvasGroup = gameObject.AddComponent<CanvasGroup>();
+        LevelSlider = GetComponent<CombinedLevelSlider>();
     }
 
     public void SetVisible(bool visible)
