@@ -8,9 +8,9 @@ using LDL.Haptics;
 
 using C462.Shared;
 
-namespace LDL
+namespace Audiograms
 {
-    public class LDLMeasurementSettings : BasicMeasurementConfiguration
+    public class CombinedAudioLDLSettings : BasicMeasurementConfiguration
     {
         public string Title { get; set; }
         public string Prompt { get; set; }
@@ -18,6 +18,7 @@ namespace LDL
         public Audiograms.TestEar TestEar { get; set; }
         public float[] TestFrequencies { get; set; }
         public int NumRepeats { get; set; }
+        public int NumReversals { get; set; }
         public bool Merge { set; get; }
         public bool LogSliderTracks { set; get; }
         public float Bandwidth { set; get; }
@@ -31,7 +32,7 @@ namespace LDL
         public float ModDepth_pct {  set; get; }
         public HapticStimulus HapticStimulus { set; get; }
 
-        public LDLMeasurementSettings() : base()
+        public CombinedAudioLDLSettings() : base()
         {
             Title = "How loud does it sound?";
 
@@ -49,12 +50,10 @@ namespace LDL
             ModDepth_pct = 0;
             MinLevel = 10;
             LevelUnits = LevelUnits.dB_SPL;
-            NumRepeats = 3;
+            NumRepeats = 1;
+            NumReversals = 2;
 
-            Prompt = "Move sliders until sound is uncomfortable";
             PromptFontSize = 72;
-
-            HapticStimulus = new HapticStimulus();
         }
 
     }

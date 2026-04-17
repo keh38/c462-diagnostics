@@ -59,6 +59,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Lobby.unity
     guid: 95ac4e130deceba4ca5ea5c0ecf64c0a
+  - enabled: 1
+    path: Assets/Basic/Combined Audio-LDL/Combined Audio-LDL.unity
+    guid: 03a1ac88ed9a0e94e9abc976b7beced4
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 28be48df767d2434681ec999065f06dc, type: 3}
   m_UseUCBPForAssetBundles: 0
