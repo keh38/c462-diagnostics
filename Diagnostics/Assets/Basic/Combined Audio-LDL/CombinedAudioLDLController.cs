@@ -167,11 +167,11 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
             ShowInstructions(
                 instructions: _settings.InstructionMarkdown,
                 fontSize: _settings.InstructionFontSize);
+
+            return;
         }
-        else
-        {
-            StartMeasurement();
-        }
+
+        StartMeasurement();
     }
 
     private void StartMeasurement()
