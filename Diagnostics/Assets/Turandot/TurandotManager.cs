@@ -269,7 +269,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
             if (_params.schedule.mode == Mode.Sequence || _params.schedule.mode == Mode.CS)
             {
-                _engine.FlowchartFinished = OnFlowchartFinished;
+                _engine.FlowchartFinished = HandleFlowchartFinished;
                 AdvanceSequence();
             }
             else // Adaptation
@@ -346,13 +346,13 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         if (_params.schedule.mode == Mode.Sequence || _params.schedule.mode == Mode.CS)
         {
             _results.Clear();
-            _engine.FlowchartFinished = OnFlowchartFinished;
+            _engine.FlowchartFinished = HandleFlowchartFinished;
 
             StartCoroutine(NextBlock());
         }
         else if (_params.schedule.mode == Mode.Adapt) // Adaptation
         {
-            _engine.FlowchartFinished = OnAdaptFlowchartFinished;
+            _engine.FlowchartFinished = HandleAdaptFlowchartFinished;
             _params.adapt.Initialize();
             InitializeProgressBar(_params.adapt.MaxNumberOfBlocks);
             NextBlockOfTracks();
@@ -420,8 +420,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         HTS_Server.SendDataFile("Turandot", _mainDataFile);
         HTS_Server.SendDataFile("Turandot", audioFile);
-        HTS_Server.SendRequest("Turandot", "Finished:");
-        Debug.Log("send finish");
 
         if (_params.trialLogOption == TrialLogOption.Upload)
         {
@@ -431,9 +429,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
                 HTS_Server.SendDataFile("Turandot", trialFile);
             }
         }
-
-        //if (SubjectManager.Instance.UploadData) DataFileManager.UploadDataFile(_mainDataFile);
-        //SubjectManager.Instance.DataFiles.Add(_mainDataFile);
+        HTS_Server.SendRequest("Turandot", "Finished:");
 
         if (!abort)
         {
@@ -638,7 +634,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         }
     }
     
-    void OnFlowchartFinished()
+    void HandleFlowchartFinished()
     {
         Cursor.visible = true;
         Match p = Regex.Match(_engine.Result, "outcome=\"([\\w\\d\\s]+)\"");
@@ -758,7 +754,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
         }
     }
 
-    void OnAdaptFlowchartFinished()
+    void HandleAdaptFlowchartFinished()
     {
         _data.result = _engine.Result;
         _data.reactionTime = _engine.ReactionTime;
@@ -830,7 +826,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             string json = KLibU.Files.JSONStringAdd("", "trackResults", KLibU.Files.JSONSerializeToString(_params.adapt.Results));
             File.AppendAllText(_mainDataFile, json);
 
-            json = KLibU.Files.JSONStringAdd("", "finalResults", KLibU.Files.JSONSerializeToString(final));
+            json = Files.JSONStringAdd("", "finalResults", KLibU.Files.JSONSerializeToString(final));
             File.AppendAllText(_mainDataFile, json);
 
             _isRunning = false;

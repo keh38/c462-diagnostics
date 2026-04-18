@@ -76,6 +76,8 @@ public class DigitimerControl : MonoBehaviour
 
     public bool EnableDevices(List<KLib.Signals.Channel> channels)
     {
+        if (channels.Count == 0) return true;
+
         bool success = true;
 
         foreach (var c in channels)
@@ -86,14 +88,23 @@ public class DigitimerControl : MonoBehaviour
             }
         }
 
-        success &= _trigger.EnableTrigger();
+        if (_trigger.Connected)
+        {
+            success &= _trigger.EnableTrigger();
+        }
 
         return success;
     }
 
     public bool ZeroDevices(List<KLib.Signals.Channel> channels)
     {
-        bool success = _trigger.DisableTrigger();
+        if (channels.Count == 0) return true;
+        bool success = true;
+
+        if (_trigger.Connected)
+        {
+            success = _trigger.DisableTrigger();
+        }
 
         foreach (var c in channels)
         {
@@ -108,7 +119,13 @@ public class DigitimerControl : MonoBehaviour
 
     public bool DisableDevices(List<KLib.Signals.Channel> channels)
     {
-        bool success = _trigger.DisableTrigger();
+        if (channels.Count == 0) return true;
+        bool success = true;
+
+        if (_trigger.Connected)
+        {
+            success = _trigger.DisableTrigger();
+        }
 
         foreach (var c in channels)
         {
@@ -186,7 +203,13 @@ public class DigitimerControl : MonoBehaviour
 
     public bool DisableAllDevices()
     {
-        bool success = _trigger.DisableTrigger();
+        bool success = true;
+
+        if (_trigger.Connected)
+        {
+            success = _trigger.DisableTrigger();
+        }
+
         if (_d128 != null)
         {
             var result = _d128.DisableAll();

@@ -13,6 +13,8 @@ public class DigitimerTrigger
 {
     private SerialPort _serialPort;
 
+    public bool Connected { get { return _serialPort != null; } }
+
     public DigitimerTrigger() { }
 
     public bool Initialize(string comPort)

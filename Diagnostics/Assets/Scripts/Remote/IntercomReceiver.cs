@@ -6,6 +6,7 @@ using System.Threading;
 using UnityEngine;
 
 using KLibU.Legacy.Network;
+using Microsoft.Graph;
 
 public class IntercomReceiver : MonoBehaviour
 {
@@ -20,6 +21,8 @@ public class IntercomReceiver : MonoBehaviour
     private Thread _readThreadUDP;
 
     private AudioConfiguration _audioConfig;
+    private int _leftOffset = 0;
+    private int _rightOffset = 1;
 
     private UdpClient _udpClient;
     private int _udpPort = 52247;
@@ -77,8 +80,11 @@ public class IntercomReceiver : MonoBehaviour
         go.transform.parent = this.gameObject.transform;
         _discoveryServer = go.GetComponent<NetworkDiscoveryServer>();
 
-        StartTCPServer();
+        _leftOffset = HardwareInterface.AdapterMap.Items.FindIndex(item => item.modality == "Audio" && item.location == "Left");
+        _rightOffset = HardwareInterface.AdapterMap.Items.FindIndex(item => item.modality == "Audio" && item.location == "Right");
+
         //StartReceivingUDP();
+        StartTCPServer();
 
         return true;
     }
@@ -200,7 +206,6 @@ public class IntercomReceiver : MonoBehaviour
         }
     }
 
-
     private void ReceiveData()
     {
         _udpClient = new UdpClient(_udpPort);
@@ -240,8 +245,9 @@ public class IntercomReceiver : MonoBehaviour
             int offset = 0;
             for (int k=0; k<buffer.Length; k++)
             {
-                data[offset] = buffer[k];
-                data[offset + 1] = buffer[k];
+                data[offset +  _leftOffset]  = buffer[k];
+                data[offset + _rightOffset]  = buffer[k];
+
                 offset += channels;
             }
         }

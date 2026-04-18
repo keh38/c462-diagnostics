@@ -6,6 +6,8 @@ public class SliderWheel : MonoBehaviour
     [SerializeField] private CombinedSliderAnimator[] _sliders; // 5 sliders, assigned in inspector
     [SerializeField] private float _animationDuration = 0.4f;
 
+    private int _maxNumSliders;
+
     // Each slot has a position and a scale
     // Slot 0 = top (smallest), Slot 2 = active (largest), Slot 4 = below screen (hidden)
     private readonly Vector2[] _slotPositions = new Vector2[]
@@ -37,8 +39,10 @@ public class SliderWheel : MonoBehaviour
         _slotAssignment = new int[] { 0, 1, 2, 3, 4 };
     }
 
-    public void Initialize()
+    public void Initialize(int maxNumSliders)
     {
+        _maxNumSliders = maxNumSliders;
+
         // Snap all sliders to their initial positions immediately
         for (int slot = 0; slot < 5; slot++)
         {
@@ -93,6 +97,11 @@ public class SliderWheel : MonoBehaviour
         for (int slot = 0; slot < 4; slot++)
             _slotAssignment[slot] = _slotAssignment[slot + 1];
         _slotAssignment[4] = exitingSlider;
+        _sliders[exitingSlider].LevelSlider.Reset();
 
+        if (_advanceCount >= _maxNumSliders-1)
+        {
+            _sliders[exitingSlider].SetVisible(false);
+        }
     }
 }

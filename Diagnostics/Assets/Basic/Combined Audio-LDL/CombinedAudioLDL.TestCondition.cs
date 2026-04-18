@@ -16,6 +16,7 @@ namespace CombinedAudioLDL
         public bool offerBreakAfter = false;
         public float threshold;
         public float LDL;
+        public CombinedSliderLog log = null;
 
         public TestCondition() { }
 

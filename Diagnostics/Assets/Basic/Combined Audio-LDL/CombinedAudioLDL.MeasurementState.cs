@@ -39,12 +39,12 @@ namespace CombinedAudioLDL
 
         public int NumConditions { get; set; }
 
-        public int NumCompleted { get { return NumConditions - testOrder.Count; } }
+        public int NumCompleted { get { return testIndex; } }
 
         public float FractionCompleted { get { return (float)NumCompleted / NumConditions; } }
 
         public int PercentCompleted { get { return Mathf.RoundToInt(100 * FractionCompleted); } }
 
-        public bool IsComplete { get { return testOrder.Count == 0; } }
+        public bool IsComplete { get { return testIndex >= testOrder.Count; } }
     }
 }

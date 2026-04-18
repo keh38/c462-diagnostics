@@ -81,7 +81,7 @@ public class TurandotEngine : MonoBehaviour
 
         CreateAudioPlayers();
 
-        _inputMonitor.EventChanged = OnInputEventChanged;
+        _inputMonitor.EventChanged = HandleInputEventChanged;
         _inputMonitor.Initialize(_params.screen.Inputs, _params.inputEvents);
 
         _cueController.Initialize(_params.screen.Cues);
@@ -108,7 +108,7 @@ public class TurandotEngine : MonoBehaviour
 
             TurandotAudio a = o.GetComponent<TurandotAudio>();
             a.name = fe.name;
-            a.TimeOut = OnStateTimeout;
+            a.TimeOut = HandleStateTimeout;
             a.Initialize(fe.sigMan);
             //if (fe.isAction)
             //{
@@ -272,7 +272,7 @@ public class TurandotEngine : MonoBehaviour
         _cueController.Deactivate();
     }
 
-    void OnStateTimeout(string source)
+    void HandleStateTimeout(string source)
     {
         string linkTo = "";
 
@@ -302,7 +302,7 @@ public class TurandotEngine : MonoBehaviour
         }
     }
 
-    void OnInputEventChanged(string whichEvent)
+    void HandleInputEventChanged(string whichEvent)
     {
 //#if KDEBUG
         if (_currentFlowElement == null) return;

@@ -95,7 +95,7 @@ namespace Turandot.Scripts
 
             if (_sigMan != null)
             {
-                if (_sigMan.IsActive)
+                if (_isRunning)
                     throw new System.Exception("Still synthesizing!");
 
                 int npts, nbuf;
@@ -107,7 +107,7 @@ namespace Turandot.Scripts
             }
         }
 
-        public void Activate(float timeOut, List<Turandot.Flag> flags, bool start)
+        public void Activate(float timeOut, List<Flag> flags, bool start)
         {
             _timeOut = timeOut;
             _startTime = Time.timeSinceLevelLoad;
