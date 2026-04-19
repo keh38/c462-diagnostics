@@ -1,5 +1,12 @@
 ## Changelog
 
+### v2.1.9 (unreleased)
+#### Added
+- transmit audiogram/LDL data points
+- send audiogram/LDL files at end of measurements
+
+---
+
 ### v2.1.8 (2026-04-15)
 #### Fixed
 - enumerate transducers from shared folder only

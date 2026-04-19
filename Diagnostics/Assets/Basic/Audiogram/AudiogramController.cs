@@ -546,16 +546,33 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
             _currentTrack.alternateComputation = true;
         }
 
+        float thresholdSPL = _currentTrack.thresholdHL + ANSI_dBHL.HL_To_SPL(freq, 0, SessionContext.Signal.Transducer);
         _data.audiogramData.Set(
             _currentStimulusCondition.Laterality,
             freq,
             _currentTrack.thresholdHL,
-            _currentTrack.thresholdHL + ANSI_dBHL.HL_To_SPL(freq, 0, SessionContext.Signal.Transducer));
+            thresholdSPL);
+
+        SendThreshold(_currentStimulusCondition.Laterality, freq, _currentTrack.thresholdHL, thresholdSPL);
 
         _state.SetCompleted(_currentStimulusCondition, _currentTrack.thresholdHL);
         SaveState();
 
         AdvanceMeasurement();
+    }
+
+    private void SendThreshold(Laterality ear, float freq, float thresholdHL, float thresholdSPL)
+    {
+        AudiogramPointPayload payload = new AudiogramPointPayload()
+        {
+            Type = AudiogramType.Threshold,
+            Ear = ear == Laterality.Left ? AudiogramTestEar.Left : AudiogramTestEar.Right,
+            Frequency_Hz = freq,
+            Threshold_dBHL = thresholdHL,
+            Threshold_dBSPL = thresholdSPL
+        };
+
+        HTS_Server.SendRequest("AudiogramPoint", _mySceneName, payload);
     }
 
     /// <summary>

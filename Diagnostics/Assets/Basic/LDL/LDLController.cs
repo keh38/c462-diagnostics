@@ -52,6 +52,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
 
     private List<TestCondition> _curGroup = new List<TestCondition>();
     private LoudnessDiscomfortData _data = new LoudnessDiscomfortData();
+    private AudiogramData _audiograms;
 
     private InputAction _abortAction;
 
@@ -64,7 +65,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         _abortAction.performed += OnAbortAction;
 
         _sliderPanel = _workPanel.GetComponent<LDLSliderPanel>();
-        _sliderPanel.LockInPressed += OnLockIn;
+        _sliderPanel.LockInPressed += HandleLockIn;
 
         Application.logMessageReceived += HandleException;
     }
@@ -108,6 +109,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
     void InitializeMeasurement()
     {
         _title.text = _settings.Title;
+        _audiograms = AudiogramData.Load(SharedFileLocations.AudiogramPath);
 
         InitDataFile();
 
@@ -442,15 +444,15 @@ public class LDLController : MonoBehaviour, IRemoteControllable
     private void DoSimulation()
     {
         _sliderPanel.SimulateMove();
-        OnLockIn();
+        HandleLockIn();
     }
 
-    public void OnLockIn()
+    public void HandleLockIn()
     {
-        StartCoroutine(LockIn());
+        StartCoroutine(LockInCoroutine());
     }
 
-    private IEnumerator LockIn()
+    private IEnumerator LockInCoroutine()
     {
         _progressBar.gameObject.SetActive(true);
 
@@ -460,6 +462,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
             _data.sliderSettings.Add(sliderSettings[k].Clone());
             _curGroup[k].discomfortLevel.Add(sliderSettings[k].isMaxed ? float.NaN : sliderSettings[k].end);
             _state.testOrder.RemoveAt(0);
+            SendLDL(_curGroup[k]);
         }
         SaveState();
 
@@ -481,10 +484,49 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         }
     }
 
+    void SendLDL(TestCondition tc)
+    {
+        float sum = 0;
+        float n = 0;
+        foreach (float level in tc.discomfortLevel)
+        {
+            if (!float.IsNaN(level))
+            {
+                sum += level;
+                ++n;
+            }
+        }
+
+        var ear = tc.ear == Laterality.Left ? AudiogramTestEar.Left : AudiogramTestEar.Right;
+        float thresh_SPL = _audiograms.Get(ear).GetThreshold(tc.Freq_Hz);
+        float ldlSL;
+        float ldlSPL;
+        if (_settings.LevelUnits == LevelUnits.dB_SL)
+        {
+            ldlSL = (n > 0) ? (sum / n) : float.NaN;
+            ldlSPL = ldlSL + thresh_SPL;
+        }
+        else
+        {
+            ldlSPL = (n > 0) ? (sum / n) : float.NaN;
+            ldlSL = ldlSPL - thresh_SPL;
+        }
+
+        AudiogramPointPayload payload = new AudiogramPointPayload()
+        {
+            Type = AudiogramType.LDL,
+            Ear = ear,
+            Frequency_Hz = tc.Freq_Hz,
+            Threshold_dBHL = ldlSL,
+            Threshold_dBSPL = ldlSPL
+        };
+
+        HTS_Server.SendRequest("AudiogramPoint", _mySceneName, payload);
+    }
+
     void FinishData()
     {
         _data.testConditions = _state.testConditions;
-        AudiogramData audiograms = AudiogramData.Load(SharedFileLocations.AudiogramPath);
 
         // 1. Create "LDL Audiogram"
         if (_data.LDLgram != null)
@@ -502,7 +544,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         {
             _data.LDLgram = new Audiograms.AudiogramData();
             if (_settings.LevelUnits == LevelUnits.dB_SL)
-                _data.LDLgram.Initialize(audiograms.Get_Frequency_Hz());
+                _data.LDLgram.Initialize(_audiograms.Get_Frequency_Hz());
             else
                 _data.LDLgram.Initialize(_settings.TestFrequencies);
         }
@@ -521,17 +563,17 @@ public class LDLController : MonoBehaviour, IRemoteControllable
             }
 
             var ear = tc.ear == Laterality.Left ? AudiogramTestEar.Left : AudiogramTestEar.Right;
+            float thresh_SPL = _audiograms.Get(ear).GetThreshold(tc.Freq_Hz);
+
             if (_settings.LevelUnits == LevelUnits.dB_SL)
             {
-                float thresh_SPL = audiograms.Get(ear).GetThreshold(tc.Freq_Hz);
-
                 float LDL_SL = (n > 1) ? (sum / n) : float.NaN;
                 _data.LDLgram.Set(ear, tc.Freq_Hz, LDL_SL, LDL_SL + thresh_SPL);
             }
             else
             {
                 float LDL_SPL = (n > 1) ? (sum / n) : float.NaN;
-                _data.LDLgram.Set(ear, tc.Freq_Hz, float.NaN, LDL_SPL);
+                _data.LDLgram.Set(ear, tc.Freq_Hz, LDL_SPL - thresh_SPL, LDL_SPL);
             }
         }
         _data.LDLgram.Save(SharedFileLocations.LDLPath);
