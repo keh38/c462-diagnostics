@@ -44,7 +44,7 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
 
     private string _configName;
     private string _dataPath;
-    private string _mySceneName = "CombinedAudioLDL";
+    private string _mySceneName = "Combined Audio-LDL";
 
     private string _stateFile;
     private MeasurementState _state;
@@ -285,27 +285,38 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(false);
 
-        FinishData();
-
-        if (File.Exists(_stateFile) && _state.IsComplete)
+        if (_state.testConditions.FindAll(test => test.completed).Count > 0)
         {
-            File.Delete(_stateFile);
+            FinishData();
+
+            if (File.Exists(_stateFile) && _state.IsComplete)
+            {
+                File.Delete(_stateFile);
+            }
+
+            string status = abort ? "Measurement aborted" : "Measurement finished";
+
+            HTS_Server.SendDataFile(_mySceneName, _dataPath);
+            HTS_Server.SendDataFile(_mySceneName, SharedFileLocations.AudiogramPath);
+            HTS_Server.SendDataFile(_mySceneName, SharedFileLocations.LDLPath);
+            HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
         }
-
-        string status = abort ? "Measurement aborted" : "Measurement finished";
-
-        HTS_Server.SendDataFile(_mySceneName, _dataPath);
-        HTS_Server.SendDataFile(_mySceneName, SharedFileLocations.AudiogramPath);
-        HTS_Server.SendDataFile(_mySceneName, SharedFileLocations.LDLPath);
-        HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
+        else
+        {
+            HTS_Server.SendRequest(_mySceneName, "Finished:No data collected");
+            if (File.Exists(_stateFile))
+            {
+                File.Delete(_stateFile);
+            }
+        }
 
         if (_localAbort)
         {
             SceneManager.LoadScene("Home");
+            return;
         }
 
-        bool finished = true;
-        if (finished && !_isRemote)
+        if (!_isRemote)
         {
             ShowFinishPanel();
         }
@@ -473,6 +484,7 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         {
             case SliderMeasurement.Threshold:
                 _state.testConditions[_state.testIndex].threshold = value;
+                SendThreshold(_state.testConditions[_state.testIndex]);
                 if (value == float.PositiveInfinity)
                 {
                     _state.testConditions[_state.testIndex].LDL = float.PositiveInfinity;
@@ -482,9 +494,41 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
                 break;
             case SliderMeasurement.LDL:
                 _state.testConditions[_state.testIndex].LDL = value;
+                SendLDL(_state.testConditions[_state.testIndex]);
                 StartCoroutine(EndSlider());
                 break;
         }
+    }
+
+    private void SendThreshold(TestCondition testCondition)
+    {
+        float thresholdHL = ANSI_dBHL.SPL_To_HL(testCondition.Freq_Hz, testCondition.threshold, SessionContext.Signal.Transducer);
+        thresholdHL = Mathf.Round(thresholdHL / 5f) * 5f;
+
+        AudiogramPointPayload payload = new AudiogramPointPayload()
+        {
+            Type = AudiogramType.Threshold,
+            Ear = testCondition.ear == Laterality.Left ? AudiogramTestEar.Left : AudiogramTestEar.Right,
+            Frequency_Hz = testCondition.Freq_Hz,
+            Threshold_dBHL = thresholdHL,
+            Threshold_dBSPL = testCondition.threshold
+        };
+
+        HTS_Server.SendRequest("AudiogramPoint", _mySceneName, payload);
+    }
+
+    private void SendLDL(TestCondition testCondition)
+    {
+        AudiogramPointPayload payload = new AudiogramPointPayload()
+        {
+            Type = AudiogramType.LDL,
+            Ear = testCondition.ear == Laterality.Left ? AudiogramTestEar.Left : AudiogramTestEar.Right,
+            Frequency_Hz = testCondition.Freq_Hz,
+            Threshold_dBHL = testCondition.LDL - testCondition.threshold,
+            Threshold_dBSPL = testCondition.threshold
+        };
+
+        HTS_Server.SendRequest("AudiogramPoint", _mySceneName, payload);
     }
 
     private IEnumerator EndSlider()
@@ -496,7 +540,9 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         {
             _state.testConditions[_state.testIndex].log = _levelSlider.Log.Finish();
         }
+        _state.testConditions[_state.testIndex].completed = true;
         bool finished = _state.Advance();
+        Debug.Log($"Completed test {_state.testIndex} of {_state.testOrder.Count}, finished = {finished}");
 
         SaveState();
 
@@ -526,7 +572,7 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         _data.LDLgram = new AudiogramData();
         _data.LDLgram.Initialize(_settings.TestFrequencies);
 
-        foreach (TestCondition tc in _state.testConditions)
+        foreach (TestCondition tc in _state.testConditions.FindAll(test => test.completed))
         {
             var ear = tc.ear == Laterality.Left ? AudiogramTestEar.Left : AudiogramTestEar.Right;
             float thresholdHL = ANSI_dBHL.SPL_To_HL(tc.Freq_Hz, tc.threshold, SessionContext.Signal.Transducer);

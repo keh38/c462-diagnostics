@@ -98,8 +98,6 @@ public class CombinedLevelSlider : MonoBehaviour
         _maxVal = max;
         _range = max - min;
 
-        Debug.Log($"Slider activated with range [{_minVal}, {_maxVal}]");   
-
         _phase = Phase.Threshold;
         _promptText.text = "Adjust the slider until you just barely hear the sound";
         _buttonText.text = "I just hear it";
@@ -120,7 +118,6 @@ public class CombinedLevelSlider : MonoBehaviour
 
     public void Reset()
     {
-        Debug.Log("Slider reset");
         _subthresholdImage.fillAmount = 0;
         _tooLoudImage.fillAmount = 0;
         _slider.value = 0;

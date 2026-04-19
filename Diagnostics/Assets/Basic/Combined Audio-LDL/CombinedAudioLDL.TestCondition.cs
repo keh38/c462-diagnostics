@@ -16,6 +16,7 @@ namespace CombinedAudioLDL
         public bool offerBreakAfter = false;
         public float threshold;
         public float LDL;
+        public bool completed = false;
         public CombinedSliderLog log = null;
 
         public TestCondition() { }
@@ -24,6 +25,8 @@ namespace CombinedAudioLDL
         {
             this.ear = ear;
             this.Freq_Hz = Freq_Hz;
+            this.threshold = float.NaN;
+            this.LDL = float.NaN;
         }
 
     }
