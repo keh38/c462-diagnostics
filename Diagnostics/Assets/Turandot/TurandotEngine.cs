@@ -147,7 +147,7 @@ public class TurandotEngine : MonoBehaviour
         _log.Clear();
         _log.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, HistoryEvent.StartTrial);
 
-        NextState(_params.firstState);
+        AdvanceToNextState(_params.firstState);
 
         yield break;
     }
@@ -194,7 +194,7 @@ public class TurandotEngine : MonoBehaviour
     }
 #endif
 
-    void NextState(string nextState)
+    void AdvanceToNextState(string nextState)
     {
         if (string.IsNullOrEmpty(nextState))
         {
@@ -236,6 +236,11 @@ public class TurandotEngine : MonoBehaviour
             HTS_Server.SendRequest("Turandot", $"State:{_currentFlowElement.name}");
 
             _log.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, HistoryEvent.StartState, _currentFlowElement.name);
+
+            if (_currentFlowElement.disableInputs)
+            {
+                _inputMonitor.DisableAll();
+            }
 
             _cueController.Activate(_currentFlowElement.cues);
             _inputMonitor.Activate(_currentFlowElement.inputs, a, timeOut);
@@ -296,9 +301,14 @@ public class TurandotEngine : MonoBehaviour
 
             _log.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, HistoryEvent.EndState, _stateEndReason);
 
+            if (_currentFlowElement.disableInputs)
+            {
+                _inputMonitor.EnableAll();
+            }
+
             _cueController.Deactivate();
             _inputMonitor.Deactivate();
-            NextState(linkTo);
+            AdvanceToNextState(linkTo);
         }
     }
 
@@ -336,11 +346,16 @@ public class TurandotEngine : MonoBehaviour
 
             if (term.action == TerminationAction.EndImmediately && !nextIsAction)
             {
+                if (_currentFlowElement.disableInputs)
+                {
+                    _inputMonitor.EnableAll();
+                }
+
                 _cueController.Deactivate();
                 _inputMonitor.Deactivate();
                 _audio.Find(a => a.name == _currentFlowElement.name).KillAudio();
                 _log.Add(Time.timeSinceLevelLoad, Time.realtimeSinceStartup, HistoryEvent.EndState, _stateEndReason);
-                NextState(term.linkTo);
+                AdvanceToNextState(term.linkTo);
             }
             else
             {

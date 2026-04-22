@@ -8,6 +8,7 @@ using Turandot.Screen;
 using UnityEngine.Windows;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using TMPro;
 
 namespace Turandot.Scripts
 {
@@ -25,7 +26,7 @@ namespace Turandot.Scripts
         public ButtonData Data { get; private set; }
         
         private ButtonLayout _layout;
-        private Turandot.Inputs.Button _buttonAction;
+        private Inputs.Button _buttonAction;
         private InputAction _pressAction;
 
         private Rect _myRect;
@@ -84,22 +85,7 @@ namespace Turandot.Scripts
         {
             _buttonAction = (Turandot.Inputs.Button)input;
 
-            _button.interactable = input.Enabled == EnabledState.Enabled;
-            if (input.Enabled == EnabledState.Enabled) { }
-            else
-            {
-                var cblock = _button.colors;
-                if (input.Enabled == EnabledState.Disabled)
-                {
-                    cblock.disabledColor = _normalColor;
-                }
-                else if (input.Enabled == EnabledState.Grayed)
-                {
-                    cblock.disabledColor = _disabledColor;
-                }
-                _button.colors = cblock;
-            }
-
+            ApplyEnabledState(input.Enabled);
             base.Activate(input, audio);
 
             if (_buttonAction.NumFlash > 0)
@@ -114,6 +100,40 @@ namespace Turandot.Scripts
             {
                 ShowButton(_buttonAction.BeginVisible);
             }
+        }
+
+        private void ApplyEnabledState(EnabledState state)
+        {
+            _button.interactable = (state == EnabledState.Enabled);
+            if (state == EnabledState.Enabled) { }
+            else
+            {
+                var cblock = _button.colors;
+                if (state == EnabledState.Disabled)
+                {
+                    cblock.disabledColor = _normalColor;
+                }
+                else if (state == EnabledState.Grayed)
+                {
+                    cblock.disabledColor = _disabledColor;
+                }
+                _button.colors = cblock;
+            }
+        }
+
+        public override void Enable()
+        {
+            if (_buttonAction != null && _buttonAction.Enabled != EnabledState.Enabled)
+            {
+                return;
+            }
+
+            ApplyEnabledState(EnabledState.Enabled);
+        }
+
+        public override void Disable()
+        {
+            ApplyEnabledState(EnabledState.Grayed);
         }
 
         public override void Deactivate()

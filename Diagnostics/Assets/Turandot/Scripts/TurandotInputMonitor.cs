@@ -158,6 +158,22 @@ namespace Turandot.Scripts
             _eventValues = new int[inputEvents.Count];
         }
 
+        public void EnableAll()
+        {
+            for (int k = 0; k < _inputObjects.Count; k++)
+            {
+                _inputObjects[k].Enable();
+            }
+        }
+
+        public void DisableAll()
+        {
+            for (int k = 0; k < _inputObjects.Count; k++)
+            {
+                _inputObjects[k].Disable();
+            }
+        }
+
         public void Activate(List<Input> inputs, TurandotAudio audio, float timeOut)
         {
             _currentStateInputs = inputs;

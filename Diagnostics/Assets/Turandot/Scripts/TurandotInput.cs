@@ -20,10 +20,8 @@ namespace Turandot.Scripts
 
         protected InputLog _log = null;
         public InputLog Log { get { return _log; } }
-            
-        public void Initialize()
-        {
-        }
+
+        public void Initialize() { }
 
         virtual public void Activate(Input input, TurandotAudio audio)
         {
@@ -40,6 +38,9 @@ namespace Turandot.Scripts
                 ShowInput(_input.EndVisible);
             }
         }
+
+        virtual public void Enable() { }
+        virtual public void Disable() { }
 
         void ShowInput(bool visible)
         {
