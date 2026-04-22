@@ -112,7 +112,15 @@ namespace Turandot.Scripts
 
                 var tickLabel = tickMark.GetComponentInChildren<TMPro.TMP_Text>();
                 tickLabel.fontSize = _layout.FontSize;
-                tickLabel.text = (_layout.MinValue + i).ToString();
+
+                if (i < _layout.TickLabels.Count)
+                {
+                    tickLabel.text = _layout.TickLabels[i];
+                }
+                else
+                {
+                    tickLabel.text = (_layout.MinValue + i).ToString();
+                }
             }
 
         }

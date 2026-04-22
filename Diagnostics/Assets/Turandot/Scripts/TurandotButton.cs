@@ -6,10 +6,12 @@ using Turandot;
 using Turandot.Inputs;
 using Turandot.Screen;
 using UnityEngine.Windows;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 namespace Turandot.Scripts
 {
-    public class TurandotButton : TurandotInput
+    public class TurandotButton : TurandotInput, IPointerDownHandler, IPointerUpHandler
     {
         [SerializeField] private Image _image;
         [SerializeField] private TMPro.TMP_Text _label;
@@ -24,6 +26,7 @@ namespace Turandot.Scripts
         
         private ButtonLayout _layout;
         private Turandot.Inputs.Button _buttonAction;
+        private InputAction _pressAction;
 
         private Rect _myRect;
 
@@ -52,6 +55,13 @@ namespace Turandot.Scripts
                 rt.anchorMin.y * UnityEngine.Screen.height - rt.rect.height/2);
 
             _myRect = new Rect(position.x, position.y, rt.rect.width, rt.rect.height);
+
+            //SetBinding("");
+        }
+
+        private void OnDestroy()
+        {
+            ClearBinding();
         }
 
         private void LayoutControl()
@@ -113,43 +123,57 @@ namespace Turandot.Scripts
             base.Deactivate();
         }
 
-#if UNITY_EDITOR
-        public void FixedUpdate()
-#else
-        public void OnGUI()
-#endif
+        public void SetBinding(string bindingPath)
         {
-            //if (!_isVisible || !_enabled) return;
+            // Clean up any existing action
+            ClearBinding();
 
-#if UNITY_EDITOR
-            _lastvalue = _value;
+            // e.g. bindingPath = "<Keyboard>/space" or "<Gamepad>/buttonSouth"
+            _pressAction = new InputAction("HoldButton", InputActionType.Button, bindingPath);
 
-            //_value = !_isHidden && UnityEngine.Input.GetMouseButton(0) && rect.Contains(UnityEngine.Input.mousePosition);
-            _value = UnityEngine.Input.GetMouseButtonDown(0) && _myRect.Contains(UnityEngine.Input.mousePosition);
+            _pressAction.started += _ => HandlePressStart();
+            _pressAction.canceled += _ => HandlePressEnd();
+        }
 
-            //if (_useXbox)
-            //{
-            //    _value |= UnityEngine.Input.GetButton(_xboxControl);
-            //}
+        public void AddBinding(string bindingPath)
+        {
+            // Call this to support multiple bindings on the same button
+            // e.g. keyboard AND gamepad both bound to the same button
+            _pressAction?.AddBinding(bindingPath);
+        }
 
-#else
-
-            _lastvalue = _value;
-            _value = UnityEngine.Input.GetMouseButtonDown(0) && _myRect.Contains(UnityEngine.Input.mousePosition);
-            //if (_useXbox)
-            //{
-            //    _value |= UnityEngine.Input.GetButtonDown(_xboxControl);
-            //}
-
-#endif
-            if ((KeyCode)_layout.KeyCode != KeyCode.None && UnityEngine.Input.GetKeyDown((KeyCode) _layout.KeyCode))
+        public void ClearBinding()
+        {
+            if (_pressAction != null)
             {
-                _value = true;
+                _pressAction.Disable();
+                _pressAction.Dispose();
+                _pressAction = null;
             }
+        }
 
+        // ---- Pointer input (via EventSystem) ----
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            HandlePressStart();
+        }
+
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            HandlePressEnd();
+        }
+
+        private void HandlePressStart()
+        {
+            _value = true;
             Data.value = _value;
+        }
 
-            //if (_value && !_lastvalue && _showPress) StartCoroutine(ShowButtonPress());
+        private void HandlePressEnd()
+        {
+            _value = false;
+            Data.value = _value;
         }
 
         private IEnumerator DelayCue()
@@ -163,6 +187,15 @@ namespace Turandot.Scripts
         {
             _image.enabled = show;
             _label.enabled = show;
+
+            if (show)
+            {
+                _pressAction?.Enable();
+            }
+            else
+            {
+                _pressAction?.Disable();
+            }
         }
 
         private IEnumerator FlashCue()
