@@ -64,24 +64,30 @@ namespace Turandot.Scripts
             _rightLabel.fontSize = _layout.FontSize;
             _rightLabel.text = _layout.MaxLabel;
 
-            if (_layout.ShowTicks && _layout.WholeNumbers)
+            _leftLabel.rectTransform.pivot = new Vector2(1f, 0.5f);
+            _leftLabel.alignment = TMPro.TextAlignmentOptions.Right;
+            _leftLabel.rectTransform.anchorMin = new Vector2(0f, 0.5f);
+            _leftLabel.rectTransform.anchorMax = new Vector2(0f, 0.5f);
+            _leftLabel.rectTransform.anchoredPosition = new Vector2(-25, 0);
+
+            _rightLabel.rectTransform.pivot = new Vector2(0f, 0.5f);
+            _rightLabel.alignment = TMPro.TextAlignmentOptions.Left;
+            _rightLabel.rectTransform.anchorMin = new Vector2(1f, 0.5f);
+            _rightLabel.rectTransform.anchorMax = new Vector2(1f, 0.5f);
+            _rightLabel.rectTransform.anchoredPosition = new Vector2(25, 0);
+
+            _slider.minValue = _layout.MinValue;
+            _slider.maxValue = _layout.MaxValue;
+            _slider.wholeNumbers = _layout.WholeNumbers;
+
+            if (_layout.TickMode == TickMode.None) { }
+            if (_layout.TickMode != TickMode.Custom)
             {
-                if (_layout.LabelTicks)
-                {
-                    _leftLabel.rectTransform.pivot = new Vector2(1f, 0.5f);
-                    _leftLabel.alignment = TMPro.TextAlignmentOptions.Right;
-                    _leftLabel.rectTransform.anchorMin = new Vector2(0f, 0.5f);
-                    _leftLabel.rectTransform.anchorMax = new Vector2(0f, 0.5f);
-                    _leftLabel.rectTransform.anchoredPosition = new Vector2(-25, 0);
-
-                    _rightLabel.rectTransform.pivot = new Vector2(0f, 0.5f);
-                    _rightLabel.alignment = TMPro.TextAlignmentOptions.Left;
-                    _rightLabel.rectTransform.anchorMin = new Vector2(1f, 0.5f);
-                    _rightLabel.rectTransform.anchorMax = new Vector2(1f, 0.5f);
-                    _rightLabel.rectTransform.anchoredPosition = new Vector2(25, 0);
-                }
-
-                CreateTickMarks();
+                CreateAutoTickMarks();
+            }
+            else if (_layout.TickMode == TickMode.Custom)
+            {
+                CreateCustomTickMarks();
             }
 
             _fillImage.raycastTarget = _layout.BarClickable;
@@ -92,35 +98,56 @@ namespace Turandot.Scripts
             {
                 _thumbImage.color = new Color(1, 1, 1, 0);
             }
-
-            _slider.minValue = _layout.MinValue;
-            _slider.maxValue = _layout.MaxValue;
-            _slider.wholeNumbers = _layout.WholeNumbers;
         }
 
-        private void CreateTickMarks()
+        private void CreateAutoTickMarks()
         {
-            int numTicks = (int)(_layout.MaxValue - _layout.MinValue) + 1;
+            int minTick = (int)_layout.MinValue;
+            int maxTick = (int)_layout.MaxValue;
+
+            int numTicks = (int)(maxTick - minTick) + 1;
             for (int i = 0; i < numTicks; i++)
             {
+                float tickVal = minTick + i;
+
                 var tickMark = Instantiate(_tickMarkPrefab, _slider.transform);
                 var tickRectTransform = tickMark.GetComponent<RectTransform>();
-                float normalizedValue = (i * (_slider.maxValue - _slider.minValue) / (numTicks - 1) + _slider.minValue - _slider.minValue) / (_slider.maxValue - _slider.minValue);
+                float normalizedValue = (tickVal - _slider.minValue) / (_slider.maxValue - _slider.minValue);
                 tickRectTransform.anchorMin = new Vector2(normalizedValue, 0);
                 tickRectTransform.anchorMax = new Vector2(normalizedValue, 0);
                 tickRectTransform.anchoredPosition = Vector2.zero;
 
                 var tickLabel = tickMark.GetComponentInChildren<TMPro.TMP_Text>();
                 tickLabel.fontSize = _layout.FontSize;
+                tickLabel.text = "";
 
-                if (i < _layout.TickLabels.Count)
+                if (_layout.TickMode == TickMode.AutoCustomLabeled)
                 {
                     tickLabel.text = _layout.TickLabels[i];
                 }
-                else
+                else if (_layout.TickMode == TickMode.AutoLabeled)
                 {
                     tickLabel.text = (_layout.MinValue + i).ToString();
                 }
+            }
+        }
+
+        private void CreateCustomTickMarks()
+        {
+            Debug.Log($"Creating custom tick marks: {_layout.Ticks.Count} ticks");
+
+            for (int i = 0; i < _layout.Ticks.Count; i++)
+            {
+                var tickMark = Instantiate(_tickMarkPrefab, _slider.transform);
+                var tickRectTransform = tickMark.GetComponent<RectTransform>();
+                float normalizedValue = (_layout.Ticks[i].Value - _slider.minValue) / (_slider.maxValue - _slider.minValue);
+                tickRectTransform.anchorMin = new Vector2(normalizedValue, 0);
+                tickRectTransform.anchorMax = new Vector2(normalizedValue, 0);
+                tickRectTransform.anchoredPosition = Vector2.zero;
+
+                var tickLabel = tickMark.GetComponentInChildren<TMPro.TMP_Text>();
+                tickLabel.fontSize = _layout.FontSize;
+                tickLabel.text = _layout.Ticks[i].Label;
             }
 
         }
