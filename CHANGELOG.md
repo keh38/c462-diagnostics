@@ -1,9 +1,15 @@
 ## Changelog
 
-### v2.1.9 (unreleased)
+### v2.1.9 (2026-04-23)
 #### Added
 - transmit audiogram/LDL data points
 - send audiogram/LDL files at end of measurements
+#### Changed
+- Turandot:
+  - expressions for Level and Filename
+  - option for state to disable all controls
+#### Fixed
+- intercom uses channel mapping
 
 ---
 
