@@ -351,7 +351,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
             Level = new Level()
             {
                 Units = _settings.LevelUnits == LevelUnits.dB_SPL ? LevelUnits.dB_SPL_noLDL : _settings.LevelUnits,
-                Value = 75f
+                Value = "75"
             },
             Gate = new Gate()
             {
@@ -498,7 +498,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         }
 
         var ear = tc.ear == Laterality.Left ? AudiogramTestEar.Left : AudiogramTestEar.Right;
-        float thresh_SPL = _audiograms.Get(ear).GetThreshold(tc.Freq_Hz);
+        float thresh_SPL = (_audiograms != null) ? _audiograms.Get(ear).GetThreshold(tc.Freq_Hz) : float.NaN;
         float ldlSL;
         float ldlSPL;
         if (_settings.LevelUnits == LevelUnits.dB_SL)
@@ -563,7 +563,7 @@ public class LDLController : MonoBehaviour, IRemoteControllable
             }
 
             var ear = tc.ear == Laterality.Left ? AudiogramTestEar.Left : AudiogramTestEar.Right;
-            float thresh_SPL = _audiograms.Get(ear).GetThreshold(tc.Freq_Hz);
+            float thresh_SPL = (_audiograms != null) ? _audiograms.Get(ear).GetThreshold(tc.Freq_Hz) : float.NaN;
 
             if (_settings.LevelUnits == LevelUnits.dB_SL)
             {

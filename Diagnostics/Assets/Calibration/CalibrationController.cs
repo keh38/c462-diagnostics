@@ -54,7 +54,7 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
             Level = new Level()
             {
                 Units = LevelUnits.dB_Vrms,
-                Value = -40
+                Value = "-40"
             }
         };
 
@@ -68,7 +68,7 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
             Level = new Level()
             {
                 Units = LevelUnits.dB_Vrms,
-                Value = -40
+                Value = "-40"
             }
         };
 
@@ -125,7 +125,7 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
         string chName = $"Tone{ear}";
 
         (_signalManager[chName].Waveform as Sinusoid).Frequency_Hz = freq;
-        _signalManager[chName].Level.Value = level;
+        _signalManager[chName].Level.Value = level.ToString();
         _signalManager[chName].SetActive(true);
     }
 
@@ -138,7 +138,7 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
 
         string chName = $"Noise{ear}";
 
-        _signalManager[chName].Level.Value = level;
+        _signalManager[chName].Level.Value = level.ToString();
         _signalManager[chName].SetActive(true);
     }
 

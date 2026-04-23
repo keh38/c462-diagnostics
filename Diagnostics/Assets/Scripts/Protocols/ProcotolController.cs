@@ -246,12 +246,10 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
                 StartCoroutine(AbortNextFrame());
                 return TcpMessage.Ok();
             case "SetProtocol":
-                Debug.Log($"payload  = {request.Payload}");
                 var protocol = request.GetPayload<Protocol>();
                 RpcSetProtocol(protocol);
                 return TcpMessage.Ok();
             case "SetHistory":
-                Debug.Log($"payload  = {request.Payload}");
                 _history = request.GetPayload<ProtocolHistory>();
                 return TcpMessage.Ok();
             case "Begin":

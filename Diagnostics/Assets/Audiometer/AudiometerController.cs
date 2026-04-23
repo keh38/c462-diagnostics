@@ -121,7 +121,7 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
             Level = new Level()
             {
                 Units = LevelUnits.dB_SPL,
-                Value = channel.Level + ANSI_dBHL.HL_To_SPL(channel.Freq, 0, _transducers[number - 1])
+                Value = (channel.Level + ANSI_dBHL.HL_To_SPL(channel.Freq, 0, _transducers[number - 1])).ToString()
             },
             Gate = new Gate()
             {
@@ -173,10 +173,10 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
             _settings.Channels[chNum].Level = level;
 
             (_signalManager.Channels[2 * chNum].Waveform as FM).Carrier_Hz = _settings.Channels[chNum].Freq;
-            _signalManager.Channels[2 * chNum].Level.Value = level + ANSI_dBHL.HL_To_SPL(_settings.Channels[chNum].Freq, 0, _transducers[chNum]);
+            _signalManager.Channels[2 * chNum].Level.SetParameter("Value", level + ANSI_dBHL.HL_To_SPL(_settings.Channels[chNum].Freq, 0, _transducers[chNum]));
 
             (_signalManager.Channels[2 * chNum + 1].Waveform as FM).Carrier_Hz = _settings.Channels[chNum].Freq;
-            _signalManager.Channels[2 * chNum + 1].Level.Value = level + ANSI_dBHL.HL_To_SPL(_settings.Channels[chNum].Freq, 0, _transducers[chNum]);
+            _signalManager.Channels[2 * chNum + 1].Level.SetParameter("Value", level + ANSI_dBHL.HL_To_SPL(_settings.Channels[chNum].Freq, 0, _transducers[chNum]));
         }
     }
 

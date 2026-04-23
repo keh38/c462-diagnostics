@@ -426,7 +426,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
             Level = new Level()
             {
                 Units = _settings.LevelUnits == LevelUnits.dB_SPL ? LevelUnits.dB_SPL_noLDL : _settings.LevelUnits,
-                Value = 75f
+                Value = "75"
             },
             Gate = new Gate()
             {
@@ -451,7 +451,7 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
                 Level = new Level()
                 {
                     Units = LevelUnits.Volts,
-                    Value = _settings.HapticStimulus.Level
+                    Value = _settings.HapticStimulus.Level.ToString()
                 },
                 Gate = new Gate()
                 {

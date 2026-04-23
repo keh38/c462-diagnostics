@@ -819,7 +819,7 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
         // 500-ms steps
         float waitTime = 0.5f * Mathf.Round(UnityEngine.Random.Range(_settings.MinISI, _settings.MaxISI) * 2);
 
-        _signalManager["Signal"].Level.Value = level + ANSI_dBHL.HL_To_SPL(freq, 0, SessionContext.Signal.Transducer);
+        _signalManager["Signal"].Level.SetParameter("Value", level + ANSI_dBHL.HL_To_SPL(freq, 0, SessionContext.Signal.Transducer));
 
         //float vol_dB = noiseGen.IsPlaying ? 0 : volumeControl.SetAttenuation(_signalManager.MinAtten());
         //_signalManager.SetMasterVolume(vol_dB);

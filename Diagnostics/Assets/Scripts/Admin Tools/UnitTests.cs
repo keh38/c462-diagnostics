@@ -44,7 +44,7 @@ public class UnitTests : MonoBehaviour
             Level = new Level()
             {
                 Units = LevelUnits.dB_SPL,
-                Value = 30
+                Value = "30"
             }
         };
 

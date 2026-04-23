@@ -395,7 +395,7 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
             Level = new Level()
             {
                 Units = LevelUnits.dB_SPL_noLDL,
-                Value = 75f
+                Value = "75"
             },
             Gate = new Gate()
             {
@@ -470,7 +470,7 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
             noise.Filter.CF = testCondition.Freq_Hz;
         }
         _signalManager.Channels[0].Laterality = testCondition.ear;
-        _signalManager.Channels[0].Level.Value = 0;
+        _signalManager.Channels[0].Level.Value = "0";
 
         var config = AudioSettings.GetConfiguration();
         _signalManager.Initialize(config.sampleRate, config.dspBufferSize, SessionContext.Signal);
