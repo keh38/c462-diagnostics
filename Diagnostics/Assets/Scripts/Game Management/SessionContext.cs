@@ -30,7 +30,7 @@ public static class SessionContext
             return;
         }
         Signal.Transducer = transducer;
-        Signal.CalibrationFolder = SharedFileLocations.GetCalibrationFolder(transducer);
+        Signal.CalibrationFolder = SharedFileLocations.GetCalibrationFolder();
     }
 
     public static void SetAudiogram(string audiogramPath)
