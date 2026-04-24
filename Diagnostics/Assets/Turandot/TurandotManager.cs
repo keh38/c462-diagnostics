@@ -547,9 +547,10 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             }
         }
 
-        string json = KLibU.Files.JSONStringAdd("", "info", KLibU.Files.JSONSerializeToString(header));
-        json = KLibU.Files.JSONStringAdd(json, "params", KLibU.Files.JSONSerializeToString(_params));
-        json = KLibU.Files.JSONStringAdd(json, "data", $"[{Environment.NewLine}]");
+        string json = Files.JSONStringAdd("", "info", Files.JSONSerializeToString(header));
+        json = Files.JSONStringAdd(json, "metrics", GameManager.Metrics.ToJSONString());
+        json = Files.JSONStringAdd(json, "params", Files.JSONSerializeToString(_params));
+        json = Files.JSONStringAdd(json, "data", $"[{Environment.NewLine}]");
         //json += Environment.NewLine;
 
         File.WriteAllText(_mainDataFile, json);

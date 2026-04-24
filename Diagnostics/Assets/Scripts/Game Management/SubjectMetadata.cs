@@ -19,9 +19,7 @@ public class SubjectMetadata
     public SerializeableDictionary<int> runCounter = new SerializeableDictionary<int>();
     public SerializeableDictionary<string> metrics = new SerializeableDictionary<string>();
 
-    public SubjectMetadata()
-    {
-    }
+    public SubjectMetadata() { }
 
  /*   public void AddMetric(string name, float val)
     {
