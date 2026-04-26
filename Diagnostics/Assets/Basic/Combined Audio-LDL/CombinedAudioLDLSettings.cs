@@ -19,13 +19,17 @@ namespace CombinedAudioLDL
         public float[] TestFrequencies { get; set; }
         public int NumRepeats { get; set; }
         public float MinExcursion { get; set; } 
-        public int NumReversals { get; set; }
+        public int NumThresholdReversals { get; set; }
+        public int NumLDLReversals { get; set; }
         public bool LogSliderTracks { set; get; }
+        public float MinLevel { set; get; }
         public float Bandwidth { set; get; }
         public float ToneDuration { set; get; }
         public float ToneDelay { set; get; }
         public float ISI_ms { set; get; }
         public float Ramp { set; get; }
+        public bool ContraNoiseActive { set; get; }
+        public float ContraNoiseLevel { set; get; }
 
         public float ModDepth_pct {  set; get; }
         public HapticStimulus HapticStimulus { set; get; }
@@ -47,7 +51,12 @@ namespace CombinedAudioLDL
             ModDepth_pct = 0;
             NumRepeats = 1;
             MinExcursion = 2.5f;
-            NumReversals = 2;
+            NumThresholdReversals = 2;
+            NumLDLReversals = 0;
+            MinLevel = 0;
+
+            ContraNoiseActive = false;
+            ContraNoiseLevel = 40;
 
             PromptFontSize = 72;
         }

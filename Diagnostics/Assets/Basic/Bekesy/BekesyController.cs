@@ -326,10 +326,11 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
             threshold = float.PositiveInfinity;
         }
         _data.audiogram.Set(
-            _currentTrack.ear,
-            _currentTrack.Freq_Hz,
-            ANSI_dBHL.SPL_To_HL(_currentTrack.Freq_Hz, threshold, SessionContext.Signal.Transducer),
-            threshold);
+            laterality: _currentTrack.ear,
+            Frequency_Hz: _currentTrack.Freq_Hz,
+            ThresholdHL: ANSI_dBHL.SPL_To_HL(_currentTrack.Freq_Hz, threshold, SessionContext.Signal.Transducer),
+            ThresholdSPL: threshold,
+            ThresholdSL: 0);
 
         StartNextStimulusCondition();
         yield break;

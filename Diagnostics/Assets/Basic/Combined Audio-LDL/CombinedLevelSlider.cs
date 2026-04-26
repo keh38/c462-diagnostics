@@ -52,7 +52,8 @@ public class CombinedLevelSlider : MonoBehaviour
     private float _maxVal;
     private float _range;
     private float _minExcursionSize;
-    private int _minNumReversals;
+    private int _minNumThresholdReversals;
+    private int _minNumLDLReversals;
 
     private int _reversals = 0;
     private int _direction;
@@ -80,10 +81,11 @@ public class CombinedLevelSlider : MonoBehaviour
         _maxButton.gameObject.SetActive(false);
     }
 
-    public void Initialize(float minExcursionSize, int minNumReversals)
+    public void Initialize(float minExcursionSize, int minNumThresholdReversals, int minNumLDLReversals)
     {
         _minExcursionSize = minExcursionSize;
-        _minNumReversals = minNumReversals;
+        _minNumThresholdReversals = minNumThresholdReversals;
+        _minNumLDLReversals = minNumLDLReversals;
 
         _slider.value = 0;
         _subthresholdImage.raycastTarget = false;
@@ -99,6 +101,7 @@ public class CombinedLevelSlider : MonoBehaviour
         _range = max - min;
 
         _phase = Phase.Threshold;
+        _promptText.gameObject.SetActive(true);
         _promptText.text = "Adjust the slider until you just barely hear the sound";
         _buttonText.text = "I just hear it";
         _maxButtonText.text = "Still can't hear it";
@@ -108,6 +111,7 @@ public class CombinedLevelSlider : MonoBehaviour
         _lastExtremum = float.NegativeInfinity;
 
         _slider.value = 0;
+        ParamSetter?.Invoke(_minVal);
         _button.SetActive(false);
 
         _thresholdSliderValue = 0;
@@ -197,7 +201,8 @@ public class CombinedLevelSlider : MonoBehaviour
             _maxButton.SetActive(true);
         }
 
-        if (_reversals < _minNumReversals)
+        int minNumReversals = _phase == Phase.Threshold ? _minNumThresholdReversals : _minNumLDLReversals;
+        if (_reversals < minNumReversals)
         {
             _messageText.gameObject.SetActive(true);
             return;

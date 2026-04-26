@@ -425,7 +425,8 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
             },
             Level = new Level()
             {
-                Units = _settings.LevelUnits == LevelUnits.dB_SPL ? LevelUnits.dB_SPL_noLDL : _settings.LevelUnits,
+                Units = _settings.LevelUnits,
+                BypassLDL = _settings.LevelUnits == LevelUnits.dB_SPL,
                 Value = "75"
             },
             Gate = new Gate()
@@ -709,14 +710,15 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
 
             var ear = tc.ear == Laterality.Left ? AudiogramTestEar.Left : AudiogramTestEar.Right;
             float current = _data.LDLgram.Get(ear).GetThreshold(tc.Freq_Hz);
+            float thresh_SPL = audiograms.Get(ear).GetThreshold(tc.Freq_Hz);
+
             if (_settings.LevelUnits == LevelUnits.dB_SL)
             {
-                float thresh_SPL = audiograms.Get(ear).GetThreshold(tc.Freq_Hz);
-
                 float LDL_SL = (n > 0) ? (sum / n) : float.NaN;
                 if (float.IsNaN(current) || LDL_SL < current + thresh_SPL)
                 {
-                    _data.LDLgram.Set(ear, tc.Freq_Hz, LDL_SL, LDL_SL + thresh_SPL);
+                    float ldlHL = ANSI_dBHL.SPL_To_HL(tc.Freq_Hz, LDL_SL + thresh_SPL, SessionContext.Signal.Transducer);
+                    _data.LDLgram.Set(ear, tc.Freq_Hz, ldlHL, LDL_SL + thresh_SPL, LDL_SL);
                 }
             }
             else
@@ -724,7 +726,8 @@ public class LDLHapticsController : MonoBehaviour, IRemoteControllable
                 float LDL_SPL = (n > 0) ? (sum / n) : float.NaN;
                 if (float.IsNaN(current) || LDL_SPL < current)
                 {
-                    _data.LDLgram.Set(ear, tc.Freq_Hz, float.NaN, LDL_SPL);
+                    float ldlHL = ANSI_dBHL.SPL_To_HL(tc.Freq_Hz, LDL_SPL, SessionContext.Signal.Transducer);
+                    _data.LDLgram.Set(ear, tc.Freq_Hz, ldlHL, LDL_SPL, LDL_SPL-thresh_SPL);
                 }
             }
         }

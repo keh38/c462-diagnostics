@@ -548,10 +548,11 @@ public class AudiogramController : MonoBehaviour, IRemoteControllable
 
         float thresholdSPL = _currentTrack.thresholdHL + ANSI_dBHL.HL_To_SPL(freq, 0, SessionContext.Signal.Transducer);
         _data.audiogramData.Set(
-            _currentStimulusCondition.Laterality,
-            freq,
-            _currentTrack.thresholdHL,
-            thresholdSPL);
+            laterality: _currentStimulusCondition.Laterality,
+            Frequency_Hz: freq,
+            ThresholdHL: _currentTrack.thresholdHL,
+            ThresholdSPL: thresholdSPL,
+            ThresholdSL: 0);
 
         SendThreshold(_currentStimulusCondition.Laterality, freq, _currentTrack.thresholdHL, thresholdSPL);
 

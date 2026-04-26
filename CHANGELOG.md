@@ -1,6 +1,12 @@
 ## Changelog
 
-### v2.1.9 (2026-04-23)
+### v2.1.11 (2026-04-24)
+#### Added
+- restored noise filtering
+
+---
+
+### v2.1.10 (2026-04-23)
 #### Added
 - transmit audiogram/LDL data points
 - send audiogram/LDL files at end of measurements

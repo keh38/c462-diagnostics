@@ -117,40 +117,18 @@ namespace Turandot.Scripts
                     throw new Exception($"{_action.Channel}.{_action.Property} not found");
                 }
 
-                if (_action.Property == "Level")
-                {
-                    _sigMan[_action.Channel].ClampLevelToMax(true);
-                }
-
-                //if (_ncalls == 0)
-                //{
                 _value = _action.StartValue;
                 _minVal = _action.Min;
                 _maxVal = _action.Max;
-                //}
+
+                if (_action.Property == "Level" && float.IsInfinity(_action.Max))
+                {
+                    _maxVal = _sigMan[_action.Channel].GetMaxLevel(SessionContext.Signal);
+                    _sigMan[_action.Channel].ClampLevelToMax(true);
+                }
 
                 if (_action.Scale == ParamSliderAction.SliderScale.Log)
                 {
-                    //if (_ncalls > 0)
-                    //{
-                    //    if (_action.shrinkFactor > 0)
-                    //    {
-                    //        float newRange = (1 - _action.shrinkFactor / 100) * Mathf.Log(_maxVal / _minVal); // number of log units
-                    //        float dv = UnityEngine.Random.Range(0.5f * (1 - _action.startRange / 100), 0.5f * (1 + _action.startRange / 100));
-                    //        _minVal = Mathf.Max(_minVal, _value * Mathf.Exp(-dv * newRange));
-                    //        _maxVal = Mathf.Min(_maxVal, _minVal * Mathf.Exp(newRange));
-                    //        _minVal = _maxVal * Mathf.Exp(-newRange);
-
-                    //        _value = Mathf.Exp(UnityEngine.Random.Range(0f, 1f) * newRange) * _minVal;
-                    //    }
-                    //    else
-                    //    {
-                    //        _value = Mathf.Pow(2, UnityEngine.Random.Range(-0.5f, 0.5f)) * _action.startVal;
-                    //    }
-                    //    Debug.Log("random value = " + _value);
-
-                    //    Debug.Log("Min=" + _minVal + "; Max=" + _maxVal);
-                    //}
                     _range = Mathf.Log(_maxVal / _minVal);
                     _slider.SetValueWithoutNotify(Mathf.Log(_value / _minVal) / _range);
                 }
@@ -165,17 +143,7 @@ namespace Turandot.Scripts
 
                 _paramSetter?.Invoke(_value);
                 _log.Add(Time.timeSinceLevelLoad, _value);
-
-                //++_ncalls;
-
-                //_values.Add(_value);
-
-                //_ignoreEvents = false;
             }
-
-            //button.IsVisible = false;
-            //_xmin = input.X - (float)(slider.foregroundWidget.width - button.Width) / 2;
-            //_xmax = input.X + (float)(slider.foregroundWidget.width - button.Width) / 2;
 
             base.Activate(input, audio);
         }

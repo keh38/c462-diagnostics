@@ -350,7 +350,8 @@ public class LDLController : MonoBehaviour, IRemoteControllable
             },
             Level = new Level()
             {
-                Units = _settings.LevelUnits == LevelUnits.dB_SPL ? LevelUnits.dB_SPL_noLDL : _settings.LevelUnits,
+                Units = _settings.LevelUnits,
+                BypassLDL = _settings.LevelUnits == LevelUnits.dB_SPL,
                 Value = "75"
             },
             Gate = new Gate()
@@ -511,13 +512,14 @@ public class LDLController : MonoBehaviour, IRemoteControllable
             ldlSPL = (n > 0) ? (sum / n) : float.NaN;
             ldlSL = ldlSPL - thresh_SPL;
         }
+        float ldlHL = ANSI_dBHL.SPL_To_HL(tc.Freq_Hz, ldlSL, SessionContext.Signal.Transducer);
 
         AudiogramPointPayload payload = new AudiogramPointPayload()
         {
             Type = AudiogramType.LDL,
             Ear = ear,
             Frequency_Hz = tc.Freq_Hz,
-            Threshold_dBHL = ldlSL,
+            Threshold_dBHL = ldlHL,
             Threshold_dBSPL = ldlSPL
         };
 
@@ -568,12 +570,14 @@ public class LDLController : MonoBehaviour, IRemoteControllable
             if (_settings.LevelUnits == LevelUnits.dB_SL)
             {
                 float LDL_SL = (n > 1) ? (sum / n) : float.NaN;
-                _data.LDLgram.Set(ear, tc.Freq_Hz, LDL_SL, LDL_SL + thresh_SPL);
+                float ldlHL = ANSI_dBHL.SPL_To_HL(tc.Freq_Hz, LDL_SL + thresh_SPL, SessionContext.Signal.Transducer);
+                _data.LDLgram.Set(ear, tc.Freq_Hz, ldlHL, LDL_SL + thresh_SPL, LDL_SL);
             }
             else
             {
                 float LDL_SPL = (n > 1) ? (sum / n) : float.NaN;
-                _data.LDLgram.Set(ear, tc.Freq_Hz, LDL_SPL - thresh_SPL, LDL_SPL);
+                float ldlHL = ANSI_dBHL.SPL_To_HL(tc.Freq_Hz, LDL_SPL, SessionContext.Signal.Transducer);
+                _data.LDLgram.Set(ear, tc.Freq_Hz, ldlHL, LDL_SPL, LDL_SPL - thresh_SPL);
             }
         }
         _data.LDLgram.Save(SharedFileLocations.LDLPath);

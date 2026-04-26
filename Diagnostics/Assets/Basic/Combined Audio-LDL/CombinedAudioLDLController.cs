@@ -118,7 +118,7 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         InitializeStimulusGeneration();
 
         var maxLevel = GetOverallMaxLevel();
-        _sliderRange = maxLevel;
+        _sliderRange = (maxLevel - _settings.MinLevel);
 
         _progressBar.maxValue = _state.NumConditions;
         _progressBar.value = 0;
@@ -205,11 +205,17 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         float rightMax = GetMaxLevel("Right");
         return Mathf.Max(leftMax, rightMax);
     }
-
+    
     private float GetMaxLevel(string ear)
     {
         float earMax = float.NegativeInfinity;
-        var cal = CalibrationFactory.Load(LevelUnits.dB_SPL_noLDL, SessionContext.Signal, ear);
+
+        var cal = CalibrationFactory.Load(
+            units: LevelUnits.dB_SPL, 
+            bypassLDL: true,
+            context: SessionContext.Signal, 
+            destination: ear);
+
         for (int k = 0; k < _settings.TestFrequencies.Length; k++)
         {
             float max = cal.GetReference(_settings.TestFrequencies[k]);
@@ -281,6 +287,9 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
 
     private void EndRun(bool abort)
     {
+        _signalManager.Pause();
+        _stopAudio = true;
+
         _progressBar.gameObject.SetActive(false);
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(false);
@@ -394,7 +403,8 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
             Waveform = wf,
             Level = new Level()
             {
-                Units = LevelUnits.dB_SPL_noLDL,
+                Units = LevelUnits.dB_SPL,
+                BypassLDL = true,
                 Value = "75"
             },
             Gate = new Gate()
@@ -407,6 +417,22 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         };
 
         _signalManager.Channels.Add(ch);
+
+        if (_settings.ContraNoiseActive)
+        {
+            var noiseCh = new Channel()
+            {
+                Modality = Modality.Audio,
+                Laterality = Laterality.Diotic,
+                Waveform = new Noise(),
+                Level = new Level()
+                {
+                    Units = LevelUnits.dB_SPL,
+                    Value = _settings.ContraNoiseLevel.ToString()
+                }
+            };
+            _signalManager.Channels.Add(noiseCh);
+        }
 
         var config = AudioSettings.GetConfiguration();
         _signalManager.Initialize(config.sampleRate, config.dspBufferSize, SessionContext.Signal);
@@ -446,7 +472,7 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         _levelSlider.MeasurementLocked = HandleMeasurementLocked;
         _levelSlider.ParamSetter = _signalManager.Channels[0].Level.GetParamSetter("Level");
 
-        _levelSlider.Initialize(_settings.MinExcursion, _settings.NumReversals);
+        _levelSlider.Initialize(_settings.MinExcursion, _settings.NumThresholdReversals, _settings.NumLDLReversals);
 
         _levelSlider.Activate(maxLevel - _sliderRange, maxLevel);
         _signalManager.Activate();
@@ -471,6 +497,18 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         }
         _signalManager.Channels[0].Laterality = testCondition.ear;
         _signalManager.Channels[0].Level.Value = "0";
+
+        if (_settings.ContraNoiseActive)
+        {
+            if (testCondition.ear == Laterality.Left)
+            {
+                _signalManager.Channels[1].Laterality = Laterality.Right;
+            }
+            else
+            {
+                _signalManager.Channels[1].Laterality = Laterality.Left;
+            }
+        }
 
         var config = AudioSettings.GetConfiguration();
         _signalManager.Initialize(config.sampleRate, config.dspBufferSize, SessionContext.Signal);
@@ -524,7 +562,7 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
             Type = AudiogramType.LDL,
             Ear = testCondition.ear == Laterality.Left ? AudiogramTestEar.Left : AudiogramTestEar.Right,
             Frequency_Hz = testCondition.Freq_Hz,
-            Threshold_dBHL = testCondition.LDL - testCondition.threshold,
+            Threshold_dBHL = ANSI_dBHL.SPL_To_HL(testCondition.Freq_Hz, testCondition.LDL, SessionContext.Signal.Transducer),
             Threshold_dBSPL = testCondition.threshold
         };
 
@@ -542,7 +580,6 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         }
         _state.testConditions[_state.testIndex].completed = true;
         bool finished = _state.Advance();
-        Debug.Log($"Completed test {_state.testIndex} of {_state.testOrder.Count}, finished = {finished}");
 
         SaveState();
 
@@ -578,10 +615,11 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
             float thresholdHL = ANSI_dBHL.SPL_To_HL(tc.Freq_Hz, tc.threshold, SessionContext.Signal.Transducer);
             thresholdHL = Mathf.Round(thresholdHL / 5f) * 5f;
             float thresholdSPL = ANSI_dBHL.HL_To_SPL(tc.Freq_Hz, thresholdHL, SessionContext.Signal.Transducer);
-            _data.audiogram.Set(ear, tc.Freq_Hz, thresholdHL, thresholdSPL);
+            _data.audiogram.Set(ear, tc.Freq_Hz, thresholdHL, thresholdSPL, 0);
 
+            float ldlHL = ANSI_dBHL.SPL_To_HL(tc.Freq_Hz, tc.LDL, SessionContext.Signal.Transducer);
             float ldlSL = (tc.LDL != float.PositiveInfinity) ? tc.LDL - thresholdSPL : float.PositiveInfinity;
-            _data.LDLgram.Set(ear, tc.Freq_Hz, ldlSL, tc.LDL);
+            _data.LDLgram.Set(ear, tc.Freq_Hz, ldlHL, tc.LDL, ldlSL);
         }
         _data.audiogram.Save(SharedFileLocations.AudiogramPath);
         SessionContext.SetAudiogram(SharedFileLocations.AudiogramPath);
