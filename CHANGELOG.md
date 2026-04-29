@@ -1,5 +1,14 @@
 ## Changelog
 
+### v2.1.12 (2026-04-29)
+#### Added
+- contra noise option to combined audio/LDL
+#### Changed
+- made "no LDL" option separate and explicit
+- added SL to audiogram data structure to make usage in LDL unambiguous
+
+---
+
 ### v2.1.11 (2026-04-24)
 #### Added
 - restored noise filtering
