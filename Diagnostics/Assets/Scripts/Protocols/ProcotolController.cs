@@ -76,18 +76,14 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
                     _protocol.Tests[_nextTestIndex].Instructions, 
                     fontSize: _protocol.Appearance.InstructionFontSize,
                     autoAdvance: true);
+                return;
             }
-            else
+            if (ProtocolManager.IsActive)
             {
-                if (ProtocolManager.IsActive)
-                {
-                    ProtocolManager.Advance();
-                }
-                else
-                {
-                    HTS_Server.SendRequest("Protocol", "Advance");
-                }
+                ProtocolManager.Advance();
+                return;
             }
+            HTS_Server.SendRequest("Protocol", "Advance");
         }
     }
 

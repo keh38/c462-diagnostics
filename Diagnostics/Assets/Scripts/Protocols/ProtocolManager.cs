@@ -14,6 +14,7 @@ using KLibU.Net;
 
 using C462.Shared;
 using C462.Shared.Protocol.DTOs;
+using BasicMeasurements;
 
 public class ProtocolManager : MonoBehaviour
 {
@@ -122,6 +123,39 @@ public class ProtocolManager : MonoBehaviour
         var nextTest = _history.Data[_nextTestIndex];
         GameManager.DataForNextScene = nextTest.Settings;
 
+        if (nextTest.Scene == "Audiogram")
+        {
+            SceneManager.LoadScene("Audiogram");
+            return;
+        }
+        if (nextTest.Scene == "Combined")
+        {
+            SceneManager.LoadScene("Combined Audio-LDL");
+            return;
+        }
+        if (nextTest.Scene == "Digits")
+        {
+            SceneManager.LoadScene("Digits");
+            return;
+        }
+        if (nextTest.Scene == "LDL")
+        {
+            var configPath = Path.Combine(SharedFileLocations.GetConfigFile("LDL", nextTest.Settings));
+            var config = Files.XmlDeserialize<BasicMeasurementConfiguration>(configPath) as LDL.LDLMeasurementSettings;
+            if (config.HapticStimulus != null && config.HapticStimulus.Source != HapticSource.NONE)
+            {
+                SceneManager.LoadScene("LDL_Haptics");
+                return;
+            }
+            SceneManager.LoadScene("LDL");
+            return;
+        }
+
+        if (nextTest.Scene == "Questionnaire")
+        {
+            SceneManager.LoadScene("Questionnaire");
+            return;
+        }
         if (nextTest.Scene == "Questionnaire")
         {
             SceneManager.LoadScene("Questionnaire");

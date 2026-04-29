@@ -44,27 +44,35 @@ public class BasicPanel : MonoBehaviour
         if (fileType == "Audiogram")
         {
             SceneManager.LoadScene("Audiogram");
+            return;
         }
-        else if (fileType == "Digits")
+        if (fileType == "Combined")
+        {
+            SceneManager.LoadScene("Combined Audio-LDL");
+            return;
+        }
+        if (fileType == "Digits")
         {
             SceneManager.LoadScene("Digits");
+            return;
         }
-        else if (fileType == "LDL")
+        if (fileType == "LDL")
         {
             var configPath = Path.Combine(SharedFileLocations.GetConfigFile("LDL", _listBox.SelectedText));
             var config = Files.XmlDeserialize<BasicMeasurementConfiguration>(configPath) as LDL.LDLMeasurementSettings;
             if (config.HapticStimulus != null && config.HapticStimulus.Source != HapticSource.NONE)
             {
                 SceneManager.LoadScene("LDL_Haptics");
+                return;
             }
-            else
-            {
-                SceneManager.LoadScene("LDL");
-            }
+            SceneManager.LoadScene("LDL");
+            return;
         }
-        else if (fileType == "Questionnaire")
+
+        if (fileType == "Questionnaire")
         {
             SceneManager.LoadScene("Questionnaire");
+            return;
         }
     }
 

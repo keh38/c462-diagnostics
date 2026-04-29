@@ -1,5 +1,11 @@
 ## Changelog
 
+### v2.1.13 (2026-04-29)
+#### Changed
+- run combined audio/LDL from basic panel or protocol (i.e.: HTS only)
+
+--
+
 ### v2.1.12 (2026-04-29)
 #### Added
 - contra noise option to combined audio/LDL
