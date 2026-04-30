@@ -20,6 +20,8 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
     private Protocol _protocol;
     private ProtocolHistory _history;
 
+    private float _animationDelay = 0.1f;
+
     private bool _isRemote;
     private int _nextTestIndex;
     private bool _advanceAfterInstructions = false;
@@ -135,13 +137,13 @@ public class ProcotolController : MonoBehaviour, IRemoteControllable
 
     private IEnumerator AnimateOutline()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f);
         for (int k=0; k<_history.Data.Count; k++)
         {
             if (!_protocol.Tests[k].HideOutline)
             {
                 DrawOutline(k + 1, -1);
-                yield return new WaitForSeconds(1f);
+                yield return new WaitForSeconds(_animationDelay);
             }
         }
         DrawOutline(_history.Data.Count, _nextTestIndex);

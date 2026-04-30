@@ -71,6 +71,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
     void OnDestroy()
     {
+        Cursor.visible = true;
         HTS_Server.OnSubjectChanged -= HandleSubjectChanged;
         Application.logMessageReceived -= HandleException;
     }
@@ -411,6 +412,8 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
     private void EndRun(bool abort)
     {
+        Cursor.visible = true;
+
         if (_params.schedule.mode != Mode.Adapt) StoreResults();
 
         _engine.ClearScreen();
@@ -637,7 +640,9 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     
     void HandleFlowchartFinished()
     {
-        Cursor.visible = true;
+        // NOT HERE! makes it flash on short trials
+//        Cursor.visible = true; 
+
         Match p = Regex.Match(_engine.Result, "outcome=\"([\\w\\d\\s]+)\"");
         if (p.Success)
         {

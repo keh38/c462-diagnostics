@@ -1,5 +1,19 @@
 ## Changelog
 
+### v2.1.15 (2026-04-30)
+#### Fixed
+- download installer to correct folder
+#### Changed
+- sped up protocol outline animation
+
+---
+
+### v2.1.14 (2026-04-30)
+#### Fixed
+- Turandot: do not restore cursor until end of run
+
+---
+
 ### v2.1.13 (2026-04-29)
 #### Changed
 - run combined audio/LDL from basic panel or protocol (i.e.: HTS only)

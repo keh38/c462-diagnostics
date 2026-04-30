@@ -462,6 +462,11 @@ public class HTS_Server : MonoBehaviour
                 _tcpListener.WriteResponse(TcpMessage.Ok()); // signal ready
 
                 var destPath = Path.Combine(SharedFileLocations.HtsResourcesFolder, largeFilePayload.Filename);
+                if (largeFilePayload.Filename.StartsWith("Downloads"))
+                {
+                    destPath = Path.Combine(SharedFileLocations.HtsProjectFolder, largeFilePayload.Filename);
+                }
+                
                 Directory.CreateDirectory(Path.GetDirectoryName(destPath));
 
                 using (var fs = new FileStream(destPath, FileMode.Create, FileAccess.Write))
