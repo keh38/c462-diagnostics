@@ -62,7 +62,7 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
         {
             Name = "NoiseLeft",
             Modality = KLib.Signals.Modality.Audio,
-            Laterality = Laterality.Binaural,
+            Laterality = Laterality.Left,
             Waveform = new Noise(),
             Active = false,
             Level = new Level()
@@ -87,6 +87,7 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
 
         var audioConfig = AudioSettings.GetConfiguration();
         _signalManager.Initialize(audioConfig.sampleRate, audioConfig.dspBufferSize, SessionContext.Signal);
+        _signalManager.Activate();
 
         _audioInitialized = true;
     }
@@ -125,7 +126,7 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
         string chName = $"Tone{ear}";
 
         (_signalManager[chName].Waveform as Sinusoid).Frequency_Hz = freq;
-        _signalManager[chName].Level.Value = level.ToString();
+        _signalManager[chName].Level.SetParameter("Value", level);
         _signalManager[chName].SetActive(true);
     }
 
@@ -138,7 +139,7 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
 
         string chName = $"Noise{ear}";
 
-        _signalManager[chName].Level.Value = level.ToString();
+        _signalManager[chName].Level.SetParameter("Value", level);
         _signalManager[chName].SetActive(true);
     }
 
@@ -153,6 +154,7 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
     TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
         var data = request.GetPayload<string>();
+
         switch (request.Command)
         {
             case "Noise":
