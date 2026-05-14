@@ -15,6 +15,7 @@ using HTS.Unity.Tcp;
 using C462.Shared;
 using C462.Shared.Protocol;
 using C462.Shared.Protocol.DTOs;
+using System.Collections.Generic;
 
 public class HTS_Server : MonoBehaviour
 {
@@ -92,7 +93,7 @@ public class HTS_Server : MonoBehaviour
         SendRequest(command, payload);
     }
 
-    public static void SendDataFile(string sceneName, string path)
+    public static void SendDataFile(string sceneName, string path, FileDestination destination = FileDestination.SubjectData)
     {
         if (IsLocalConnection)
         {
@@ -101,6 +102,7 @@ public class HTS_Server : MonoBehaviour
 
         SendRequest("ReceiveData", sceneName, new TextFilePayload
         {
+            Destination = destination,
             Filename = Path.GetFileName(path),
             Content = File.ReadAllText(path)
         });
@@ -262,14 +264,10 @@ public class HTS_Server : MonoBehaviour
 
         var request = _tcpListener.ReadRequest();
 
-        if (!request.Command.Equals("Ping"))
-        {
-            Debug.Log("Command received: " + request.Command);
-        }
-
         switch (request.Command)
         {
             case "Connect":
+                Debug.Log("Command received: " + request.Command);
                 var connectionData = request.GetPayload<ConnectionRequestPayload>();
                 var incomingEndPoint = new IPEndPoint(IPAddress.Parse(connectionData.Address), connectionData.Port);
                 bool acceptConnection = !_remoteConnected || incomingEndPoint.Equals(_remoteEndPoint);
@@ -298,12 +296,14 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "SetDataRoot":
+                Debug.Log("Command received: " + request.Command);
                 _tcpListener.WriteResponse(TcpMessage.Ok());
                 string dataRoot = request.GetPayload<string>();
                 SharedFileLocations.SetProjectRootFolder(dataRoot);
                 break;
 
             case "Disconnect":
+                Debug.Log("Command received: " + request.Command);
                 _tcpListener.WriteResponse(TcpMessage.Ok());
                 _remoteConnected = false;
                 OnControllerDisconnected?.Invoke(this, EventArgs.Empty);
@@ -318,6 +318,7 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "ChangeScene":
+                Debug.Log("Command received: " + request.Command);
                 string sceneName = request.GetPayload<string>();
                 _tcpListener.WriteResponse(TcpMessage.Ok());
                 KLogger.Log.FlushLog();
@@ -328,39 +329,47 @@ public class HTS_Server : MonoBehaviour
 
             case "CreateProject":
                 string projectName = request.GetPayload<string>();
+                Debug.Log($"Command received: {request.Command} {projectName}");
                 _tcpListener.WriteResponse(TcpMessage.Ok());
                 SharedFileLocations.CreateHtsProjectFolder(projectName);
                 break;
 
             case "GetCurrentSceneName":
+                Debug.Log($"Command received: {request.Command}");
                 _tcpListener.WriteResponse(TcpMessage.Ok(_currentSceneName));
                 break;
 
             case "GetSubjectInfo":
+                Debug.Log($"Command received: {request.Command}");
                 _tcpListener.WriteResponse(TcpMessage.Ok($"{GameManager.Project}/{GameManager.Subject}"));
                 break;
 
             case "GetProjectList":
+                Debug.Log($"Command received: {request.Command}");
                 _tcpListener.WriteResponse(TcpMessage.Ok(SharedFileLocations.EnumerateHtsProjects()));
                 break;
 
             case "GetSubjectList":
+                Debug.Log($"Command received: {request.Command}");
                 string projectToEnumerate = request.GetPayload<string>();
                 _tcpListener.WriteResponse(TcpMessage.Ok(SharedFileLocations.EnumerateHtsSubjects(projectToEnumerate)));
                 break;
 
             case "SetSubjectInfo":
                 string projectAndSubject = request.GetPayload<string>();
+                Debug.Log($"Command received: {request.Command} {projectAndSubject}");
                 _tcpListener.WriteResponse(TcpMessage.Ok());
                 GameManager.SetSubject(projectAndSubject);
                 OnSubjectChanged?.Invoke(this, EventArgs.Empty);
                 break;
 
             case "GetSubjectMetadata":
+                Debug.Log($"Command received: {request.Command}");
                 _tcpListener.WriteResponse(TcpMessage.Ok(GameManager.GetSubjectMetadata()));
                 break;
 
             case "SetSubjectMetadata":
+                Debug.Log($"Command received: {request.Command}");
                 _tcpListener.WriteResponse(TcpMessage.Ok());
                 var metaData = request.GetPayload<SubjectMetadata>();
                 GameManager.SetSubjectMetadata(metaData);
@@ -368,6 +377,7 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "SetSubjectMetrics":
+                Debug.Log($"Command received: {request.Command}");
                 _tcpListener.WriteResponse(TcpMessage.Ok());
                 var metrics = request.GetPayload<SerializeableDictionary<string>>();
                 GameManager.SetSubjectMetrics(metrics);
@@ -375,14 +385,17 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "GetTransducers":
+                Debug.Log($"Command received: {request.Command}");
                 _tcpListener.WriteResponse(TcpMessage.Ok(SharedFileLocations.EnumerateTransducers()));
                 break;
 
             case "GetAdapterMap":
+                Debug.Log($"Command received: {request.Command}");
                 _tcpListener.WriteResponse(TcpMessage.Ok(HardwareInterface.AdapterMap));
                 break;
 
             case "GetLog":
+                Debug.Log($"Command received: {request.Command}");
                 KLogger.Log.FlushLog();
                 var logFilePayload = new TextFilePayload() 
                 { 
@@ -393,6 +406,7 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "GetSyncLog":
+                Debug.Log($"Command received: {request.Command}");
                 var logPath = HardwareInterface.ClockSync.LogFile;
                 //Debug.Log($"sync log path = {logPath}");
                 if (!string.IsNullOrEmpty(logPath))
@@ -411,10 +425,12 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "GetScreenSize":
+                Debug.Log($"Command received: {request.Command}");
                 _tcpListener.WriteResponse(TcpMessage.Ok($"{Screen.width},{Screen.height}"));
                 break;
 
             case "GetLEDColors":
+                Debug.Log($"Command received: {request.Command}");
                 var cstring = "none";
                 if (HardwareInterface.LED.IsInitialized)
                 {
@@ -438,6 +454,7 @@ public class HTS_Server : MonoBehaviour
             case "RunInstaller":
                 _tcpListener.WriteResponse(TcpMessage.Ok());
                 var data = request.GetPayload<string>();
+                Debug.Log($"Command received: {request.Command} {data}");
                 RunInstaller(data);
                 break;
 
@@ -461,9 +478,11 @@ public class HTS_Server : MonoBehaviour
                 _tcpListener.WriteResponse(TcpMessage.Ok()); // signal ready
 
                 folder = FileLocations.ResolveFolder(largeFilePayload.Destination, largeFilePayload.SubPath);
-                var destPath = Path.Combine(SharedFileLocations.HtsProjectFolder, largeFilePayload.Filename);
                 
-                Directory.CreateDirectory(folder);
+                if (!Directory.Exists(folder))
+                    Directory.CreateDirectory(folder);
+
+                var destPath = Path.Combine(folder, largeFilePayload.Filename);
 
                 using (var fs = new FileStream(destPath, FileMode.Create, FileAccess.Write))
                 using (var writer = new BinaryWriter(fs))
@@ -480,6 +499,7 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "RunMeasurements":
+                Debug.Log($"Command received: {request.Command}");
                 var runMeasurementsPayload = request.GetPayload<RunMeasurementsPayload>();
                 bool protocolStarted = ProtocolManager.StartProtocol(runMeasurementsPayload);
                 if (!protocolStarted)
@@ -491,6 +511,7 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "Quit":
+                Debug.Log($"Command received: {request.Command}");
                 StartCoroutine(QuitNextFrame());
                 _tcpListener.WriteResponse(TcpMessage.Ok());
                 break;

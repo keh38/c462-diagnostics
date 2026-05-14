@@ -306,8 +306,8 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
             string status = abort ? "Measurement aborted" : "Measurement finished";
 
             HTS_Server.SendDataFile(_mySceneName, _dataPath);
-            HTS_Server.SendDataFile(_mySceneName, SharedFileLocations.AudiogramPath);
-            HTS_Server.SendDataFile(_mySceneName, SharedFileLocations.LDLPath);
+            HTS_Server.SendDataFile(_mySceneName, SharedFileLocations.AudiogramPath, FileDestination.SubjectMetadata);
+            HTS_Server.SendDataFile(_mySceneName, SharedFileLocations.LDLPath, FileDestination.SubjectMetadata);
             HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
         }
         else

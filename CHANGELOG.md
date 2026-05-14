@@ -1,5 +1,11 @@
 ## Changelog
 
+### v2.1.16 (unreleased)
+#### Changed
+- cleaned up file transfer logic
+
+---
+
 ### v2.1.15 (2026-04-30)
 #### Fixed
 - download installer to correct folder

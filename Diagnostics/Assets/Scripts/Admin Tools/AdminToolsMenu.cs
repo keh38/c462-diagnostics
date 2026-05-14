@@ -166,8 +166,8 @@ public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
                 _message.text = "";
                 return TcpMessage.Ok();
             case "SendResourceList":
-                var fileList = EnumerateResources();
-                return TcpMessage.Ok(fileList);
+                var resourceList = EnumerateResources();
+                return TcpMessage.Ok(new ResourceListPayload() { Resources = resourceList});
             case "DeleteFile":
                 var fileInfo = request.GetPayload<FileInfoPayload>();
                 var folder = FileLocations.ResolveFolder(FileDestination.ProjectResources, fileInfo.SubPath);
