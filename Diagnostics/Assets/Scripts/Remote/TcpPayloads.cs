@@ -46,12 +46,4 @@ namespace HTS.Unity.Tcp
         public string Filename { get; set; }
         public System.DateTime LastModified { get; set; }
     }
-
-    [JsonObject]
-    public class BufferedFilePayload
-    {
-        public string Filename { get; set; }
-        public long NumBuffers { get; set; }
-        public int BufferSize { get; set; }
-    }
 }

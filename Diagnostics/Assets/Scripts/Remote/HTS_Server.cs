@@ -256,6 +256,8 @@ public class HTS_Server : MonoBehaviour
 
     void ProcessMessage()
     {
+        string folder;
+
         _tcpListener.AcceptTcpClient();
 
         var request = _tcpListener.ReadRequest();
@@ -421,13 +423,13 @@ public class HTS_Server : MonoBehaviour
                 _tcpListener.WriteResponse(TcpMessage.Ok($"{cstring}"));
                 break;
 
-            case "TransferFile":
+            case "ReceiveTextFile":
                 _tcpListener.WriteResponse(TcpMessage.Ok());
-                var filePayload = request.GetPayload<TransferFilePayload>();
-                ReceiveFile(filePayload);
+                var filePayload = request.GetPayload<TextFilePayload>();
+                ReceiveTextFile(filePayload);
                 break;
 
-            case "TransferAudiogram":
+            case "ReceiveAudiogram":
                 _tcpListener.WriteResponse(TcpMessage.Ok());
                 var audiogramPayload = request.GetPayload<TextFilePayload>();
                 ReceiveAudiogram(audiogramPayload);
@@ -440,34 +442,28 @@ public class HTS_Server : MonoBehaviour
                 break;
 
             case "FileExists":
-                var filename = request.GetPayload<string>();
-                var fullpath = Path.Combine(SharedFileLocations.HtsProjectFolder, "Resources", filename);
+                var fileInfoPayload = request.GetPayload<FileInfoPayload>();
+                folder = FileLocations.ResolveFolder(fileInfoPayload.Destination, fileInfoPayload.SubPath);
+                var fullpath = Path.Combine(folder, fileInfoPayload.Filename);
                 if (File.Exists(fullpath))
                 {
-                    var fileInfo = new FileInformationPayload()
-                    {
-                        Filename = filename,
-                        LastModified = File.GetLastAccessTime(fullpath)
-                    };
-                    _tcpListener.WriteResponse(TcpMessage.Ok(fileInfo));
+                    fileInfoPayload.LastModified = File.GetLastAccessTime(fullpath);
+                    _tcpListener.WriteResponse(TcpMessage.Ok(fileInfoPayload));
                 }
                 else
                 {
-                    _tcpListener.WriteResponse(TcpMessage.NotFound(filename));
+                    _tcpListener.WriteResponse(TcpMessage.NotFound(fileInfoPayload.Filename));
                 }
                 break;
 
-            case "ReceiveFile":
+            case "ReceiveBufferedFile":
                 var largeFilePayload = request.GetPayload<BufferedFilePayload>();
                 _tcpListener.WriteResponse(TcpMessage.Ok()); // signal ready
 
-                var destPath = Path.Combine(SharedFileLocations.HtsResourcesFolder, largeFilePayload.Filename);
-                if (largeFilePayload.Filename.StartsWith("Downloads"))
-                {
-                    destPath = Path.Combine(SharedFileLocations.HtsProjectFolder, largeFilePayload.Filename);
-                }
+                folder = FileLocations.ResolveFolder(largeFilePayload.Destination, largeFilePayload.SubPath);
+                var destPath = Path.Combine(SharedFileLocations.HtsProjectFolder, largeFilePayload.Filename);
                 
-                Directory.CreateDirectory(Path.GetDirectoryName(destPath));
+                Directory.CreateDirectory(folder);
 
                 using (var fs = new FileStream(destPath, FileMode.Create, FileAccess.Write))
                 using (var writer = new BinaryWriter(fs))
@@ -480,7 +476,7 @@ public class HTS_Server : MonoBehaviour
                 }
 
                 _tcpListener.WriteResponse(TcpMessage.Ok()); // signal complete
-                Debug.Log($"ReceiveFile complete: {largeFilePayload.Filename}");
+                Debug.Log($"ReceiveBufferedFile complete: {largeFilePayload.Filename}");
                 break;
 
             case "RunMeasurements":
@@ -546,12 +542,12 @@ public class HTS_Server : MonoBehaviour
             };
 
             client.WriteBuffer(System.Text.Encoding.UTF8.GetBytes(
-                TcpMessage.Request("ReceiveFile", payload).Serialize()));
+                TcpMessage.Request("ReceiveBufferedFile", payload).Serialize()));
 
             var ready = client.ReadBufferedSendResponse();
             if (!ready.IsOk)
             {
-                Debug.Log($"ReceiveFile refused by controller: {ready.Command}");
+                Debug.Log($"ReceiveBufferedFile refused by controller: {ready.Command}");
                 return;
             }
 
@@ -578,9 +574,9 @@ public class HTS_Server : MonoBehaviour
         }
     }
 
-    private void ReceiveFile(TransferFilePayload filePayload)
+    private void ReceiveTextFile(TextFilePayload filePayload)
     {
-        var folder = SharedFileLocations.ResourceFolder(filePayload.Folder);
+        var folder = FileLocations.ResolveFolder(filePayload.Destination, filePayload.SubPath);
         if (!Directory.Exists(folder))
         {
             Directory.CreateDirectory(folder);

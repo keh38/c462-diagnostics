@@ -8,6 +8,8 @@ using UnityEngine.UI;
 using KLib;
 using KLibU.Net;
 using C462.Shared;
+using C462.Shared.ProjectManagement;
+using C462.Shared.Protocol.DTOs;
 
 public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
 {
@@ -125,9 +127,9 @@ public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
         yield return null;
     }
 
-    private List<string> EnumerateResources()
+    private List<ResourceItem> EnumerateResources()
     {
-        List<string> resources = new List<string>();
+        var resources = new List<ResourceItem>();
 
         string rootResourceFolder = SharedFileLocations.HtsResourcesFolder;
         foreach (var resourceFolder in SharedFileLocations.HtsProjectResourceFolders)
@@ -140,7 +142,12 @@ public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
             var files = Directory.GetFiles(folder);
             foreach (var file in files)
             {
-                resources.Add(file.Remove(0, rootResourceFolder.Length+1));
+                resources.Add(
+                    new ResourceItem()
+                    {
+                        Type = resourceFolder,
+                        Name = Path.GetFileName(file),
+                    });
             }
         }
         Debug.Log($"{rootResourceFolder} contains {resources.Count} resources");
@@ -162,8 +169,9 @@ public class AdminToolsMenu : MonoBehaviour, IRemoteControllable
                 var fileList = EnumerateResources();
                 return TcpMessage.Ok(fileList);
             case "DeleteFile":
-                var data = request.GetPayload<string>();
-                var fullpath = Path.Combine(SharedFileLocations.HtsProjectFolder, "Resources", data);
+                var fileInfo = request.GetPayload<FileInfoPayload>();
+                var folder = FileLocations.ResolveFolder(FileDestination.ProjectResources, fileInfo.SubPath);
+                var fullpath = Path.Combine(folder, fileInfo.Filename);
                 File.Delete(fullpath);
                 return TcpMessage.Ok();
             default:
