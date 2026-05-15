@@ -183,7 +183,7 @@ public class HTS_Server : MonoBehaviour
 
     public void StopServer()
     {
-        SendRequest("Disconnect", (object) null);   
+        SendRequest("Disconnect", (object)null);
 
         _stopServer = true;
         if (_tcpListener != null)
@@ -218,7 +218,7 @@ public class HTS_Server : MonoBehaviour
                 }
                 catch (Exception ex)
                 {
-                    _tcpListener.WriteResponse(TcpMessage.Error(ex.Message));   
+                    _tcpListener.WriteResponse(TcpMessage.Error(ex.Message));
                     Debug.Log("error processing TCP message: " + ex.Message);
                 }
             }
@@ -324,7 +324,14 @@ public class HTS_Server : MonoBehaviour
                 KLogger.Log.FlushLog();
                 GameManager.DataForNextScene = "";
                 Debug.Log($"changing scene to {sceneName}...");
-                _currentScene.ChangeScene(sceneName);
+                if (_currentScene != null)
+                {
+                    _currentScene.ChangeScene(sceneName);
+                }
+                else
+                {
+                    SceneManager.LoadScene(sceneName);
+                }
                 break;
 
             case "CreateProject":
@@ -397,11 +404,11 @@ public class HTS_Server : MonoBehaviour
             case "GetLog":
                 Debug.Log($"Command received: {request.Command}");
                 KLogger.Log.FlushLog();
-                var logFilePayload = new TextFilePayload() 
-                { 
+                var logFilePayload = new TextFilePayload()
+                {
                     Filename = Path.GetFileName(KLogger.LogPath),
                     Content = File.ReadAllText(KLogger.LogPath)
-                }; 
+                };
                 _tcpListener.WriteResponse(TcpMessage.Ok(logFilePayload));
                 break;
 
@@ -478,7 +485,7 @@ public class HTS_Server : MonoBehaviour
                 _tcpListener.WriteResponse(TcpMessage.Ok()); // signal ready
 
                 folder = FileLocations.ResolveFolder(largeFilePayload.Destination, largeFilePayload.SubPath);
-                
+
                 if (!Directory.Exists(folder))
                     Directory.CreateDirectory(folder);
 
@@ -635,9 +642,12 @@ public class HTS_Server : MonoBehaviour
         });
 
 #if !UNITY_EDITOR
-    Application.Quit();
+        if (filename.StartsWith("Hearing_Test_Suite"))
+        {
+            Application.Quit();
+        }
 #endif
     }
 
-#endregion
+    #endregion
 }
