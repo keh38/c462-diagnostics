@@ -8,7 +8,6 @@ using UnityEngine.SceneManagement;
 
 public class Lobby : MonoBehaviour
 {
-    [SerializeField] private TMPro.TMP_Text _versionLabel;
     [SerializeField] private TMPro.TMP_Text _message;
     [SerializeField] private GameObject _quitPanel;
 
@@ -18,7 +17,6 @@ public class Lobby : MonoBehaviour
     {
         HTS_Server.SetCurrentScene("Lobby", null);
 
-        _versionLabel.text = "V" + Application.version;
         HardwareInterface.Yield();
     }
 

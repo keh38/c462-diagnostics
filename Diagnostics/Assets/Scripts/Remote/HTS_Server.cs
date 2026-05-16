@@ -302,6 +302,22 @@ public class HTS_Server : MonoBehaviour
                 }
                 break;
 
+            case "SwitchToGame":
+                Debug.Log($"Command received: {request.Command}");
+
+                // Give the active scene a chance to clean itself up before changing scenes. 
+                var scResponse = _currentScene?.ProcessRPC(request);
+                if (scResponse != null && scResponse.IsOk)
+                {
+                    _tcpListener.WriteResponse(scResponse);
+                    break;
+                }
+                _tcpListener.WriteResponse(TcpMessage.Ok());
+                KLogger.Log.FlushLog();
+                Debug.Log($"changing scene to Lobby ...");
+                SceneManager.LoadScene("Lobby");
+                break;
+
             case "CreateProject":
                 string projectName = request.GetPayload<string>();
                 Debug.Log($"Command received: {request.Command} {projectName}");
@@ -476,13 +492,25 @@ public class HTS_Server : MonoBehaviour
             case "RunMeasurements":
                 Debug.Log($"Command received: {request.Command}");
                 var runMeasurementsPayload = request.GetPayload<RunMeasurementsPayload>();
-                bool protocolStarted = ProtocolManager.StartProtocol(runMeasurementsPayload);
-                if (!protocolStarted)
+                if (!string.IsNullOrEmpty(runMeasurementsPayload.ListFile))
                 {
-                    _tcpListener.WriteResponse(TcpMessage.Error("Failed to start protocol"));
-                    break;
+                    bool protocolStarted = ProtocolManager.StartProtocol(runMeasurementsPayload);
+                    if (!protocolStarted)
+                    {
+                        _tcpListener.WriteResponse(TcpMessage.Error("Failed to start protocol"));
+                        break;
+                    }
                 }
                 _tcpListener.WriteResponse(TcpMessage.Ok());
+
+                if (string.IsNullOrEmpty(runMeasurementsPayload.ListFile))
+                {
+                    WindowManager.GrantForegroundPermission(runMeasurementsPayload.Notification.ProcessId);
+                    WindowManager.BringToFront();
+                    if (SceneManager.GetActiveScene().name != "Lobby")
+                        SceneManager.LoadScene("Lobby");
+                }
+
                 break;
 
             case "Quit":
