@@ -117,38 +117,6 @@ public class HTS_Server : MonoBehaviour
         KTcpClient.SendRequest(instance._remoteEndPoint, TcpMessage.Request($"{target}:{command}"));
     }
 
-    public static void SendBufferedFile(string localPath)
-    {
-        //if (instance._remoteEndPoint == null) return;
-
-        //int bufferSize = 16384;
-
-        //var fileInfo = new FileInfo(localPath);
-
-        //long numBuffers = (long)Math.Ceiling((double)fileInfo.Length / bufferSize);
-
-        //KTcpClient client = new KTcpClient();
-        //client.ConnectTCPServer(instance._remoteEndPoint.Address.ToString(), _instance._remoteEndPoint.Port);
-
-        //var result = client.WriteStringAsByteArray($"ReceiveBufferedFile:{Path.GetFileName(localPath)}:{bufferSize}:{numBuffers}");
-        //if (result <= 0)
-        //{
-        //    return;
-        //}
-
-        //using (FileStream fs = new FileStream(localPath, FileMode.Open, FileAccess.Read))
-        //using (BinaryReader reader = new BinaryReader(fs))
-        //{
-        //    for (int k = 0; k < numBuffers; k++)
-        //    {
-        //        var bytes = reader.ReadBytes(bufferSize);
-        //        result = client.SendBuffer(bytes);
-        //    }
-        //}
-
-        //client.CloseTCPServer();
-    }
-
     private void _Init()
     {
         DontDestroyOnLoad(this);
@@ -307,9 +275,9 @@ public class HTS_Server : MonoBehaviour
                 _tcpListener.WriteResponse(TcpMessage.Ok());
                 _remoteConnected = false;
                 OnControllerDisconnected?.Invoke(this, EventArgs.Empty);
-                if (SceneManager.GetActiveScene().name != "Home")
+                if (SceneManager.GetActiveScene().name != "Lobby")
                 {
-                    SceneManager.LoadScene("Home");
+                    SceneManager.LoadScene("Lobby");
                 }
                 break;
 
@@ -564,6 +532,7 @@ public class HTS_Server : MonoBehaviour
 
             var payload = new BufferedFilePayload
             {
+                Destination = FileDestination.SubjectData,
                 Filename = remoteFilename,
                 NumBuffers = numBuffers,
                 BufferSize = bufferSize

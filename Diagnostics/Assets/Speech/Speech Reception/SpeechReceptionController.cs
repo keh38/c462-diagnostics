@@ -813,7 +813,7 @@ public class SpeechReceptionController : MonoBehaviour, IRemoteControllable
                 HTS_Server.SendDataFile(_mySceneName, jsonPath);
 
                 string wavPath = jsonPath.Replace(".json", ".wav");
-                HTS_Server.SendBufferedFile(wavPath);
+                HTS_Server.SendBufferedFile(wavPath, Path.GetFileName(wavPath));
 
                 _srData.responses.Add(_provisionalResponse);
                 ResponseAcquired();

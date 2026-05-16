@@ -17,6 +17,7 @@ using KLib.Expressions;
 using KLibU.Net;
 
 using C462.Shared;
+using System.Net.NetworkInformation;
 
 public class TurandotManager : MonoBehaviour, IRemoteControllable
 {
@@ -580,6 +581,12 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
     public void OnQuitConfirmButtonClick()
     {
         HTS_Server.SendRequest("Turandot", "Error:Quit");
+        if (ProtocolManager.IsActive)
+        {
+            ProtocolManager.FinishTest(_mainDataFile);
+            return;
+        }
+
         SceneManager.LoadScene("Home");
     }
 
