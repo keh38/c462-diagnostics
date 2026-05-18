@@ -219,6 +219,7 @@ public class ProtocolManager : MonoBehaviour
         try
         {
             HardwareInterface.Resume();
+            Debug.Log("Bringing window to front for protocol...");
             WindowManager.BringToFront();
 
             _notification = runMeasurementsPayload.Notification;

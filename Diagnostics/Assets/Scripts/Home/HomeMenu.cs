@@ -252,10 +252,10 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
 
     TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        var data = request.GetPayload<string>();
         switch (request.Command)
         {
             case "SetProject":
+                var data = request.GetPayload<string>();
                 GameManager.SetSubject(data, GameManager.Subject);
                 StartCoroutine(SelectSubjectPanel());
                 return TcpMessage.Ok();

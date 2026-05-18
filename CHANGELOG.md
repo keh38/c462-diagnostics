@@ -1,8 +1,10 @@
 ## Changelog
 
-### v2.1.16 (unreleased)
+### v2.1.16 (2026-05-18)
 #### Changed
 - cleaned up file transfer logic
+#### Added
+- logic to facilitate switching between HTS and Game
 
 ---
 

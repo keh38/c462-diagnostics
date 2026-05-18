@@ -258,6 +258,7 @@ public class HTS_Server : MonoBehaviour
                     Debug.Log($"Connection accepted from {incomingEndPoint}");
                     _remoteConnected = true;
                     _remoteEndPoint = incomingEndPoint;
+                    Debug.Log("Bringing window to front for new connection...");
                     WindowManager.BringToFront();
                     OnControllerConnected?.Invoke(this, EventArgs.Empty);
                 }
@@ -313,8 +314,9 @@ public class HTS_Server : MonoBehaviour
                     break;
                 }
                 _tcpListener.WriteResponse(TcpMessage.Ok());
-                KLogger.Log.FlushLog();
                 Debug.Log($"changing scene to Lobby ...");
+                GameBridge.LaunchGame();
+                KLogger.Log.FlushLog();
                 SceneManager.LoadScene("Lobby");
                 break;
 
@@ -505,8 +507,11 @@ public class HTS_Server : MonoBehaviour
 
                 if (string.IsNullOrEmpty(runMeasurementsPayload.ListFile))
                 {
-                    WindowManager.GrantForegroundPermission(runMeasurementsPayload.Notification.ProcessId);
+                    GameManager.SetSubject($"{runMeasurementsPayload.Project}/{runMeasurementsPayload.Subject}");
+                    Debug.Log("Bringing window to front for measurements...");
+                    HardwareInterface.Resume();
                     WindowManager.BringToFront();
+                    WindowManager.GrantForegroundPermission(runMeasurementsPayload.Notification.ProcessId);
                     if (SceneManager.GetActiveScene().name != "Lobby")
                         SceneManager.LoadScene("Lobby");
                 }
