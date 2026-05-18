@@ -805,10 +805,6 @@
       <HintPath>Assets\Plugins\MathNet.Numerics.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.IO.Ports">
-      <HintPath>Assets\Plugins\System.IO.Ports.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="C462.Digitimer.Abstractions">
       <HintPath>Assets\Plugins\C462.Digitimer.Abstractions.dll</HintPath>
       <Private>False</Private>

@@ -618,10 +618,6 @@
       <HintPath>Library\PackageCache\com.unity.collab-proxy@50ac96531b63\Lib\Editor\Unity.Plastic.Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.IO.Ports">
-      <HintPath>Assets\Plugins\System.IO.Ports.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="log4netPlastic">
       <HintPath>Library\PackageCache\com.unity.collab-proxy@50ac96531b63\Lib\Editor\log4netPlastic.dll</HintPath>
       <Private>False</Private>
