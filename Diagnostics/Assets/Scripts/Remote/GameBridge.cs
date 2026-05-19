@@ -4,6 +4,9 @@ using MathNet.Numerics;
 using Microsoft.Win32;
 
 using C462.Shared;
+using C462.Shared.Protocol.DTOs;
+using KLibU.Net;
+using System.Net;
 
 public static class GameBridge
 {
@@ -11,8 +14,27 @@ public static class GameBridge
     private const string RegistryValue = "InstallPath";
     private const string GameExecutableName = "SoundOfSilence";
 
-    public static void LaunchGame()
+    private static NotificationDescriptor _notification;
+
+
+    public static void RetakeControl(RunMeasurementsPayload runMeasurementsPayload)
     {
+        _notification = runMeasurementsPayload.Notification;
+        GameManager.SetSubject($"{runMeasurementsPayload.Project}/{runMeasurementsPayload.Subject}");
+        HardwareInterface.Resume();
+        WindowManager.BringToFront();
+    }
+
+    public static void RestoreControlToGame()
+    {
+        if (_notification != null)
+        {
+            WindowManager.GrantForegroundPermission(_notification.ProcessId);
+            SendNotification(_notification);
+            _notification = null;
+            return;
+        }
+
         var process = System.Diagnostics.Process.GetProcessesByName(GameExecutableName).FirstOrDefault();
         if (process != null)
         {
@@ -37,6 +59,16 @@ public static class GameBridge
                 return subKey?.GetValue(RegistryValue) as string;
             }
         }
+    }
+
+    private static void SendNotification(NotificationDescriptor notification)
+    {
+        var gameEndPoint = new IPEndPoint(
+            IPAddress.Parse(notification.Address),
+            notification.Port);
+
+        // Fire and forget — the Game's listener just needs the knock.
+        KTcpClient.SendRequest(gameEndPoint, TcpMessage.Request(notification.Command));  // "MeasurementsComplete"
     }
 
 

@@ -315,7 +315,7 @@ public class HTS_Server : MonoBehaviour
                 }
                 _tcpListener.WriteResponse(TcpMessage.Ok());
                 Debug.Log($"changing scene to Lobby ...");
-                GameBridge.LaunchGame();
+                GameBridge.RestoreControlToGame();
                 KLogger.Log.FlushLog();
                 SceneManager.LoadScene("Lobby");
                 break;
@@ -507,11 +507,7 @@ public class HTS_Server : MonoBehaviour
 
                 if (string.IsNullOrEmpty(runMeasurementsPayload.ListFile))
                 {
-                    GameManager.SetSubject($"{runMeasurementsPayload.Project}/{runMeasurementsPayload.Subject}");
-                    Debug.Log("Bringing window to front for measurements...");
-                    HardwareInterface.Resume();
-                    WindowManager.BringToFront();
-                    WindowManager.GrantForegroundPermission(runMeasurementsPayload.Notification.ProcessId);
+                    GameBridge.RetakeControl(runMeasurementsPayload);
                     if (SceneManager.GetActiveScene().name != "Lobby")
                         SceneManager.LoadScene("Lobby");
                 }
