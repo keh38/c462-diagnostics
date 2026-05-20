@@ -1,5 +1,12 @@
 ## Changelog
 
+### v2.1.18 (unreleased)
+#### Fixed
+- Launcher: hardware config dialog will run without Digitimer installed
+- fixed com port display in firmware updater
+
+---
+
 ### v2.1.17 (2026-05-20)
 #### Fixed
 - improved interface with Game

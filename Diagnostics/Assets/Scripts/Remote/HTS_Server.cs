@@ -377,6 +377,11 @@ public class HTS_Server : MonoBehaviour
                 OnSubjectChanged?.Invoke(this, EventArgs.Empty);
                 break;
 
+            case "GetSubjectMetrics":
+                Debug.Log($"Command received: {request.Command}");
+                _tcpListener.WriteResponse(TcpMessage.Ok(GameManager.Metrics));
+                break;
+
             case "GetTransducers":
                 Debug.Log($"Command received: {request.Command}");
                 _tcpListener.WriteResponse(TcpMessage.Ok(SharedFileLocations.EnumerateTransducers()));
@@ -507,11 +512,8 @@ public class HTS_Server : MonoBehaviour
 
                 if (string.IsNullOrEmpty(runMeasurementsPayload.ListFile))
                 {
-                    GameBridge.RetakeControl(runMeasurementsPayload);
-                    if (SceneManager.GetActiveScene().name != "Lobby")
-                        SceneManager.LoadScene("Lobby");
+                    StartCoroutine(RetakeControlNextFrame(runMeasurementsPayload));
                 }
-
                 break;
 
             case "Quit":
@@ -540,6 +542,14 @@ public class HTS_Server : MonoBehaviour
         Debug.Log("Quitting application by remote request...");
         yield return null;
         Application.Quit();
+    }
+
+    private IEnumerator RetakeControlNextFrame(RunMeasurementsPayload runMeasurementsPayload)
+    {
+        yield return null;
+        GameBridge.RetakeControl(runMeasurementsPayload);
+        if (SceneManager.GetActiveScene().name != "Lobby")
+            SceneManager.LoadScene("Lobby");
     }
 
     public static void SendBufferedFile(string localPath, string remoteFilename)

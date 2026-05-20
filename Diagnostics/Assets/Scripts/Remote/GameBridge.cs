@@ -21,6 +21,7 @@ public static class GameBridge
     {
         _notification = runMeasurementsPayload.Notification;
         GameManager.SetSubject($"{runMeasurementsPayload.Project}/{runMeasurementsPayload.Subject}");
+        HTS_Server.SendRequest("ChangedSubject", $"{runMeasurementsPayload.Project}/{runMeasurementsPayload.Subject}");
         HardwareInterface.Resume();
         WindowManager.BringToFront();
     }
