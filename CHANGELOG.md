@@ -1,6 +1,6 @@
 ## Changelog
 
-### v2.1.18 (unreleased)
+### v2.1.18 (2026-05-21)
 #### Fixed
 - Launcher: hardware config dialog will run without Digitimer installed
 - fixed com port display in firmware updater
