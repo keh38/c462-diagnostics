@@ -4,6 +4,8 @@
 #### Fixed
 - Launcher: hardware config dialog will run without Digitimer installed
 - fixed com port display in firmware updater
+#### Changed
+- send subject change to HTSController when set by the game
 
 ---
 
