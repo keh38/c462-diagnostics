@@ -1,5 +1,11 @@
 ## Changelog
 
+### v2.1.19 (unreleased)
+#### Added
+- Turandot param slider: custom tick marks
+
+---
+
 ### v2.1.18 (2026-05-21)
 #### Fixed
 - Launcher: hardware config dialog will run without Digitimer installed

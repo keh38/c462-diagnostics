@@ -1851,3 +1851,4 @@ MonoBehaviour:
   _button: {fileID: 4278910112594081539}
   _backgroundImage: {fileID: 8438942425842186961}
   _fillImage: {fileID: 8438942425776977211}
+  _tickMarkPrefab: {fileID: 804626169938325638, guid: 5aa329b02d28f7548a5f694bd80903bb, type: 3}

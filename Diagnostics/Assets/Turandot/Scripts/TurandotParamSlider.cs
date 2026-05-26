@@ -9,6 +9,7 @@ using KLib.Signals;
 using Turandot.Inputs;
 using Turandot.Screen;
 using Input = Turandot.Inputs.Input;
+using KLib.Expressions;
 
 namespace Turandot.Scripts
 {
@@ -22,6 +23,7 @@ namespace Turandot.Scripts
         [SerializeField] private GameObject _button;
         [SerializeField] private Image _backgroundImage;
         [SerializeField] private Image _fillImage;
+        [SerializeField] private GameObject _tickMarkPrefab;
 
         private RectTransform _buttonRectTransform;
 
@@ -65,7 +67,28 @@ namespace Turandot.Scripts
             rt.anchorMax = new Vector2(_layout.X, _layout.Y);
             rt.sizeDelta = new Vector2(_layout.Width, _layout.Height);
         }
-        
+
+        private void CreateCustomTickMarks()
+        {
+            //Debug.Log($"Creating custom tick marks: {_layout.Ticks.Count} ticks");
+
+            for (int i = 0; i < _layout.Ticks.Count; i++)
+            {
+                float tickValue = Expressions.EvaluateRandomElement(_layout.Ticks[i].Value);
+                var tickMark = Instantiate(_tickMarkPrefab, _slider.transform);
+                var tickRectTransform = tickMark.GetComponent<RectTransform>();
+                float normalizedValue = (tickValue - _minVal) / (_maxVal - _minVal);
+                tickRectTransform.anchorMin = new Vector2(normalizedValue, 0);
+                tickRectTransform.anchorMax = new Vector2(normalizedValue, 0);
+                tickRectTransform.anchoredPosition = Vector2.zero;
+
+                var tickLabel = tickMark.GetComponentInChildren<TMPro.TMP_Text>();
+                tickLabel.fontSize = _layout.FontSize;
+                tickLabel.text = _layout.Ticks[i].Label;
+            }
+
+        }
+
         public void ClearLog()
         {
             _log.Clear();
@@ -140,6 +163,12 @@ namespace Turandot.Scripts
 
                 if (!_action.ThumbTogglesSound) 
                     _sigMan.Activate();
+
+
+                if (_layout.TickMode == ParamSliderTickMode.Custom)
+                {
+                    CreateCustomTickMarks();
+                }
 
                 _paramSetter?.Invoke(_value);
                 _log.Add(Time.timeSinceLevelLoad, _value);
