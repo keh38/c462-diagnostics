@@ -1,6 +1,6 @@
 ## Changelog
 
-### v2.1.19 (unreleased)
+### v2.1.19 (2026-05-27)
 #### Added
 - Turandot param slider: custom tick marks
 
