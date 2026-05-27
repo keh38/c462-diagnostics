@@ -2,7 +2,7 @@
 - We want to find the softest sounds that you can hear
 - then we want you to judge the **loudness** of those sounds
 [br]
-- There are several sliders on the following screen
+- A slider will appear on the following screen
 - When prompted, drag the slider to the right until you can just barely hear a sound
 - Go back and forth a couple times just to be sure you get the right spot
 - Then press the button to lock in your choice
