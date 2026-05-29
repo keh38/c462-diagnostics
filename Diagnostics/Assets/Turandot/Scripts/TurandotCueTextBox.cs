@@ -37,7 +37,7 @@ namespace Turandot.Scripts
         private void LayoutControl()
         {
             _markdownRenderer.TextMesh.fontSize = _layout.FontSize;
-            _markdownRenderer.TextMesh.color = KLib.ColorTranslator.ColorFromARGB(_layout.Color);
+            _markdownRenderer.TextMesh.color = KLib.UnityColorTranslator.ColorFromARGB(_layout.Color);
             _markdownRenderer.TextMesh.alignment = ConvertAlignmentEnum(_layout.HorizontalAlignment);
 
             var rt = GetComponent<RectTransform>();

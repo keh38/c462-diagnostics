@@ -181,7 +181,7 @@ public class GameManager : MonoBehaviour
         string screenColor = _subjectMetadata.metrics["ScreenColor"];
         if (!string.IsNullOrEmpty(screenColor))
         {
-            return KLib.ColorTranslator.ColorFromFloatString(screenColor);
+            return KLib.UnityColorTranslator.ColorFromFloatString(screenColor);
         }
         return new Color(214f / 255, 214f / 255, 214f / 255);
     }

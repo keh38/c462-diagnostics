@@ -2,7 +2,7 @@
 
 namespace KLib
 {
-    public static class ColorTranslator
+    public static class UnityColorTranslator
     {
         public static UnityEngine.Color WindowsToUnity(System.Drawing.Color windowsColor)
         {

@@ -161,7 +161,7 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
             }
             if (_params.screen.ApplyParamSpecificScreenColor)
             {
-                _camera.backgroundColor = KLib.ColorTranslator.ColorFromARGB(_params.screen.Color);
+                _camera.backgroundColor = KLib.UnityColorTranslator.ColorFromARGB(_params.screen.Color);
             }
 
             _params.Initialize();

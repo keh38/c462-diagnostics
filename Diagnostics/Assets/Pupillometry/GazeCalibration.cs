@@ -53,13 +53,13 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
 
             float size = Screen.width / _settings.TargetSizeFactor;
             _target.rectTransform.sizeDelta = new Vector2(size, size);
-            _target.color = KLib.ColorTranslator.ColorFromARGB(_settings.TargetColor);
+            _target.color = KLib.UnityColorTranslator.ColorFromARGB(_settings.TargetColor);
 
             size = Screen.width / _settings.HoleSizeFactor;
             _hole.rectTransform.sizeDelta = new Vector2(size, size);
-            _hole.color = KLib.ColorTranslator.ColorFromARGB(_settings.BackgroundColor);
+            _hole.color = KLib.UnityColorTranslator.ColorFromARGB(_settings.BackgroundColor);
 
-            GetComponent<Camera>().backgroundColor = KLib.ColorTranslator.ColorFromARGB(_settings.BackgroundColor);
+            GetComponent<Camera>().backgroundColor = KLib.UnityColorTranslator.ColorFromARGB(_settings.BackgroundColor);
 
             string fn = $"{GameManager.Subject}-GazeCalibration-{DateTime.Now.ToString("yyyy-MM-dd_HHmmss")}.json";
             _dataPath = Path.Combine(SharedFileLocations.HtsSubjectDataFolder, fn);
@@ -91,6 +91,16 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
 
         _target.rectTransform.position = new Vector2(x, Screen.height - y);
         _numAcquired++;
+    }
+
+    private void ShowTargetNormalized(float x, float y)
+    {
+        _target.gameObject.SetActive(true);
+        _data.Add(Time.time, x, y);
+        Debug.Log($"set target to {x}, {y}");
+
+        _target.rectTransform.anchorMin = new Vector2(x, 1 - y);
+        _target.rectTransform.anchorMax = new Vector2(x, 1 - y);
     }
 
     void OnGUI()
@@ -161,6 +171,10 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
                 int y = int.Parse(parts[1]);
                 _canRespond = true;
                 ShowTarget(x, y);
+                return TcpMessage.Ok();
+            case "SetLocationNormalized":
+                var targetPayload = request.GetPayload<TargetPointPayload>();
+                ShowTargetNormalized(targetPayload.X, targetPayload.Y);
                 return TcpMessage.Ok();
             default:
                 return TcpMessage.NotFound(request.Command);

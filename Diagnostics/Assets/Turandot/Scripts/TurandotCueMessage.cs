@@ -46,7 +46,7 @@ namespace Turandot.Scripts
         private void LayoutControl()
         {
             _label.fontSize = _layout.FontSize;
-            _label.color = KLib.ColorTranslator.ColorFromARGB(_layout.Color);
+            _label.color = KLib.UnityColorTranslator.ColorFromARGB(_layout.Color);
 
             SetPosition(_layout.X, _layout.Y);
         }

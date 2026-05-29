@@ -30,7 +30,7 @@ namespace Turandot.Scripts
             {
                 _horizontalBar.enabled = false;
                 _verticalBar.enabled = false;
-                _image.color = KLib.ColorTranslator.ColorFromARGB(_layout.Color);
+                _image.color = KLib.UnityColorTranslator.ColorFromARGB(_layout.Color);
                 var image_rt = _image.GetComponent<RectTransform>();
                 image_rt.sizeDelta = new Vector2(_layout.Size, _layout.Size);
             }
@@ -40,11 +40,11 @@ namespace Turandot.Scripts
 
                 rt = _horizontalBar.GetComponent<RectTransform>();
                 rt.sizeDelta = new Vector2(_layout.Size, _layout.BarWidth);
-                _horizontalBar.color = KLib.ColorTranslator.ColorFromARGB(_layout.Color);
+                _horizontalBar.color = KLib.UnityColorTranslator.ColorFromARGB(_layout.Color);
 
                 rt = _verticalBar.GetComponent<RectTransform>();
                 rt.sizeDelta = new Vector2(_layout.BarWidth, _layout.Size);
-                _verticalBar.color = KLib.ColorTranslator.ColorFromARGB(_layout.Color);
+                _verticalBar.color = KLib.UnityColorTranslator.ColorFromARGB(_layout.Color);
             }
         }
    }

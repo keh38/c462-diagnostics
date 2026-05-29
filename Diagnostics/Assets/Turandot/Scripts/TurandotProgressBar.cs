@@ -23,7 +23,7 @@ namespace Turandot.Scripts
             var rt = GetComponent<RectTransform>();
             rt.sizeDelta = new Vector2(layout.Width, layout.Height);
 
-            _fillImage.color = KLib.ColorTranslator.ColorFromARGB(layout.Color);
+            _fillImage.color = KLib.UnityColorTranslator.ColorFromARGB(layout.Color);
             _slider.value = 0;
         }
 

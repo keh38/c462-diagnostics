@@ -6,44 +6,15 @@ namespace Pupillometry
     public class GazeCalibrationSettings
     {
         public int Width { get; set; }
-        private bool ShouldSerializeWidth() { return false; }
-
         public int Height { get; set; }
-        private bool ShouldSerializeHeight() { return false; }
-
-        public float TargetSizeFactor { get; set; }
-        private bool ShouldSerializeTargetSizeFactor() { return false; }
-
-        public float HoleSizeFactor { get; set; }
-        private bool ShouldSerializeHoleSizeFactor() { return false; }
-
-
-        //[Category("Appearance")]
-        [XmlIgnore]
-        public System.Drawing.Color TargetWindowsColor
-        {
-            get { return System.Drawing.Color.FromArgb(TargetColor); }
-            set { TargetColor = value.ToArgb(); }
-        }
-        private bool ShouldSerializeTargetWindowsColor() { return false; }
-
-        public int TargetColor { set; get; }
-
-        [XmlIgnore]
-        public System.Drawing.Color BackgroundWindowsColor
-        {
-            get { return System.Drawing.Color.FromArgb(BackgroundColor); }
-            set { BackgroundColor = value.ToArgb(); }
-        }
-        private bool ShouldSerializeBackgroundWindowsColor() { return false; }
-
         public int BackgroundColor { set; get; }
 
-        public string CalibrationType { get; set; }
-        private bool ShouldSerializeCalibrationType() { return false; }
+        public float TargetSizeFactor { get; set; }
+        public float HoleSizeFactor { get; set; }
+        public int TargetColor { set; get; }
 
+        public string CalibrationType { get; set; }
         public UnityEngine.KeyCode KeyCode { get; set; }
-        private bool ShouldSerializeKeyCode() { return false; }
 
         public GazeCalibrationSettings()
         {
