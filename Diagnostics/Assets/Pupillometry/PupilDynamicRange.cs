@@ -226,13 +226,6 @@ public class PupilDynamicRange : MonoBehaviour, IRemoteControllable
             case "Abort":
                 _stopMeasurement = true;
                 return TcpMessage.Ok();
-            case "SendSyncLog":
-                var logPath = HardwareInterface.ClockSync.LogFile;
-                if (!string.IsNullOrEmpty(logPath))
-                {
-                    HTS_Server.SendDataFile(_mySceneName, logPath);
-                }
-                return TcpMessage.Ok();
             default:
                 return TcpMessage.NotFound(request.Command);
         }

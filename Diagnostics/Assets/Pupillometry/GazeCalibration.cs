@@ -14,6 +14,7 @@ using Pupillometry;
 using C462.Shared;
 
 using KeyCode = UnityEngine.KeyCode;
+using C462.Shared.Protocol.DTOs;
 
 public class GazeCalibration : MonoBehaviour, IRemoteControllable
 {
@@ -41,11 +42,11 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
         HTS_Server.SetCurrentScene(_mySceneName, this);
     }
 
-    void Initialize(string data)
+    void Initialize(GazeCalibrationSettings settings)
     {
         try
         {
-            _settings = Files.XmlDeserializeFromString<GazeCalibrationSettings>(data);
+            _settings = settings;
 
             _numTargets = int.Parse(_settings.CalibrationType.Substring(_settings.CalibrationType.Length - 1)) + 1;
             _numAcquired = 0;
@@ -122,22 +123,6 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
         }
     }
 
-    void SendData()
-    {
-        _data.Trim();
-        File.AppendAllText(_dataPath, Files.JSONSerializeToString(_data));
-        HTS_Server.SendDataFile(_mySceneName, _dataPath);
-    }
-
-    void SendSyncLog()
-    {
-        var logPath = HardwareInterface.ClockSync.LogFile;
-        if (!string.IsNullOrEmpty(logPath))
-        {
-            HTS_Server.SendDataFile(_mySceneName, logPath);
-        }
-    }
-
     void IRemoteControllable.ChangeScene(string newScene)
     {
         SceneManager.LoadScene(newScene);
@@ -145,29 +130,32 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
 
     TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        var data = request.GetPayload<string>();
         switch (request.Command)
         {
             case "Initialize":
-                Initialize(data);
-                return TcpMessage.Ok();
-            case "StartSynchronizing":
-                HardwareInterface.ClockSync.StartSynchronizing(Path.GetFileName(data));
-                return TcpMessage.Ok();
-            case "StopSynchronizing":
-                HardwareInterface.ClockSync.StopSynchronizing();
-                return TcpMessage.Ok();
+                var settings = request.GetPayload<GazeCalibrationSettings>();
+                Initialize(settings);
+                return TcpMessage.Ok(_dataPath);
             case "Abort":
                 _isRunning = false;
                 _target.gameObject.SetActive(false);
                 return TcpMessage.Ok();
+            case "Finish":
+                _isRunning = false;
+                _target.gameObject.SetActive(false);
+                HTS_Server.SendRequest("Gaze Calibration", "GazeCalibrationFinished");
+                return TcpMessage.Ok();
             case "SendData":
-                SendData();
-                return TcpMessage.Ok();
-            case "SendSyncLog":
-                SendSyncLog();
-                return TcpMessage.Ok();
+                _data.Trim();
+                File.AppendAllText(_dataPath, Files.JSONSerializeToString(_data));
+                var dataFilePayload = new TextFilePayload()
+                {
+                    Filename = Path.GetFileName(_dataPath),
+                    Content = File.ReadAllText(_dataPath)
+                };
+                return TcpMessage.Ok(dataFilePayload);
             case "Location":
+                var data = request.GetPayload<string>();
                 var parts = data.Split(',');
                 int x = int.Parse(parts[0]);
                 int y = int.Parse(parts[1]);
