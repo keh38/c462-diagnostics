@@ -38,8 +38,15 @@ public class GazeCalibration : MonoBehaviour, IRemoteControllable
 
     void Start()
     {
+        Cursor.visible = false;
+
         _target.gameObject.SetActive(false);
         HTS_Server.SetCurrentScene(_mySceneName, this);
+    }
+
+    private void OnDisable()
+    {
+        Cursor.visible = true;
     }
 
     void Initialize(GazeCalibrationSettings settings)

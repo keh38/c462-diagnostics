@@ -1,5 +1,11 @@
 ## Changelog
 
+### v2.1.21 (unreleased)
+#### Changed
+- hide cursor in gaze calibration
+
+---
+
 ### v2.1.20 (2026-05-29)
 #### Added
 - support for Tobii-based gaze calibration
