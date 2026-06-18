@@ -89,6 +89,12 @@ public class QuestionnaireController : MonoBehaviour, IRemoteControllable
         }
     }
 
+    private void OnDisable()
+    {
+        _abortAction.performed -= OnAbortAction;
+        _abortAction.Disable();
+    }
+
     void InitializeMeasurement()
     {
         _title.text = _questionnaire.Title;

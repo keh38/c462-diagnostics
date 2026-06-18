@@ -120,6 +120,16 @@ public class CombinedLevelSlider : MonoBehaviour
         _messageText.gameObject.SetActive(false);
     }
 
+    public void Clear()
+    {
+        _subthresholdImage.fillAmount = 0;
+        _tooLoudImage.fillAmount = 0;
+        _thumbRectTransform.gameObject.SetActive(false);
+        _thresholdSliderValue = 0;
+        _slider.SetValueWithoutNotify(0);
+        _backgroundImage.color = _defaultBackgroundColor;
+    }
+
     public void Reset()
     {
         _subthresholdImage.fillAmount = 0;
@@ -226,7 +236,7 @@ public class CombinedLevelSlider : MonoBehaviour
             _phase = Phase.LDL;
             _reversals = 0;
             _promptText.text = "Adjust the slider to the loudest level you can tolerate";
-            _buttonText.text = "No louder than this";
+            _buttonText.text = "That's my limit!";
             _maxButtonText.text = "Could go higher";
             _thresholdSliderValue = _slider.value;
             _subthresholdImage.fillAmount = _slider.value;

@@ -1,8 +1,13 @@
 ## Changelog
 
-### v2.1.21 (unreleased)
+### v2.1.21 (2026-06-18)
 #### Changed
 - hide cursor in gaze calibration
+- Combined Audio/LDL:
+  - clear slider when it rotates up to eliminate reference
+  - changed LDL button label to "That's my limit!"
+#### Fixed
+- exceptions related to undisposed input actions
 
 ---
 

@@ -64,6 +64,12 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
         Debug.Log(_udpEndPoint.ToString());
     }
 
+    private void OnDisable()
+    {
+        _abortAction.performed -= OnAbortAction;
+        _abortAction.Disable();
+    }
+
     private void Update()
     {
         if (_isRunning)

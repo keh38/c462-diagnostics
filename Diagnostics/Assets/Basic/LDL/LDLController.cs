@@ -75,6 +75,12 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         Application.logMessageReceived -= HandleException;
     }
 
+    private void OnDisable()
+    {
+        _abortAction.performed -= OnAbortAction;
+        _abortAction.Disable();
+    }
+
     private void Start()
     {
         HTS_Server.SetCurrentScene(_mySceneName, this);

@@ -40,6 +40,12 @@ public class CalibrationController : MonoBehaviour, IRemoteControllable
         InitializeStimulusGeneration();
     }
 
+    private void OnDisable()
+    {
+        _abortAction.performed -= OnAbortAction;
+        _abortAction.Disable();
+    }
+
     private void InitializeStimulusGeneration()
     {
         _signalManager = new SignalManager();

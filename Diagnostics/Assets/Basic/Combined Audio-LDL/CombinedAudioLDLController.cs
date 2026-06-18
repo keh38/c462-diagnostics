@@ -70,6 +70,12 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         _sliderWheel.Advance();
     }
 
+    private void OnDisable()
+    {
+        _abortAction.performed -= HandleAbortAction;
+        _abortAction.Disable();
+    }
+
     private void OnDestroy()
     {
         Application.logMessageReceived -= HandleException;

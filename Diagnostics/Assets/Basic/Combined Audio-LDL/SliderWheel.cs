@@ -101,7 +101,7 @@ public class SliderWheel : MonoBehaviour
 
         // The slider that just finished should also be reset, so its position cannot be used as a guide
         int justFinishedSlider = _slotAssignment[1];
-        _sliders[justFinishedSlider].LevelSlider.Reset();
+        _sliders[justFinishedSlider].LevelSlider.Clear();
 
         if (_advanceCount >= _maxNumSliders-1)
         {
