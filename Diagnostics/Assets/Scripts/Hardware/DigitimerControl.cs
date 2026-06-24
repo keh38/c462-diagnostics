@@ -154,6 +154,7 @@ public class DigitimerControl : MonoBehaviour
         if (result != ErrorCode.Success)
         {
             Debug.Log($"Error setting Digitimer {deviceNum}: {result}");
+            throw new Exception($"Error setting Digitimer {deviceNum}: {result}");
         }
 
         return result == ErrorCode.Success;

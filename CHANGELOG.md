@@ -1,5 +1,13 @@
 ## Changelog
 
+### v2.1.21 (2026-06-24)
+#### Fixed
+- Turandot did not clear script settings between runs
+#### Changed
+- Digitimer enable error now throws an exception
+
+---
+
 ### v2.1.21 (2026-06-18)
 #### Changed
 - hide cursor in gaze calibration
