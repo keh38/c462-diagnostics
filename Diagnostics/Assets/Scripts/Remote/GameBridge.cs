@@ -16,6 +16,7 @@ public static class GameBridge
 
     private static NotificationDescriptor _notification;
 
+    public static bool GameHasControl { get; private set; } = false;
 
     public static void RetakeControl(RunMeasurementsPayload runMeasurementsPayload)
     {
@@ -24,10 +25,12 @@ public static class GameBridge
         HTS_Server.SendRequest("ChangedSubject", $"{runMeasurementsPayload.Project}/{runMeasurementsPayload.Subject}");
         HardwareInterface.Resume();
         WindowManager.BringToFront();
+        GameHasControl = false;
     }
 
     public static void RestoreControlToGame()
     {
+        GameHasControl = true;
         if (_notification != null)
         {
             WindowManager.GrantForegroundPermission(_notification.ProcessId);

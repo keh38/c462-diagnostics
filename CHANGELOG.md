@@ -1,5 +1,11 @@
 ## Changelog
 
+### v2.1.22 (2026-06-25)
+#### Fixed
+- allow Lobby to reacquire control of hardware in the event the Game disappears before formally relinquishing it
+
+---
+
 ### v2.1.21 (2026-06-24)
 #### Fixed
 - Turandot did not clear script settings between runs

@@ -17,7 +17,23 @@ public class Lobby : MonoBehaviour
     {
         HTS_Server.SetCurrentScene("Lobby", null);
 
-        HardwareInterface.Yield();
+        // Not sure why this was ever a good idea:
+//        HardwareInterface.Yield();
+    }
+
+    private void OnDisable()
+    {
+        if (GameBridge.GameHasControl)
+        {
+            // We shouldn't be leaving the lobby until the Game has formally relinquished control.
+            // But there is a loophole: if the Game is closed before it relinquishes control, 
+            // then we will never resume hardware control, specifically the Digitimer, leading to downstream
+            // errors. 
+
+            Debug.Log("WARNING! Resuming hardware control, but it appears the Game is still in control");
+
+            HardwareInterface.Resume();
+        }
     }
 
     void OnGUI()
