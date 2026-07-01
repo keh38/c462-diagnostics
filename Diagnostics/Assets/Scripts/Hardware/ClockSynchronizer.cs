@@ -185,12 +185,6 @@ public class ClockSynchronizer : MonoBehaviour
         File.AppendAllText(_logPath, logEntry + Environment.NewLine);
     }
 
-    private void MeasureOnePulse()
-    {
-        _generatePulse = true;
-        _syncPulseDetector.DetectOnePulse();
-    }
-
     private void OnAudioFilterRead(float[] data, int channels)
     {
         if (_generatePulse && channels > 2)

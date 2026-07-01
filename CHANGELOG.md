@@ -1,5 +1,11 @@
 ## Changelog
 
+### v2.1.23 (unreleased)
+#### Fixed
+- LDL Inf's were not getting replaced with max SPL
+
+---
+
 ### v2.1.22 (2026-06-25)
 #### Fixed
 - allow Lobby to reacquire control of hardware in the event the Game disappears before formally relinquishing it

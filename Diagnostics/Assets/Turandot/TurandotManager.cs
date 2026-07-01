@@ -1037,7 +1037,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 
         if (_scriptArguments != null)
         {
-            Debug.Log("YYOOOOO");
             ApplyScriptArguments(_scriptArguments);
             _scriptArguments = null;
         }
