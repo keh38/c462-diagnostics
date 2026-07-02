@@ -9,12 +9,12 @@ public class SyncPulseDetector : MonoBehaviour
 {
     public class SyncPulseEvent
     {
-        public enum Result { NotDetected, Detected, Error}
+        public enum Result { Unknown, NotDetected, Detected, Error}
 
         public long systemTime = 0;
         public double offset = double.NaN;
         public double rtt = double.NaN;
-        public Result result = Result.NotDetected;
+        public Result result = Result.Unknown;
     }
 
     private SerialPort _serialPort;
@@ -82,7 +82,7 @@ public class SyncPulseDetector : MonoBehaviour
 
             if (tlast > 0)
             {
-                var rtt = (double)(t3 - t0)*1e-4 - (t2 - t1) * 1e-3;
+                var rtt = (double)(t3 - t0) * 1e-4 - (t2 - t1) * 1e-3;
 
                 syncPulseEvent.systemTime = t3;
 
@@ -95,6 +95,10 @@ public class SyncPulseDetector : MonoBehaviour
                 syncPulseEvent.offset = (tlast - t2) / 1000;
                 syncPulseEvent.rtt = rtt;
                 syncPulseEvent.result = SyncPulseEvent.Result.Detected;
+            }
+            else if (t1 > 0 && t2 > 0)
+            {
+                syncPulseEvent.result = SyncPulseEvent.Result.NotDetected;
             }
         }
         catch (TimeoutException)
