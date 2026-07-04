@@ -6,9 +6,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-using KLibU;
+using KLibU.Logging;
 using KLibU.Net;
-using KLib.Signals;
+
 using System;
 
 public class HomeMenu : MonoBehaviour, IRemoteControllable

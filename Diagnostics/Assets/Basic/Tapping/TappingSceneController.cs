@@ -1,22 +1,22 @@
+using BasicMeasurements;
+using C462.Shared;
+using KLib.Signals;
+using KLibU;
+using KLibU.Net;
+using KLibU.Synthesizers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using Tapping;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-using Audiograms;
-using KLib;
-using KLibU;
-using KLibU.Net;
-using C462.Shared;
-
-using BasicMeasurements;
-
-public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
+public class TappingSceneController : MonoBehaviour, IRemoteControllable
 {
     [SerializeField] private InputActionAsset _actions;
     [SerializeField] private TMPro.TMP_Text _title;
@@ -34,11 +34,17 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
     private bool _stopMeasurement = false;
     private bool _localAbort = false;
 
-    private BasicMeasurementConfiguration _settings = new BasicMeasurementConfiguration();
+    private TappingConfiguration _settings = new TappingConfiguration();
 
     private string _dataPath;
-    private string _mySceneName = "Basic Measurement";
+    private string _mySceneName = "Tapping";
     private string _configName;
+
+    private Synthesizer _synth;
+    private ClipTrack _clipTrack;
+
+    private bool _audioEnabled = false;
+    private bool _stopAudio = false;
 
     private InputAction _abortAction;
 
@@ -77,7 +83,7 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
             {
                 ShowFinishPanel("Nothing to do");
             }
-        }     
+        }
     }
     void InitializeMeasurement()
     {
@@ -105,8 +111,8 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
             subjectID = GameManager.Subject
         };
 
-        string json = Files.JSONStringAdd("", "info", KLibU.Files.JSONSerializeToString(header));
-        json = KLibU.Files.JSONStringAdd(json, "params", KLibU.Files.JSONSerializeToString(_settings));
+        string json = Files.JSONStringAdd("", "info", Files.JSONSerializeToString(header));
+        json = Files.JSONStringAdd(json, "params", Files.JSONSerializeToString(_settings));
         json += Environment.NewLine;
 
         File.WriteAllText(_dataPath, json);
@@ -144,6 +150,10 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
     {
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(true);
+
+        InitializeSynth();
+
+        _audioEnabled = true;
     }
 
     void OnAbortAction(InputAction.CallbackContext context)
@@ -253,13 +263,49 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
         }
     }
 
+    private void InitializeSynth()
+    {
+        var audioConfig = AudioSettings.GetConfiguration();
+
+        var channel = _settings.Channel.Clone();
+        float Tmax = channel.Gate.Width_ms;
+        int npts = Mathf.RoundToInt(audioConfig.sampleRate * Tmax / 1000f);
+
+        var signalManager = new SignalManager();
+        signalManager.AddChannel(channel);
+
+        signalManager.Initialize(audioConfig.sampleRate, npts, SessionContext.Signal);
+
+        _clipTrack = new ClipTrack(channelOffsetL: channel.OutputNum, channelOffsetR: channel.IsStereo ? channel.ContraOutputNum : -1);
+        _clipTrack.Name = "ClipTrack";
+        _clipTrack.ClipManager.CalibratedLevel = 0f;
+        _clipTrack.ClipManager.Reverb.Active = false;
+        _clipTrack.Sequencer.Active = true;
+        _clipTrack.Sequencer.Steps = 8;
+        _clipTrack.Sequencer.EventOrder = EventOrder.Fixed;
+        _clipTrack.Sequencer.SetNote(0);
+        _clipTrack.Sequencer.SetEvents(setAll: true);
+
+        channel.SetActive(true);
+        channel.Create();
+
+        _clipTrack.ClipManager.AddClip(channel.Data, 0);
+        _synth = new Synthesizer();
+
+        float beatInterval_s = 2f * _settings.MinISI / 1000;
+        float bpm = 60f / beatInterval_s;
+        _synth.BPM = bpm; 
+
+        _synth.Tracks.Add(_clipTrack);
+    }
+
     TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
         var data = request.GetPayload<string>();
         switch (request.Command)
         {
             case "Initialize":
-                _settings = Files.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as AudiogramMeasurementSettings;
+                _settings = Files.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as TappingConfiguration;
                 InitializeMeasurement();
                 return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
@@ -282,5 +328,17 @@ public class BasicMeasurementController : MonoBehaviour, IRemoteControllable
     void IRemoteControllable.ChangeScene(string newScene)
     {
         SceneManager.LoadScene(newScene);
+    }
+
+    private void OnAudioFilterRead(float[] data, int channels)
+    {
+        if (_audioEnabled)
+        {
+            if (_stopAudio)
+            {
+                Gate.RampDown(data);
+                _audioEnabled = false;
+            }
+        }
     }
 }

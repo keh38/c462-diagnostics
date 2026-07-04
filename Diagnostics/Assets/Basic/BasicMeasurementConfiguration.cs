@@ -12,6 +12,7 @@ namespace BasicMeasurements
     [XmlInclude(typeof(CombinedAudioLDL.CombinedAudioLDLSettings))]
     [XmlInclude(typeof(DigitsTest.DigitsTestSettings))]
     [XmlInclude(typeof(LDL.LDLMeasurementSettings))]
+    [XmlInclude(typeof(Tapping.TappingConfiguration))]
     [XmlInclude(typeof(Questionnaires.Questionnaire))]
     [JsonObject(MemberSerialization.OptOut)]
     public class BasicMeasurementConfiguration

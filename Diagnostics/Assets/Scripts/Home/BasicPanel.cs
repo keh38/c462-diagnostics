@@ -69,17 +69,17 @@ public class BasicPanel : MonoBehaviour
             return;
         }
 
+        if (fileType == "Tapping")
+        {
+            SceneManager.LoadScene("Tapping");
+            return;
+        }
+
         if (fileType == "Questionnaire")
         {
             SceneManager.LoadScene("Questionnaire");
             return;
         }
-    }
-
-    private void ApplyScript(string name)
-    {
-        var script = Files.XmlDeserialize<Turandot.Schedules.Script>(SharedFileLocations.GetConfigFile("TScript", name));
-        script.Apply(SharedFileLocations.HtsProtocolFolder);
     }
 
     private void FillListBox(string fileType)

@@ -85,7 +85,6 @@ public class TurandotManager : MonoBehaviour, IRemoteControllable
 #if HACKING
         Application.targetFrameRate = 60;
         GameManager.SetSubject("Joanne/_Test");
-        FileLocations.SetDataRoot(@"C:\Users\hancock\OneDrive - Mass General Brigham\HTS");
         string configName = "CMMStart";
         //DiagnosticsManager.Instance.MakeExtracurricular("Turandot", "Turandot." + configName);
 #else

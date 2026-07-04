@@ -62,6 +62,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Basic/Combined Audio-LDL/Combined Audio-LDL.unity
     guid: 03a1ac88ed9a0e94e9abc976b7beced4
+  - enabled: 1
+    path: Assets/Basic/Tapping/Tapping.unity
+    guid: cf54b72bac876974bb3d441a28fc10a9
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 28be48df767d2434681ec999065f06dc, type: 3}
   m_UseUCBPForAssetBundles: 0

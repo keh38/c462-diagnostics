@@ -7,8 +7,8 @@ using System.Net;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-using KLib;
 using KLibU;
+using KLibU.Logging;
 using KLibU.Net;
 using System.Threading.Tasks;
 using HTS.Unity.Tcp;
