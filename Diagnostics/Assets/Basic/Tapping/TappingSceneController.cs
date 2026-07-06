@@ -1,21 +1,20 @@
-using BasicMeasurements;
-using C462.Shared;
-using CombinedAudioLDL;
-using KLib.Signals;
-using KLibU;
-using KLibU.Net;
-using KLibU.Synthesizers;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
-using Tapping;
-using Unity.VisualScripting.FullSerializer;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+
+using C462.Shared;
+
+using KLib.Signals;
+using KLibU;
+using KLibU.Net;
+
+using BasicMeasurements;
+using Tapping;
 
 public class TappingSceneController : MonoBehaviour, IRemoteControllable
 {
@@ -41,11 +40,11 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     private string _mySceneName = "Tapping";
     private string _configName;
 
-    private Synthesizer _synth;
-    private ClipTrack _clipTrack;
+    private TappingPatternGenerator _patternGenerator;
 
     private bool _audioEnabled = false;
     private bool _stopAudio = false;
+    private bool _runEnded = false;
 
     private InputAction _abortAction;
 
@@ -160,11 +159,9 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(true);
 
-        InitializeSynth();
+        InitializePatternGenerator();
 
         _audioEnabled = true;
-
-        _synth.StartPlay();
     }
 
     void OnAbortAction(InputAction.CallbackContext context)
@@ -178,10 +175,21 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
     void Update()
     {
+        if (_runEnded) return;
+        
+        if (_patternGenerator != null && _patternGenerator.IsComplete)
+        {
+            _runEnded = true;
+            EndRun(abort: false);
+            return;
+        }
+
         if (_stopMeasurement)
         {
             _abortAction.Disable();
             _stopMeasurement = false;
+            _stopAudio = true;
+            _runEnded = true;
             EndRun(abort: true);
         }
     }
@@ -209,6 +217,8 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     {
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(false);
+
+        KLib.Utilities.AppendToJsonFile(_dataPath, Files.JSONSerializeToString(new { onsetDspTimes = _patternGenerator.OnsetDspTimes }));
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
         HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
@@ -274,49 +284,16 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         }
     }
 
-    private void InitializeSynth()
+    private void InitializePatternGenerator()
     {
-        var audioConfig = AudioSettings.GetConfiguration();
+        _patternGenerator = new TappingPatternGenerator();
 
-        var channel = _settings.Channel.Clone();
-        float Tmax = channel.Gate.Width_ms;
-        int npts = Mathf.RoundToInt(audioConfig.sampleRate * Tmax / 1000f);
-
-        var signalManager = new SignalManager();
-        signalManager.AddChannel(channel);
-
-        signalManager.Initialize(audioConfig.sampleRate, npts, SessionContext.Signal);
-
-        var channelOffsetL = channel.OutputNum;
-        var channelOffsetR = channel.IsStereo ? channel.ContraOutputNum : -1;
-
-        _clipTrack = new ClipTrack(channelOffsetL: channelOffsetL, channelOffsetR: channelOffsetR);
-        _clipTrack.Name = "ClipTrack";
-        _clipTrack.ClipManager.CalibratedLevel = 0f;
-        _clipTrack.ClipManager.Reverb.Active = false;
-        _clipTrack.Sequencer.Active = true;
-        _clipTrack.Sequencer.Steps = 7;
-        _clipTrack.Sequencer.EventOrder = EventOrder.Fixed;
-        _clipTrack.Sequencer.SetNote(0);
-        _clipTrack.Sequencer.SetEvents(setAll: true);
-
-        channel.SetActive(true);
-        channel.Create();
-
-        _clipTrack.ClipManager.AddClip(channel.Data, 0);
-        _synth = new Synthesizer();
-
-        float beatInterval_s = 2f * _settings.MinISI / 1000;
-        float bpm = 60f / beatInterval_s;
-        Debug.Log($"[InitializeSynth] beatInterval_s: {beatInterval_s}, bpm: {bpm}");
-
-        _synth.BPM = bpm; 
-
-        _synth.Tracks.Add(_clipTrack);
-
-        _synth.Initialize(audioConfig.sampleRate, audioConfig.dspBufferSize,
-            channelOffsetL: channelOffsetL,
-            channelOffsetR: channelOffsetR);
+        _patternGenerator.Initialize(
+            channel: _settings.Channel.Clone(),
+            minISI: _settings.MinISI,
+            intervalExpression: _settings.IntervalExpression,
+            numIntervals: _settings.PatternLength,
+            numRepeats: _settings.NumRepeats);
     }
 
     TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
@@ -354,11 +331,16 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     {
         if (_audioEnabled)
         {
-            _synth.Process(data, channels);
+            _patternGenerator.Process(data, channels);
 
             if (_stopAudio)
             {
                 Gate.RampDown(data);
+                _audioEnabled = false;
+            }
+
+            if (_patternGenerator.IsComplete)
+            {
                 _audioEnabled = false;
             }
         }

@@ -11,36 +11,46 @@ public class TappingPatternGenerator
 {
     private List<float[]> _signals;
 
-    private int[] _intervalLength;
+    private int[] _intervals;
     private int _numRepeats;
-    private int _repeatNumber;
-    private int _intervalNumber;
-    private int _pointPerCycle;
-    private int _currentPointIndex;
-    private int _signalIndex;
+
+    // --- running position (persists across Process calls) ---
+    private int _intervalIndex;   // which interval in the pattern
+    private int _repeatIndex;     // which repeat of the whole pattern
+    private int _posInInterval;   // samples already emitted into current interval
+    private int _stimulusIndex;   // which stimulus is playing (free-running)
 
     private int _channelOffsetL;
     private int _channelOffsetR;
 
-    private int _bufferSize;
+    private float _dt;
 
-    public bool IsFinished { get; private set; }
+    private double[] _onsetDspTimes;
+    private int _onsetCursor;
+
+    public volatile bool IsComplete;
+    public double[] OnsetDspTimes => _onsetDspTimes;
 
     public void Initialize(
         Channel channel, 
         float minISI,
         string intervalExpression,
-        int numIntervals)
+        int numIntervals, 
+        int numRepeats)
     {
+        _numRepeats = numRepeats;
+
         var audioConfig = AudioSettings.GetConfiguration();
-        _bufferSize = audioConfig.dspBufferSize;
+        _dt = 1f / audioConfig.sampleRate;
 
         CreateSignals(audioConfig.sampleRate, channel.Clone());
         CreatePattern(audioConfig.sampleRate, minISI, intervalExpression, numIntervals);
 
-        IsFinished = false;
+        _onsetDspTimes = new double[_intervals.Length * _numRepeats];
+        _onsetCursor = 0;
 
-        _signalIndex = 0;
+        IsComplete = false;
+
     }
 
     private void CreateSignals(int Fs, Channel channel)
@@ -77,19 +87,74 @@ public class TappingPatternGenerator
                 break;
         }
 
-        _intervalLength = new int[numIntervals];
+        _intervals = new int[numIntervals];
         for (int k=0; k < numIntervals; k++)
         {
-            _intervalLength[k] = Mathf.RoundToInt(Fs * ratios[inum[k]] * minISI * 1000f);
+            _intervals[k] = Mathf.RoundToInt(Fs * ratios[inum[k]] * minISI / 1000f);
         }
     }
 
     public void Process(float[] data, int channels)
     {
-        for (int k=0; k<_bufferSize; k++)
-        {
+        int outPos = 0;
 
+        double dspTime = AudioSettings.dspTime;
+
+        while (outPos < data.Length && !IsComplete)
+        {
+            if (_posInInterval == 0)
+            {
+                _onsetDspTimes[_onsetCursor++] = dspTime;
+            }
+
+            int intervalLength = _intervals[_intervalIndex];
+            float[] stim = _signals[_stimulusIndex];
+
+            // Fill until the buffer is full OR this interval ends.
+            // First stim.Length samples of the interval = the stimulus, rest = silence.
+            while (outPos < data.Length && _posInInterval < intervalLength)
+            {
+                data[outPos + _channelOffsetL] = (_posInInterval < stim.Length) ? stim[_posInInterval] : 0f;
+                if (_channelOffsetR >= 0)
+                    data[outPos + _channelOffsetR] = data[outPos + _channelOffsetL];
+                outPos += channels;
+
+                _posInInterval++;
+                dspTime += _dt;
+            }
+
+            // Advance ONLY if we truly reached the interval end,
+            // not if we just ran out of buffer.
+            if (_posInInterval >= intervalLength)
+                AdvanceInterval();
+        }
+
+        // After completion (or if we broke early), pad remaining buffer with silence.
+        while (outPos < data.Length)
+        {
+            data[outPos + _channelOffsetL] = 0f;
+            if (_channelOffsetR >= 0)
+                data[outPos + _channelOffsetR] = 0f;
+            outPos += channels;
         }
     }
 
+    private void AdvanceInterval()
+    {
+        _posInInterval = 0;
+        _stimulusIndex = (_stimulusIndex + 1) % _signals.Count;
+
+        if (++_intervalIndex >= _intervals.Length)
+        {
+            _intervalIndex = 0;
+            if (++_repeatIndex >= _numRepeats)
+                IsComplete = true;
+        }
+    }
+
+    public void Reset()
+    {
+        _intervalIndex = _repeatIndex = _posInInterval = _stimulusIndex = 0;
+        IsComplete = false;
+    }
 }
