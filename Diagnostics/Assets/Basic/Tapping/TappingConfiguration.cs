@@ -8,9 +8,11 @@ using LDL.Haptics;
 
 using C462.Shared;
 using Audiograms;
+using Newtonsoft.Json;
 
 namespace Tapping
 {
+    [JsonObject(MemberSerialization.OptOut)]
     public class TappingConfiguration : BasicMeasurementConfiguration
     {
         public string Title { get; set; }

@@ -1,5 +1,6 @@
 using BasicMeasurements;
 using C462.Shared;
+using CombinedAudioLDL;
 using KLib.Signals;
 using KLibU;
 using KLibU.Net;
@@ -71,7 +72,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 #if HACKING
         Application.targetFrameRate = 60;
         GameManager.SetSubject("Scratch/_shit");
-        _configName = "Hello";
+        _configName = "Test";
 #else
         _configName = GameManager.DataForNextScene;
 #endif
@@ -84,7 +85,15 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
                 ShowFinishPanel("Nothing to do");
             }
         }
+        else
+        {
+            var fn = SharedFileLocations.GetConfigFile("Tapping", _configName);
+            _settings = Files.XmlDeserialize<BasicMeasurementConfiguration>(fn) as TappingConfiguration;
+            InitializeMeasurement();
+            Begin();
+        }
     }
+
     void InitializeMeasurement()
     {
         InitDataFile();
@@ -154,6 +163,8 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         InitializeSynth();
 
         _audioEnabled = true;
+
+        _synth.StartPlay();
     }
 
     void OnAbortAction(InputAction.CallbackContext context)
@@ -276,12 +287,15 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
         signalManager.Initialize(audioConfig.sampleRate, npts, SessionContext.Signal);
 
-        _clipTrack = new ClipTrack(channelOffsetL: channel.OutputNum, channelOffsetR: channel.IsStereo ? channel.ContraOutputNum : -1);
+        var channelOffsetL = channel.OutputNum;
+        var channelOffsetR = channel.IsStereo ? channel.ContraOutputNum : -1;
+
+        _clipTrack = new ClipTrack(channelOffsetL: channelOffsetL, channelOffsetR: channelOffsetR);
         _clipTrack.Name = "ClipTrack";
         _clipTrack.ClipManager.CalibratedLevel = 0f;
         _clipTrack.ClipManager.Reverb.Active = false;
         _clipTrack.Sequencer.Active = true;
-        _clipTrack.Sequencer.Steps = 8;
+        _clipTrack.Sequencer.Steps = 7;
         _clipTrack.Sequencer.EventOrder = EventOrder.Fixed;
         _clipTrack.Sequencer.SetNote(0);
         _clipTrack.Sequencer.SetEvents(setAll: true);
@@ -294,9 +308,15 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
         float beatInterval_s = 2f * _settings.MinISI / 1000;
         float bpm = 60f / beatInterval_s;
+        Debug.Log($"[InitializeSynth] beatInterval_s: {beatInterval_s}, bpm: {bpm}");
+
         _synth.BPM = bpm; 
 
         _synth.Tracks.Add(_clipTrack);
+
+        _synth.Initialize(audioConfig.sampleRate, audioConfig.dspBufferSize,
+            channelOffsetL: channelOffsetL,
+            channelOffsetR: channelOffsetR);
     }
 
     TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
@@ -334,6 +354,8 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     {
         if (_audioEnabled)
         {
+            _synth.Process(data, channels);
+
             if (_stopAudio)
             {
                 Gate.RampDown(data);

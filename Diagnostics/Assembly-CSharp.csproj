@@ -208,6 +208,7 @@
     <Compile Include="Assets\Turandot\Inputs\Turandot.EventLog.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotAudio.cs" />
     <Compile Include="Assets\Scripts\Hardware\DigitimerControl.cs" />
+    <Compile Include="Assets\Basic\Tapping\TappingPatternGenerator.cs" />
     <Compile Include="Assets\Audiometer\AudiometerController.cs" />
     <Compile Include="Assets\Speech\Speech Reception\SpeechReception.MatrixTest.cs" />
     <Compile Include="Assets\Scripts\Home\HomeMenu.cs" />
