@@ -1,8 +1,9 @@
 ## Changelog
 
-### v2.1.23 (unreleased)
+### v2.1.24 (2026-07-06)
 #### Fixed
 - LDL Inf's were not getting replaced with max SPL
+- cleaned up game transition/hardware control logic
 
 ---
 

@@ -314,10 +314,13 @@ public class HTS_Server : MonoBehaviour
                     break;
                 }
                 _tcpListener.WriteResponse(TcpMessage.Ok());
-                Debug.Log($"changing scene to Lobby ...");
                 GameBridge.RestoreControlToGame();
                 KLogger.Log.FlushLog();
-                SceneManager.LoadScene("Lobby");
+                if (SceneManager.GetActiveScene().name != "Lobby")
+                {
+                    Debug.Log($"changing scene to Lobby ...");
+                    SceneManager.LoadScene("Lobby");
+                }
                 break;
 
             case "CreateProject":

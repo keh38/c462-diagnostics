@@ -17,8 +17,8 @@ public class Lobby : MonoBehaviour
     {
         HTS_Server.SetCurrentScene("Lobby", null);
 
-        // Not sure why this was ever a good idea:
-//        HardwareInterface.Yield();
+        // Not sure why this was ever a good idea. Should be handled by the GameBridge when the Game is launched, not here.
+        //HardwareInterface.Yield();
     }
 
     private void OnDisable()

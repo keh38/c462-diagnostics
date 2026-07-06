@@ -7,6 +7,7 @@ using C462.Shared;
 using C462.Shared.Protocol.DTOs;
 using KLibU.Net;
 using System.Net;
+using System.Diagnostics;
 
 public static class GameBridge
 {
@@ -20,6 +21,7 @@ public static class GameBridge
 
     public static void RetakeControl(RunMeasurementsPayload runMeasurementsPayload)
     {
+        UnityEngine.Debug.Log("Retaking control...");
         _notification = runMeasurementsPayload.Notification;
         GameManager.SetSubject($"{runMeasurementsPayload.Project}/{runMeasurementsPayload.Subject}");
         HTS_Server.SendRequest("ChangedSubject", $"{runMeasurementsPayload.Project}/{runMeasurementsPayload.Subject}");
@@ -30,6 +32,7 @@ public static class GameBridge
 
     public static void RestoreControlToGame()
     {
+        HardwareInterface.Yield();
         GameHasControl = true;
         if (_notification != null)
         {

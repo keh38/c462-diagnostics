@@ -190,6 +190,8 @@ public class HardwareInterface : MonoBehaviour
             return true;    // nothing to disable, so we're good to go
         }
 
+        Debug.Log("Yielding hardware control");
+
         // TENS trigger disable should already be in effect;
         // this is a safety confirmation, not a command.
         bool safe = _digitimer.VerifyTriggersDisabled();
@@ -201,6 +203,7 @@ public class HardwareInterface : MonoBehaviour
     {
         if (_hardwareConfig.UsesDigitimer())
         {
+            Debug.Log("Retaking hardware control");
             _digitimer.OpenHandle();
         }
     }

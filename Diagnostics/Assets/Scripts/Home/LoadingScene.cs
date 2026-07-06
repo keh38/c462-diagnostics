@@ -3,6 +3,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+using C462.Shared;
 using KLibU.Logging;
 
 public class LoadingScene : MonoBehaviour
