@@ -1438,6 +1438,7 @@ GameObject:
   m_Component:
   - component: {fileID: 886566274}
   - component: {fileID: 886566275}
+  - component: {fileID: 886566278}
   - component: {fileID: 886566277}
   - component: {fileID: 886566276}
   m_Layer: 0
@@ -1485,6 +1486,7 @@ MonoBehaviour:
   _workPanel: {fileID: 661140294}
   _progressBar: {fileID: 41247538}
   _tapSynchronizer: {fileID: 886566277}
+  _tapSynchronizer2: {fileID: 886566278}
 --- !u!82 &886566276
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1594,7 +1596,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66045b6a47614194fa65dd4c27fe4fdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pollInterval_s: 5
+  pollInterval_s: 1
+--- !u!114 &886566278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 886566272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e1ef6aa0916c464f8b9637ee61bf887, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pollInterval_s: 1
 --- !u!1 &970270371
 GameObject:
   m_ObjectHideFlags: 0

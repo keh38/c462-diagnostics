@@ -29,6 +29,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     [SerializeField] private GameObject _workPanel;
     [SerializeField] private Slider _progressBar;
     [SerializeField] private TapSynchronizer _tapSynchronizer;
+    [SerializeField] private TapSynchronizer2 _tapSynchronizer2;
 
     private bool _isRemote;
 
@@ -50,12 +51,19 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
     private InputAction _abortAction;
 
+    private int _blocksProcessed = 0;
+    private double _dspTime = -1;
+    private double _bufferDuration = -1;
+
     private void Awake()
     {
         _abortAction = _actions.FindAction("Abort");
         _abortAction.Enable();
         _abortAction.performed += OnAbortAction;
         Application.logMessageReceived += HandleException;
+
+        var config = AudioSettings.GetConfiguration();
+        _bufferDuration = config.dspBufferSize / (double)config.sampleRate;
     }
 
     void OnDestroy()
@@ -66,6 +74,13 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
     private void Start()
     {
+        StartCoroutine(StartNextFrame());
+    }
+
+    private IEnumerator StartNextFrame()
+    {
+        yield return new WaitForEndOfFrame();
+
         HTS_Server.SetCurrentScene(_mySceneName, this);
 
         _title.text = "";
@@ -223,10 +238,12 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
         StopTapStreamer();
 
-        KLib.Utilities.AppendToJsonFile(_dataPath, 
-            Files.JSONSerializeToString(new { 
+        KLib.Utilities.AppendToJsonFile(_dataPath,
+            Files.JSONSerializeToString(new
+            {
                 onsetDspTimes = _patternGenerator.OnsetDspTimes,
-                syncDspTimes = _tapSynchronizer.SyncDspTimes}));
+                syncDspTimes = _tapSynchronizer.SyncDspTimes
+            }));
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
         HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
@@ -318,7 +335,8 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
         if (!_isRemote)
         {
-            _tapSynchronizer.StartSyncPulses();
+            _tapSynchronizer.StartSyncPulses(7);
+            //_tapSynchronizer2.StartSyncPulses(0);
         }
     }
 
@@ -332,6 +350,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         if (!_isRemote)
         {
             _tapSynchronizer.StopSyncPulses();
+            //_tapSynchronizer2.StopSyncPulses();
         }
     }
 
@@ -368,9 +387,17 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
     private void OnAudioFilterRead(float[] data, int channels)
     {
+        if (_dspTime < 0)
+            _dspTime = AudioSettings.dspTime;
+
+        _blocksProcessed++;
+
+        // first line of EACH OnAudioFilterRead, before any work
+        //Debug.Log($"[{GetType().Name}] blocksProcessed={_blocksProcessed} dspBase={AudioSettings.dspTime:F6} wall={HighPrecisionClock.UtcNowIn100nsTicks}");
+
         if (_audioEnabled)
         {
-            _patternGenerator.Process(data, channels);
+            _patternGenerator.Process(_dspTime, data, channels);
 
             if (_stopAudio)
             {
@@ -383,5 +410,8 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
                 _audioEnabled = false;
             }
         }
+
+        _dspTime += _bufferDuration;
+
     }
 }

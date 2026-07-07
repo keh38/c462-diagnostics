@@ -14,7 +14,7 @@ public class TapSynchronizer : MonoBehaviour
 {
     [SerializeField] public float pollInterval_s = 5;
     
-    private float _pulseInterval_s = 5f;
+    private float _pulseInterval_s = 1f;
     private float _pulseCarrierFreq = 1000f;
     private int _numPulsePts;
     private double[] _pulseDspTimes;
@@ -35,8 +35,12 @@ public class TapSynchronizer : MonoBehaviour
     public long LastPulseClockTime { get; private set; } = 0;
     public double[] SyncDspTimes => _pulseDspTimes != null ? _pulseDspTimes[.._pulseCount] : new double[0];
 
-    public void StartSyncPulses()
+    private int _channelOffset;
+    private int _blocksProcessed = 0;
+
+    public void StartSyncPulses(int channelOffset)
     {
+        _channelOffset = channelOffset;
         CreateSignal();
 
         _pulseDspTimes = new double[10000];
@@ -73,9 +77,13 @@ public class TapSynchronizer : MonoBehaviour
 
     private void OnAudioFilterRead(float[] data, int channels)
     {
+        _blocksProcessed++;
+        //Debug.Log($"[{GetType().Name}] blocksProcessed={_blocksProcessed} dspBase={AudioSettings.dspTime:F6} wall={HighPrecisionClock.UtcNowIn100nsTicks}");
+
         if (!_isRunning) return;
 
-        int index = channels - 1;
+        //int index = channels - 1;
+        int index = _channelOffset;
 
         for (int k = 0; k < _bufferSize; k++)
         {

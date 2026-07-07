@@ -94,11 +94,14 @@ public class TappingPatternGenerator
         }
     }
 
-    public void Process(float[] data, int channels)
+    public void Process(double dspTime, float[] data, int channels)
     {
         int outPos = 0;
 
-        double dspTime = AudioSettings.dspTime;
+        // first line of EACH OnAudioFilterRead, before any work
+        //Debug.Log($"[{GetType().Name}] dspBase={AudioSettings.dspTime:F6} wall={HighPrecisionClock.UtcNowIn100nsTicks}");
+
+        //double dspTime = AudioSettings.dspTime;
 
         while (outPos < data.Length && !IsComplete)
         {
@@ -117,6 +120,7 @@ public class TappingPatternGenerator
                 data[outPos + _channelOffsetL] = (_posInInterval < stim.Length) ? stim[_posInInterval] : 0f;
                 if (_channelOffsetR >= 0)
                     data[outPos + _channelOffsetR] = data[outPos + _channelOffsetL];
+
                 outPos += channels;
 
                 _posInInterval++;
