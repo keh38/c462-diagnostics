@@ -28,6 +28,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     [SerializeField] private QuestionBox _questionBox;
     [SerializeField] private GameObject _workPanel;
     [SerializeField] private Slider _progressBar;
+    [SerializeField] private TapSynchronizer _tapSynchronizer;
 
     private bool _isRemote;
 
@@ -41,6 +42,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     private string _configName;
 
     private TappingPatternGenerator _patternGenerator;
+    private TapStreamer _tapStreamer;
 
     private bool _audioEnabled = false;
     private bool _stopAudio = false;
@@ -160,6 +162,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         _workPanel.SetActive(true);
 
         InitializePatternGenerator();
+        StartTapStreamer();
 
         _audioEnabled = true;
     }
@@ -218,7 +221,12 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(false);
 
-        KLib.Utilities.AppendToJsonFile(_dataPath, Files.JSONSerializeToString(new { onsetDspTimes = _patternGenerator.OnsetDspTimes }));
+        StopTapStreamer();
+
+        KLib.Utilities.AppendToJsonFile(_dataPath, 
+            Files.JSONSerializeToString(new { 
+                onsetDspTimes = _patternGenerator.OnsetDspTimes,
+                syncDspTimes = _tapSynchronizer.SyncDspTimes}));
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
         HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
@@ -294,6 +302,37 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
             intervalExpression: _settings.IntervalExpression,
             numIntervals: _settings.PatternLength,
             numRepeats: _settings.NumRepeats);
+    }
+
+    private void StartTapStreamer()
+    {
+        _tapStreamer = new TapStreamer();
+        bool initialized = _tapStreamer.Initialize();
+        if (!initialized)
+        {
+            HandleError("Failed to initialize TapStreamer");
+            return;
+        }
+
+        _tapStreamer.StartStreaming(_dataPath.Replace(".json", ".wav"));
+
+        if (!_isRemote)
+        {
+            _tapSynchronizer.StartSyncPulses();
+        }
+    }
+
+    private void StopTapStreamer()
+    {
+        if (_tapStreamer != null)
+        {
+            _tapStreamer.StopStreaming();
+            _tapStreamer = null;
+        }
+        if (!_isRemote)
+        {
+            _tapSynchronizer.StopSyncPulses();
+        }
     }
 
     TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
