@@ -6,6 +6,8 @@ using UnityEngine;
 
 using KLib.Expressions;
 using KLib.Signals;
+using KLib.Logging;
+using JetBrains.Annotations;
 
 public class TappingPatternGenerator
 {
@@ -23,13 +25,16 @@ public class TappingPatternGenerator
     private int _channelOffsetL;
     private int _channelOffsetR;
 
+    private int _markerChannelOffset = 6;
+    private float _markerPulseFreq = 1000f;
+    private float[] _markerPulse;
+
+    private AudioDspEventLog _dspEventLog;
+    public AudioDspEventLog DspEventLog => _dspEventLog.Trim();
+
     private float _dt;
 
-    private double[] _onsetDspTimes;
-    private int _onsetCursor;
-
     public volatile bool IsComplete;
-    public double[] OnsetDspTimes => _onsetDspTimes;
 
     public void Initialize(
         Channel channel, 
@@ -45,12 +50,11 @@ public class TappingPatternGenerator
 
         CreateSignals(audioConfig.sampleRate, channel.Clone());
         CreatePattern(audioConfig.sampleRate, minISI, intervalExpression, numIntervals);
+        CreateMarkerPulse();
 
-        _onsetDspTimes = new double[_intervals.Length * _numRepeats];
-        _onsetCursor = 0;
+        _dspEventLog = new AudioDspEventLog("pattern");
 
         IsComplete = false;
-
     }
 
     private void CreateSignals(int Fs, Channel channel)
@@ -73,6 +77,16 @@ public class TappingPatternGenerator
         _signals.Add(channel.Data);
     }
 
+    void CreateMarkerPulse()
+    {
+        var config = AudioSettings.GetConfiguration();
+
+        int numPulsePts = Mathf.RoundToInt(config.sampleRate / _markerPulseFreq);
+        _markerPulse = new float[numPulsePts];
+        for (int k = 0; k < numPulsePts; k++) _markerPulse[k] = Mathf.Sin(2 * Mathf.PI * _markerPulseFreq * k / config.sampleRate) / Mathf.Sqrt(2);
+    }
+
+
     private void CreatePattern(float Fs, float minISI, string ratioExpression, int numIntervals)
     {
         float[] ratios = Expressions.Evaluate(ratioExpression);
@@ -94,20 +108,16 @@ public class TappingPatternGenerator
         }
     }
 
-    public void Process(double dspTime, float[] data, int channels)
+    public void Process(float[] data, int channels, int blockNumber)
     {
         int outPos = 0;
 
-        // first line of EACH OnAudioFilterRead, before any work
-        //Debug.Log($"[{GetType().Name}] dspBase={AudioSettings.dspTime:F6} wall={HighPrecisionClock.UtcNowIn100nsTicks}");
-
-        //double dspTime = AudioSettings.dspTime;
-
+        double offset = 0;
         while (outPos < data.Length && !IsComplete)
         {
             if (_posInInterval == 0)
             {
-                _onsetDspTimes[_onsetCursor++] = dspTime;
+                _dspEventLog.AddEvent(blockNumber, offset);
             }
 
             int intervalLength = _intervals[_intervalIndex];
@@ -121,10 +131,13 @@ public class TappingPatternGenerator
                 if (_channelOffsetR >= 0)
                     data[outPos + _channelOffsetR] = data[outPos + _channelOffsetL];
 
+                if (_posInInterval < _markerPulse.Length)
+                    data[outPos + _markerChannelOffset] = _markerPulse[_posInInterval];
+
                 outPos += channels;
 
                 _posInInterval++;
-                dspTime += _dt;
+                offset += _dt;
             }
 
             // Advance ONLY if we truly reached the interval end,
@@ -153,6 +166,7 @@ public class TappingPatternGenerator
             _intervalIndex = 0;
             if (++_repeatIndex >= _numRepeats)
                 IsComplete = true;
+            Debug.Log($"repeat index = {_repeatIndex}");
         }
     }
 

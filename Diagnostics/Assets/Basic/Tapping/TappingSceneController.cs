@@ -15,6 +15,7 @@ using KLibU.Net;
 
 using BasicMeasurements;
 using Tapping;
+using KLib.Logging;
 
 public class TappingSceneController : MonoBehaviour, IRemoteControllable
 {
@@ -28,8 +29,6 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     [SerializeField] private QuestionBox _questionBox;
     [SerializeField] private GameObject _workPanel;
     [SerializeField] private Slider _progressBar;
-    [SerializeField] private TapSynchronizer _tapSynchronizer;
-    [SerializeField] private TapSynchronizer2 _tapSynchronizer2;
 
     private bool _isRemote;
 
@@ -51,9 +50,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
     private InputAction _abortAction;
 
-    private int _blocksProcessed = 0;
-    private double _dspTime = -1;
-    private double _bufferDuration = -1;
+    private AudioDspLog _audioDspLog = new AudioDspLog();
 
     private void Awake()
     {
@@ -61,9 +58,6 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         _abortAction.Enable();
         _abortAction.performed += OnAbortAction;
         Application.logMessageReceived += HandleException;
-
-        var config = AudioSettings.GetConfiguration();
-        _bufferDuration = config.dspBufferSize / (double)config.sampleRate;
     }
 
     void OnDestroy()
@@ -197,6 +191,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         
         if (_patternGenerator != null && _patternGenerator.IsComplete)
         {
+            _stopAudio = true;
             _runEnded = true;
             EndRun(abort: false);
             return;
@@ -238,12 +233,8 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
         StopTapStreamer();
 
-        KLib.Utilities.AppendToJsonFile(_dataPath,
-            Files.JSONSerializeToString(new
-            {
-                onsetDspTimes = _patternGenerator.OnsetDspTimes,
-                syncDspTimes = _tapSynchronizer.SyncDspTimes
-            }));
+        _audioDspLog.dspEvents.Add(_patternGenerator.DspEventLog);
+        KLib.Utilities.AppendToJsonFile(_dataPath, _audioDspLog.ToJsonString());
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
         HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
@@ -252,6 +243,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         if (_localAbort)
         {
             SceneManager.LoadScene("Home");
+            return;
         }
 
         bool finished = true;
@@ -332,12 +324,6 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         }
 
         _tapStreamer.StartStreaming(_dataPath.Replace(".json", ".wav"));
-
-        if (!_isRemote)
-        {
-            _tapSynchronizer.StartSyncPulses(7);
-            //_tapSynchronizer2.StartSyncPulses(0);
-        }
     }
 
     private void StopTapStreamer()
@@ -346,11 +332,6 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         {
             _tapStreamer.StopStreaming();
             _tapStreamer = null;
-        }
-        if (!_isRemote)
-        {
-            _tapSynchronizer.StopSyncPulses();
-            //_tapSynchronizer2.StopSyncPulses();
         }
     }
 
@@ -387,17 +368,11 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
     private void OnAudioFilterRead(float[] data, int channels)
     {
-        if (_dspTime < 0)
-            _dspTime = AudioSettings.dspTime;
-
-        _blocksProcessed++;
-
-        // first line of EACH OnAudioFilterRead, before any work
-        //Debug.Log($"[{GetType().Name}] blocksProcessed={_blocksProcessed} dspBase={AudioSettings.dspTime:F6} wall={HighPrecisionClock.UtcNowIn100nsTicks}");
+        if (_runEnded) return;
 
         if (_audioEnabled)
         {
-            _patternGenerator.Process(_dspTime, data, channels);
+            _patternGenerator.Process(data, channels, _audioDspLog.CurrentBlockNumber);
 
             if (_stopAudio)
             {
@@ -411,7 +386,6 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
             }
         }
 
-        _dspTime += _bufferDuration;
-
+        _audioDspLog.AddBlock();
     }
 }
