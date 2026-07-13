@@ -1,11 +1,10 @@
 using System;
 
+using C462.Shared;
 using BasicMeasurements;
 
 namespace Audiograms
 {
-    public enum TestEar { Left, Right, Both }
-
     public class AudiogramMeasurementSettings : BasicMeasurementConfiguration
     {
         public string Title { get; set; }
@@ -16,7 +15,7 @@ namespace Audiograms
         public bool ShowNewFrequencyMessage { get; set; }
         public float MinISI { get; set; }
         public float MaxISI { get; set; }
-        public TestEar TestEar { get; set; }
+        public AudiogramTestEar TestEar { get; set; }
         public float[] TestFrequencies { get; set; }
         public bool Abridged { get; set; }
         public bool Merge { set; get; }
@@ -38,7 +37,7 @@ namespace Audiograms
         {
             Title = "The Softest Sound";
 
-            TestEar = TestEar.Both;
+            TestEar = AudiogramTestEar.Each;
             TestFrequencies = new float[] { 750, 1000, 1500, 2000, 3000, 4000, 8000, 125, 250, 500 };
 
             Merge = false;

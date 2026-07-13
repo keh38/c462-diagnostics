@@ -157,11 +157,11 @@ public class BekesyController : MonoBehaviour, IRemoteControllable
 
         foreach (var f in _settings.TestFrequencies)
         {
-            if (_settings.TestEar != Audiograms.TestEar.Right)
+            if (_settings.TestEar != AudiogramTestEar.Right)
             {
                 _data.tracks.Add(new Bekesy.TrackData(Laterality.Left, f));
             }
-            if (_settings.TestEar != Audiograms.TestEar.Left)
+            if (_settings.TestEar != AudiogramTestEar.Left)
             {
                 _data.tracks.Add(new Bekesy.TrackData(Laterality.Right, f));
             }

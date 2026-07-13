@@ -16,7 +16,7 @@ namespace Tapping
     public class TappingConfiguration : BasicMeasurementConfiguration
     {
         public string Title { get; set; }
-        public TestEar TestEar { get; set; }
+        public AudiogramTestEar TestEar { get; set; }
         public Channel Channel { get; set; }
         public float MinISI { get; set; }
         public int PatternLength { get; set; }
@@ -27,7 +27,7 @@ namespace Tapping
         {
             Title = "Tapping";
 
-            TestEar = Audiograms.TestEar.Both;
+            TestEar = AudiogramTestEar.Each;
 
             Channel = new Channel();
             MinISI = 0.5f;

@@ -1,5 +1,11 @@
 ## Changelog
 
+### v2.1.25 (unreleased)
+#### Added
+- diotic specific audiogram data (for now, applicable only to combined measurement)
+
+---
+
 ### v2.1.24 (2026-07-06)
 #### Fixed
 - LDL Inf's were not getting replaced with max SPL

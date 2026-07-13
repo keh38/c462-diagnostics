@@ -450,8 +450,15 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
 
         for (int k = 0; k < _settings.TestFrequencies.Length; k++)
         {
-            if (_settings.TestEar != TestEar.Right) _state.testConditions.Add(new TestCondition(Laterality.Left, _settings.TestFrequencies[k]));
-            if (_settings.TestEar != TestEar.Left) _state.testConditions.Add(new TestCondition(Laterality.Right, _settings.TestFrequencies[k]));
+            if (_settings.TestEar == AudiogramTestEar.Diotic)
+            {
+                _state.testConditions.Add(new TestCondition(Laterality.Diotic, _settings.TestFrequencies[k]));
+            }
+            else
+            {
+                if (_settings.TestEar != AudiogramTestEar.Right) _state.testConditions.Add(new TestCondition(Laterality.Left, _settings.TestFrequencies[k]));
+                if (_settings.TestEar != AudiogramTestEar.Left) _state.testConditions.Add(new TestCondition(Laterality.Right, _settings.TestFrequencies[k]));
+            }
         }
 
         _state.CreateRandomTestOrder(_settings.NumRepeats);
@@ -552,7 +559,7 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         AudiogramPointPayload payload = new AudiogramPointPayload()
         {
             Type = AudiogramType.Threshold,
-            Ear = testCondition.ear == Laterality.Left ? AudiogramTestEar.Left : AudiogramTestEar.Right,
+            Ear = Audiogram.GetTestEarFromLaterality(testCondition.ear),
             Frequency_Hz = testCondition.Freq_Hz,
             Threshold_dBHL = thresholdHL,
             Threshold_dBSPL = testCondition.threshold
@@ -566,7 +573,7 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         AudiogramPointPayload payload = new AudiogramPointPayload()
         {
             Type = AudiogramType.LDL,
-            Ear = testCondition.ear == Laterality.Left ? AudiogramTestEar.Left : AudiogramTestEar.Right,
+            Ear = Audiogram.GetTestEarFromLaterality(testCondition.ear),
             Frequency_Hz = testCondition.Freq_Hz,
             Threshold_dBHL = ANSI_dBHL.SPL_To_HL(testCondition.Freq_Hz, testCondition.LDL, SessionContext.Signal.Transducer),
             Threshold_dBSPL = testCondition.threshold
@@ -609,15 +616,26 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
     {
         _data.testConditions = _state.testConditions;
 
-        _data.audiogram = new AudiogramData();
-        _data.audiogram.Initialize(_settings.TestFrequencies);  
+        if (_settings.MergeData)
+        {
+            _data.audiogram = AudiogramData.Load(SharedFileLocations.AudiogramPath);
+            _data.audiogram.Append(_settings.TestFrequencies);
 
-        _data.LDLgram = new AudiogramData();
-        _data.LDLgram.Initialize(_settings.TestFrequencies);
+            _data.LDLgram = AudiogramData.Load(SharedFileLocations.LDLPath);
+            _data.LDLgram.Append(_settings.TestFrequencies);
+        }
+        else
+        {
+            _data.audiogram = new AudiogramData();
+            _data.audiogram.Initialize(_settings.TestFrequencies);
+
+            _data.LDLgram = new AudiogramData();
+            _data.LDLgram.Initialize(_settings.TestFrequencies);
+        }
 
         foreach (TestCondition tc in _state.testConditions.FindAll(test => test.completed))
         {
-            var ear = tc.ear == Laterality.Left ? AudiogramTestEar.Left : AudiogramTestEar.Right;
+            var ear = Audiogram.GetTestEarFromLaterality(tc.ear);
             float thresholdHL = ANSI_dBHL.SPL_To_HL(tc.Freq_Hz, tc.threshold, SessionContext.Signal.Transducer);
             thresholdHL = Mathf.Round(thresholdHL / 5f) * 5f;
             float thresholdSPL = ANSI_dBHL.HL_To_SPL(tc.Freq_Hz, thresholdHL, SessionContext.Signal.Transducer);

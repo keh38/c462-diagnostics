@@ -15,13 +15,14 @@ namespace CombinedAudioLDL
     {
         public string Title { get; set; }
         public int PromptFontSize {  get; set; }
-        public TestEar TestEar { get; set; }
+        public AudiogramTestEar TestEar { get; set; }
         public float[] TestFrequencies { get; set; }
         public int NumRepeats { get; set; }
         public float MinExcursion { get; set; } 
         public int NumThresholdReversals { get; set; }
         public int NumLDLReversals { get; set; }
         public bool LogSliderTracks { set; get; }
+        public bool MergeData { set; get; }
         public float MinLevel { set; get; }
         public float Bandwidth { set; get; }
         public float ToneDuration { set; get; }
@@ -38,10 +39,11 @@ namespace CombinedAudioLDL
         {
             Title = "How loud does it sound?";
 
-            TestEar = Audiograms.TestEar.Both;
+            TestEar = AudiogramTestEar.Each;
             TestFrequencies = new float[] { 1000, 2000, 4000 };
 
             LogSliderTracks = true;
+            MergeData = false;
 
             Ramp = 5f;
             ToneDelay = 0;

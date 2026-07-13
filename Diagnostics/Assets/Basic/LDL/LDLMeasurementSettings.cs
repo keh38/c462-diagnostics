@@ -15,7 +15,7 @@ namespace LDL
         public string Title { get; set; }
         public string Prompt { get; set; }
         public int PromptFontSize {  get; set; }
-        public Audiograms.TestEar TestEar { get; set; }
+        public AudiogramTestEar TestEar { get; set; }
         public float[] TestFrequencies { get; set; }
         public int NumRepeats { get; set; }
         public bool Merge { set; get; }
@@ -35,7 +35,7 @@ namespace LDL
         {
             Title = "How loud does it sound?";
 
-            TestEar = Audiograms.TestEar.Both;
+            TestEar = AudiogramTestEar.Each;
             TestFrequencies = new float[] { 1000, 2000, 4000 };
 
             Merge = true;

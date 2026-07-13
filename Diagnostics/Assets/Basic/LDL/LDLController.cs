@@ -389,11 +389,11 @@ public class LDLController : MonoBehaviour, IRemoteControllable
             {
                 int ifreq = agramFreqs.FindIndex(o => o == _settings.TestFrequencies[k]);
 
-                if (!float.IsNaN(agramLeft.Threshold_dBSPL[ifreq]) && !float.IsInfinity(agramLeft.Threshold_dBSPL[ifreq]) && _settings.TestEar != Audiograms.TestEar.Right)
+                if (!float.IsNaN(agramLeft.Threshold_dBSPL[ifreq]) && !float.IsInfinity(agramLeft.Threshold_dBSPL[ifreq]) && _settings.TestEar != AudiogramTestEar.Right)
                 {
                     _state.testConditions.Add(new TestCondition(Laterality.Left, _settings.TestFrequencies[k]));
                 }
-                if (!float.IsNaN(agramRight.Threshold_dBSPL[ifreq]) && !float.IsInfinity(agramRight.Threshold_dBSPL[ifreq]) && _settings.TestEar != Audiograms.TestEar.Left)
+                if (!float.IsNaN(agramRight.Threshold_dBSPL[ifreq]) && !float.IsInfinity(agramRight.Threshold_dBSPL[ifreq]) && _settings.TestEar != AudiogramTestEar.Left)
                 {
                     _state.testConditions.Add(new TestCondition(Laterality.Right, _settings.TestFrequencies[k]));
                 }
@@ -403,8 +403,8 @@ public class LDLController : MonoBehaviour, IRemoteControllable
         {
             for (int k = 0; k < _settings.TestFrequencies.Length; k++)
             {
-                if (_settings.TestEar != Audiograms.TestEar.Right) _state.testConditions.Add(new TestCondition(Laterality.Left, _settings.TestFrequencies[k]));
-                if (_settings.TestEar != Audiograms.TestEar.Left) _state.testConditions.Add(new TestCondition(Laterality.Right, _settings.TestFrequencies[k]));
+                if (_settings.TestEar != AudiogramTestEar.Right) _state.testConditions.Add(new TestCondition(Laterality.Left, _settings.TestFrequencies[k]));
+                if (_settings.TestEar != AudiogramTestEar.Left) _state.testConditions.Add(new TestCondition(Laterality.Right, _settings.TestFrequencies[k]));
             }
         }
 

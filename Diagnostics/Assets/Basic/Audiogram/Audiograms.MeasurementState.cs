@@ -43,13 +43,13 @@ namespace Audiograms
 
         public MeasurementState() { }
 
-        public MeasurementState(float[] freqs, TestEar ears)
+        public MeasurementState(float[] freqs, AudiogramTestEar ears)
         {
             stimulusConditions = new List<StimulusCondition>();
             for (int k=0; k<freqs.Length; k++)
             {
                 bool newFreq = k > 0;
-                if (ears != TestEar.Right)
+                if (ears != AudiogramTestEar.Right)
                 {
                     stimulusConditions.Add(
                         new StimulusCondition(
@@ -60,14 +60,14 @@ namespace Audiograms
                         ));
                     newFreq = false;
                 }
-                if (ears != TestEar.Left)
+                if (ears != AudiogramTestEar.Left)
                 {
                     stimulusConditions.Add(
                         new StimulusCondition(
                         frequency: freqs[k],
                         laterality: Laterality.Right,
                         newFrequency: newFreq,
-                        newEar: ears == TestEar.Both
+                        newEar: ears == AudiogramTestEar.Both
                         ));
                 }
             }
