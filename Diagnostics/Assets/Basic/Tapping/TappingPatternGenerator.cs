@@ -7,7 +7,6 @@ using UnityEngine;
 using KLib.Expressions;
 using KLib.Signals;
 using KLib.Logging;
-using JetBrains.Annotations;
 
 public class TappingPatternGenerator
 {
