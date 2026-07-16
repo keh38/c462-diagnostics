@@ -5,10 +5,17 @@ using UnityEngine.SceneManagement;
 
 using C462.Shared;
 using KLibU.Logging;
+using KLibU.Audio;
 
 public class LoadingScene : MonoBehaviour
 {
     [SerializeField] private TMPro.TMP_Text _versionLabel;
+
+    void Awake()
+    {
+        AudioWatchdog.ProcessTag = "HTS";
+        AudioAuditLog.Verbose = false;
+    }
 
     IEnumerator Start()
     {
@@ -43,7 +50,7 @@ public class LoadingScene : MonoBehaviour
 
         _versionLabel.text = "V" + Application.version;
         KLogger.Create(
-            Path.Combine(Application.persistentDataPath, "Logs", Application.productName + ".log"),
+            Path.Combine(C462.Shared.SharedFileLocations.HtsFolder, "Logs", Application.productName + ".log"),
             retainDays: 14)
             .StartLogging();
 

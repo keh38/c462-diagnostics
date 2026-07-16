@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+using KLibU.Audio;
 using KLibU.Logging;
 using KLibU.Net;
 
@@ -43,6 +44,8 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
     private void Awake()
     {
         _subjectLabel = _subjectMenuButton.GetComponentInChildren<TMPro.TMP_Text>();
+        AudioWatchdog.ProcessTag = "HTS";
+        AudioAuditLog.Verbose = true;
     }
 
     IEnumerator Start()
@@ -65,12 +68,12 @@ public class HomeMenu : MonoBehaviour, IRemoteControllable
         if (!GameManager.Initialized)
         {
             KLogger.Create(
-                Path.Combine(Application.persistentDataPath, "Logs", Application.productName + ".log"),
+                Path.Combine(C462.Shared.SharedFileLocations.HtsFolder, "Logs", Application.productName + ".log"),
                 retainDays: 14)
                 .StartLogging();
 
             Debug.Log($"Started V{Application.version}");
-            
+
             HTS_Server.StartServer();
 
             StartCoroutine(InitializeHardware());

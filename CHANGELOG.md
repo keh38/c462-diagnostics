@@ -1,8 +1,9 @@
 ## Changelog
 
-### v2.1.25 (unreleased)
+### v2.1.25 (2026-07-16)
 #### Added
 - diotic specific audiogram data (for now, applicable only to combined measurement)
+- detailed audio logging (intercom)
 
 ---
 
