@@ -1,5 +1,11 @@
 ## Changelog
 
+### v2.1.26 (unreleased)
+#### Fixed
+- diotic audiogram/LDL logic
+
+---
+
 ### v2.1.25 (2026-07-16)
 #### Added
 - diotic specific audiogram data (for now, applicable only to combined measurement)

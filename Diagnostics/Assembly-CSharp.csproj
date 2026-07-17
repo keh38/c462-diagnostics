@@ -793,7 +793,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.Graph">
-      <HintPath>Library\PackageCache\com.epl.klib@15337a32b710\Runtime\Plugins\Microsoft.Graph\netstandard2.0\Microsoft.Graph.dll</HintPath>
+      <HintPath>Library\PackageCache\com.epl.klib@c61d157cce76\Runtime\Plugins\Microsoft.Graph\netstandard2.0\Microsoft.Graph.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="C462.Shared">
@@ -821,7 +821,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Diagnostics.DiagnosticSource">
-      <HintPath>Library\PackageCache\com.epl.klib@15337a32b710\Runtime\Plugins\System.Diagnostics.DiagnosticSource\netstandard1.3\System.Diagnostics.DiagnosticSource.dll</HintPath>
+      <HintPath>Library\PackageCache\com.epl.klib@c61d157cce76\Runtime\Plugins\System.Diagnostics.DiagnosticSource\netstandard1.3\System.Diagnostics.DiagnosticSource.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
@@ -829,7 +829,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.Graph.Core">
-      <HintPath>Library\PackageCache\com.epl.klib@15337a32b710\Runtime\Plugins\Microsoft.Graph.Core\netstandard1.1\Microsoft.Graph.Core.dll</HintPath>
+      <HintPath>Library\PackageCache\com.epl.klib@c61d157cce76\Runtime\Plugins\Microsoft.Graph.Core\netstandard1.1\Microsoft.Graph.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="NAudio.Wasapi">
@@ -841,7 +841,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="protobuf-net">
-      <HintPath>Library\PackageCache\com.epl.klib@15337a32b710\Runtime\Plugins\protobuf-net.dll</HintPath>
+      <HintPath>Library\PackageCache\com.epl.klib@c61d157cce76\Runtime\Plugins\protobuf-net.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="D128NET">
