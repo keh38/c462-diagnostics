@@ -16,6 +16,7 @@ using C462.Shared;
 using C462.Shared.Protocol;
 using C462.Shared.Protocol.DTOs;
 using System.Collections.Generic;
+using Microsoft.Win32;
 
 public class HTS_Server : MonoBehaviour
 {
@@ -30,6 +31,9 @@ public class HTS_Server : MonoBehaviour
     private IPEndPoint _remoteEndPoint = null;
 
     private KTcpListener _beaconListener = null;
+
+    private const string RegistryKeyName = @"SOFTWARE\EPL\C462\HTS";
+    private const string RegistryValue = "InstallPath";
 
     // Make singleton
     private static HTS_Server _instance;
@@ -529,6 +533,12 @@ public class HTS_Server : MonoBehaviour
                 }
                 break;
 
+            case "Restart":
+                Debug.Log($"Command received: {request.Command}");
+                StartCoroutine(RestartNextFrame());
+                _tcpListener.WriteResponse(TcpMessage.Ok());
+                break;
+
             case "Quit":
                 Debug.Log($"Command received: {request.Command}");
                 StartCoroutine(QuitNextFrame());
@@ -548,6 +558,13 @@ public class HTS_Server : MonoBehaviour
                 break;
         }
         _tcpListener.CloseTcpClient();
+    }
+
+    private IEnumerator RestartNextFrame()
+    {
+        Debug.Log("Restarting application by remote request...");
+        yield return null;
+        RestartHTS();
     }
 
     private IEnumerator QuitNextFrame()
@@ -669,6 +686,44 @@ public class HTS_Server : MonoBehaviour
         }
 #endif
     }
+
+    private void RestartHTS()
+    {
+        string exeFolder = GetExecutableFolder();
+
+        //if (string.IsNullOrEmpty(_htsExecutablePath))
+        //{
+        //    Debug.LogWarning("HTSBridge: _htsExecutablePath not set — cannot launch HTS automatically");
+        //    return;
+        //}
+
+        try
+        {
+            var htsExecutablePath = System.IO.Path.Combine(exeFolder, "Launcher", "HTSLauncher.exe");
+            var processStartInfo = new System.Diagnostics.ProcessStartInfo(htsExecutablePath);
+            processStartInfo.WorkingDirectory = exeFolder;
+            processStartInfo.Arguments = "-restart";
+            var process = System.Diagnostics.Process.Start(processStartInfo);
+            Debug.Log($"restarted HTS from {htsExecutablePath}");
+            Application.Quit();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"HTSBridge: failed to restart HTS — {ex.Message}");
+        }
+    }
+
+    private static string GetExecutableFolder()
+    {
+        using (var view64 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+        {
+            using (var subKey = view64.OpenSubKey(RegistryKeyName, false))
+            {
+                return subKey?.GetValue(RegistryValue) as string;
+            }
+        }
+    }
+
 
     #endregion
 }

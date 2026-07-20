@@ -1,8 +1,11 @@
 ## Changelog
 
-### v2.1.26 (unreleased)
+### v2.1.26 (2026-07-20)
 #### Fixed
 - diotic audiogram/LDL logic
+- cleaned up Turandot interactive error trapping
+- cleaned up hardware initialization logging and error trapping
+- added restart option
 
 ---
 

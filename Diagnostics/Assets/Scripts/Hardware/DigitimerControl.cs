@@ -209,7 +209,7 @@ public class DigitimerControl : MonoBehaviour
     {
         bool success = true;
 
-        if (_trigger.Connected)
+        if (_trigger != null && _trigger.Connected)
         {
             success = _trigger.DisableTrigger();
         }

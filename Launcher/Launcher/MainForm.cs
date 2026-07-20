@@ -32,8 +32,10 @@ namespace Launcher
         bool _buttonPressAllowed = false;
         bool _configButtonPressed = false;
         bool _launchStarted = false;
+        bool _restartOnly = false;
         Timer _timer;
         int _delayTime = 5000;
+        int _restartDelayTime = 2000;
 
         HardwareConfiguration _config;
 
@@ -71,9 +73,14 @@ namespace Launcher
                 LaunchUnityApp();
                 return;
             }
-            
+
+            if (commandLineArgs.Contains("-restart"))
+            {
+                _restartOnly = true;
+            }
+
             _timer = new Timer();
-            _timer.Interval = _delayTime;
+            _timer.Interval = _restartOnly ? _restartDelayTime : _delayTime;
             _timer.Tick += Timer_Tick;
             _timer.Enabled = true;
         }
@@ -132,7 +139,7 @@ namespace Launcher
         private string GetVersion()
         {
             var v = Assembly.GetExecutingAssembly().GetName().Version;
-            return $"V{v.Major}.{v.Minor}" + (v.Build > 0 ? $".{ v.Build}" : "");
+            return $"V{v.Major}.{v.Minor}" + (v.Build > 0 ? $".{v.Build}" : "");
         }
 
         private async Task StartLogging()
@@ -174,6 +181,7 @@ namespace Launcher
             _launchStarted = true;
 
             string errorMsg = "";
+
             try
             {
                 errorMsg = await ValidateHardwareSetup();
@@ -191,50 +199,46 @@ namespace Launcher
                 return;
             }
 
-            statusTextBox.AppendText("Starting \"Hearing Test Suite\"..." + Environment.NewLine);
-            Log.Information("Starting SOS");
+            string operation = _restartOnly ? "Restarting" : "Starting";
+            statusTextBox.AppendText($"{operation} \"Hearing Test Suite\"..." + Environment.NewLine);
+            Log.Information($"{operation} HTS");
 
-                var folder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-#if DEBUG
-                var index = folder.IndexOf("Launcher");
-                folder = Path.Combine(folder.Substring(0, index - 1), "Diagnostics", "Build");
-                return;
-#else
-                // up one more level
-                folder = Path.GetDirectoryName(folder);
-#endif
-                var htsPath = Path.Combine(folder, "Hearing Test Suite.exe");
+            var folder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            // up one more level
+            folder = Path.GetDirectoryName(folder);
 
-                try
+            var htsPath = Path.Combine(folder, "Hearing Test Suite.exe");
+
+            try
+            {
+                Log.Information($"App path = {htsPath}");
+                string args = "-screen-fullscreen 1";
+
+                if (_config.RunWindowed)
                 {
-                    Log.Information($"App path = {htsPath}");
-                    string args = "-screen-fullscreen 1";
-                    
-                    if (_config.RunWindowed)
+                    args = $"-screen-fullscreen 0 -screen-width {_config.ScreenWidth} -screen-height {_config.ScreenHeight}";
+                }
+                else
+                {
+                    string key = @"SOFTWARE\Eaton-Peabody Labs\Hearing Test Suite";
+                    using (var view64 = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64))
                     {
-                        args = $"-screen-fullscreen 0 -screen-width {_config.ScreenWidth} -screen-height {_config.ScreenHeight}";
-                    }
-                    else
-                    {
-                        string key = @"SOFTWARE\Eaton-Peabody Labs\Hearing Test Suite";
-                        using (var view64 = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64))
+                        using (var subKey = view64.OpenSubKey(key, true))
                         {
-                            using (var subKey = view64.OpenSubKey(key, true))
-                            {
-                                subKey.SetValue("Screenmanager Resolution Use Native_h1405027254", 1, RegistryValueKind.DWord);
-                            }
+                            subKey.SetValue("Screenmanager Resolution Use Native_h1405027254", 1, RegistryValueKind.DWord);
                         }
                     }
+                }
 
-                    var process = Process.Start(htsPath, args);
-                    await WaitForWindowAsync(process, timeoutMs: 30_000)
-                        .ContinueWith(_ => Close(), TaskScheduler.FromCurrentSynchronizationContext());
+                var process = Process.Start(htsPath, args);
+                await WaitForWindowAsync(process, timeoutMs: 30_000)
+                    .ContinueWith(_ => Close(), TaskScheduler.FromCurrentSynchronizationContext());
             }
             catch (Exception ex)
-                {
-                    errorMsg = "Error starting app";
-                    Log.Error($"Error starting app:{Environment.NewLine}{ex.Message}");
-                }
+            {
+                errorMsg = "Error starting app";
+                Log.Error($"Error starting app:{Environment.NewLine}{ex.Message}");
+            }
 
             if (!string.IsNullOrEmpty(errorMsg))
             {
@@ -273,6 +277,9 @@ namespace Launcher
             statusTextBox.AppendText("Reading configuration..." + Environment.NewLine);
             Log.Information("Reading configuration");
             _config = ReadConfiguration();
+
+            if (_restartOnly) return null;
+
             var map = _config.GetSelectedMap();
 
             statusTextBox.AppendText("Checking hardware..." + Environment.NewLine);
@@ -531,7 +538,7 @@ namespace Launcher
                 var supports = audioClient.IsFormatSupported(AudioClientShareMode.Shared, desiredFormat);
                 audioClient.Dispose();
 
-                supports &= GetJackCount(d)>1;
+                supports &= GetJackCount(d) > 1;
 
                 if (supports)
                 {
@@ -611,7 +618,7 @@ namespace Launcher
             }
             catch (Exception ex)
             {
-                Log.Error("error restarting audiosrv:"  + ex.Message);
+                Log.Error("error restarting audiosrv:" + ex.Message);
                 errMsg = "Error restarting audio service";
             }
 

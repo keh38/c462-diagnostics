@@ -19,15 +19,21 @@ using Turandot.Interactive;
 using C462.Shared;
 
 using UDPPacket = Turandot.Interactive.UDPPacket;
+using UnityEngine.InputSystem;
+using HTS.Unity.Tcp;
 
 public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 {
+    [Header("UI ELEMENTS")]
     [SerializeField] private GameObject _titleBar;
     [SerializeField] private GameObject _menuPanel;
     [SerializeField] private GameObject _quitPanel;
     [SerializeField] private GameObject _sliderPanelPrefab;
     [SerializeField] private GameObject _sliderPrefab;
     [SerializeField] private GameObject _sliderArea;
+
+    [Header("ACTIONS")]
+    [SerializeField] private InputAction _abortAction;
 
     private SignalManager _sigMan;
 
@@ -44,6 +50,10 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     private List<ParameterSlider> _sliders;
     private List<SliderPanel> _sliderPanels;
 
+    private bool _isError = false;
+    private bool _errorHandled = false;
+    private string _errorMessage = "";
+
     void Start()
     {
         HTS_Server.SetCurrentScene("Turandot Interactive", this);
@@ -53,6 +63,9 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         {
             _udpEndPoint = new IPEndPoint(HTS_Server.RemoteAddress, _udpPort);
         }
+
+        _abortAction.Enable();
+        _abortAction.performed += HandleAbortAction;
 
 #if HACKING
         GameManager.SetSubject("Scratch/_Ken");
@@ -73,11 +86,31 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
             var rt = _titleBar.GetComponent<RectTransform>();
             rt.anchorMin = new Vector2(0, rt.anchorMin.y);
         }
+    }
 
+    private void OnDisable()
+    {
+        _abortAction.performed -= HandleAbortAction;
+        _abortAction.Disable();
+
+        HardwareInterface.Digitimer?.DisableAllDevices();
+    }
+
+    private void HandleAbortAction(InputAction.CallbackContext obj)
+    {
+        _abortAction.performed -= HandleAbortAction;
+        _sliderArea.SetActive(false);
+        _quitPanelShowing = true;
+        _quitPanel.SetActive(true);
     }
 
     private void Update()
     {
+        if (_isError && !_errorHandled)
+        {
+            StartCoroutine(HandleErrorSequence());
+        }
+
         if (_audioInitialized && _isRemoteConnected)
         {
             _udpPacket.Status = 1;
@@ -95,15 +128,17 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         }
     }
 
-    void OnGUI()
+    private IEnumerator HandleErrorSequence()
     {
-        Event e = Event.current;
-        if (e.control && e.keyCode == UnityEngine.KeyCode.A && !_quitPanelShowing)
+        _errorHandled = true;
+        yield return new WaitForEndOfFrame();
+
+        var payload = new RemoteMessagePayload()
         {
-            _sliderArea.SetActive(false);
-            _quitPanelShowing = true;
-            _quitPanel.SetActive(true);
-        }
+            Target = "TurandotInteractive",
+            Data = _errorMessage
+        };
+        HTS_Server.SendRequest("Error", payload);
     }
 
     public void OnQuitConfirmButtonClick()
@@ -116,6 +151,8 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
         _sliderArea.SetActive(true);
         _quitPanel.SetActive(false);
         _quitPanelShowing = false;
+
+        _abortAction.performed += HandleAbortAction;
     }
 
     public void OnStartButtonToggle(bool ispressed)
@@ -254,8 +291,20 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
     private void StartStreaming()
     {
-        HardwareInterface.Digitimer?.EnableDevices(_sigMan.GetDigitimerChannels());
-        _sigMan.Activate();
+        _isError = false;
+        _errorHandled = false;
+        _errorMessage = "";
+        try
+        {
+            HardwareInterface.Digitimer?.EnableDevices(_sigMan.GetDigitimerChannels());
+            _sigMan.Activate();
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _errorMessage = $"[Turandot Interactive] error starting streaming: {ex.Message}";
+            Debug.Log(_errorMessage);
+        }
     }
 
     private void StopStreaming()
@@ -268,15 +317,17 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
     {
         try
         {
-            if (_audioInitialized)
+            if (_audioInitialized && !_isError)
             {
                 _sigMan.Synthesize(data);
             }
         }
         catch (Exception ex)
         {
-            Debug.Log($"[Turandot Interactive] error in OnAudioFilterRead: {ex.Message}");
-            _audioInitialized = false;
+            _errorMessage = $"[Turandot Interactive] error in OnAudioFilterRead: {ex.Message}";
+            Debug.Log(_errorMessage);
+            _isError = true;
+            StopStreaming();
         }
     }
 
