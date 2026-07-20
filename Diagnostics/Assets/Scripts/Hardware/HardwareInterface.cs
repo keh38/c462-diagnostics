@@ -23,7 +23,11 @@ public class HardwareInterface : MonoBehaviour
     private HardwareConfiguration _hardwareConfig;
     private AdapterMap _adapterMap;
 
+    // HardwareInterface
+    private bool _didInit = false;
+
     private bool _audioReady = false;
+    private bool _hardwareReady = false;
     private bool _errorAcknowledged = false;
     private string _errorMessage = "";
 
@@ -52,12 +56,13 @@ public class HardwareInterface : MonoBehaviour
 #endif
     public static ClockSynchronizer ClockSync { get { return _instance._clockSynchronizer; } }
     public static VolumeManager VolumeManager { get { return _instance._volumeManager; } }
-    public static bool IsReady { get { return _instance._audioReady; } }
+    public static bool IsReady { get { return _instance._audioReady && _instance._hardwareReady; } }
     public static bool ErrorAcknowledged { get { return _instance._errorAcknowledged; } }
     public static string ErrorMessage { get { return _instance._errorMessage; } }
     public static void AcknowledgeError() { _instance._errorAcknowledged = true; }
     public static LEDController LED { get { return _instance._ledController; } }
     public static bool LockWindowInCenter { get { return _instance._hardwareConfig.LockWindowInCenter; } }
+    public static void EnsureInitialized() => _instance._EnsureInitialized();
     public static void CleanUp() => _instance._CleanUp();
     public static bool Yield() => _instance._Yield();
     public static void Resume() => _instance._Resume();
@@ -87,6 +92,13 @@ public class HardwareInterface : MonoBehaviour
 
     private void Start()
     {
+        _EnsureInitialized();   // fallback path for arbitrary-scene launches
+    }
+
+    private void _EnsureInitialized()
+    {
+        if (_didInit) return;
+        _didInit = true;
         _Init();
     }
 
@@ -131,10 +143,12 @@ public class HardwareInterface : MonoBehaviour
             }
         }
 
+        _hardwareReady = true;
         var clockOK = _clockSynchronizer.Initialize(_hardwareConfig.SyncComPort);
         if (!clockOK)
         {
             errors.AppendLine("- Failed to initialize clock sync serial port");
+            _hardwareReady = false;
         }
         _clockNetwork.Initialize();
 
@@ -147,6 +161,7 @@ public class HardwareInterface : MonoBehaviour
             }
             else
             {
+                _hardwareReady = false;
                 errors.AppendLine("- Failed to initialize LED serial port");
             }
         }
@@ -157,16 +172,23 @@ public class HardwareInterface : MonoBehaviour
             var success = _digitimer.Initialize();
             if (!success)
             {
+                _hardwareReady = false;
                 errors.AppendLine("- Failed to initialize Digitimer(s)");
             }
             success = _digitimer.InitializeTrigger(_hardwareConfig.DigitimerComPort);
             if (!success)
             {
+                _hardwareReady = false;
                 errors.AppendLine("- Failed to initialize Digitimer trigger");
             }
         }
         _errorAcknowledged = false;
         _errorMessage = errors.ToString();
+
+        if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            Debug.LogError($"Hardware initialization errors:\n{_errorMessage}");
+        }
 
         return true;
     }

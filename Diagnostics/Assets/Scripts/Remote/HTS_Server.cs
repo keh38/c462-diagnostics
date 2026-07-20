@@ -335,6 +335,16 @@ public class HTS_Server : MonoBehaviour
                 _tcpListener.WriteResponse(TcpMessage.Ok(_currentSceneName));
                 break;
 
+            case "GetHardwareStatus":
+                Debug.Log($"Command received: {request.Command}");
+                var hardwareStatusPayload = new HardwareStatusPayload()
+                {
+                    IsReady = HardwareInterface.IsReady,
+                    ErrorMessage = HardwareInterface.ErrorMessage
+                };
+                _tcpListener.WriteResponse(TcpMessage.Ok(hardwareStatusPayload));
+                break;
+
             case "GetSubjectInfo":
                 Debug.Log($"Command received: {request.Command}");
                 _tcpListener.WriteResponse(TcpMessage.Ok($"{GameManager.Project}/{GameManager.Subject}"));

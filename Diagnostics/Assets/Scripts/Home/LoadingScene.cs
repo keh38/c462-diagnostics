@@ -15,6 +15,15 @@ public class LoadingScene : MonoBehaviour
     {
         AudioWatchdog.ProcessTag = "HTS";
         AudioAuditLog.Verbose = false;
+
+        KLogger.Create(
+            Path.Combine(SharedFileLocations.HtsFolder, "Logs", Application.productName + ".log"),
+            retainDays: 14)
+            .StartLogging();
+
+        Debug.Log($"Started V{Application.version}");
+
+        HardwareInterface.EnsureInitialized();
     }
 
     IEnumerator Start()
@@ -49,12 +58,6 @@ public class LoadingScene : MonoBehaviour
 #endif
 
         _versionLabel.text = "V" + Application.version;
-        KLogger.Create(
-            Path.Combine(C462.Shared.SharedFileLocations.HtsFolder, "Logs", Application.productName + ".log"),
-            retainDays: 14)
-            .StartLogging();
-
-        Debug.Log($"Started V{Application.version}");
 
         HTS_Server.StartServer();
         HTS_Server.SetCurrentScene("Loading", null);

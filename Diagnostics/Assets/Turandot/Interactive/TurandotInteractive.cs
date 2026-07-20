@@ -266,9 +266,17 @@ public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 
     private void OnAudioFilterRead(float[] data, int channels)
     {
-        if (_audioInitialized)
+        try
         {
-            _sigMan.Synthesize(data);
+            if (_audioInitialized)
+            {
+                _sigMan.Synthesize(data);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Log($"[Turandot Interactive] error in OnAudioFilterRead: {ex.Message}");
+            _audioInitialized = false;
         }
     }
 

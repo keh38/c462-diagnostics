@@ -16,6 +16,7 @@ public class Lobby : MonoBehaviour
     void Start()
     {
         HTS_Server.SetCurrentScene("Lobby", null);
+        Debug.Log("Scene: Lobby");
 
         // Not sure why this was ever a good idea. Should be handled by the GameBridge when the Game is launched, not here.
         //HardwareInterface.Yield();

@@ -74,9 +74,9 @@ public class DigitimerControl : MonoBehaviour
         return _trigger.Initialize(comPort);
     }
 
-    public bool EnableDevices(List<KLib.Signals.Channel> channels)
+    public void EnableDevices(List<KLib.Signals.Channel> channels)
     {
-        if (channels.Count == 0) return true;
+        if (channels.Count == 0) return; // return true;
 
         bool success = true;
 
@@ -93,7 +93,10 @@ public class DigitimerControl : MonoBehaviour
             success &= _trigger.EnableTrigger();
         }
 
-        return success;
+        if (!success)
+            throw new Exception("Failed to set the state of one or more Digitimer devices.");
+
+        //return success;
     }
 
     public bool ZeroDevices(List<KLib.Signals.Channel> channels)
