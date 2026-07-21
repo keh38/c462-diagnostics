@@ -689,27 +689,26 @@ public class HTS_Server : MonoBehaviour
 
     private void RestartHTS()
     {
-        string exeFolder = GetExecutableFolder();
-
-        //if (string.IsNullOrEmpty(_htsExecutablePath))
-        //{
-        //    Debug.LogWarning("HTSBridge: _htsExecutablePath not set — cannot launch HTS automatically");
-        //    return;
-        //}
-
         try
         {
-            var htsExecutablePath = System.IO.Path.Combine(exeFolder, "Launcher", "HTSLauncher.exe");
-            var processStartInfo = new System.Diagnostics.ProcessStartInfo(htsExecutablePath);
-            processStartInfo.WorkingDirectory = exeFolder;
-            processStartInfo.Arguments = "-restart";
-            var process = System.Diagnostics.Process.Start(processStartInfo);
-            Debug.Log($"restarted HTS from {htsExecutablePath}");
+            string exeFolder = GetExecutableFolder();
+            exeFolder = Path.Combine(exeFolder, "Restarter");
+            var restarterPath = Path.Combine(exeFolder, "Restarter.exe");
+
+            int pid = System.Diagnostics.Process.GetCurrentProcess().Id;
+
+            var psi = new System.Diagnostics.ProcessStartInfo(restarterPath)
+            {
+                WorkingDirectory = Path.GetDirectoryName(restarterPath),
+                Arguments = $"{pid}"
+            };
+            System.Diagnostics.Process.Start(psi);
+            Debug.Log("launched restarter to restart HTS");
             Application.Quit();
         }
         catch (Exception ex)
         {
-            Debug.LogError($"HTSBridge: failed to restart HTS — {ex.Message}");
+            Debug.LogError($"failed to restart HTS — {ex.Message}");
         }
     }
 

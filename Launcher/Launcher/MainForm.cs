@@ -107,7 +107,9 @@ namespace Launcher
 
             if ((keyData == Keys.F2 || keyData == Keys.C) && !_configButtonPressed)
             {
-                _timer.Enabled = false;
+                if (_timer != null)
+                    _timer.Enabled = false;
+
                 _configButtonPressed = true;
                 Log.Information("Config button pressed");
                 ShowConfigDialog();

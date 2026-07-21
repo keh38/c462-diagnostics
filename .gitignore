@@ -10,3 +10,5 @@
 /Diagnostics/Logs
 /Diagnostics/.vs
 /Diagnostics/UserSettings/Layouts/*.dwlt
+/Launcher/Restarter/obj
+/Launcher/Restarter/bin

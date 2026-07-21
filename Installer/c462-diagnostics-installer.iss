@@ -32,6 +32,7 @@ Source: "{#DevRoot}\C462\c462-shared\Installer\Output\C462SharedSubjectSetup.exe
 Source: "..\Diagnostics\Build\*.*"; DestDir: "{app}"; Flags: replacesameversion recursesubdirs;
 Source: ".\Dependencies\Mono\*.*"; DestDir: "{app}"; Flags: replacesameversion;
 Source: "..\Launcher\Launcher\bin\Release\net8.0-windows\*.*"; DestDir: "{app}\Launcher"; Flags: replacesameversion recursesubdirs;
+Source: "..\Launcher\Restarter\bin\Release\net8.0-windows\*.*"; DestDir: "{app}\Restarter"; Flags: replacesameversion recursesubdirs;
 Source: "..\CHANGELOG.md"; DestDir: "{app}"; Flags: replacesameversion;
 
 [Run]
