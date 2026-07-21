@@ -127,7 +127,7 @@ public class HardwareInterface : MonoBehaviour
 
         _audioReady = true;
         var config = AudioSettings.GetConfiguration();
-        Debug.Log(AudioSettings.driverCapabilities);
+        Debug.Log($"Speaker mode = {AudioSettings.driverCapabilities}");
         if (_adapterMap.NumChannels == 8)
         {
             if (AudioSettings.driverCapabilities == AudioSpeakerMode.Mode7point1)
