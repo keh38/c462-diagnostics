@@ -305,12 +305,12 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     {
         _patternGenerator = new TappingPatternGenerator();
 
-        _patternGenerator.Initialize(
-            channel: _settings.Channel.Clone(),
-            minISI: _settings.MinISI,
-            intervalExpression: _settings.IntervalExpression,
-            numIntervals: _settings.PatternLength,
-            numRepeats: _settings.NumRepeats);
+        //_patternGenerator.Initialize(
+        //    channel: _settings.Channel.Clone(),
+        //    minISI: _settings.MinISI,
+        //    intervalExpression: _settings.IntervalExpression,
+        //    numIntervals: _settings.PatternLength,
+        //    numRepeats: _settings.NumRepeats);
     }
 
     private void StartTapStreamer()
