@@ -1,21 +1,20 @@
+using BasicMeasurements;
+using C462.Shared;
+using CombinedAudioLDL;
+using KLib.Expressions;
+using KLib.Logging;
+using KLib.Signals;
+using KLibU;
+using KLibU.Net;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
-
+using Tapping;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
-using C462.Shared;
-
-using KLib.Signals;
-using KLibU;
-using KLibU.Net;
-
-using BasicMeasurements;
-using Tapping;
-using KLib.Logging;
 
 public class TappingSceneController : MonoBehaviour, IRemoteControllable
 {
@@ -41,14 +40,19 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     private string _mySceneName = "Tapping";
     private string _configName;
 
-    private TappingPatternGenerator _patternGenerator;
+    private TappingPatternGenerator _pacer;
+    private TappingPatternGenerator _distractor;
     private TapStreamer _tapStreamer;
 
     private bool _audioEnabled = false;
     private bool _stopAudio = false;
     private bool _runEnded = false;
+    private bool _endRunStarted = false;
 
     private InputAction _abortAction;
+
+    private TappingTrialList _trialList = new TappingTrialList();
+    private int _currentTrialIndex = -1;
 
     private AudioDspLog _audioDspLog = new AudioDspLog();
 
@@ -106,7 +110,17 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
     void InitializeMeasurement()
     {
-        InitDataFile();
+        try
+        {
+            _dataPath = null;
+            CreatePlan();
+            InitDataFile();
+        }
+        catch (Exception ex)
+        {
+            Debug.Log($"[TAPPING] Failed to initialize measurement: {ex.Message}");
+            _dataPath = $"error: {ex.Message}";
+        }
     }
 
     void InitDataFile()
@@ -139,7 +153,24 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
     private void CreatePlan()
     {
+        if (string.IsNullOrEmpty(_settings.TrialListFile))
+        {
+            throw new ArgumentException("Trial list file name is not specified in the configuration.");
+        }
 
+        string trialListPath = Path.Combine(SharedFileLocations.HtsConfigFolder, $"Tapping.{_settings.TrialListFile}.json");
+        if (!File.Exists(trialListPath))
+        {
+            throw new FileNotFoundException($"Trial list file not found: {trialListPath}");
+        }
+        _trialList = Files.JSONDeserialize<TappingTrialList>(trialListPath);
+
+        if (_trialList.Trials == null || _trialList.Trials.Count == 0)
+        {
+            throw new InvalidOperationException("Trial list is empty.");
+        }
+
+        _currentTrialIndex = -1;
     }
 
     private void Begin()
@@ -170,10 +201,40 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(true);
 
-        InitializePatternGenerator();
-        StartTapStreamer();
+        InitializePatternGeneration();
+        Advance();
 
         _audioEnabled = true;
+    }
+
+    private void Advance()
+    {
+        _currentTrialIndex++;
+        if (_currentTrialIndex >= _trialList.Trials.Count)
+        {
+            EndRun(abort: false);
+            return;
+        }
+
+        var trial = _trialList.Trials[_currentTrialIndex];
+        StartCoroutine(StartNextTrial(trial));
+    }
+
+    private IEnumerator StartNextTrial(TappingTrial tappingTrial)
+    {
+        HTS_Server.SendRequest(_mySceneName, $"Status:{tappingTrial.Label}");
+
+        InitializeNextPattern(tappingTrial);
+        _audioEnabled = true;
+        //        StartTapStreamer();
+        yield break;
+    }
+
+    private IEnumerator EndTrial()
+    {
+        //        StartTapStreamer();
+        yield return null;
+        Advance();
     }
 
     void OnAbortAction(InputAction.CallbackContext context)
@@ -188,12 +249,12 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     void Update()
     {
         if (_runEnded) return;
-        
-        if (_patternGenerator != null && _patternGenerator.IsComplete)
+
+        if (_pacer != null && _pacer.IsComplete)
         {
-            _stopAudio = true;
-            _runEnded = true;
-            EndRun(abort: false);
+            //_stopAudio = true;
+            //_runEnded = true;
+            StartCoroutine(EndTrial());
             return;
         }
 
@@ -228,13 +289,16 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
     private void EndRun(bool abort)
     {
+        if (_endRunStarted) return;
+        _endRunStarted = true;
+
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(false);
 
-        StopTapStreamer();
+        //StopTapStreamer();
 
-        _audioDspLog.dspEvents.Add(_patternGenerator.DspEventLog);
-        KLib.Utilities.AppendToJsonFile(_dataPath, _audioDspLog.ToJsonString());
+        //_audioDspLog.dspEvents.Add(_pacer.DspEventLog);
+        //KLib.Utilities.AppendToJsonFile(_dataPath, _audioDspLog.ToJsonString());
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
         HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
@@ -301,16 +365,37 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         }
     }
 
-    private void InitializePatternGenerator()
+    private void InitializePatternGeneration()
     {
-        _patternGenerator = new TappingPatternGenerator();
+        var audioConfig = AudioSettings.GetConfiguration();
 
-        //_patternGenerator.Initialize(
-        //    channel: _settings.Channel.Clone(),
-        //    minISI: _settings.MinISI,
-        //    intervalExpression: _settings.IntervalExpression,
-        //    numIntervals: _settings.PatternLength,
-        //    numRepeats: _settings.NumRepeats);
+        BindProperties(_settings.StimulusA, _settings.PropertyBindings);
+        BindProperties(_settings.StimulusB, _settings.PropertyBindings);
+
+        _pacer = new TappingPatternGenerator(audioConfig.sampleRate);
+    }
+
+    private void InitializeNextPattern(TappingTrial tappingTrial)
+    {
+        _pacer.Initialize(
+            channel: _settings.StimulusA,
+            intervals: tappingTrial.PacerIntervals,
+            parameterProfiles: tappingTrial.ParameterProfiles,
+            isPacer: true);
+    }
+
+    private void BindProperties(Channel channel, List<PropertyBinding> bindings)
+    {
+        foreach (var binding in bindings.FindAll(b => b.Item.StartsWith($"{channel.Name}.")))
+        {
+            var value = Expressions.EvaluateToFloatScalar(binding.Expression);
+            if (float.IsNaN(value))
+                throw new ApplicationException($"Expression for {binding.Item} did not evaluate to a number.");
+
+            var error = channel.SetParameter(binding.Item.Replace($"{channel.Name}.", ""), value);
+            if (!string.IsNullOrEmpty(error))
+                throw new ApplicationException($"error setting {binding.Item}: {error}");
+        }
     }
 
     private void StartTapStreamer()
@@ -337,12 +422,15 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
     TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
-        var data = request.GetPayload<string>();
         switch (request.Command)
         {
             case "Initialize":
-                _settings = Files.XmlDeserializeFromString<BasicMeasurementConfiguration>(data) as TappingConfiguration;
+                _settings = request.GetPayload<TappingConfiguration>();
                 InitializeMeasurement();
+                if (_dataPath != null && _dataPath.StartsWith("error"))
+                {  
+                    return TcpMessage.Ok(_dataPath);
+                }
                 return TcpMessage.Ok(Path.GetFileName(_dataPath));
             case "Begin":
                 StartCoroutine(BeginNextFrame());
@@ -370,22 +458,30 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     {
         if (_runEnded) return;
 
-        if (_audioEnabled)
+        try
         {
-            _patternGenerator.Process(data, channels, _audioDspLog.CurrentBlockNumber);
-
-            if (_stopAudio)
+            if (_audioEnabled)
             {
-                Gate.RampDown(data);
-                _audioEnabled = false;
+                _pacer.Process(data, channels, _audioDspLog.CurrentBlockNumber);
+
+                if (_stopAudio)
+                {
+                    Gate.RampDown(data);
+                    _audioEnabled = false;
+                }
+
+                if (_pacer.IsComplete)
+                {
+                    _audioEnabled = false;
+                }
             }
 
-            if (_patternGenerator.IsComplete)
-            {
-                _audioEnabled = false;
-            }
+            _audioDspLog.AddBlock();
         }
-
-        _audioDspLog.AddBlock();
+        catch (Exception ex)
+        {
+            _runEnded = true;
+            HandleError($"Audio processing error: {ex.Message}", ex.StackTrace);
+        }
     }
 }

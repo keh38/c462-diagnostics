@@ -1,5 +1,11 @@
 ## Changelog
 
+### v2.1.27 (unreleased)
+#### Fixed
+- check for null audiogram before sanitizing
+
+---
+
 ### v2.1.26 (2026-07-20)
 #### Fixed
 - diotic audiogram/LDL logic

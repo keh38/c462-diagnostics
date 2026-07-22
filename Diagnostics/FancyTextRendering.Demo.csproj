@@ -555,6 +555,10 @@
       <HintPath>Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="C462.HTS">
+      <HintPath>Assets\Plugins\C462.HTS.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="NAudio.Core">
       <HintPath>Assets\Plugins\NAudio.Core.dll</HintPath>
       <Private>False</Private>
@@ -621,10 +625,6 @@
     </Reference>
     <Reference Include="D128NET">
       <HintPath>Assets\Scripts\Hardware\Plugins\D128NET.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="C462.HTS">
-      <HintPath>Assets\Plugins\C462.HTS.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="mscorlib">

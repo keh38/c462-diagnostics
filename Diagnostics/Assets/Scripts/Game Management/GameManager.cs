@@ -7,6 +7,7 @@ using KLib;
 using KLibU;
 
 using C462.Shared;
+using KLib.Expressions;
 
 public class GameManager : MonoBehaviour
 {
@@ -96,6 +97,7 @@ public class GameManager : MonoBehaviour
     {
         instance._subjectMetadata.metrics = data;
         instance._SaveSubjectMetadata();
+        Expressions.Metrics = data;
     }
 
     public static int GetNextRunNumber(string measurementType)
@@ -150,6 +152,7 @@ public class GameManager : MonoBehaviour
         if (File.Exists(SharedFileLocations.SubjectMetadataPath))
         {
             _subjectMetadata = Files.XmlDeserialize<SubjectMetadata>(SharedFileLocations.SubjectMetadataPath);
+            Expressions.Metrics = _subjectMetadata.metrics;
         }
         else
         {

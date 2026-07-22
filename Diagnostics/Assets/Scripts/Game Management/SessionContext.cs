@@ -40,7 +40,7 @@ public static class SessionContext
             Debug.LogError("SessionContext not initialized. Call Initialize() before setting audiogram.");
             return;
         }
-        Signal.Audiogram = AudiogramData.Load(audiogramPath).SanitizeThresholdForExpressions();
+        Signal.Audiogram = AudiogramData.Load(audiogramPath)?.SanitizeThresholdForExpressions();
     }
 
     public static void SetLDL(string ldlPath)
