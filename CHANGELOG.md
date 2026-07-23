@@ -1,6 +1,6 @@
 ## Changelog
 
-### v2.1.27 (unreleased)
+### v2.1.27 (2026-07-23)
 #### Fixed
 - check for null audiogram before sanitizing
 
