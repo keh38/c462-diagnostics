@@ -72,8 +72,8 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     void OnDestroy()
     {
         Application.logMessageReceived -= HandleException;
+        StopTapStreamer();
     }
-
 
     private void Start()
     {
@@ -280,7 +280,8 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         var trialData = new TappingTrialData()
         {
             trial = _trialList.Trials[_currentTrialIndex],
-            pacerLog = _pacer.DspEventLog
+            pacerLog = _pacer.DspEventLog,
+            distractorLog = _distractor.DspEventLog,
         };
 
         Files.JSONSerialize(trialData, _trialDataPath); 
@@ -355,7 +356,6 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(false);
 
-        //_audioDspLog.dspEvents.Add(_pacer.DspEventLog);
         KLib.Utilities.AppendToJsonFile(_dataPath, Files.JSONStringAdd("", "trials", KLibU.Files.JSONSerializeToString(_data)));
         KLib.Utilities.AppendToJsonFile(_dataPath, _audioDspLog.ToJsonString());
 
@@ -401,6 +401,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
         try
         {
+            StopTapStreamer();
             _workPanel.SetActive(false);
         }
         catch { }
@@ -432,15 +433,23 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         BindProperties(_settings.StimulusB, _settings.PropertyBindings);
 
         _pacer = new TappingPatternGenerator(audioConfig.sampleRate);
+        _distractor = new TappingPatternGenerator(audioConfig.sampleRate);
     }
 
     private void InitializeNextPattern(TappingTrial tappingTrial)
     {
         _pacer.Initialize(
-            channel: _settings.StimulusA,
+            channel: (tappingTrial.Pacer == PacerStimulus.A) ? _settings.StimulusA : _settings.StimulusB,
             intervals: tappingTrial.PacerIntervals,
             parameterProfiles: tappingTrial.ParameterProfiles,
             isPacer: true);
+
+        _distractor.Initialize(
+            channel: (tappingTrial.Pacer == PacerStimulus.A) ? _settings.StimulusB : _settings.StimulusA,
+            intervals: tappingTrial.DistractorIntervals,
+            parameterProfiles: tappingTrial.ParameterProfiles,
+            isPacer: false,
+            leadIn_ms: tappingTrial.LeadIn + tappingTrial.Offset);
     }
 
     private void BindProperties(Channel channel, List<PropertyBinding> bindings)
@@ -522,6 +531,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
             if (_audioEnabled)
             {
                 _pacer.Process(data, channels, _audioDspLog.CurrentBlockNumber);
+                _distractor.Process(data, channels, _audioDspLog.CurrentBlockNumber);
 
                 if (_stopAudio)
                 {

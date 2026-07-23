@@ -25,8 +25,10 @@ public class TappingPatternGenerator
 
     private List<int> _channelOffsets = new List<int>();
     private List<Signal> _signals = new List<Signal>();
+    private Signal _silence;
 
     private int[] _intervals;
+    private bool[] _emitStimulus;
 
     // --- running position (persists across Process calls) ---
     private int _intervalIndex;   // which interval in the pattern
@@ -41,6 +43,7 @@ public class TappingPatternGenerator
     public AudioDspEventLog DspEventLog => _dspEventLog?.Trim();
 
     private bool _isPacer;
+    private bool _isActive;
 
     private float _Fs;
     private float _dt;
@@ -55,19 +58,34 @@ public class TappingPatternGenerator
         CreateMarkerPulse();
     }
 
-    public void Initialize(Channel channel, float[] intervals, List<ParameterProfile> parameterProfiles, bool isPacer)
+    public void Initialize(Channel channel, float[] intervals, List<ParameterProfile> parameterProfiles, bool isPacer, float leadIn_ms = 0)
     {
         _isPacer = isPacer;
+        _isActive = intervals.Length > 0;
 
-        // Convert intervals from ms to samples
-        _intervals = new int[intervals.Length];
-        for (int k=0; k<intervals.Length; k++) {
-            _intervals[k] = Mathf.RoundToInt(_Fs * intervals[k] / 1000f);
+        if (_isPacer && !_isActive)
+            throw new Exception("[TappingPatternGenerator] Pacer requires intervals");
+
+        _dspEventLog = new AudioDspEventLog(channel.Name);
+
+        if (!_isActive) return;
+
+        int nLead = (leadIn_ms > 0) ? 1 : 0;
+        _intervals = new int[intervals.Length + nLead];
+        _emitStimulus = new bool[_intervals.Length];
+
+        if (nLead == 1)
+        {
+            _intervals[0] = Mathf.RoundToInt(_Fs * leadIn_ms / 1000f);
+            _emitStimulus[0] = false;
+        }
+        for (int k = 0; k < intervals.Length; k++)
+        {
+            _intervals[k + nLead] = Mathf.RoundToInt(_Fs * intervals[k] / 1000f);
+            _emitStimulus[k + nLead] = true;
         }
 
         CreateSignals(channel.Clone(), parameterProfiles);
-
-        _dspEventLog = new AudioDspEventLog(channel.Name);
 
         Reset();
     }
@@ -104,6 +122,10 @@ public class TappingPatternGenerator
             _channelOffsets.Add(channel.ContraSide.OutputNum);
         }
         _signals.Add(signal);
+
+        _silence = new Signal();
+        for (int k = 0; k < _channelOffsets.Count; k++)
+            _silence.AddChannelData(Array.Empty<float>());
     }
 
     void CreateMarkerPulse()
@@ -115,18 +137,22 @@ public class TappingPatternGenerator
 
     public void Process(float[] data, int channels, int blockNumber)
     {
+        if (!_isActive) return;
+
         int outPos = 0;
 
         double offset = 0;
         while (outPos < data.Length && !IsComplete)
         {
-            if (_posInInterval == 0)
+            bool emit = _emitStimulus[_intervalIndex];
+
+            if (_posInInterval == 0 && emit)
             {
                 _dspEventLog.AddEvent(blockNumber, offset);
             }
 
             int intervalLength = _intervals[_intervalIndex];
-            var stim = _signals[_signalIndex];
+            var stim = emit ? _signals[_signalIndex] : _silence;
 
             // Fill until the buffer is full OR this interval ends.
             // First stim.Length samples of the interval = the stimulus, rest = silence.
@@ -134,11 +160,11 @@ public class TappingPatternGenerator
             {
                 for (int k = 0; k < _channelOffsets.Count; k++)
                 {
-                    data[outPos + _channelOffsets[k]] = (_posInInterval < stim.channelData[k].Length) ? stim.channelData[k][_posInInterval] : 0f;
+                    data[outPos + _channelOffsets[k]] += (_posInInterval < stim.channelData[k].Length) ? stim.channelData[k][_posInInterval] : 0f;
                 }
 
-                if (_isPacer && _posInInterval < _markerPulse.Length)
-                    data[outPos + _markerChannelOffset] = _markerPulse[_posInInterval];
+                if (_isPacer && emit && _posInInterval < _markerPulse.Length)
+                    data[outPos + _markerChannelOffset] += _markerPulse[_posInInterval];
 
                 outPos += channels;
 
@@ -153,18 +179,20 @@ public class TappingPatternGenerator
         }
 
         // After completion (or if we broke early), pad remaining buffer with silence.
-        while (outPos < data.Length)
-        {
-            for (int k = 0; k < _channelOffsets.Count; k++)
-                data[outPos + _channelOffsets[k]] = 0f;
-            outPos += channels;
-        }
+        //while (outPos < data.Length)
+        //{
+        //    for (int k = 0; k < _channelOffsets.Count; k++)
+        //        data[outPos + _channelOffsets[k]] = 0f;
+        //    outPos += channels;
+        //}
     }
 
     private void AdvanceInterval()
     {
+        if (_emitStimulus[_intervalIndex])
+            _signalIndex = (_signalIndex + 1) % _signals.Count;
+        
         _posInInterval = 0;
-        _signalIndex = (_signalIndex + 1) % _signals.Count;
 
         if (++_intervalIndex >= _intervals.Length)
         {
