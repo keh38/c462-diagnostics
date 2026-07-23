@@ -1,5 +1,11 @@
 ## Changelog
 
+### v2.1.28 (unreleased)
+#### Added
+- get/set volume mute state 
+
+---
+
 ### v2.1.27 (2026-07-23)
 #### Fixed
 - check for null audiogram before sanitizing

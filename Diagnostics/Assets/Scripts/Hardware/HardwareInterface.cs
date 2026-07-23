@@ -104,13 +104,17 @@ public class HardwareInterface : MonoBehaviour
 
     private bool _Init()
     {
+        _audioReady = true;
+        _hardwareReady = true;
+
         StringBuilder errors = new StringBuilder(100);
 
-        _volumeManager = new VolumeManager();
-        _startVolume = _volumeManager.GetMasterVolume(VolumeManager.VolumeUnit.Scalar);
-#if !UNITY_EDITOR
-        _volumeManager.SetMasterVolume(1.0f, VolumeManager.VolumeUnit.Scalar);
-#endif
+        var volumeOK = _InitVolumeControl();
+        if (!volumeOK)
+        {
+            errors.AppendLine("- Failed to initialize volume control");
+            _audioReady = false;
+        }
 
         string configFile = SharedFileLocations.HardwareConfigFile;
         if (File.Exists(configFile))
@@ -125,7 +129,6 @@ public class HardwareInterface : MonoBehaviour
         Debug.Log($"Adapter map contains {_adapterMap.NumChannels} channels");
         SessionContext.Initialize(_adapterMap);
 
-        _audioReady = true;
         var config = AudioSettings.GetConfiguration();
         Debug.Log($"Speaker mode = {AudioSettings.driverCapabilities}");
         if (_adapterMap.NumChannels == 8)
@@ -143,7 +146,6 @@ public class HardwareInterface : MonoBehaviour
             }
         }
 
-        _hardwareReady = true;
         var clockOK = _clockSynchronizer.Initialize(_hardwareConfig.SyncComPort);
         if (!clockOK)
         {
@@ -191,6 +193,37 @@ public class HardwareInterface : MonoBehaviour
         }
 
         return true;
+    }
+
+    private bool _InitVolumeControl()
+    {
+        try
+        {
+            _volumeManager = new VolumeManager();
+            _startVolume = _volumeManager.GetMasterVolume(VolumeManager.VolumeUnit.Scalar);
+
+            _EnsureVolumeSettings();
+        }
+        catch (Exception ex)
+        {
+            Debug.Log($"[HardwareInterface] Failed to initialize volume control: {ex.Message}");
+            return false;
+        }
+        return true;
+    }
+
+    private void _EnsureVolumeSettings()
+    {
+        if (_volumeManager == null) return;
+
+#if !UNITY_EDITOR
+        _volumeManager.SetMasterVolume(1.0f, VolumeManager.VolumeUnit.Scalar);
+#endif
+
+        var isMuted = _volumeManager.IsMuted();
+        if (isMuted)
+            Debug.Log("[HardwareInterface] Audio is muted!");
+        _volumeManager.Mute(false);
     }
 
     public void _CleanUp()
