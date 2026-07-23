@@ -28,6 +28,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     [SerializeField] private QuestionBox _questionBox;
     [SerializeField] private GameObject _workPanel;
     [SerializeField] private Slider _progressBar;
+    [SerializeField] private TMPro.TMP_Text _trialPrompt;
 
     private bool _isRemote;
 
@@ -37,6 +38,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     private TappingConfiguration _settings = new TappingConfiguration();
 
     private string _dataPath;
+    private string _trialDataPath;
     private string _mySceneName = "Tapping";
     private string _configName;
 
@@ -48,11 +50,14 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     private bool _stopAudio = false;
     private bool _runEnded = false;
     private bool _endRunStarted = false;
+    private bool _trialEnded = false;
 
     private InputAction _abortAction;
 
     private TappingTrialList _trialList = new TappingTrialList();
     private int _currentTrialIndex = -1;
+
+    private TappingTrialList _data = new TappingTrialList();
 
     private AudioDspLog _audioDspLog = new AudioDspLog();
 
@@ -60,7 +65,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     {
         _abortAction = _actions.FindAction("Abort");
         _abortAction.Enable();
-        _abortAction.performed += OnAbortAction;
+        _abortAction.performed += HandleAbortAction;
         Application.logMessageReceived += HandleException;
     }
 
@@ -199,12 +204,11 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     private void StartMeasurement()
     {
         _instructionPanel.gameObject.SetActive(false);
+        _trialPrompt.text = "";
         _workPanel.SetActive(true);
 
         InitializePatternGeneration();
         Advance();
-
-        _audioEnabled = true;
     }
 
     private void Advance()
@@ -216,6 +220,9 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
             return;
         }
 
+        _progressBar.value = (float)(_currentTrialIndex + 1) / _trialList.Trials.Count;
+        _trialDataPath = _dataPath.Replace(".json", $"-Trial{_currentTrialIndex + 1:000}.json");
+        
         var trial = _trialList.Trials[_currentTrialIndex];
         StartCoroutine(StartNextTrial(trial));
     }
@@ -224,22 +231,67 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     {
         HTS_Server.SendRequest(_mySceneName, $"Status:{tappingTrial.Label}");
 
+        yield return StartCoroutine(ShowPrompts(tappingTrial.Pacer, tappingTrial.ResponseInstructions));
+
+        StartTapStreamer();
+
         InitializeNextPattern(tappingTrial);
         _audioEnabled = true;
-        //        StartTapStreamer();
+        _trialEnded = false;
         yield break;
+    }
+
+    private IEnumerator ShowPrompts(PacerStimulus pacerSource, ResponseInstructions responseInstructions)
+    {
+        float delay = 1;
+
+        string pacerName = pacerSource == PacerStimulus.A ? _settings.StimulusA.Name : _settings.StimulusB.Name;
+        _trialPrompt.text = $"Pay attention to the {pacerName.ToLower()} stimulus";
+        yield return new WaitForSeconds(2);
+
+        _trialPrompt.text = responseInstructions == ResponseInstructions.AllElements ?
+            "Tap along with all elements of the stimulus"
+            : "Tap to the downbeat of the stimulus";
+        yield return new WaitForSeconds(2);
+
+        _trialPrompt.text = "Ready...";
+        yield return new WaitForSeconds(delay);
+        _trialPrompt.text = "Set...";
+        yield return new WaitForSeconds(delay);
+        _trialPrompt.text = "Go!";
+        yield return new WaitForSeconds(delay);
+        _trialPrompt.text = "";
     }
 
     private IEnumerator EndTrial()
     {
-        //        StartTapStreamer();
         yield return null;
+
+        StopTapStreamer();
+
+        SaveTrialData();
+        _data.Trials.Add(_trialList.Trials[_currentTrialIndex]);
+
         Advance();
     }
 
-    void OnAbortAction(InputAction.CallbackContext context)
+    private void SaveTrialData()
+    {
+        var trialData = new TappingTrialData()
+        {
+            trial = _trialList.Trials[_currentTrialIndex],
+            pacerLog = _pacer.DspEventLog
+        };
+
+        Files.JSONSerialize(trialData, _trialDataPath); 
+    }
+
+    void HandleAbortAction(InputAction.CallbackContext context)
     {
         _abortAction.Disable();
+
+        _stopAudio = true;
+        StopTapStreamer();
 
         _workPanel.SetActive(false);
         _instructionPanel.gameObject.SetActive(false);
@@ -250,8 +302,9 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     {
         if (_runEnded) return;
 
-        if (_pacer != null && _pacer.IsComplete)
+        if (!_trialEnded && _pacer != null && _pacer.IsComplete)
         {
+            _trialEnded = true;
             //_stopAudio = true;
             //_runEnded = true;
             StartCoroutine(EndTrial());
@@ -261,6 +314,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         if (_stopMeasurement)
         {
             _abortAction.Disable();
+            StopTapStreamer(); // just to be sure (it's idempotent)
             _stopMeasurement = false;
             _stopAudio = true;
             _runEnded = true;
@@ -278,6 +332,10 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     {
         _quitPanel.SetActive(false);
         _abortAction.Enable();
+
+        // restart the current trial
+        var trial = _trialList.Trials[_currentTrialIndex];
+        StartCoroutine(StartNextTrial(trial));
     }
 
     private void ShowInstructions(string instructions, int fontSize)
@@ -292,13 +350,14 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         if (_endRunStarted) return;
         _endRunStarted = true;
 
+        _runEnded = true;
+
         _instructionPanel.gameObject.SetActive(false);
         _workPanel.SetActive(false);
 
-        //StopTapStreamer();
-
         //_audioDspLog.dspEvents.Add(_pacer.DspEventLog);
-        //KLib.Utilities.AppendToJsonFile(_dataPath, _audioDspLog.ToJsonString());
+        KLib.Utilities.AppendToJsonFile(_dataPath, Files.JSONStringAdd("", "trials", KLibU.Files.JSONSerializeToString(_data)));
+        KLib.Utilities.AppendToJsonFile(_dataPath, _audioDspLog.ToJsonString());
 
         string status = abort ? "Measurement aborted" : "Measurement finished";
         HTS_Server.SendRequest(_mySceneName, $"Finished:{status}");
@@ -408,7 +467,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
             return;
         }
 
-        _tapStreamer.StartStreaming(_dataPath.Replace(".json", ".wav"));
+        _tapStreamer.StartStreaming(_trialDataPath.Replace(".json", ".wav"));
     }
 
     private void StopTapStreamer()

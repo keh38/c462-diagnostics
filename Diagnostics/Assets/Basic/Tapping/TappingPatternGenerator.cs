@@ -27,7 +27,6 @@ public class TappingPatternGenerator
     private List<Signal> _signals = new List<Signal>();
 
     private int[] _intervals;
-    private int _numRepeats;
 
     // --- running position (persists across Process calls) ---
     private int _intervalIndex;   // which interval in the pattern
@@ -138,8 +137,8 @@ public class TappingPatternGenerator
                     data[outPos + _channelOffsets[k]] = (_posInInterval < stim.channelData[k].Length) ? stim.channelData[k][_posInInterval] : 0f;
                 }
 
-                //if (_isPacer && _posInInterval < _markerPulse.Length)
-                //    data[outPos + _markerChannelOffset] = _markerPulse[_posInInterval];
+                if (_isPacer && _posInInterval < _markerPulse.Length)
+                    data[outPos + _markerChannelOffset] = _markerPulse[_posInInterval];
 
                 outPos += channels;
 

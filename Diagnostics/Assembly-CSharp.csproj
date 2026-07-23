@@ -163,6 +163,7 @@
     <Compile Include="Assets\Scripts\Protocols\Protocol.cs" />
     <Compile Include="Assets\Basic\Combined Audio-LDL\CombinedSliderAnimator.cs" />
     <Compile Include="Assets\Prefabs\MessageBox.cs" />
+    <Compile Include="Assets\Basic\Tapping\TappingTrialData.cs" />
     <Compile Include="Assets\Speech\Speech Reception\SpeechReception.MatrixTestData.cs" />
     <Compile Include="Assets\Scripts\Admin Tools\HardwarePanel.cs" />
     <Compile Include="Assets\Audiometer\AudiometerSettings.cs" />
@@ -256,7 +257,6 @@
     <Compile Include="Assets\Basic\Combined Audio-LDL\SliderWheel.cs" />
     <Compile Include="Assets\Basic\Questionnaires\QuestionnaireController.cs" />
     <Compile Include="Assets\Scripts\Game Management\FileLocations.cs" />
-    <Compile Include="Assets\Scripts\Hardware\HighPrecisionClock.cs" />
     <Compile Include="Assets\Scripts\Home\LoadingScene.cs" />
     <Compile Include="Assets\Speech\Digits\Prefabs\KeypadButton.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotChecklist.cs" />

@@ -12,8 +12,11 @@ namespace KLib.Logging
     public class AudioDspLog
     {
         public string name;
-        public long[] blockWallTime;
+        public string T0;
+        public double[] blockWallTime;
         public double[] blockDspTime;
+
+        private long _T0;
 
         public List<AudioDspEventLog> dspEvents = new List<AudioDspEventLog>();
 
@@ -26,7 +29,9 @@ namespace KLib.Logging
         public AudioDspLog()
         {
             name = "audioDspLog";
-            blockWallTime = new long[_lengthIncrement];
+            _T0 = HighPrecisionClock.UtcNowIn100nsTicks;
+            T0 = _T0.ToString();
+            blockWallTime = new double[_lengthIncrement];
             blockDspTime = new double[_lengthIncrement];
             _cursor = 0;
         }
@@ -34,7 +39,7 @@ namespace KLib.Logging
         public AudioDspLog(string name)
         {
             this.name = name;
-            blockWallTime = new long[_lengthIncrement];
+            blockWallTime = new double[_lengthIncrement];
             blockDspTime = new double[_lengthIncrement];
             _cursor = 0;
         }
@@ -46,7 +51,7 @@ namespace KLib.Logging
                 Array.Resize(ref this.blockWallTime, this.blockWallTime.Length + _lengthIncrement);
                 Array.Resize(ref this.blockDspTime, this.blockDspTime.Length + _lengthIncrement);
             }
-            this.blockWallTime[_cursor] = HighPrecisionClock.UtcNowIn100nsTicks;
+            this.blockWallTime[_cursor] = (double)(HighPrecisionClock.UtcNowIn100nsTicks - _T0);
             this.blockDspTime[_cursor] = AudioSettings.dspTime;
             _cursor++;
         }
@@ -63,6 +68,7 @@ namespace KLib.Logging
             Trim();
 
             string json = $"{{\"{name}\": {{\n";
+            json += $"\"T0\": \"{T0}\",\n";
             json += $"\"blockWallTime\": [{string.Join(", ", blockWallTime)}],\n";
             json += $"\"blockDspTime\": [{string.Join(", ", blockDspTime)}]\n";
 
