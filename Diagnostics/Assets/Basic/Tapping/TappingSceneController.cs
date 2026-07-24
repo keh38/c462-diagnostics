@@ -246,12 +246,12 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         float delay = 1;
 
         string pacerName = pacerSource == PacerStimulus.A ? _settings.StimulusA.Name : _settings.StimulusB.Name;
-        _trialPrompt.text = $"Pay attention to the {pacerName.ToLower()} stimulus";
+        _trialPrompt.text = $"Pay attention to the {pacerName.ToLower()}";
         yield return new WaitForSeconds(2);
 
         _trialPrompt.text = responseInstructions == ResponseInstructions.AllElements ?
-            "Tap along with all elements of the stimulus"
-            : "Tap to the downbeat of the stimulus";
+            $"Tap to each element of the {pacerName.ToLower()}"
+            : "Tap just to the downbeat";
         yield return new WaitForSeconds(2);
 
         _trialPrompt.text = "Ready...";

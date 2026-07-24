@@ -92,10 +92,20 @@ public class TappingPatternGenerator
 
     private void CreateSignals(Channel channel, List<ParameterProfile> parameterProfiles)
     {
-        var myProfiles = parameterProfiles?.Where(p => p.Item.StartsWith($"{channel.Name}.")).ToList();
+        string profilePrefix = $"{channel.Name}.";
+        string profileItem = "";
+        float[] profileValues = null;
+
+        var myProfiles = parameterProfiles?.Where(p => p.Item.StartsWith(profilePrefix)).ToList();
 
         if (myProfiles != null && myProfiles.Count > 1)
             throw new Exception("TappingPatternGenerator cannot handle more than one parameter profile");
+
+        if (myProfiles != null && myProfiles.Count == 1)
+        {
+            profileItem = myProfiles[0].Item.Substring(profilePrefix.Length);
+            profileValues = myProfiles[0].Values;
+        }
 
         float Tmax = channel.Gate.Width_ms;
         int npts = Mathf.RoundToInt(_Fs * Tmax / 1000f);
@@ -104,24 +114,38 @@ public class TappingPatternGenerator
         signalManager.AddChannel(channel);
 
         signalManager.Initialize(_Fs, npts, SessionContext.Signal);
+        channel.SetActive(true);
 
         _channelOffsets.Clear();
         _signals.Clear();
 
-        channel.SetActive(true);
-        channel.Create();
+        int numSignals = (profileValues != null) ? profileValues.Length : 1;
 
-        var signal = new Signal();
-        signal.AddChannelData(channel.Data);
-        _channelOffsets.Add(channel.OutputNum);
-
-        if (channel.IsStereo)
+        for (int k = 0; k < numSignals; k++)
         {
-            channel.ContraSide.Create();
-            signal.AddChannelData(channel.ContraSide.Data);
-            _channelOffsets.Add(channel.ContraSide.OutputNum);
+            if (profileValues != null)
+            {
+                var value = profileValues[k];
+                Debug.Log($"[TappingPatternGenerator] Setting {profileItem} = {value}");
+                channel.SetParameterAndReset(profileItem, value);
+            }
+
+            channel.Create();
+
+            var signal = new Signal();
+            signal.AddChannelData(channel.Data);
+            if (k==0)
+                _channelOffsets.Add(channel.OutputNum);
+
+            if (channel.IsStereo)
+            {
+                channel.ContraSide.Create();
+                signal.AddChannelData(channel.ContraSide.Data);
+                if (k==0)
+                    _channelOffsets.Add(channel.ContraSide.OutputNum);
+            }
+            _signals.Add(signal);
         }
-        _signals.Add(signal);
 
         _silence = new Signal();
         for (int k = 0; k < _channelOffsets.Count; k++)
@@ -191,7 +215,7 @@ public class TappingPatternGenerator
     {
         if (_emitStimulus[_intervalIndex])
             _signalIndex = (_signalIndex + 1) % _signals.Count;
-        
+
         _posInInterval = 0;
 
         if (++_intervalIndex >= _intervals.Length)

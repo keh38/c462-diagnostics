@@ -51,7 +51,7 @@ namespace KLib.Logging
                 Array.Resize(ref this.blockWallTime, this.blockWallTime.Length + _lengthIncrement);
                 Array.Resize(ref this.blockDspTime, this.blockDspTime.Length + _lengthIncrement);
             }
-            this.blockWallTime[_cursor] = (double)(HighPrecisionClock.UtcNowIn100nsTicks - _T0);
+            this.blockWallTime[_cursor] = (double)(HighPrecisionClock.UtcNowIn100nsTicks - _T0) * 1e-4; // convert to ms
             this.blockDspTime[_cursor] = AudioSettings.dspTime;
             _cursor++;
         }
