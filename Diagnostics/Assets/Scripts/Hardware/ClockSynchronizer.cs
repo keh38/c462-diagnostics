@@ -40,11 +40,13 @@ public class ClockSynchronizer : MonoBehaviour
     public int PulsesGenerated { get; private set; }
     public int PulsesDetected { get; private set; }
 
-    public bool Initialize(string comPort)
+    public bool Initialize(string comPort, int pulseChannel)
     {
         CreateSignal();
 
         _comPort = comPort;
+        _pulseChannel = pulseChannel; // note: -1 OK, will default to last channel
+
         Status = SyncStatus.Idle;
 
         if (string.IsNullOrEmpty(_comPort))

@@ -146,7 +146,8 @@ public class HardwareInterface : MonoBehaviour
             }
         }
 
-        var clockOK = _clockSynchronizer.Initialize(_hardwareConfig.SyncComPort);
+        _adapterMap.TryGetAdapterIndex(modality: "Sync", location:"Clock", out int pulseChannel);
+        var clockOK = _clockSynchronizer.Initialize(_hardwareConfig.SyncComPort, pulseChannel);
         if (!clockOK)
         {
             errors.AppendLine("- Failed to initialize clock sync serial port");

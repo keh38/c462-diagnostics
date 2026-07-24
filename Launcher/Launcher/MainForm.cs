@@ -23,6 +23,7 @@ using KLib;
 using KLib.IO;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Launcher
 {
@@ -36,6 +37,9 @@ namespace Launcher
         Timer _timer;
         int _delayTime = 5000;
         int _restartDelayTime = 2000;
+
+        private const int DiscoveryAttempts = 5;
+        private const int DiscoveryDelayMs = 250;
 
         HardwareConfiguration _config;
 
@@ -427,25 +431,58 @@ namespace Launcher
             statusTextBox.AppendText("Initializing Digitimer devices..." + Environment.NewLine);
             string result = "";
 
+            var required = devices
+                .Select(d => new
+                {
+                    Spec = d,
+                    Id = int.Parse(d.transducer.Substring("DS8R".Length))
+                })
+                .ToList();
+
             D128ExAPI d128 = null;
+            var found = new List<int>();
+
             try
             {
-                d128 = new D128ExAPI();
-                d128.Initialize();
-                d128.GetState();
-                foreach (var d in devices)
+                for (int attempt = 1; attempt <= DiscoveryAttempts; attempt++)
                 {
-                    int id = int.Parse(d.transducer.Substring(("DS8R").Length));
-                    float max = float.Parse(d.extra);
-
-                    if (d128.Devices.Contains(id))
+                    if (d128 != null)
                     {
-                        d128[id].Limit = (int)(max * 10);
-                        d128[id].Source = D128NET.DemandSource.External;
+                        d128.Close();
+                        d128 = null;
+                        System.Threading.Thread.Sleep(DiscoveryDelayMs);
+                    }
+
+                    d128 = new D128ExAPI();
+                    var initCode = d128.Initialize();
+                    var stateCode = d128.GetState();
+                    found = d128.Devices.ToList();
+
+                    Log.Information(
+                        $"DS8R discovery attempt {attempt}/{DiscoveryAttempts}: " +
+                        $"Initialize={initCode}, GetState={stateCode}, " +
+                        $"found=[{string.Join(",", found)}]");
+
+                    if (initCode == ErrorCode.Success &&
+                        stateCode == ErrorCode.Success &&
+                        required.All(r => found.Contains(r.Id)))
+                    {
+                        if (attempt > 1)
+                            Log.Warning($"DS8R discovery required {attempt} attempts");
+                        break;
+                    }
+                }
+
+                foreach (var r in required)
+                {
+                    if (found.Contains(r.Id))
+                    {
+                        d128[r.Id].Limit = (int)(float.Parse(r.Spec.extra) * 10);
+                        d128[r.Id].Source = D128NET.DemandSource.External;
                     }
                     else
                     {
-                        var e = $"DS8R #{id} not found";
+                        var e = $"DS8R #{r.Id} not found";
                         result += e + Environment.NewLine;
                         Log.Error(e);
                     }
@@ -467,7 +504,6 @@ namespace Launcher
             {
                 if (d128 != null) d128.Close();
             }
-
             return result;
         }
 

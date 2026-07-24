@@ -56,6 +56,10 @@ public class TappingPatternGenerator
         _dt = 1f / _Fs;
 
         CreateMarkerPulse();
+
+        var haveChannelSpec = HardwareInterface.AdapterMap.TryGetAdapterIndex(modality: "Sync", location: "Stimulus", out int index);
+        if (haveChannelSpec)
+            _markerChannelOffset = index;
     }
 
     public void Initialize(Channel channel, float[] intervals, List<ParameterProfile> parameterProfiles, bool isPacer, float leadIn_ms = 0)

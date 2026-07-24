@@ -36,6 +36,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     private bool _localAbort = false;
 
     private TappingConfiguration _settings = new TappingConfiguration();
+    private TappingMeasurementState _state;
 
     private string _dataPath;
     private string _trialDataPath;
@@ -108,7 +109,16 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         {
             var fn = SharedFileLocations.GetConfigFile("Tapping", _configName);
             _settings = Files.XmlDeserialize<BasicMeasurementConfiguration>(fn) as TappingConfiguration;
+            
             InitializeMeasurement();
+
+            var canResume = CheckForResume();
+            if (canResume)
+            {
+                AskToResume();
+                yield break;
+            }
+
             Begin();
         }
     }
@@ -194,10 +204,57 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
             ShowInstructions(
                 instructions: _settings.InstructionMarkdown,
                 fontSize: _settings.InstructionFontSize);
+
+             return;
+        }
+
+        StartMeasurement();
+    }
+
+    private bool CheckForResume()
+    {
+        _state = TappingMeasurementState.LoadState();
+        if (_state.CanResume(_configName, _settings.TrialListFile))
+        {
+            return true;
         }
         else
         {
+            _state.ClearState();
+            return false;
+        }
+    }
+
+    private void AskToResume()
+    {
+        Debug.Log("[TAPPING] Previous state exists. Asking whether to resume");
+        HTS_Server.SendRequest(_mySceneName, "Status:Asking to resume");
+
+        _questionBox.gameObject.SetActive(true);
+        _questionBox.PoseQuestion("Continue previous session?", OnQuestionResponse);
+    }
+
+    private void OnQuestionResponse(bool yes)
+    {
+        _questionBox.gameObject.SetActive(false);
+
+        if (yes)
+        {
+            Debug.Log("[TAPPING] Resuming previous");
+            HTS_Server.SendRequest(_mySceneName, "Status:Resuming previous");
+
+            HTS_Server.SendRequest(_mySceneName, "Status:Running measurement");
+            _currentTrialIndex = _state.trialIndex - 1; // will be incremented in Advance()
             StartMeasurement();
+        }
+        else
+        {
+            Debug.Log("[TAPPING] Starting new measurement");
+            HTS_Server.SendRequest(_mySceneName, "Status:Starting new measurement");
+
+            _state.ClearState();
+
+            Begin();
         }
     }
 
@@ -206,6 +263,8 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         _instructionPanel.gameObject.SetActive(false);
         _trialPrompt.text = "";
         _workPanel.SetActive(true);
+
+        _state.Initialize(_configName, _settings.TrialListFile, _currentTrialIndex);
 
         InitializePatternGeneration();
         Advance();
@@ -220,6 +279,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
             return;
         }
 
+        _state.Advance();
         _progressBar.value = (float)(_currentTrialIndex + 1) / _trialList.Trials.Count;
         _trialDataPath = _dataPath.Replace(".json", $"-Trial{_currentTrialIndex + 1:000}.json");
         
@@ -236,6 +296,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         StartTapStreamer();
 
         InitializeNextPattern(tappingTrial);
+
         _audioEnabled = true;
         _trialEnded = false;
         yield break;
@@ -306,8 +367,6 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         if (!_trialEnded && _pacer != null && _pacer.IsComplete)
         {
             _trialEnded = true;
-            //_stopAudio = true;
-            //_runEnded = true;
             StartCoroutine(EndTrial());
             return;
         }
@@ -332,7 +391,10 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     public void OnQuitCancelButtonClick()
     {
         _quitPanel.SetActive(false);
+        _workPanel.SetActive(true);
         _abortAction.Enable();
+
+        _stopAudio = false;
 
         // restart the current trial
         var trial = _trialList.Trials[_currentTrialIndex];
@@ -350,6 +412,11 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     {
         if (_endRunStarted) return;
         _endRunStarted = true;
+
+        if (!abort || _currentTrialIndex == 0)
+        {
+            _state.ClearState();
+        }
 
         _runEnded = true;
 
@@ -514,6 +581,14 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     IEnumerator BeginNextFrame()
     {
         yield return null;
+
+        var canResume = CheckForResume();
+        if (canResume)
+        {
+            AskToResume();
+            yield break;
+        }
+
         Begin();
     }
 
