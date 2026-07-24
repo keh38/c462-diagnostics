@@ -110,7 +110,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
             var fn = SharedFileLocations.GetConfigFile("Tapping", _configName);
             _settings = Files.XmlDeserialize<BasicMeasurementConfiguration>(fn) as TappingConfiguration;
             
-            InitializeMeasurement();
+            InitializeMeasurement(GameManager.ArgsForNextScene);
 
             var canResume = CheckForResume();
             if (canResume)
@@ -123,11 +123,17 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         }
     }
 
-    void InitializeMeasurement()
+    void InitializeMeasurement(string arguments)
     {
         try
         {
             _dataPath = null;
+
+            if (!string.IsNullOrEmpty(arguments))
+            {
+                _settings.TrialListFile = arguments;
+            }
+
             CreatePlan();
             InitDataFile();
         }
@@ -560,8 +566,9 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         switch (request.Command)
         {
             case "Initialize":
-                _settings = request.GetPayload<TappingConfiguration>();
-                InitializeMeasurement();
+                var payload = request.GetPayload<TappingConfigPayload>();
+                _settings = payload.Configuration;
+                InitializeMeasurement(payload.Arguments);
                 if (_dataPath != null && _dataPath.StartsWith("error"))
                 {  
                     return TcpMessage.Ok(_dataPath);

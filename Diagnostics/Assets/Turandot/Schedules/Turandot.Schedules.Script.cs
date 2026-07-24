@@ -12,6 +12,7 @@ using Protocols;
 using System.Text;
 
 using C462.Shared;
+using C462.Shared.Protocols;
 
 namespace Turandot.Schedules
 {

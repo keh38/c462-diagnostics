@@ -130,7 +130,6 @@ public class TappingPatternGenerator
             if (profileValues != null)
             {
                 var value = profileValues[k];
-                Debug.Log($"[TappingPatternGenerator] Setting {profileItem} = {value}");
                 channel.SetParameterAndReset(profileItem, value);
             }
 
@@ -140,6 +139,16 @@ public class TappingPatternGenerator
             signal.AddChannelData(channel.Data);
             if (k==0)
                 _channelOffsets.Add(channel.OutputNum);
+
+            if (channel.Modality == Modality.Haptic && channel.NumHapticCopies > 1)
+            {
+                for (int copy = 1; copy < channel.NumHapticCopies; copy++)
+                {
+                    signal.AddChannelData(channel.Data);
+                    if (k == 0)
+                        _channelOffsets.Add(channel.OutputNum + copy);
+                }
+            }
 
             if (channel.IsStereo)
             {

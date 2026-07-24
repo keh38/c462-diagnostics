@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+using C462.Shared.Protocols;
 using Protocols;
 using KLibU.Net;
 using Turandot;

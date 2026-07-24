@@ -14,6 +14,7 @@ using KLibU.Net;
 
 using C462.Shared;
 using C462.Shared.Protocol.DTOs;
+using C462.Shared.Protocols;
 using BasicMeasurements;
 
 public class ProtocolManager : MonoBehaviour
@@ -122,6 +123,7 @@ public class ProtocolManager : MonoBehaviour
     {
         var nextTest = _history.Data[_nextTestIndex];
         GameManager.DataForNextScene = nextTest.Settings;
+        GameManager.ArgsForNextScene = nextTest.Arguments;
 
         if (nextTest.Scene == "Audiogram")
         {
@@ -150,24 +152,21 @@ public class ProtocolManager : MonoBehaviour
             SceneManager.LoadScene("LDL");
             return;
         }
-
         if (nextTest.Scene == "Questionnaire")
         {
             SceneManager.LoadScene("Questionnaire");
             return;
         }
-        if (nextTest.Scene == "Questionnaire")
+        if (nextTest.Scene == "Tapping")
         {
-            SceneManager.LoadScene("Questionnaire");
+            SceneManager.LoadScene("Tapping");
             return;
         }
-
         if (nextTest.Scene == "Turandot")
         {
             SceneManager.LoadScene("Turandot");
             return;
         }
-        
         if (nextTest.Scene == "TScript")
         {
             var script = Files.XmlDeserialize<Turandot.Schedules.Script>(SharedFileLocations.GetConfigFile("TScript", nextTest.Settings));
