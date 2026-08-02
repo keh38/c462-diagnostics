@@ -192,6 +192,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
         }
 
         _currentTrialIndex = -1;
+        _data.Provenance = _trialList.Provenance;
     }
 
     private void Begin()
@@ -295,7 +296,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
     private IEnumerator StartNextTrial(TappingTrial tappingTrial)
     {
-        HTS_Server.SendRequest(_mySceneName, $"Status:{tappingTrial.Label}");
+        HTS_Server.SendRequest(_mySceneName, $"Status:Trial {_currentTrialIndex + 1} -- {tappingTrial.Tag}");
 
         yield return StartCoroutine(ShowPrompts(tappingTrial.Pacer, tappingTrial.ResponseInstructions));
 

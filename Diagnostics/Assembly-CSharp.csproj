@@ -262,6 +262,7 @@
     <Compile Include="Assets\Speech\Speech Reception\SpeechReception.TestLog.cs" />
     <Compile Include="Assets\Turandot\Inputs\ChecklistItem.cs" />
     <Compile Include="Assets\Speech\Digits\DigitsWavManifest.cs" />
+    <Compile Include="Assets\Scripts\KLib\Logging\DebugDataLog.cs" />
     <Compile Include="Assets\Pupillometry\GazeCalibrationLog.cs" />
     <Compile Include="Assets\Turandot\Scripts\TurandotCueController.cs" />
     <Compile Include="Assets\Basic\LDL\Haptics\LDL.HapticsTestCondition.cs" />

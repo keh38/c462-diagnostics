@@ -29,6 +29,7 @@ public class TappingPatternGenerator
 
     private int[] _intervals;
     private bool[] _emitStimulus;
+    private bool _hasLeadIn;
 
     // --- running position (persists across Process calls) ---
     private int _intervalIndex;   // which interval in the pattern
@@ -74,6 +75,7 @@ public class TappingPatternGenerator
 
         if (!_isActive) return;
 
+        _hasLeadIn = (leadIn_ms > 0);
         int nLead = (leadIn_ms > 0) ? 1 : 0;
         _intervals = new int[intervals.Length + nLead];
         _emitStimulus = new bool[_intervals.Length];
@@ -134,6 +136,7 @@ public class TappingPatternGenerator
             }
 
             channel.Create();
+            DebugDataLog.Add($"{channel.Name}_signal_{k}", channel.Data);
 
             var signal = new Signal();
             signal.AddChannelData(channel.Data);
@@ -233,7 +236,9 @@ public class TappingPatternGenerator
 
         if (++_intervalIndex >= _intervals.Length)
         {
-            IsComplete = true;
+            IsComplete = _isPacer;
+            if (!_isPacer)
+                _intervalIndex = _hasLeadIn ? 1: 0;
         }
     }
 
