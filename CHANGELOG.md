@@ -1,8 +1,9 @@
 ## Changelog
 
-### v2.1.28 (unreleased)
+### v2.1.28 (2026-07-30)
 #### Added
 - get/set volume mute state 
+- option to set EPL folder root using environment variable
 
 ---
 
