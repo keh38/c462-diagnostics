@@ -1,5 +1,11 @@
 ## Changelog
 
+### v2.1.29 (2026-08-04)
+#### Added
+- Combined audio/ldl: max level setting
+
+---
+
 ### v2.1.28 (2026-07-30)
 #### Added
 - get/set volume mute state 

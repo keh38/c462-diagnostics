@@ -54,7 +54,7 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
     private InputAction _abortAction;
 
     private SignalManager _signalManager = new SignalManager();
-    private float _sliderRange;
+//    private float _sliderRange;
 
     private void Awake()
     {
@@ -123,8 +123,8 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         CreatePlan();
         InitializeStimulusGeneration();
 
-        var maxLevel = GetOverallMaxLevel();
-        _sliderRange = (maxLevel - _settings.MinLevel);
+        //var maxLevel = GetOverallMaxLevel();
+        //_sliderRange = (maxLevel - _settings.MinLevel);
 
         _progressBar.maxValue = _state.NumConditions;
         _progressBar.value = 0;
@@ -205,13 +205,6 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
         }
     }
 
-    private float GetOverallMaxLevel()
-    {
-        float leftMax = GetMaxLevel("Left");
-        float rightMax = GetMaxLevel("Right");
-        return Mathf.Max(leftMax, rightMax);
-    }
-    
     private float GetMaxLevel(string ear)
     {
         float earMax = float.NegativeInfinity;
@@ -477,6 +470,7 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
 #endif
 
         float maxLevel = UpdateStimulus(_state.testConditions[_state.testIndex]);
+        maxLevel = Mathf.Min(maxLevel, _settings.MaxLevel);
         //Debug.Log($"Max level for current stimulus: {maxLevel} dB SPL");
 
         yield return _sliderWheel.Advance();
@@ -487,7 +481,8 @@ public class CombinedAudioLDLController : MonoBehaviour, IRemoteControllable
 
         _levelSlider.Initialize(_settings.MinExcursion, _settings.NumThresholdReversals, _settings.NumLDLReversals);
 
-        _levelSlider.Activate(maxLevel - _sliderRange, maxLevel);
+//        _levelSlider.Activate(maxLevel - _sliderRange, maxLevel);
+        _levelSlider.Activate(_settings.MinLevel, maxLevel);
         _signalManager.Activate();
         _stopAudio = false;
         _audioEnabled = true;
