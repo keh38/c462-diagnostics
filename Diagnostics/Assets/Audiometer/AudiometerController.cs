@@ -21,6 +21,7 @@ using UnityEngine.UI;
 using C462.Shared;
 
 using UDPPacket = Audiometer.UDPPacket;
+using KLib.Logging;
 
 public class AudiometerController : MonoBehaviour, IRemoteControllable
 {
@@ -107,6 +108,7 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
         var audioConfig = AudioSettings.GetConfiguration();
         _signalManager.Initialize(audioConfig.sampleRate, audioConfig.dspBufferSize, SessionContext.Signal);
 
+        _signalManager.Activate();
         _isRunning = true;
     }
 
@@ -114,8 +116,8 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
     {
         var ch = new Channel()
         {
-            //Name = $"Channel{number}{laterality}",
-            Modality = KLib.Signals.Modality.Audio,
+            Name = $"Channel{number}{laterality}",
+            Modality = Modality.Audio,
             Laterality = laterality,
             Active = (channel.Continuous && (channel.Routing == "Binaural" || channel.Routing == laterality.ToString())),
             Waveform = new FM()
@@ -199,6 +201,7 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
     {
         if (_pulsedChannelIndex >= 0)
         {
+            Debug.Log("fuck you");
             _signalManager.Channels[2 * _pulsedChannelIndex].SetActive(_settings.Channels[_pulsedChannelIndex].Routing != "Right");
             _signalManager.Channels[2 * _pulsedChannelIndex + 1].SetActive(_settings.Channels[_pulsedChannelIndex].Routing != "Left");
         }
@@ -207,7 +210,6 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
     private void SetDuration(string data)
     {
         _settings.Duration = float.Parse(data);
-
 
         foreach (var ch in _signalManager.Channels)
         {
@@ -255,14 +257,11 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
         SceneManager.LoadScene("Home");
     }
 
-
     TcpMessage IRemoteControllable.ProcessRPC(TcpMessage request)
     {
         switch (request.Command)
         {
             case "Initialize":
-                Debug.Log(request.Payload);
-                Debug.Log(KLibU.Files.JSONSerializeToString(new AudiometerSettings()));
                 _settings = request.GetPayload<AudiometerSettings>();
                 InitializeStimulusGeneration();
                 return TcpMessage.Ok();
@@ -299,7 +298,6 @@ public class AudiometerController : MonoBehaviour, IRemoteControllable
         if (_isRunning)
         {
             _signalManager.Synthesize(data);
-
         }
     }
 }

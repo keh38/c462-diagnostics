@@ -1,5 +1,11 @@
 ## Changelog
 
+### v2.1.30 (2026-08-05)
+#### Fixed
+- audiometer
+
+---
+
 ### v2.1.29 (2026-08-04)
 #### Added
 - Combined audio/ldl: max level setting
