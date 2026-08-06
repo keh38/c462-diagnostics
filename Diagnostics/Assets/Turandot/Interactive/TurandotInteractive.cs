@@ -20,7 +20,7 @@ using C462.Shared;
 
 using UDPPacket = Turandot.Interactive.UDPPacket;
 using UnityEngine.InputSystem;
-using HTS.Unity.Tcp;
+using HTS.Tcp;
 
 public class TurandotInteractive : MonoBehaviour, IRemoteControllable
 {

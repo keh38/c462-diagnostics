@@ -8,6 +8,7 @@ using KLibU;
 
 using C462.Shared;
 using KLib.Expressions;
+using C462.Shared.Protocol.DTOs;
 
 public class GameManager : MonoBehaviour
 {
@@ -171,6 +172,8 @@ public class GameManager : MonoBehaviour
         SessionContext.SetAudiogram(SharedFileLocations.AudiogramPath);
         SessionContext.SetLDL(SharedFileLocations.LDLPath);
         SessionContext.SetWavFolder(Path.Combine(SharedFileLocations.HtsResourcesFolder, "Wav Files"));
+
+        HTS_Server.SendRequest("SubjectChanged", new SubjectMetricsPayload() { Project = Project, Subject = Subject });
     }
 
     private void _SetTransducer(string transducer)

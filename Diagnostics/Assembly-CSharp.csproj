@@ -127,7 +127,6 @@
     <Compile Include="Assets\Basic\LDL\LDLSliderPanel.cs" />
     <Compile Include="Assets\Unity UI Controls\Scripts\ProgressBar Scripts\ProgressBar.cs" />
     <Compile Include="Assets\Turandot\TurandotEngine.cs" />
-    <Compile Include="Assets\Scripts\Remote\TcpPayloads.cs" />
     <Compile Include="Assets\Speech\Speech Reception\SpeechReception.LevelUnits.cs" />
     <Compile Include="Assets\Speech\Speech Reception\SpeechReceptionController.cs" />
     <Compile Include="Assets\Basic\BasicMeasurementFileHeader.cs" />

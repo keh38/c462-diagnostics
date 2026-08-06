@@ -1,14 +1,13 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Net;
 using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 
 using KLibU.Net;
-using System.Collections.Concurrent;
-using HTS.Unity.Tcp;
+
+using C462.Shared.Protocol.DTOs;
+
 using static ClockSynchronizer;
 
 public class ClockNetworkInterface : MonoBehaviour

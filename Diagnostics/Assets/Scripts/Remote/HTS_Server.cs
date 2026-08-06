@@ -11,7 +11,7 @@ using KLibU;
 using KLibU.Logging;
 using KLibU.Net;
 using System.Threading.Tasks;
-using HTS.Unity.Tcp;
+using HTS.Tcp;
 using C462.Shared;
 using C462.Shared.Protocol;
 using C462.Shared.Protocol.DTOs;
@@ -97,6 +97,15 @@ public class HTS_Server : MonoBehaviour
         SendRequest(command, payload);
     }
 
+    public static void SendRequest(string target, string command)
+    {
+        if (instance._remoteEndPoint == null)
+        {
+            return;
+        }
+        KTcpClient.SendRequest(instance._remoteEndPoint, TcpMessage.Request($"{target}:{command}"));
+    }
+
     public static void SendDataFile(string sceneName, string path, FileDestination destination = FileDestination.SubjectData)
     {
         if (IsLocalConnection)
@@ -110,15 +119,6 @@ public class HTS_Server : MonoBehaviour
             Filename = Path.GetFileName(path),
             Content = File.ReadAllText(path)
         });
-    }
-
-    public static void SendRequest(string target, string command)
-    {
-        if (instance._remoteEndPoint == null)
-        {
-            return;
-        }
-        KTcpClient.SendRequest(instance._remoteEndPoint, TcpMessage.Request($"{target}:{command}"));
     }
 
     private void _Init()
