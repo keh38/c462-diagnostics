@@ -136,7 +136,6 @@ public class TappingPatternGenerator
             }
 
             channel.Create();
-            DebugDataLog.Add($"{channel.Name}_signal_{k}", channel.Data);
 
             var signal = new Signal();
             signal.AddChannelData(channel.Data);

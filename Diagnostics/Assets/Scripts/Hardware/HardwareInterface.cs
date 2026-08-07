@@ -171,6 +171,8 @@ public class HardwareInterface : MonoBehaviour
 
         if (_hardwareConfig.UsesDigitimer())
         {
+            Debug.Log("Initializing Digitimer(s)");
+
             //_digitimer.Inject(new NullD128ExAPI());
             var success = _digitimer.Initialize();
             if (!success)

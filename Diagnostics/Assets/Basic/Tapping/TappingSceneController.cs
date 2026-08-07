@@ -52,6 +52,7 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
     private bool _runEnded = false;
     private bool _endRunStarted = false;
     private bool _trialEnded = false;
+    private bool _abortActionStarted = false;
 
     private InputAction _abortAction;
 
@@ -197,8 +198,14 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
     private void Begin()
     {
+        _abortActionStarted = false;
         _localAbort = false;
         _stopMeasurement = false;
+        _runEnded = false;
+        _endRunStarted = false;
+        _audioEnabled = false;
+        _stopAudio = false;
+        _trialEnded = false;
 
         if (_settings.UseDefaultInstructions || !string.IsNullOrEmpty(_settings.InstructionMarkdown))
         {
@@ -357,6 +364,9 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
     void HandleAbortAction(InputAction.CallbackContext context)
     {
+        if (_audioEnabled) return;
+        _abortActionStarted = true;
+
         _abortAction.Disable();
 
         _stopAudio = true;
@@ -397,6 +407,9 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
 
     public void OnQuitCancelButtonClick()
     {
+        _abortActionStarted = false;
+        _abortAction.Enable();
+
         _quitPanel.SetActive(false);
         _workPanel.SetActive(true);
         _abortAction.Enable();
