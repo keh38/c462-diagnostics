@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Tapping;
+using TMPro.EditorUtilities;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -180,12 +181,19 @@ public class TappingSceneController : MonoBehaviour, IRemoteControllable
             throw new ArgumentException("Trial list file name is not specified in the configuration.");
         }
 
-        string trialListPath = Path.Combine(SharedFileLocations.HtsConfigFolder, $"Tapping.{_settings.TrialListFile}.json");
-        if (!File.Exists(trialListPath))
+        if (_settings.TrialListFile.StartsWith("{"))
         {
-            throw new FileNotFoundException($"Trial list file not found: {trialListPath}");
+            _trialList = Files.JSONDeserializeFromString<TappingTrialList>(_settings.TrialListFile);
         }
-        _trialList = Files.JSONDeserialize<TappingTrialList>(trialListPath);
+        else
+        {
+            string trialListPath = Path.Combine(SharedFileLocations.HtsConfigFolder, $"Tapping.{_settings.TrialListFile}.json");
+            if (!File.Exists(trialListPath))
+            {
+                throw new FileNotFoundException($"Trial list file not found: {trialListPath}");
+            }
+            _trialList = Files.JSONDeserialize<TappingTrialList>(trialListPath);
+        }
 
         if (_trialList.Trials == null || _trialList.Trials.Count == 0)
         {

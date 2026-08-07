@@ -46,7 +46,7 @@ namespace KLib.Logging
 
         public void AddBlock()
         {
-            if (_cursor >= _lengthIncrement)
+            if (_cursor >= this.blockWallTime.Length)
             {
                 Array.Resize(ref this.blockWallTime, this.blockWallTime.Length + _lengthIncrement);
                 Array.Resize(ref this.blockDspTime, this.blockDspTime.Length + _lengthIncrement);

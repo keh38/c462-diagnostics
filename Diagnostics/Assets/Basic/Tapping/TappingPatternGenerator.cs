@@ -142,6 +142,8 @@ public class TappingPatternGenerator
             if (k==0)
                 _channelOffsets.Add(channel.OutputNum);
 
+            //DebugDataLog.Add(channel.Name, channel.Data);
+
             if (channel.Modality == Modality.Haptic && channel.NumHapticCopies > 1)
             {
                 for (int copy = 1; copy < channel.NumHapticCopies; copy++)
