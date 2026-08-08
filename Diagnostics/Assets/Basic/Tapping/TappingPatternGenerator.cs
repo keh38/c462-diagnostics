@@ -99,19 +99,8 @@ public class TappingPatternGenerator
     private void CreateSignals(Channel channel, List<ParameterProfile> parameterProfiles)
     {
         string profilePrefix = $"{channel.Name}.";
-        string profileItem = "";
-        float[] profileValues = null;
 
         var myProfiles = parameterProfiles?.Where(p => p.Item.StartsWith(profilePrefix)).ToList();
-
-        if (myProfiles != null && myProfiles.Count > 1)
-            throw new Exception("TappingPatternGenerator cannot handle more than one parameter profile");
-
-        if (myProfiles != null && myProfiles.Count == 1)
-        {
-            profileItem = myProfiles[0].Item.Substring(profilePrefix.Length);
-            profileValues = myProfiles[0].Values;
-        }
 
         float Tmax = channel.Gate.Width_ms;
         int npts = Mathf.RoundToInt(_Fs * Tmax / 1000f);
@@ -125,14 +114,25 @@ public class TappingPatternGenerator
         _channelOffsets.Clear();
         _signals.Clear();
 
-        int numSignals = (profileValues != null) ? profileValues.Length : 1;
+        int numSignals = 1;
+        if (myProfiles != null && myProfiles.Count > 0)
+        {
+            foreach (var profile in myProfiles)
+            {
+                numSignals = Mathf.Max(numSignals, profile.Values.Length);
+            }
+        }
 
         for (int k = 0; k < numSignals; k++)
         {
-            if (profileValues != null)
+            if (myProfiles != null)
             {
-                var value = profileValues[k];
-                channel.SetParameterAndReset(profileItem, value);
+                foreach (var profile in myProfiles)
+                {
+                    var profileValues = profile.Values;
+                    var value = profileValues[k % profile.Values.Length];
+                    channel.SetParameterAndReset(profile.Item.Substring(profilePrefix.Length), value);
+                }
             }
 
             channel.Create();
@@ -141,8 +141,6 @@ public class TappingPatternGenerator
             signal.AddChannelData(channel.Data);
             if (k==0)
                 _channelOffsets.Add(channel.OutputNum);
-
-            //DebugDataLog.Add(channel.Name, channel.Data);
 
             if (channel.Modality == Modality.Haptic && channel.NumHapticCopies > 1)
             {
