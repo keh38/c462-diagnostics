@@ -1,5 +1,11 @@
 ## Changelog
 
+### v2.1.31 (2026-08-10)
+#### Added
+- refinements to Tapping scene to accommodate TDP
+
+---
+
 ### v2.1.30 (2026-08-05)
 #### Fixed
 - audiometer
